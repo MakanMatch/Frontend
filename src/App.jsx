@@ -4,7 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import Home from './pages/Home'
 import Navbar from './components/Navbar'
-import Reviews from './components/reviews/SubmitReviews.jsx'
+import Reviews from './components/reviews/SubmitReviews'
 
 function App() {
     const [count, setCount] = useState(0)

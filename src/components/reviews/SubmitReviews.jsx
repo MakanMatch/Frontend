@@ -1,5 +1,7 @@
 import React from 'react'
-import { Button, Box } from '@chakra-ui/react';
+import { useState } from 'react';
+import StarRating from './StarRatings';
+import { Button, Box, Input, Flex, Avatar, Text, Center, Container, Image, Textarea, Spacer } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
 import {
@@ -11,9 +13,17 @@ import {
   ModalBody,
   ModalCloseButton,
 } from '@chakra-ui/react'
+import {
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  FormHelperText,
+} from '@chakra-ui/react'
 
 function SubmitReviews() {
   const dispatch = useDispatch()
+  const [foodRating, setFoodRating] = useState(0);
+  const [hygieneRating, setHygieneRating] = useState(0)
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <Box>
@@ -21,19 +31,45 @@ function SubmitReviews() {
       <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom' isCentered >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Modal Title</ModalHeader>
+          <ModalHeader>Submit A Review</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-          Sit nulla est ex deserunt exercitation anim occaecat. Nostrud ullamco deserunt aute id consequat veniam incididunt duis in sint irure nisi. Mollit officia cillum Lorem ullamco minim nostrud elit officia tempor esse quis.
-
-Sunt ad dolore quis aute consequat. Magna exercitation reprehenderit magna aute tempor cupidatat consequat elit dolor adipisicing. Mollit dolor eiusmod sunt ex incididunt cillum quis. Velit duis sit officia eiusmod Lorem aliqua enim laboris do dolor eiusmod. Et mollit incididunt nisi consectetur esse laborum eiusmod pariatur proident Lorem eiusmod et. Culpa deserunt nostrud ad veniam.
+            <Flex direction="column" align="center" mb={4}>
+              <Image
+                borderRadius='full'
+                boxSize='100px'
+                src='https://bit.ly/dan-abramov'
+                alt='Dan Abramov'
+              />
+              <Text fontSize='3xl' textAlign='center'>Jamie Oliver</Text>
+            </Flex>
+            <FormControl>
+              <Box>
+                <Flex>
+                  <Flex direction='column'>
+                    <Text mt='8px' mb='8px'>Food Rating</Text>
+                    <StarRating maxStars={5} foodRating={foodRating} setFoodRating={setFoodRating} />
+                  </Flex>
+                  <Spacer/>
+                  <Flex direction='column'>
+                    <Text mt='8px' mb='8px'>Hygiene Rating</Text>
+                    <StarRating maxStars={5} hygieneRating={hygieneRating} setHygieneRating={setHygieneRating} />
+                  </Flex>
+                </Flex>
+              </Box>
+              <Text mt='16px' mb='8px'>Comments</Text>
+              <Textarea
+                placeholder='Write something to the host...'
+                size='sm'
+                resize='none'
+              />
+            </FormControl>
           </ModalBody>
-
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={onClose}>
+            <Button colorScheme='red' borderRadius='10px' mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant='ghost'>Secondary Action</Button>
+            <Button variant='MMPrimary' type='submit'>Submit</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

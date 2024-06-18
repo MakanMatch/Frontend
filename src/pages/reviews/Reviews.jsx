@@ -1,8 +1,12 @@
 import React from 'react'
+import { Button, Box,  } from '@chakra-ui/react';
+import SubmitReviews from '../../components/reviews/SubmitReviews';
 
 function Reviews() {
   return (
-    <div>Reviews</div>
+    <Box>
+      <SubmitReviews />
+    </Box>
   )
 }
 
