@@ -25,6 +25,11 @@ const MainTheme = extendTheme({
                     }
                 }
             }
+        },
+        Text: {
+            baseStyle: {
+                fontFamily: 'Sora'
+            }
         }
     }
 })
