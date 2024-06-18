@@ -9,17 +9,17 @@ const MainTheme = extendTheme({
     components: {
         Button: {
             baseStyle: {
-                borderRadius: '10px',
-                fontWeight: 'bold',
                 // textTransform: 'uppercase',
                 // _focus: {
                 //     boxShadow: 'none'
                 // }
             },
             variants: {
-                solid: {
+                MMPrimary: {
                     bg: 'primaryButton',
+                    borderRadius: '10px',
                     color: 'white',
+                    fontWeight: 'bold',
                     _hover: {
                         bg: 'purple.700'
                     }

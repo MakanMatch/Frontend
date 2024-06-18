@@ -29,7 +29,7 @@ function Home() {
         <Heading as={"h1"}>Home</Heading>
         <Text>{Universal.systemName}, {Universal.systemVersion}</Text>
         <Text>Backend health check: {healthCheck}</Text>
-        <Button onClick={checkHealth}>Check Health</Button>
+        <Button onClick={checkHealth} variant={"MMPrimary"}>Check Health</Button>
     </Box>
 }
 
