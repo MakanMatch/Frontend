@@ -4,7 +4,9 @@ import App from './App.jsx'
 import './index.css'
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
+import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 import universalReducer from './slices/UniversalState.js'
+import MainTheme from './themes/MainTheme.js'
 
 const store = configureStore({
     reducer: {
@@ -15,7 +17,9 @@ const store = configureStore({
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <Provider store={store}>
-            <App />
-        </Provider> 
+            <ChakraProvider theme={MainTheme}>
+                <App />
+            </ChakraProvider>
+        </Provider>
     </React.StrictMode>,
 )
