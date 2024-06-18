@@ -2,6 +2,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import server from '../networking';
+import { Box, Button, Heading, Text } from '@chakra-ui/react';
 
 function Home() {
     const Universal = useSelector(state => state.universal)
@@ -24,12 +25,12 @@ function Home() {
         })
     }
 
-    return <div>
-        <p>Home</p>
-        <p>{Universal.systemName}, {Universal.systemVersion}</p>
-        <p>Backend health check: {healthCheck}</p>
-        <button onClick={checkHealth}>Check Health</button>
-    </div>
+    return <Box>
+        <Heading as={"h1"}>Home</Heading>
+        <Text>{Universal.systemName}, {Universal.systemVersion}</Text>
+        <Text>Backend health check: {healthCheck}</Text>
+        <Button onClick={checkHealth} variant={"MMPrimary"}>Check Health</Button>
+    </Box>
 }
 
 export default Home
