@@ -20,6 +20,7 @@ import {
   FormErrorMessage,
   FormHelperText,
 } from '@chakra-ui/react'
+import { date } from 'yup';
 
 function SubmitReviews() {
   const dispatch = useDispatch()
@@ -36,15 +37,20 @@ function SubmitReviews() {
     setPreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
   };
   const handleSubmit = () => {
+    const currentDate = new Date().toLocaleDateString();
     const reviewData = {
       sender: "Susie Jones",
       receiver: "Jamie Oliver",
       foodRating,
       hygieneRating,
       comments,
-      images
+      images,
+      dateCreated: currentDate
     };
     dispatch(submitReviews(reviewData));
+    setComments('');
+    setImages([]);
+    setPreviews([]);
     onClose();
   };
 
