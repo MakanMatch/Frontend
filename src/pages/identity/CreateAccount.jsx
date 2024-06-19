@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Heading, Input, Button, Text, VStack, Checkbox, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react'
+import { Box, Heading, Input, Button, Text, VStack, Checkbox, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link } from '@chakra-ui/react'
 import { Formik, Field, Form } from 'formik'
 import * as Yup from 'yup'
 
@@ -130,7 +130,7 @@ function CreateAccount() {
                         )}
                     </Formik>
                     <Text textAlign='center' fontSize='12px' mb={5}>
-                        Already have an account? Sign In
+                        Already have an account? <Link href='./login'>Sign In</Link>
                     </Text>
                 </VStack>
             </Box>
