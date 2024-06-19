@@ -10,6 +10,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './Layout.jsx'
 import Version from './pages/Version.jsx'
 import Home from './pages/Home.jsx'
+import ListingDetail from './components/orders/ListingDetail.jsx'
 
 const store = configureStore({
     reducer: {
@@ -19,12 +20,13 @@ const store = configureStore({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
-        <ChakraProvider theme={MainTheme}>
+        <ChakraProvider theme={MainTheme} toastOptions={{ defaultOptions: { position: 'bottom-right' }}}>
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Layout />}>
                         <Route index element={<Home />} />
                         <Route path='version' element={<Version />} />
+                        <Route path="listingDetails" element={<ListingDetail />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
