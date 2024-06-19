@@ -60,14 +60,14 @@ function ListingDetail() {
             </GridItem>
             <GridItem colSpan={2}>
                 <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
-                    <VStack bg={"teal.300"} alignItems={"flex-start"} width={"100%"}>
+                    <VStack alignItems={"flex-start"} width={"100%"}>
                         <Text fontWeight={"bold"} mb={"10px"}>Description</Text>
                         <Textarea placeholder='Describe your dish here' />
                     </VStack>
 
                     <Spacer />
 
-                    <VStack bg={"teal.300"} alignItems={"flex-start"} width={"100%"}>
+                    <VStack alignItems={"flex-start"} width={"100%"}>
                         <Heading size={"md"}>Listing Statistics</Heading>
 
                         <HStack spacing={"30px"} wrap={"wrap"}>
@@ -81,7 +81,7 @@ function ListingDetail() {
             </GridItem>
 
             <GridItem colSpan={1}>
-                <VStack bg={"teal.200"}>
+                <VStack>
                     <Card>
                         <CardHeader>Hello</CardHeader>
                         <CardBody>World</CardBody>
