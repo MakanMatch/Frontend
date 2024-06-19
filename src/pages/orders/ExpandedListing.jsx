@@ -10,12 +10,13 @@ function ExpandedListing() {
     // const Universal = useSelector(state => state.universal)
     const toast = useToast()
 
+    const backendAPIURL = import.meta.env.VITE_BACKEND_URL
     const [pricePerPortion, setPricePerPortion] = useState('0.00')
     const [listingPublished, setListingPublished] = useState(false)
     const [listingData, setListingData] = useState({
         listingID: null,
         title: null,
-        images: null,
+        images: [],
         shortDescription: null,
         longDescription: null,
         portionPrice: null,
@@ -47,13 +48,24 @@ function ExpandedListing() {
     }
 
     const showComingSoon = () => { showToast("Coming soon", "This feature is not complete yet.", 3000) }
+    const imgBackendURL = (imgName) => `${backendAPIURL}/img/${imgName}`
+
+    const processData = (data) => {
+        let datetime = new Date(data.datetime)
+        let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
+        data.datetime = formattedString
+
+        data.images = data.images.split("|")
+
+        return data
+    }
 
     useEffect(() => {
         server.get("/listingDetails")
         .then(response => {
             if (response.status == 200) {
                 console.log(response.data)
-                setListingData(response.data)
+                setListingData(processData(response.data))
                 setLoading(false)
                 return
             } else {
@@ -91,12 +103,15 @@ function ExpandedListing() {
         >
             <GridItem colSpan={3} mb={"20px"}>
                 <VStack alignItems={"flex-start"}>
-                    <Text>17 May, 6-8PM</Text>
-                    <Heading>Chili Crab for Dinner</Heading>
+                    <Text>{listingData.datetime}</Text>
+                    <Heading>{listingData.title}</Heading>
 
                     <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
-                        <Image maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800" />
-                        <Image maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800" />
+                        {listingData.images.map(imgName => {
+                            return (
+                                <Image maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
+                            )
+                        })}
                         <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={showComingSoon}>
                             <SmallAddIcon boxSize={"10"} />
                         </Center>
@@ -107,7 +122,7 @@ function ExpandedListing() {
                 <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
                     <VStack alignItems={"flex-start"} width={"100%"}>
                         <Text fontWeight={"bold"} mb={"10px"}>Description</Text>
-                        <Textarea placeholder='Describe your dish here' />
+                        <Textarea placeholder='Describe your dish here' value={listingData.longDescription} />
                     </VStack>
 
                     <Spacer />
