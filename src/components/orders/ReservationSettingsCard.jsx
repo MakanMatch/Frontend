@@ -6,8 +6,6 @@ function ReservationSettingsCard({ listingPublished, setListingPublished, priceP
     const formatAsCurrency = (val) => `$` + val
     const parseCurrencyValue = (val) => val.replace(/^\$/, '')
 
-    
-
     return (
         <Card maxWidth={"100%"}>
             <CardHeader fontFamily={"Sora"} fontWeight={"bold"}>Reservation Settings</CardHeader>

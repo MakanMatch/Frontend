@@ -1,15 +1,31 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Text, Textarea, VStack, useToast } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
+import server from '../../networking';
+import axios from 'axios'
 
 function ExpandedListing() {
-    const Universal = useSelector(state => state.universal)
+    // const Universal = useSelector(state => state.universal)
     const toast = useToast()
 
     const [pricePerPortion, setPricePerPortion] = useState('0.00')
     const [listingPublished, setListingPublished] = useState(false)
+    const [listingData, setListingData] = useState({
+        listingID: null,
+        title: null,
+        images: null,
+        shortDescription: null,
+        longDescription: null,
+        portionPrice: null,
+        approxAddress: null,
+        address: null,
+        totalSlots: null,
+        datetime: null,
+        published: null
+    })
+    const [loading, setLoading] = useState(true)
 
     const showToast = (title, description, duration = 5000, isClosable = true, status = 'info', icon = null) => {
         if (!["success", "warning", "error", "info"].includes(status)) {
@@ -32,6 +48,27 @@ function ExpandedListing() {
 
     const showComingSoon = () => { showToast("Coming soon", "This feature is not complete yet.", 3000) }
 
+    useEffect(() => {
+        server.get("/listingDetails")
+        .then(response => {
+            if (response.status == 200) {
+                console.log(response.data)
+                setListingData(response.data)
+                setLoading(false)
+                return
+            } else {
+                showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
+                console.log(response.data)
+                return
+            }
+        })
+        .catch(err => {
+            showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
+            console.log(err)
+            return
+        })
+    }, [])
+
     function Statistic({ value, description }) {
         return (
             <VStack alignItems={"flex-start"} spacing={"0px"}>
@@ -39,6 +76,10 @@ function ExpandedListing() {
                 <Text>{description}</Text>
             </VStack>
         )
+    }
+
+    if (loading) {
+        return (<Spinner />)
     }
 
     return (
