@@ -1,4 +1,23 @@
-import { Button } from "@chakra-ui/react";
+/* eslint-disable react/prop-types */
+import { 
+  Button, 
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Input,
+  useDisclosure,
+  FormControl,
+  FormLabel,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import server from '../../networking';
 
@@ -11,12 +30,11 @@ const FoodListings = ({ foodListings }) => {
         console.log('Fetching host info...');
         const response = await server.get('/listings/hostInfo');
         console.log('Host info fetched:', response.data);
-        // Enhance each listing with hostName and hostFoodRating
         const enhancedListings = foodListings.map(listing => ({
           ...listing,
           hostName: response.data.username,
           hostFoodRating: response.data.foodRating,
-          Favourite: false // Initialize favourite state for each listing
+          Favourite: false
         }));
         setLocalFoodListings(enhancedListings);
       } catch (error) {
@@ -35,9 +53,12 @@ const FoodListings = ({ foodListings }) => {
     );
   };
 
-  const handleAddListing = () => {
-    console.log('Add Listing Button Clicked');
-  };
+  const handleSubmitListing = async () => {
+    onClose();
+    console.log('Submitting listing...');
+  }
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <div>
@@ -57,10 +78,51 @@ const FoodListings = ({ foodListings }) => {
         ))}
       </div>
       <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
-        <Button onClick={handleAddListing} variant={"MMPrimary"}>
+        <Button onClick={onOpen}variant={"MMPrimary"}>
           Add Listing
         </Button>
       </div>
+      <Modal blockScrollOnMount={true} isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Host a meal</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+          <FormControl mb={4} isRequired>
+            <FormLabel>What is the name of your dish?</FormLabel>
+            <Input type='text' placeholder="E.g Pani Puri" />
+          </FormControl>
+
+          <FormControl mb={4} isRequired>
+            <FormLabel>Describe your dish</FormLabel>
+            <Input type='text' placeholder="E.g Popular Indian Street Food" />
+          </FormControl>
+
+          <FormControl mb={4} isRequired>
+            <FormLabel>Portion Fee (in SGD)</FormLabel>
+            <NumberInput step={1} defaultValue={1} min={1} max={10} mb={4}>
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </FormControl>
+          
+          <FormControl mb={4} isRequired>
+            <FormLabel>Upload a previously taken image of your dish</FormLabel>
+            <Input type='file' size="sm" />
+          </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme='red' mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmitListing} variant='MMPrimary'>Host it!</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
