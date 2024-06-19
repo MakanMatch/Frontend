@@ -29,6 +29,12 @@ const MainTheme = extendTheme({
         Text: {
             baseStyle: {
                 fontFamily: 'Sora'
+            },
+            variants: {
+                link: {
+                    color: 'blue',
+                    textDecoration: 'underline'
+                }
             }
         }
     }

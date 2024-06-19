@@ -10,7 +10,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './Layout.jsx'
 import Version from './pages/Version.jsx'
 import Home from './pages/Home.jsx'
-import ListingDetail from './components/orders/ListingDetail.jsx'
+import ExpandedListing from './pages/orders/ExpandedListing.jsx'
+import NotFound from './pages/404.jsx'
 
 const store = configureStore({
     reducer: {
@@ -26,7 +27,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path='/' element={<Layout />}>
                         <Route index element={<Home />} />
                         <Route path='version' element={<Version />} />
-                        <Route path="listingDetails" element={<ListingDetail />} />
+                        <Route path="expandedListing" element={<ExpandedListing />} />
+                        <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
