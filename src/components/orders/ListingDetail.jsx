@@ -1,11 +1,14 @@
-import { PlusSquareIcon, SmallAddIcon } from '@chakra-ui/icons'
-import { Box, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Text, Textarea, VStack, useToast } from '@chakra-ui/react'
-import React from 'react'
+import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Text, Textarea, VStack, useToast } from '@chakra-ui/react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 function ListingDetail() {
     const Universal = useSelector(state => state.universal)
     const toast = useToast()
+
+    const [pricePerPortion, setPricePerPortion] = useState('0.00')
+    const [listingPublished, setListingPublished] = useState(false)
 
     const showToast = (title, description, duration = 5000, isClosable = true, status = 'info', icon = null) => {
         if (!["success", "warning", "error", "info"].includes(status)) {
@@ -25,6 +28,9 @@ function ListingDetail() {
 
         toast(toastConfig)
     }
+
+    const formatAsCurrency = (val) => `$` + val
+    const parseCurrencyValue = (val) => val.replace(/^\$/, '')
 
     const showComingSoon = () => { showToast("Coming soon", "This feature is not complete yet.", 3000) }
 
@@ -81,47 +87,52 @@ function ListingDetail() {
             </GridItem>
 
             <GridItem colSpan={1}>
-                <VStack>
-                    <Card>
-                        <CardHeader>Hello</CardHeader>
-                        <CardBody>World</CardBody>
-                        <CardFooter>Hehe</CardFooter>
-                    </Card>
-                </VStack>
+                <Card maxWidth={"100%"}>
+                    <CardHeader fontFamily={"Sora"} fontWeight={"bold"}>Reservation Settings</CardHeader>
+                    <CardBody>
+                        <VStack spacing={"10px"} textAlign={"left"}>
+                            <HStack width={"100%"}>
+                                <Text>Max. Guests</Text>
+                                <Spacer />
+                                <NumberInput defaultValue={1} min={1} max={10}>
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </HStack>
+
+                            <HStack width={"100%"}>
+                                <Text>Portions</Text>
+                                <Spacer />
+                                <NumberInput defaultValue={1} min={1} max={10}>
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </HStack>
+
+                            <HStack width={"100%"}>
+                                <Text>Price Per Portion</Text>
+                                <Spacer />
+                                <NumberInput defaultValue={'$1.50'} onChange={(valueString) => setPricePerPortion(parseCurrencyValue(valueString))} value={formatAsCurrency(pricePerPortion)}>
+                                    <NumberInputField />
+                                </NumberInput>
+                            </HStack>
+                        </VStack>
+                    </CardBody>
+                    <CardFooter>
+                        {listingPublished ?
+                            <Button variant={"MMPrimary"} width={"100%"} leftIcon={<ViewOffIcon />} onClick={() => setListingPublished(false)}>Hide Listing</Button> :
+                            <Button variant={"MMPrimary"} width={"100%"} leftIcon={<ViewIcon />} onClick={() => setListingPublished(true)}>Publish Listing</Button>
+                        }
+                    </CardFooter>
+                </Card>
             </GridItem>
         </Grid>
-        /* <Flex mt={"20px"} wrap={"wrap"} maxWidth={"100%"} gap={"10px"}>
-                <Box alignItems={"flex-start"}>
-                    <VStack alignItems={"flex-start"} bg={"teal.100"}>
-                        <Text fontWeight={"bold"} mb={"10px"}>Description</Text>
-                        <Textarea placeholder='Describe your dish here' />
-
-                        <Spacer />
-
-                        <Heading size={"md"}>Listing Statistics</Heading>
-
-                        <HStack spacing={"30px"}>
-                            <Statistic value={"2/5"} description={"Reservations"} />
-                            <Statistic value={"1000"} description={"Impressions"} />
-                            <Statistic value={"45%"} description={"Click-Through Rate"} />
-                            <Statistic value={"$7.00"} description={"Revenue"} />
-                        </HStack>
-                    </VStack>
-                </Box>
-
-                <Spacer />
-
-                <Box alignItems={"flex-end"}>
-                    <VStack alignItems={"flex-end"}>
-                        <Card>
-                            <CardHeader>Hello</CardHeader>
-                            <CardBody>World</CardBody>
-                            <CardFooter>Hehe</CardFooter>
-                        </Card>
-                    </VStack>
-                </Box>
-            </Flex> */
-        // </VStack>
     )
 }
 
