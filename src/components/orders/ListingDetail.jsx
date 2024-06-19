@@ -1,5 +1,5 @@
 import { PlusSquareIcon, SmallAddIcon } from '@chakra-ui/icons'
-import { Box, Center, Container, HStack, Heading, Image, Text, VStack, useToast } from '@chakra-ui/react'
+import { Box, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Text, Textarea, VStack, useToast } from '@chakra-ui/react'
 import React from 'react'
 import { useSelector } from 'react-redux'
 
@@ -7,7 +7,7 @@ function ListingDetail() {
     const Universal = useSelector(state => state.universal)
     const toast = useToast()
 
-    const showToast = (title, description, duration=5000, isClosable=true, status='info', icon=null) => {
+    const showToast = (title, description, duration = 5000, isClosable = true, status = 'info', icon = null) => {
         if (!["success", "warning", "error", "info"].includes(status)) {
             status = "info"
         }
@@ -28,18 +28,100 @@ function ListingDetail() {
 
     const showComingSoon = () => { showToast("Coming soon", "This feature is not complete yet.", 3000) }
 
+    function Statistic({ value, description }) {
+        return (
+            <VStack alignItems={"flex-start"} spacing={"0px"}>
+                <Text fontWeight={"bold"} fontSize={"large"}>{value}</Text>
+                <Text>{description}</Text>
+            </VStack>
+        )
+    }
+
     return (
-        <VStack align={"flex-start"}>
-            <Text>17 May, 6-8PM</Text>
-            <Heading>Chili Crab for Dinner</Heading>
-            <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
-                <Image maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800" />
-                <Image maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800" />
-                <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={showComingSoon}>
-                    <SmallAddIcon boxSize={"10"} />
-                </Center>
-            </HStack>
-        </VStack>
+        <Grid
+            h={"100%"}
+            templateColumns='repeat(3, 1fr)'
+            gap={4}
+            p={"10px"}
+        >
+            <GridItem colSpan={3} mb={"20px"}>
+                <VStack alignItems={"flex-start"}>
+                    <Text>17 May, 6-8PM</Text>
+                    <Heading>Chili Crab for Dinner</Heading>
+
+                    <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
+                        <Image maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800" />
+                        <Image maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800" />
+                        <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={showComingSoon}>
+                            <SmallAddIcon boxSize={"10"} />
+                        </Center>
+                    </HStack>
+                </VStack>
+            </GridItem>
+            <GridItem colSpan={2}>
+                <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
+                    <VStack bg={"teal.300"} alignItems={"flex-start"} width={"100%"}>
+                        <Text fontWeight={"bold"} mb={"10px"}>Description</Text>
+                        <Textarea placeholder='Describe your dish here' />
+                    </VStack>
+
+                    <Spacer />
+
+                    <VStack bg={"teal.300"} alignItems={"flex-start"} width={"100%"}>
+                        <Heading size={"md"}>Listing Statistics</Heading>
+
+                        <HStack spacing={"30px"} wrap={"wrap"}>
+                            <Statistic value={"2/5"} description={"Reservations"} />
+                            <Statistic value={"1000"} description={"Impressions"} />
+                            <Statistic value={"45%"} description={"Click-Through Rate"} />
+                            <Statistic value={"$7.00"} description={"Revenue"} />
+                        </HStack>
+                    </VStack>
+                </VStack>
+            </GridItem>
+
+            <GridItem colSpan={1}>
+                <VStack bg={"teal.200"}>
+                    <Card>
+                        <CardHeader>Hello</CardHeader>
+                        <CardBody>World</CardBody>
+                        <CardFooter>Hehe</CardFooter>
+                    </Card>
+                </VStack>
+            </GridItem>
+        </Grid>
+        /* <Flex mt={"20px"} wrap={"wrap"} maxWidth={"100%"} gap={"10px"}>
+                <Box alignItems={"flex-start"}>
+                    <VStack alignItems={"flex-start"} bg={"teal.100"}>
+                        <Text fontWeight={"bold"} mb={"10px"}>Description</Text>
+                        <Textarea placeholder='Describe your dish here' />
+
+                        <Spacer />
+
+                        <Heading size={"md"}>Listing Statistics</Heading>
+
+                        <HStack spacing={"30px"}>
+                            <Statistic value={"2/5"} description={"Reservations"} />
+                            <Statistic value={"1000"} description={"Impressions"} />
+                            <Statistic value={"45%"} description={"Click-Through Rate"} />
+                            <Statistic value={"$7.00"} description={"Revenue"} />
+                        </HStack>
+                    </VStack>
+                </Box>
+
+                <Spacer />
+
+                <Box alignItems={"flex-end"}>
+                    <VStack alignItems={"flex-end"}>
+                        <Card>
+                            <CardHeader>Hello</CardHeader>
+                            <CardBody>World</CardBody>
+                            <CardFooter>Hehe</CardFooter>
+                        </Card>
+                    </VStack>
+                </Box>
+            </Flex> */
+        // </VStack>
     )
 }
 
