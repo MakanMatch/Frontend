@@ -29,6 +29,8 @@ const FoodListings = ({
           src={images}
           alt="Food listing image"
           borderRadius="lg"
+          minWidth={"100%"}
+          maxHeight={"108px"}
         />
         <Stack mt="6" spacing="3">
           <Heading size="md">{title}</Heading>
