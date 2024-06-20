@@ -31,7 +31,6 @@ const FoodListingsPage = () => {
 
   const fetchListings = async () => {
     try {
-      console.log("Fetching food listings...");
       const response = await server.get("/listings");
       console.log("Food listings fetched:", response.data);
       setListings(response.data);
@@ -43,10 +42,7 @@ const FoodListingsPage = () => {
   useEffect(() => {
     const fetchHostInfo = async () => {
       try {
-        console.log("Fetching host info...");
         const response = await server.get("/listings/hostInfo");
-        console.log("Host name fetched:", response.data.username);
-        console.log("Host rating fetched:", response.data.foodRating);
         setHostName(response.data.username);
         setHostRating(response.data.foodRating);
       } catch (error) {
@@ -78,9 +74,7 @@ const FoodListingsPage = () => {
 
   const handleSubmitListing = async () => {
     var addedListingID = null;
-    var imageUrl = null;
     try {
-      console.log("Submitting listing...");
       const newListing = {
         title,
         images: "",
@@ -90,27 +84,29 @@ const FoodListingsPage = () => {
         totalSlots,
         datetime,
       }
-      console.log("New listing:", newListing);
-      const response = await server.post("/listings/addListing", newListing);
-      console.log("Listing submitted:", response.data);
-      addedListingID = response.data.ID;
+      const addListingResponse = await server.post("/listings/addListing", newListing);
+      console.log("Listing submitted:", addListingResponse.data);
+      addedListingID = addListingResponse.data.ID;
+      try {
+        const formData = new FormData();
+        formData.append("images", images);
+        formData.append("listingID", addedListingID);
+        const addImageResponse = await server.post("/listings/addImage", formData);
+        console.log("Listing image uploaded", addImageResponse.data.url);
+        server.put("/listings/updateListingImageUrl", { listingID: addListingResponse.data.ID, url: addImageResponse.data.url })
+        .then((response) => {
+          if (response.status === 200) {
+            console.log("Listing image URL updated:", response.data);
+          } else {
+            console.error("Error updating listing image URL:", response.data);
+          }
+        })
+      } catch (error) {
+        console.error("Error uploading listing image URL:", error);
+      }
       fetchListings();
     } catch (error) {
       console.error("Error submitting listing:", error);
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append("images", images);
-      formData.append("listingID", addedListingID);
-      const response = await server.post("/listings/addImage", formData);
-      console.log("Listing image uploaded", response.data.url);
-      addedListingID = response.data.ID;
-      imageUrl = response.data.url;
-      server.put("/listings/updateListingImageUrl", { listingID: addedListingID, url: imageUrl })
-
-    } catch (error) {
-      console.error("Error uploading listing image:", error);
     }
     onClose();
   };
