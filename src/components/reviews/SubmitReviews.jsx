@@ -2,7 +2,7 @@ import React from 'react'
 import { useState } from 'react';
 import StarRating from './StarRatings';
 import { submitReviews } from '../../slices/ReviewsState';
-import { Button, Box, Input, Flex, Avatar, Text, Center, Container, Image, Textarea, Spacer } from '@chakra-ui/react';
+import { Button, Box, Input, Flex, Avatar, Text, Center, Container, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
 import {
@@ -20,10 +20,10 @@ import {
   FormErrorMessage,
   FormHelperText,
 } from '@chakra-ui/react'
-import { date } from 'yup';
 
 function SubmitReviews() {
   const dispatch = useDispatch()
+  const toast = useToast()
   const [foodRating, setFoodRating] = useState(0);
   const [hygieneRating, setHygieneRating] = useState(0)
   const [comments, setComments] = useState('')
@@ -115,7 +115,14 @@ function SubmitReviews() {
             <Button colorScheme='red' borderRadius='10px' mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant='MMPrimary' type='submit' onClick={handleSubmit}>Submit</Button>
+            <Button variant='MMPrimary' type='submit' onClick={() => {
+              handleSubmit();
+              toast({
+                title: `Review submitted successfully!`,
+                status: 'success',
+                isClosable: true,
+              });
+            }}>Submit</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
