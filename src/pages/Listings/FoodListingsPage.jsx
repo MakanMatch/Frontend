@@ -130,6 +130,7 @@ const FoodListingsPage = () => {
         hostFoodRating={hostRating}
         isFavourite={listing.isFavourite}
         onToggleFavourite={() => toggleFavourite(listing.listingID)}
+        images={listing.images}
         />
       ))}
     </SimpleGrid>
