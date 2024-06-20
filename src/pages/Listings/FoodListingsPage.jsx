@@ -21,6 +21,7 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  SimpleGrid
 } from "@chakra-ui/react";
 
 const FoodListingsPage = () => {
@@ -101,20 +102,20 @@ const FoodListingsPage = () => {
 
   return (
     <div>
-      <Heading as={"h1"}>Food Listings</Heading>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
-        {listings.map((listing) => (
-          <FoodListings
-            key={listing.listingID}
-            title={listing.title}
-            hostName={hostName}
-            portionPrice={listing.portionPrice}
-            hostFoodRating={hostRating}
-            isFavourite={listing.isFavourite}
-            onToggleFavourite={() => toggleFavourite(listing.listingID)}
-          />
-        ))}
-      </div>
+      <Heading as={"h1"} mb={4}>Food Listings</Heading>
+      <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
+      {listings.map((listing) => (
+        <FoodListings
+        key={listing.listingID}
+        title={listing.title}
+        hostName={hostName}
+        portionPrice={listing.portionPrice}
+        hostFoodRating={hostRating}
+        isFavourite={listing.isFavourite}
+        onToggleFavourite={() => toggleFavourite(listing.listingID)}
+        />
+      ))}
+    </SimpleGrid>
       <Button onClick={onOpen}variant={"MMPrimary"} mt={4}>
         Add Listing
       </Button>
