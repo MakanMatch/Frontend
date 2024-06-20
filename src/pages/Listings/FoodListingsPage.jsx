@@ -74,28 +74,49 @@ const FoodListingsPage = () => {
   const [portionPrice, setPortionPrice] = useState(1);
   const [totalSlots, setTotalSlots] = useState(1);
   const [datetime, setDatetime] = useState("");
-  const [images, setImages] = useState("");
+  const [images, setImages] = useState(null);
 
   const handleSubmitListing = async () => {
+    var addedListingID = null;
+    var imageUrl = null;
     try {
       console.log("Submitting listing...");
       const newListing = {
         title,
-        images,
+        images: "",
         shortDescription,
         longDescription,
         portionPrice,
         totalSlots,
-        datetime
+        datetime,
       }
       console.log("New listing:", newListing);
       const response = await server.post("/listings/addListing", newListing);
       console.log("Listing submitted:", response.data);
+      addedListingID = response.data.ID;
       fetchListings();
     } catch (error) {
       console.error("Error submitting listing:", error);
     }
+
+    try {
+      const formData = new FormData();
+      formData.append("images", images);
+      formData.append("listingID", addedListingID);
+      const response = await server.post("/listings/addImage", formData);
+      console.log("Listing image uploaded", response.data.url);
+      addedListingID = response.data.ID;
+      imageUrl = response.data.url;
+      server.put("/listings/updateListingImageUrl", { listingID: addedListingID, url: imageUrl })
+
+    } catch (error) {
+      console.error("Error uploading listing image:", error);
+    }
     onClose();
+  };
+
+  const handleFileChange = (event) => {
+    setImages(event.target.files[0]);
   };
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -208,7 +229,7 @@ const FoodListingsPage = () => {
               <Input
                 type="file"
                 size="sm"
-                onChange={(event) => setImages(event.target.value)}
+                onChange={handleFileChange}
               />
             </FormControl>
           </ModalBody>
