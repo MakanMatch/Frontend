@@ -93,7 +93,7 @@ const FoodListingsPage = () => {
         formData.append("listingID", addedListingID);
         const addImageResponse = await server.post("/listings/addImage", formData);
         console.log("Listing image uploaded", addImageResponse.data.url);
-        server.put("/listings/updateListingImageUrl", { listingID: addListingResponse.data.ID, url: addImageResponse.data.url })
+        await server.put("/listings/updateListingImageUrl", { listingID: addListingResponse.data.ID, url: addImageResponse.data.url })
         .then((response) => {
           if (response.status === 200) {
             console.log("Listing image URL updated:", response.data);
