@@ -23,6 +23,14 @@ import server from '../../networking';
 
 const FoodListings = ({ foodListings }) => {
   const [localFoodListings, setLocalFoodListings] = useState([]);
+  const [title, setTitle] = useState("");
+  const [shortDescription, setShortDescription] = useState("");
+  const [longDescription, setLongDescription] = useState("");
+  const [portionPrice, setPortionPrice] = useState(0);
+  const [images, setImages] = useState([]);
+  const [totalSlots, setTotalSlots] = useState(0);
+  const [datetime, setDateTime] = useState("");
+  
 
   useEffect(() => {
     const fetchHostNameAndRating = async () => {
@@ -54,8 +62,26 @@ const FoodListings = ({ foodListings }) => {
   };
 
   const handleSubmitListing = async () => {
+    const newListing = {
+      title,
+      images,
+      shortDescription,
+      longDescription,
+      portionPrice,
+      totalSlots,
+      datetime
+    }
+    await server.post('/listings/addListing', newListing)
+    .then(response => {
+      if (response.status == 200) {
+        console.log('New listing posted:', response.data);
+        setLocalFoodListings(prevListings => [...prevListings, response.data]);
+      }
+    })
+    .catch(error => {
+      console.error('Error posting new listing:', error);
+    });
     onClose();
-    console.log('Submitting listing...');
   }
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -82,7 +108,7 @@ const FoodListings = ({ foodListings }) => {
           Add Listing
         </Button>
       </div>
-      <Modal blockScrollOnMount={true} isOpen={isOpen} onClose={onClose}>
+      <Modal blockScrollOnMount={true} isOpen={isOpen} onClose={onClose} size={"lg"}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Host a meal</ModalHeader>
@@ -90,28 +116,49 @@ const FoodListings = ({ foodListings }) => {
           <ModalBody>
           <FormControl mb={4} isRequired>
             <FormLabel>What is the name of your dish?</FormLabel>
-            <Input type='text' placeholder="E.g Pani Puri" />
+            <Input type='text' placeholder="E.g Pani Puri" onChange={event => setTitle(event.target.value)} />
           </FormControl>
 
           <FormControl mb={4} isRequired>
-            <FormLabel>Describe your dish</FormLabel>
-            <Input type='text' placeholder="E.g Popular Indian Street Food" />
+            <FormLabel>What is this dish?</FormLabel>
+            <Input type='text' placeholder="E.g Popular Indian Street Food" onChange={event => setShortDescription(event.target.value)} />
+          </FormControl>
+
+          <FormControl mb={4} isRequired>
+            <FormLabel>Give a detailed description of this dish</FormLabel>
+            <Input type='text' placeholder="E.g Pani Puri offers a burst of flavors and textures in every bite. It is made of a crispy shell, a mixture of potato, onion, peas and chickpea." onChange={event => setLongDescription(event.target.value)} />
           </FormControl>
 
           <FormControl mb={4} isRequired>
             <FormLabel>Portion Fee (in SGD)</FormLabel>
-            <NumberInput step={1} defaultValue={1} min={1} max={10} mb={4}>
-              <NumberInputField />
+            <NumberInput step={1} defaultValue={1} min={1} max={10} mb={4} onChange={(valueAsString, valueAsNumber) => setPortionPrice(valueAsNumber)}>
+              <NumberInputField/>
               <NumberInputStepper>
                 <NumberIncrementStepper />
                 <NumberDecrementStepper />
               </NumberInputStepper>
             </NumberInput>
           </FormControl>
+
+          <FormControl mb={4} isRequired>
+            <FormLabel>How many guests are you inviting?</FormLabel>
+            <NumberInput step={1} defaultValue={1} min={1} max={5} mb={4} onChange={(valueAsString, valueAsNumber) => setTotalSlots(valueAsNumber)}>
+              <NumberInputField/>
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </FormControl>
+
+          <FormControl mb={4} isRequired>
+            <FormLabel>When will you be hosting this dish?</FormLabel>
+            <Input type='date' onChange={event => setDateTime(event.target.value)}/>
+          </FormControl>
           
           <FormControl mb={4} isRequired>
             <FormLabel>Upload a previously taken image of your dish</FormLabel>
-            <Input type='file' size="sm" />
+            <Input type='file' size="sm" onChange={event => setImages(event.target.value)}/>
           </FormControl>
           </ModalBody>
 
