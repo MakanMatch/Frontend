@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Box, Heading, Input, Button, Text, VStack, Checkbox, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link } from '@chakra-ui/react';
+import { Box, Heading, Input, Button, Text, VStack, useToast, Checkbox, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link } from '@chakra-ui/react';
 import { useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import instance from '../../networking';
 
 function CreateAccount() {
+    const navigate = useNavigate();
+    const toast = useToast();
     const [showPassword, setShowPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
@@ -29,7 +32,7 @@ function CreateAccount() {
                 .required('Confirm Password is required'),
         }),
         onSubmit: (values, actions) => {
-            const { confirmPassword, ...submitValues } = values;
+            const { confirmPassword,...submitValues } = values;
             const data = JSON.stringify(submitValues, null, 2);
             console.log(data)
             console.log(submitValues)
@@ -38,19 +41,47 @@ function CreateAccount() {
                     'Content-Type': 'application/json'
                 }
             })
-                .then((res) => {
-                    console.log(res.data);
+               .then((res) => {
+                    if (res && res.data) {
+                        console.log(res.data);
+                        console.log("Account created successfully.");
+                        toast({
+                            title: 'Account created.',
+                            description: "Welcome to MakanMatch!",
+                            status: 'success',
+                            duration: 3000,
+                            isClosable: true,
+                        });
+                        navigate("/");
+                    } else {
+                        console.log("An error has occured creating the account.")
+                        toast({
+                            title: 'Account creation failed.',
+                            description: "An error has occured creating the account.",
+                            status: 'error',
+                            duration: 3000,
+                            isClosable: true,
+                        });
+                    }
                 })
-                .catch(function (err) {
+               .catch(function (err) {
                     console.log("error")
+                    console.log(err)
                     console.log(`${err.response.data.message}`);
                     if (err.response.data.message === "Username already exists.") {
                         formik.setFieldError('username', 'Username already exists.');
                     } else if (err.response.data.message === "Email already exists.") {
                         formik.setFieldError('email', 'Email already exists.');
                     }
+                    toast({
+                        title: 'Account creation failed.',
+                        description: `${err.response.data.message}`,
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    });
                 });
-
+        
             actions.setSubmitting(false);
         },
     });

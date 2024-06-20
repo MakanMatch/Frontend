@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Box, Heading, Input, Button, Text, VStack, Checkbox, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link } from '@chakra-ui/react';
+import { Box, Heading, Input, Button, Text, VStack, useToast, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link } from '@chakra-ui/react';
 import { useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import instance from '../../networking';
 
 function Login() {
+    const navigate = useNavigate();
+    const toast = useToast();
     const [showPassword, setShowPassword] = React.useState(false);
     const handleShowPassword = () => setShowPassword(!showPassword);
 
@@ -28,15 +31,41 @@ function Login() {
                 }
             })
                 .then((res) => {
-                    console.log(res.data);
-                    // Handle login success
+                    if (res && res.data) {
+                        console.log(res.data);
+                        console.log("Account logged in successfully.");
+                        toast({
+                            title: 'Login successful.',
+                            description: "Welcome back to MakanMatch!",
+                            status: 'success',
+                            duration: 3000,
+                            isClosable: true,
+                        });
+                        navigate("/");
+                    } else {
+                        console.log("An error has occured logging in to the account.")
+                        toast({
+                            title: 'Login failed.',
+                            description: "Invalid username, email or password.",
+                            status: 'error',
+                            duration: 3000,
+                            isClosable: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log("error")
                     console.log(`${err.response.data.message}`);
                     if (err.response.data.message === "Invalid username or email or password.") {
-                        formik.setFieldError('identifier', 'Invalid username or email or password.');
+                        formik.setFieldError('usernameOrEmail', 'Invalid username, email or password.');
                     }
+                    toast({
+                        title: 'Login failed.',
+                        description: "Invalid username, email or password.",
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    });
                 });
 
             actions.setSubmitting(false);
@@ -62,7 +91,7 @@ function Login() {
                         Sign in to MakanMatch
                     </Heading>
                     <Box as="form" onSubmit={formik.handleSubmit}>
-                        <FormControl isInvalid={formik.errors.identifier && formik.touched.identifier} mb={4}>
+                        <FormControl isInvalid={formik.errors.usernameOrEmail && formik.touched.usernameOrEmail} mb={4}>
                             <FormLabel fontSize='15px'>Username or Email</FormLabel>
                             <Input
                                 name="usernameOrEmail"
@@ -73,9 +102,9 @@ function Login() {
                                 w='400px'
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
-                                value={formik.values.identifier}
+                                value={formik.values.usernameOrEmail}
                             />
-                            <FormErrorMessage fontSize='12px'>{formik.errors.identifier}</FormErrorMessage>
+                            <FormErrorMessage fontSize='12px'>{formik.errors.usernameOrEmail}</FormErrorMessage>
                         </FormControl>
                         <FormControl isInvalid={formik.errors.password && formik.touched.password} mb={4}>
                             <FormLabel fontSize='15px'>Password</FormLabel>
