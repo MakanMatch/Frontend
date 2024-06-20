@@ -31,6 +31,7 @@ const FoodListings = ({
           borderRadius="lg"
           minWidth={"100%"}
           maxHeight={"108px"}
+          objectFit="cover"
         />
         <Stack mt="6" spacing="3">
           <Heading size="md">{title}</Heading>
