@@ -23,6 +23,9 @@ import {
   NumberDecrementStepper,
   SimpleGrid,
   FormHelperText,
+  Text,
+  Box,
+  useToast,
 } from "@chakra-ui/react";
 
 const FoodListingsPage = () => {
@@ -64,7 +67,7 @@ const FoodListingsPage = () => {
       )
     );
   };
-  
+
   const [title, setTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [longDescription, setLongDescription] = useState("");
@@ -78,10 +81,11 @@ const FoodListingsPage = () => {
   const [images, setImages] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToast();
 
   const handleSubmitListing = async () => {
-    if (!title || !shortDescription || !longDescription || !images) {
-      window.alert("Please fill in all required fields.");
+    if (title.trim() === "" || shortDescription.trim() === "" || longDescription.trim() === "" || !images) {
+      window.alert("Required fields cannot be empty!");
       return;
     }
     setIsSubmitting(true);
@@ -122,6 +126,13 @@ const FoodListingsPage = () => {
     }
     onClose();
     setIsSubmitting(false);
+    toast({
+      title: "Listing published successfully!",
+      description: "We'll notify you when all slots have been filled.",
+      status: "success",
+      duration: 4000,
+      isClosable: false,
+    });
   };
 
   const [fileFormatError, setFileFormatError] = useState("");
@@ -170,7 +181,7 @@ const FoodListingsPage = () => {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Host a meal</ModalHeader>
+          <ModalHeader>Host your next meal!</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl mb={4} isRequired>
@@ -260,7 +271,10 @@ const FoodListingsPage = () => {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="red" mr={3} onClick={onClose}>
+          <Box flex={"1"} textAlign={"left"}>
+            <Text color={"red"}>*All fields are required</Text>
+          </Box>
+            <Button colorScheme={"red"} mr={3} onClick={onClose}>
               Cancel
             </Button>
             {isSubmitting ? <Button isLoading loadingText='Submitting...'/> : <Button onClick={handleSubmitListing} variant="MMPrimary">
