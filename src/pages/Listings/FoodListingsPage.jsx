@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import FoodListings from "../../components/listings/FoodListings";
+import GoogleMaps from "../../components/listings/GoogleMaps";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import {
   Button,
@@ -33,6 +34,7 @@ import {
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
+  Flex,
 } from "@chakra-ui/react";
 
 const FoodListingsPage = () => {
@@ -224,20 +226,27 @@ const FoodListingsPage = () => {
           Add Listing
         </Button>
       </Box>
-      <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
-      {listings.map((listing) => (
-        <FoodListings
-        key={listing.listingID}
-        title={listing.title}
-        hostName={hostName}
-        portionPrice={listing.portionPrice}
-        hostFoodRating={hostRating}
-        isFavourite={listing.isFavourite}
-        onToggleFavourite={() => toggleFavourite(listing.listingID)}
-        images={listing.images}
-        />
-      ))}
-    </SimpleGrid>
+      <Flex display="flex" flexWrap="wrap">
+        <Box flex="2" mr={5}>
+          <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
+            {listings.map((listing) => (
+              <FoodListings
+                key={listing.listingID}
+                title={listing.title}
+                hostName={hostName}
+                portionPrice={listing.portionPrice}
+                hostFoodRating={hostRating}
+                isFavourite={listing.isFavourite}
+                onToggleFavourite={() => toggleFavourite(listing.listingID)}
+                images={listing.images}
+              />
+            ))}
+          </SimpleGrid>
+        </Box>
+        <Box flex="1" ml={5}>
+          <GoogleMaps />
+        </Box>
+      </Flex>
       <Modal
         blockScrollOnMount={true}
         isOpen={isOpen}
