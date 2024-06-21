@@ -12,7 +12,6 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
   Input,
   useDisclosure,
   FormControl,
@@ -211,13 +210,15 @@ const FoodListingsPage = () => {
         isOpen={isOpen}
         onClose={onClose}
         size={"lg"}
-      >
-        <ModalOverlay />
-        <ModalContent>
+        scrollBehavior="inside"
+        closeOnOverlayClick={false}
+        isCentered
+        >
+        <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(10px) hue-rotate(90deg)' />
+        <ModalContent overflow={"hidden"} maxH={"90vh"}>
           <ModalHeader>Host your next meal!</ModalHeader>
-          <ModalCloseButton />
           <ModalBody>
-            <FormControl mb={4} isRequired>
+            <FormControl mb={3} isRequired>
               <FormLabel>What is the name of your dish?</FormLabel>
               <Input
                 type="text"
@@ -225,7 +226,7 @@ const FoodListingsPage = () => {
                 onChange={(event) => setTitle(event.target.value)}
               />
             </FormControl>
-            <FormControl mb={4} isRequired>
+            <FormControl mb={3} isRequired>
               <FormLabel>What is this dish?</FormLabel>
               <Input
                 type="text"
@@ -234,7 +235,7 @@ const FoodListingsPage = () => {
               />
             </FormControl>
 
-            <FormControl mb={4} isRequired>
+            <FormControl mb={3} isRequired>
               <FormLabel>Give a detailed description of this dish</FormLabel>
               <Input
                 type="text"
@@ -243,52 +244,54 @@ const FoodListingsPage = () => {
               />
             </FormControl>
 
-            <FormControl mb={4} isRequired>
-              <FormLabel>Portion Fee (in SGD)</FormLabel>
-              <NumberInput
-                step={1}
-                defaultValue={1}
-                min={1}
-                max={10}
-                mb={4}
-                onChange={(valueAsString, valueAsNumber) =>
-                  setPortionPrice(valueAsNumber)
-                }
-              >
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </FormControl>
+            <Box display="flex" flexDirection="row" justifyContent="space-between">
+              <FormControl flex="1" mr={2} isRequired>
+                <FormLabel>Portion Fee (in SGD)</FormLabel>
+                <NumberInput
+                  step={1}
+                  defaultValue={1}
+                  min={1}
+                  max={10}
+                  mb={4}
+                  onChange={(valueAsString, valueAsNumber) =>
+                    setPortionPrice(valueAsNumber)
+                  }
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
 
-            <FormControl mb={4} isRequired>
-              <FormLabel>How many guests are you inviting?</FormLabel>
-              <NumberInput
-                step={1}
-                defaultValue={1}
-                min={1}
-                max={5}
-                mb={4}
-                onChange={(valueAsString, valueAsNumber) =>
-                  setTotalSlots(valueAsNumber)
-                }
-              >
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </FormControl>
+              <FormControl flex="1" ml={2} isRequired>
+                <FormLabel>No. of Guests</FormLabel>
+                <NumberInput
+                  step={1}
+                  defaultValue={1}
+                  min={1}
+                  max={5}
+                  mb={4}
+                  onChange={(valueAsString, valueAsNumber) =>
+                    setTotalSlots(valueAsNumber)
+                  }
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+            </Box>
 
-            <FormControl mb={4} isRequired>
+            <FormControl mb={2} isRequired>
               <FormLabel>When will you be hosting this dish?</FormLabel>
               <Input type='date' onChange={event => setDatetime(event.target.value)}/>
             </FormControl>
 
-            <FormControl mb={4} isRequired>
+            <FormControl isRequired>
               <FormLabel>
                 Upload an image of your dish
               </FormLabel>
@@ -314,8 +317,10 @@ const FoodListingsPage = () => {
             </Button>
             {modalError ? (
               <Button
-                variant="MMPrimary"
                 borderRadius={"10px"}
+                colorScheme="blue"
+                color='white'
+                fontWeight='bold'
                 isDisabled
               >
                 Host
@@ -334,8 +339,6 @@ const FoodListingsPage = () => {
                   <Button
                     onClick={handleSubmitListing}
                     variant="MMPrimary"
-                    borderRadius={"10px"}
-                    _hover={{ bg: "blue.500" }}
                   >
                     Host
                   </Button>
@@ -348,8 +351,10 @@ const FoodListingsPage = () => {
       <AlertDialog
         isOpen={isAlertOpen}
         leastDestructiveRef={cancelRef}
-        onClose={onAlertClose}>
-        <AlertDialogOverlay>
+        onClose={onAlertClose}
+        motionPreset='slideInBottom'
+        closeOnOverlayClick={false}>
+        <AlertDialogOverlay bg='blackAlpha.300' backdropFilter='blur(10px) hue-rotate(90deg)'>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Discard changes
