@@ -33,6 +33,17 @@ const FoodListingsPage = () => {
   const [hostName, setHostName] = useState("");
   const [hostRating, setHostRating] = useState(0);
 
+  const toast = useToast();
+  function ShowToast(title, description, status, duration) {
+    toast({
+      title: title,
+      description: description,
+      status: status,
+      duration: duration,
+      isClosable: false,
+    });
+  }
+
   const fetchListings = async () => {
     try {
       const response = await server.get("/listings");
@@ -81,13 +92,8 @@ const FoodListingsPage = () => {
   const [images, setImages] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const toast = useToast();
 
   const handleSubmitListing = async () => {
-    if (title.trim() === "" || shortDescription.trim() === "" || longDescription.trim() === "" || !images) {
-      window.alert("Required fields cannot be empty!");
-      return;
-    }
     setIsSubmitting(true);
     var addedListingID = null;
     try {
@@ -102,14 +108,13 @@ const FoodListingsPage = () => {
       }
       const addListingResponse = await server.post("/listings/addListing", newListing);
       console.log("Listing submitted:", addListingResponse.data);
-      addedListingID = addListingResponse.data.ID;
+      addedListingID = addListingResponse.data.listingID;
       try {
         const formData = new FormData();
         formData.append("images", images);
-        formData.append("listingID", addedListingID);
-        const addImageResponse = await server.post("/listings/addImage", formData);
+        const addImageResponse = await server.post(`/listings/addImage?id=${addedListingID}`, formData);
         console.log("Listing image uploaded", addImageResponse.data.url);
-        await server.put("/listings/updateListingImageUrl", { listingID: addListingResponse.data.ID, url: addImageResponse.data.url })
+        await server.put("/listings/updateListingImageUrl", { listingID: addListingResponse.data.listingID, url: addImageResponse.data.url })
         .then((response) => {
           if (response.status === 200) {
             console.log("Listing image URL updated:", response.data);
@@ -127,13 +132,7 @@ const FoodListingsPage = () => {
       setTimeout(() => {
         onClose();
         setIsSubmitting(false);
-        toast({
-          title: "Listing published successfully!",
-          description: "We'll notify you when all slots have been filled.",
-          status: "success",
-          duration: 4000,
-          isClosable: false,
-        });
+        ShowToast("Listing published successfully!", "We'll notify you when all slots have been filled.", "success", 4000);
       }, 1500);
     }
   };
