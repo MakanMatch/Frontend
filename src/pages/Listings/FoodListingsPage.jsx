@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // FoodListingsPage.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import FoodListings from "../../components/listings/FoodListings";
 import {
@@ -27,6 +27,12 @@ import {
   Text,
   Box,
   useToast,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
 } from "@chakra-ui/react";
 
 const FoodListingsPage = () => {
@@ -152,6 +158,22 @@ const FoodListingsPage = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [modalError, setModalError] = useState(false);
+
+  const {
+    isOpen: isAlertOpen,
+    onOpen: onAlertOpen,
+    onClose: onAlertClose
+  } = useDisclosure();
+  const cancelRef = useRef();
+
+  const handleCancelClick = () => {
+    onAlertOpen();
+  };
+
+  const handleAlertConfirm = () => {
+    onAlertClose();
+    onClose();
+  };
 
   useEffect(() => {
     if (title.trim() === "" || shortDescription.trim() === "" || longDescription.trim() === "" || !images) {
@@ -287,7 +309,7 @@ const FoodListingsPage = () => {
                 <Text color="red">*All fields are required</Text>
               )}
             </Box>
-            <Button colorScheme={"red"} mr={3} borderRadius={"10px"} onClick={onClose}>
+            <Button colorScheme={"red"} mr={3} borderRadius={"10px"} onClick={handleCancelClick}>
               Cancel
             </Button>
             {modalError ? (
@@ -323,6 +345,31 @@ const FoodListingsPage = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <AlertDialog
+        isOpen={isAlertOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onAlertClose}>
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Discard changes
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to cancel? All your changes will be lost.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onAlertClose}>
+                Go back
+              </Button>
+              <Button colorScheme="red" onClick={handleAlertConfirm} ml={3}>
+                Discard
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </div>
   );
 };
