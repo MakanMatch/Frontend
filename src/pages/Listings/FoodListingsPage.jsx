@@ -227,22 +227,27 @@ const FoodListingsPage = () => {
         </Button>
       </Box>
       <Flex display="flex" flexWrap="wrap">
-        <Box flex="2" mr={5}>
-          <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
-            {listings.map((listing) => (
-              <FoodListings
-                key={listing.listingID}
-                title={listing.title}
-                hostName={hostName}
-                portionPrice={listing.portionPrice}
-                hostFoodRating={hostRating}
-                isFavourite={listing.isFavourite}
-                onToggleFavourite={() => toggleFavourite(listing.listingID)}
-                images={listing.images}
-              />
-            ))}
-          </SimpleGrid>
-        </Box>
+      <Box
+        maxH="530px"
+        overflowY="auto"
+        boxShadow={"0 4px 6px rgba(0, 0, 0, 0.1)"}
+        borderRadius="8px"
+        p="4"
+        flex={2}>
+        <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
+          {listings.map((listing) => (
+            <FoodListings
+              key={listing.listingID}
+              title={listing.title}
+              hostName={hostName}
+              portionPrice={listing.portionPrice}
+              hostFoodRating={hostRating}
+              isFavourite={listing.isFavourite}
+              onToggleFavourite={() => toggleFavourite(listing.listingID)}
+              images={listing.images}/>
+          ))}
+        </SimpleGrid>
+      </Box>
         <Box flex="1" ml={5}>
           <GoogleMaps />
         </Box>
