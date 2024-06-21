@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // FoodListingsPage.jsx
 import { useState, useEffect } from "react";
 import server from "../../networking";
@@ -70,7 +71,7 @@ const FoodListingsPage = () => {
 
     fetchListings();
     fetchHostInfo();
-  });
+  }, []);
 
   const toggleFavourite = (listingID) => {
     setListings((prevListings) =>
