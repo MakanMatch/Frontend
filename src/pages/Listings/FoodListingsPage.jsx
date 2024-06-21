@@ -188,23 +188,30 @@ const FoodListingsPage = () => {
   , [title, shortDescription, longDescription, images]);
 
   useEffect(() => {
-    if (portionPrice < 1 || portionPrice > 10) {
+    if (portionPrice < 1) {
+      setPortionPrice(1);
+      ShowToast("WARNING: You can't host a free meal!", "Fee must be at least $1", "error", 2500);
+    }
+  }, [portionPrice]);
+
+  useEffect(() => {
+    if (portionPrice > 10) {
       setPortionPrice(10);
-      ShowToast("WARNING: Invalid Portion Fee", "Fee must be between 1 to 10 dollars", "error", 3500);
+      ShowToast("WARNING: Woah, that's too expensive!", "Fee cannot exceed $10", "error", 2500);
     }
   }, [portionPrice]);
 
   useEffect(() => {
     if (totalSlots < 1) {
       setTotalSlots(1);
-      ShowToast("WARNING: You must invite someone!", "You must invite at least 1 Guest", "error", 3500);
+      ShowToast("WARNING: You must invite someone!", "You must invite at least 1 Guest", "error", 2500);
     }
   }, [totalSlots]);
 
   useEffect(() => {
     if (totalSlots > 5) {
       setTotalSlots(5);
-      ShowToast("WARNING: Too many Guests!", "You can invite a maximum of 5 Guests", "error", 3500);
+      ShowToast("WARNING: Too many Guests!", "You can invite a maximum of 5 Guests", "error", 2500);
     }
   }, [totalSlots]);
 
