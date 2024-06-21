@@ -89,16 +89,16 @@ const FoodListingsPage = () => {
     );
   };
 
+  const today = new Date();
+  today.setDate(today.getDate() + 1);
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+
   const [title, setTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [longDescription, setLongDescription] = useState("");
   const [portionPrice, setPortionPrice] = useState(1);
   const [totalSlots, setTotalSlots] = useState(1);
-  const [datetime, setDatetime] = useState(() => {
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('en-GB').split('/').reverse().join('-');
-    return formattedDate;
-  });  
+  const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
   const [images, setImages] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -141,6 +141,7 @@ const FoodListingsPage = () => {
   };
 
   const [fileFormatError, setFileFormatError] = useState("");
+  const [dateToastActive, setDateToastActive] = useState(false);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -155,6 +156,20 @@ const FoodListingsPage = () => {
       }
     }
   };
+
+  function checkDate(date) {
+    if (new Date(date) > new Date()) {
+      setDatetime(date);
+    } else {
+      if (dateToastActive) return;
+      ShowToast("WARNING: Invalid Date/Time", "Please select a date-time that's greater than today's date-time", "error", 3000);
+      setDateToastActive(true);
+      setTimeout(() => {
+        setDateToastActive(false);
+      }, 3000);
+      return;
+    }
+  }
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [modalError, setModalError] = useState(false);
@@ -307,8 +322,12 @@ const FoodListingsPage = () => {
             </Box>
 
             <FormControl mb={2} isRequired>
-              <FormLabel>When will you be hosting this dish?</FormLabel>
-              <Input type='date' onChange={event => setDatetime(event.target.value)}/>
+              <FormLabel>When will you be hosting this meal?</FormLabel>
+              <Input
+                type='datetime-local'
+                value={datetime}
+                onChange={event => checkDate(event.target.value)}
+              />
             </FormControl>
 
             <FormControl isRequired>
