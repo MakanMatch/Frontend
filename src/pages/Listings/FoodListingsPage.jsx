@@ -21,7 +21,8 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  SimpleGrid
+  SimpleGrid,
+  FormHelperText,
 } from "@chakra-ui/react";
 
 const FoodListingsPage = () => {
@@ -69,10 +70,21 @@ const FoodListingsPage = () => {
   const [longDescription, setLongDescription] = useState("");
   const [portionPrice, setPortionPrice] = useState(1);
   const [totalSlots, setTotalSlots] = useState(1);
-  const [datetime, setDatetime] = useState("");
+  const [datetime, setDatetime] = useState(() => {
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-GB').split('/').reverse().join('-');
+    return formattedDate;
+  });  
   const [images, setImages] = useState(null);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmitListing = async () => {
+    if (!title || !shortDescription || !longDescription || !images) {
+      window.alert("Please fill in all required fields.");
+      return;
+    }
+    setIsSubmitting(true);
     var addedListingID = null;
     try {
       const newListing = {
@@ -109,13 +121,26 @@ const FoodListingsPage = () => {
       console.error("Error submitting listing:", error);
     }
     onClose();
+    setIsSubmitting(false);
   };
+
+  const [fileFormatError, setFileFormatError] = useState("");
 
   const handleFileChange = (event) => {
-    setImages(event.target.files[0]);
+    const file = event.target.files[0];
+    if (file) {
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/svg+xml"];
+      if (allowedTypes.includes(file.type)) {
+        setImages(file);
+        setFileFormatError("");
+      } else {
+        setImages("");
+        setFileFormatError("Invalid file format. Only JPEG, JPG, PNG and SVG are allowed.");
+      }
+    }
   };
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <div>
@@ -221,13 +246,16 @@ const FoodListingsPage = () => {
 
             <FormControl mb={4} isRequired>
               <FormLabel>
-                Upload a previously taken image of your dish
+                Upload an image of your dish
               </FormLabel>
               <Input
                 type="file"
                 size="sm"
                 onChange={handleFileChange}
               />
+              {fileFormatError && (
+                <FormHelperText color="red">{fileFormatError}</FormHelperText>
+              )}
             </FormControl>
           </ModalBody>
 
@@ -235,9 +263,9 @@ const FoodListingsPage = () => {
             <Button colorScheme="red" mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button onClick={handleSubmitListing} variant="MMPrimary">
-              Host it!
-            </Button>
+            {isSubmitting ? <Button isLoading loadingText='Submitting...'/> : <Button onClick={handleSubmitListing} variant="MMPrimary">
+              Host
+            </Button>}
           </ModalFooter>
         </ModalContent>
       </Modal>
