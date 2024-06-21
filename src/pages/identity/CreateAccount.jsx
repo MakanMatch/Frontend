@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Heading, Input, Button, Text, VStack, useToast, Checkbox, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link } from '@chakra-ui/react';
+import {
+    Box, Heading, Input, Button, Text, VStack, useToast, Checkbox, InputGroup, InputRightElement,
+    FormControl, FormLabel, FormErrorMessage, Link
+} from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
@@ -8,11 +11,33 @@ import instance from '../../networking';
 function CreateAccount() {
     const navigate = useNavigate();
     const toast = useToast();
-    const [showPassword, setShowPassword] = React.useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isHostAccount, setIsHostAccount] = useState(false);
 
     const handleShowPassword = () => setShowPassword(!showPassword);
     const handleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+
+    const validationSchema = Yup.object().shape({
+        username: Yup.string().required('Username is required'),
+        email: Yup.string().email('Invalid email address').required('Email is required'),
+        password: Yup.string()
+            .min(6, 'Password must be at least 6 characters')
+            .required('Password is required'),
+        confirmPassword: Yup.string()
+            .oneOf([Yup.ref('password'), null], 'Passwords must match')
+            .required('Confirm Password is required'),
+        contactNum: Yup.lazy((value, context) =>
+            isHostAccount
+                ? Yup.string()
+                      .matches(/^[0-9]{8}$/, 'Contact number must be exactly 8 digits')
+                      .required('Contact number is required')
+                : Yup.string().notRequired()
+        ),
+        address: Yup.lazy((value, context) =>
+            isHostAccount ? Yup.string().required('Address is required') : Yup.string().notRequired()
+        )
+    });
 
     const formik = useFormik({
         initialValues: {
@@ -20,31 +45,23 @@ function CreateAccount() {
             email: '',
             password: '',
             confirmPassword: '',
+            contactNum: '',
+            address: '',
+            isHostAccount: false
         },
-        validationSchema: Yup.object({
-            username: Yup.string().required('Username is required'),
-            email: Yup.string().email('Invalid email address').required('Email is required'),
-            password: Yup.string()
-                .min(6, 'Password must be at least 6 characters')
-                .required('Password is required'),
-            confirmPassword: Yup.string()
-                .oneOf([Yup.ref('password'), null], 'Passwords must match')
-                .required('Confirm Password is required'),
-        }),
+        validationSchema,
         onSubmit: (values, actions) => {
-            const { confirmPassword,...submitValues } = values;
+            const { confirmPassword, ...submitValues } = values;
             const data = JSON.stringify(submitValues, null, 2);
-            console.log(data)
-            console.log(submitValues)
-            instance.post("/createGuestAccount", data, {
+
+            const endpoint = isHostAccount ? "/createHostAccount" : "/createGuestAccount";
+            instance.post(endpoint, data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })
-               .then((res) => {
+                .then((res) => {
                     if (res && res.data) {
-                        console.log(res.data);
-                        console.log("Account created successfully.");
                         toast({
                             title: 'Account created.',
                             description: "Welcome to MakanMatch!",
@@ -54,20 +71,16 @@ function CreateAccount() {
                         });
                         navigate("/");
                     } else {
-                        console.log("An error has occured creating the account.")
                         toast({
                             title: 'Account creation failed.',
-                            description: "An error has occured creating the account.",
+                            description: "An error has occurred creating the account.",
                             status: 'error',
                             duration: 3000,
                             isClosable: true,
                         });
                     }
                 })
-               .catch(function (err) {
-                    console.log("error")
-                    console.log(err)
-                    console.log(`${err.response.data.message}`);
+                .catch((err) => {
                     if (err.response.data.message === "Username already exists.") {
                         formik.setFieldError('username', 'Username already exists.');
                     } else if (err.response.data.message === "Email already exists.") {
@@ -81,7 +94,7 @@ function CreateAccount() {
                         isClosable: true,
                     });
                 });
-        
+
             actions.setSubmitting(false);
         },
     });
@@ -180,8 +193,50 @@ function CreateAccount() {
                             <FormErrorMessage fontSize='12px'>{formik.errors.confirmPassword}</FormErrorMessage>
                         </FormControl>
                         <Box w="100%" display="flex" justifyContent="start">
-                            <Checkbox fontSize='15px' mb={5}>I want to be a host</Checkbox>
+                            <Checkbox
+                                fontSize='15px'
+                                mb={5}
+                                onChange={() => {
+                                    setIsHostAccount(!isHostAccount);
+                                    formik.setFieldValue('isHostAccount', !isHostAccount);
+                                }}
+                            >
+                                I want to be a host
+                            </Checkbox>
                         </Box>
+                        {formik.values.isHostAccount && (
+                            <>
+                                <FormControl isInvalid={formik.errors.contactNum && formik.touched.contactNum} mb={4}>
+                                    <FormLabel fontSize='15px'>Contact Number</FormLabel>
+                                    <Input
+                                        name="contactNum"
+                                        placeholder='Contact Number'
+                                        borderColor='black'
+                                        size='sm'
+                                        borderRadius='5px'
+                                        w="400px"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.contactNum}
+                                    />
+                                    <FormErrorMessage fontSize='12px'>{formik.errors.contactNum}</FormErrorMessage>
+                                </FormControl>
+                                <FormControl isInvalid={formik.errors.address && formik.touched.address} mb={4}>
+                                    <FormLabel fontSize='15px'>Address</FormLabel>
+                                    <Input
+                                        name="address"
+                                        placeholder='Address'
+                                        borderColor='black'
+                                        size='sm'
+                                        borderRadius='5px'
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.address}
+                                    />
+                                    <FormErrorMessage fontSize='12px'>{formik.errors.address}</FormErrorMessage>
+                                </FormControl>
+                            </>
+                        )}
                         <Button
                             colorScheme='purple'
                             isLoading={formik.isSubmitting}
