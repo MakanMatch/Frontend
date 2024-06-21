@@ -152,6 +152,16 @@ const FoodListingsPage = () => {
   };
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [modalError, setModalError] = useState(false);
+
+  useEffect(() => {
+    if (title.trim() === "" || shortDescription.trim() === "" || longDescription.trim() === "" || !images) {
+      setModalError(true);
+    } else {
+      setModalError(false);
+    }
+  }
+  , [title, shortDescription, longDescription, images]);
 
   return (
     <div>
@@ -271,15 +281,23 @@ const FoodListingsPage = () => {
           </ModalBody>
 
           <ModalFooter>
-          <Box flex={"1"} textAlign={"left"}>
-            <Text color={"red"}>*All fields are required</Text>
-          </Box>
-            <Button colorScheme={"red"} mr={3} onClick={onClose}>
+            <Box flex={"1"} textAlign={"left"}>
+              {modalError && (
+                <Text color="red">*All fields are required</Text>
+              )}
+            </Box>
+            <Button colorScheme={"red"} mr={3} borderRadius={"10px"} onClick={onClose}>
               Cancel
             </Button>
-            {isSubmitting ? <Button isLoading loadingText='Submitting...'/> : <Button onClick={handleSubmitListing} variant="MMPrimary">
-              Host
-            </Button>}
+            {!modalError ? (
+              <Button isLoading={isSubmitting} loadingText='Submitting...' onClick={handleSubmitListing} variant="MMPrimary">
+                Host
+              </Button>
+            ) : (
+              <Button variant="MMPrimary" borderRadius={"10px"} isDisabled _hover={"blue"}>
+                Host
+              </Button>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>
