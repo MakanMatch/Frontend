@@ -50,6 +50,7 @@ const FoodListingsPage = () => {
       console.log("Food listings fetched:", response.data);
       setListings(response.data);
     } catch (error) {
+      ShowToast("Error fetching food listings", "Please try again later.", "error", 2500);
       console.error("Error fetching food listings:", error);
     }
   };
@@ -60,14 +61,16 @@ const FoodListingsPage = () => {
         const response = await server.get("/listings/hostInfo");
         setHostName(response.data.username);
         setHostRating(response.data.foodRating);
+        console.log("Host name fetched:", response.data.username); // Debugging
       } catch (error) {
+        ShowToast("Error fetching required information", "Please try again later.", "error", 2500);
         console.error("Error fetching host info:", error);
       }
     };
 
     fetchListings();
     fetchHostInfo();
-  }, []);
+  });
 
   const toggleFavourite = (listingID) => {
     setListings((prevListings) =>
@@ -107,26 +110,19 @@ const FoodListingsPage = () => {
         datetime,
       }
       const addListingResponse = await server.post("/listings/addListing", newListing);
-      console.log("Listing submitted:", addListingResponse.data);
       addedListingID = addListingResponse.data.listingID;
       try {
         const formData = new FormData();
         formData.append("images", images);
         const addImageResponse = await server.post(`/listings/addImage?id=${addedListingID}`, formData);
-        console.log("Listing image uploaded", addImageResponse.data.url);
         await server.put("/listings/updateListingImageUrl", { listingID: addListingResponse.data.listingID, url: addImageResponse.data.url })
-        .then((response) => {
-          if (response.status === 200) {
-            console.log("Listing image URL updated:", response.data);
-          } else {
-            console.error("Error updating listing image URL:", response.data);
-          }
-        })
       } catch (error) {
+        ShowToast("Error uploading listing image", "Please try again later.", "error", 2500);
         console.error("Error uploading listing image URL:", error);
       }
       fetchListings();
     } catch (error) {
+      ShowToast("Error submitting listing", "Please try again later.", "error", 2500);
       console.error("Error submitting listing:", error);
     } finally {
       setTimeout(() => {

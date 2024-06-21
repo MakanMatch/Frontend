@@ -26,7 +26,7 @@ const FoodListings = ({
       <Card maxW="sm">
       <CardBody>
         <Image
-          src={images}
+          src={images || "public/placeholderImage.png"}
           alt="Food listing image"
           borderRadius="lg"
           minWidth={"100%"}
