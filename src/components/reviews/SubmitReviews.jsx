@@ -1,10 +1,10 @@
-import React from 'react'
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StarRating from './StarRatings';
 import { submitReviews } from '../../slices/ReviewsState';
 import { Button, Box, Input, Flex, Avatar, Text, Center, Container, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
+import server from '../../networking'
 import {
   Modal,
   ModalOverlay,
@@ -22,32 +22,91 @@ import {
 } from '@chakra-ui/react'
 
 function SubmitReviews() {
-  const dispatch = useDispatch()
-  const toast = useToast()
+  const dispatch = useDispatch();
+  const toast = useToast();
   const [foodRating, setFoodRating] = useState(0);
-  const [hygieneRating, setHygieneRating] = useState(0)
-  const [comments, setComments] = useState('')
+  const [hygieneRating, setHygieneRating] = useState(0);
+  const [comments, setComments] = useState('');
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const handleImageChange = (event) => {
+  const [imageUrls, setImageUrls] = useState([]);
+  const [reviewData, setReviewData] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleImageChange = async (event) => {
     const newFiles = Array.from(event.target.files);
-    setImages(prevImages => [...prevImages, ...newFiles]);
     const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+    
+    setImages(prevImages => [...prevImages, ...newFiles]);
     setPreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
+  
+    try {
+      const formData = new FormData();
+      newFiles.forEach((file, index) => {
+        formData.append(`images`, file);
+      });
+  
+      const response = await server.post('/reviews/upload-images', formData);
+      const imageUrls = response.data.urls;
+  
+      setImageUrls(prevUrls => [...prevUrls, ...imageUrls]);
+      
+    } catch (error) {
+      console.error('Failed to upload images:', error);
+      toast({
+        title: 'Failed to upload images.',
+        status: 'error',
+        isClosable: true,
+      });
+    }
   };
+
   const handleSubmit = () => {
     const currentDate = new Date().toLocaleDateString();
-    const reviewData = {
+    const sendReviewData = {
       sender: "Susie Jones",
       receiver: "Jamie Oliver",
       foodRating,
       hygieneRating,
       comments,
-      images,
-      dateCreated: currentDate
+      images: imageUrls,
+      dateCreated: currentDate,
     };
-    dispatch(submitReviews(reviewData));
+
+    setReviewData(sendReviewData);
+    dispatch(submitReviews(sendReviewData));
+    setComments('');
+    setImages([]);
+    setPreviews([]);
+    onClose();
+  };
+
+  useEffect(() => {
+    const postReview = async () => {
+      if (reviewData) {
+        try {
+          await server.post('/reviews/', reviewData);
+          toast({
+            title: 'Review submitted successfully!',
+            status: 'success',
+            isClosable: true,
+          });
+          console.log('Review submitted successfully!');
+        } catch (error) {
+          console.error('Failed to submit review:', error);
+          toast({
+            title: 'Failed to submit review.',
+            status: 'error',
+            isClosable: true,
+          });
+        }
+      }
+    };
+
+    postReview();
+  }, [reviewData, toast]);
+
+  const handleClose = () => {
     setComments('');
     setImages([]);
     setPreviews([]);
@@ -57,7 +116,7 @@ function SubmitReviews() {
   return (
     <Box>
       <Button onClick={onOpen} variant={"MMPrimary"}> Submit Reviews </Button>
-      <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInBottom' isCentered >
+      <Modal isOpen={isOpen} onClose={handleClose} motionPreset='slideInBottom' isCentered >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Submit A Review</ModalHeader>
@@ -79,7 +138,7 @@ function SubmitReviews() {
                     <Text mt='8px' mb='8px'>Food Rating</Text>
                     <StarRating maxStars={5} rating={foodRating} onChange={setFoodRating} />
                   </Flex>
-                  <Spacer/>
+                  <Spacer />
                   <Flex direction='column'>
                     <Text mt='8px' mb='8px'>Hygiene Rating</Text>
                     <StarRating maxStars={5} rating={hygieneRating} onChange={setHygieneRating} />
@@ -108,11 +167,11 @@ function SubmitReviews() {
                     borderRadius="md"
                   />
                 ))}
-              </Flex> 
+              </Flex>
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='red' borderRadius='10px' mr={3} onClick={onClose}>
+            <Button colorScheme='red' borderRadius='10px' mr={3} onClick={handleClose}>
               Close
             </Button>
             <Button variant='MMPrimary' type='submit' onClick={() => {
