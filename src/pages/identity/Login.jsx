@@ -57,7 +57,8 @@ function Login() {
                     console.log("error")
                     console.log(`${err.response.data.message}`);
                     if (err.response.data.message === "Invalid username or email or password.") {
-                        formik.setFieldError('usernameOrEmail', 'Invalid username, email or password.');
+                        formik.setFieldError('usernameOrEmail', 'Invalid username, email.');
+                        formik.setFieldError('password', 'Incorrect password.');
                     }
                     toast({
                         title: 'Login failed.',

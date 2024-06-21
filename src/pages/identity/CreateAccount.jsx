@@ -54,7 +54,7 @@ function CreateAccount() {
             const { confirmPassword, ...submitValues } = values;
             const data = JSON.stringify(submitValues, null, 2);
 
-            const endpoint = isHostAccount ? "/createHostAccount" : "/createGuestAccount";
+            const endpoint = isHostAccount ? "/CreateAccount/host" : "/CreateAccount/guest";
             instance.post(endpoint, data, {
                 headers: {
                     'Content-Type': 'application/json'
@@ -85,6 +85,8 @@ function CreateAccount() {
                         formik.setFieldError('username', 'Username already exists.');
                     } else if (err.response.data.message === "Email already exists.") {
                         formik.setFieldError('email', 'Email already exists.');
+                    } else if (err.response.data.message === "Contact number already exists.") {
+                        formik.setFieldError('contactNum', 'Contact number already exists.');
                     }
                     toast({
                         title: 'Account creation failed.',
