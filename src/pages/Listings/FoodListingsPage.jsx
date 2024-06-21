@@ -123,16 +123,19 @@ const FoodListingsPage = () => {
       fetchListings();
     } catch (error) {
       console.error("Error submitting listing:", error);
+    } finally {
+      setTimeout(() => {
+        onClose();
+        setIsSubmitting(false);
+        toast({
+          title: "Listing published successfully!",
+          description: "We'll notify you when all slots have been filled.",
+          status: "success",
+          duration: 4000,
+          isClosable: false,
+        });
+      }, 1500);
     }
-    onClose();
-    setIsSubmitting(false);
-    toast({
-      title: "Listing published successfully!",
-      description: "We'll notify you when all slots have been filled.",
-      status: "success",
-      duration: 4000,
-      isClosable: false,
-    });
   };
 
   const [fileFormatError, setFileFormatError] = useState("");
@@ -289,14 +292,35 @@ const FoodListingsPage = () => {
             <Button colorScheme={"red"} mr={3} borderRadius={"10px"} onClick={onClose}>
               Cancel
             </Button>
-            {!modalError ? (
-              <Button isLoading={isSubmitting} loadingText='Submitting...' onClick={handleSubmitListing} variant="MMPrimary">
+            {modalError ? (
+              <Button
+                variant="MMPrimary"
+                borderRadius={"10px"}
+                isDisabled
+              >
                 Host
               </Button>
             ) : (
-              <Button variant="MMPrimary" borderRadius={"10px"} isDisabled _hover={"blue"}>
-                Host
-              </Button>
+              <>
+                {isSubmitting ? (
+                  <Button
+                    isLoading
+                    loadingText='Submitting...'
+                    borderRadius={"10px"}
+                  >
+                    Submitting...
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSubmitListing}
+                    variant="MMPrimary"
+                    borderRadius={"10px"}
+                    _hover={{ bg: "blue.500" }}
+                  >
+                    Host
+                  </Button>
+                )}
+              </>
             )}
           </ModalFooter>
         </ModalContent>
