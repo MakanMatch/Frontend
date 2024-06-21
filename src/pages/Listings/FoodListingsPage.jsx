@@ -228,12 +228,28 @@ const FoodListingsPage = () => {
       </Box>
       <Flex display="flex" flexWrap="wrap">
       <Box
-        maxH="530px"
+        maxH="520px"
         overflowY="auto"
-        boxShadow={"0 4px 6px rgba(0, 0, 0, 0.1)"}
-        borderRadius="8px"
+        boxShadow={"0 4px 6px rgba(0.1, 0.1, 0.1, 0.1)"}
+        borderRadius="22px 8px 8px 22px"
         p="4"
-        flex={2}>
+        flex={2}
+        css={{
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: '#f1f1f1',
+            borderRadius: '8px 8px 8px 8px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#C2C2C2',
+            borderRadius: '8px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#A1A1A1',
+          },
+        }}>
         <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
           {listings.map((listing) => (
             <FoodListings
@@ -259,8 +275,7 @@ const FoodListingsPage = () => {
         size={"lg"}
         scrollBehavior="inside"
         closeOnOverlayClick={false}
-        isCentered
-        >
+        isCentered>
         <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(10px) hue-rotate(90deg)' />
         <ModalContent overflow={"hidden"} maxH={"90vh"}>
           <ModalHeader>Host your next meal!</ModalHeader>
@@ -270,16 +285,14 @@ const FoodListingsPage = () => {
               <Input
                 type="text"
                 placeholder="E.g Pani Puri"
-                onChange={(event) => setTitle(event.target.value)}
-              />
+                onChange={(event) => setTitle(event.target.value)}/>
             </FormControl>
             <FormControl mb={3} isRequired>
               <FormLabel>What is this dish?</FormLabel>
               <Input
                 type="text"
                 placeholder="E.g Popular Indian Street Food"
-                onChange={(event) => setShortDescription(event.target.value)}
-              />
+                onChange={(event) => setShortDescription(event.target.value)}/>
             </FormControl>
 
             <FormControl mb={3} isRequired>
@@ -287,8 +300,7 @@ const FoodListingsPage = () => {
               <Input
                 type="text"
                 placeholder="E.g Pani Puri offers a burst of flavors and textures in every bite. It is made of a crispy shell, a mixture of potato, onion, peas and chickpea."
-                onChange={(event) => setLongDescription(event.target.value)}
-              />
+                onChange={(event) => setLongDescription(event.target.value)}/>
             </FormControl>
 
             <Box display="flex" flexDirection="row" justifyContent="space-between">
@@ -303,8 +315,7 @@ const FoodListingsPage = () => {
                   mb={4}
                   onChange={(valueAsString, valueAsNumber) =>
                     setPortionPrice(valueAsNumber || 1)
-                  }
-                >
+                  }>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -324,8 +335,7 @@ const FoodListingsPage = () => {
                   mb={4}
                   onChange={(valueAsString, valueAsNumber) =>
                     setTotalSlots(valueAsNumber || 1)
-                  }
-                >
+                  }>
                   <NumberInputField />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -340,8 +350,7 @@ const FoodListingsPage = () => {
               <Input
                 type='datetime-local'
                 value={datetime}
-                onChange={event => checkDate(event.target.value)}
-              />
+                onChange={event => checkDate(event.target.value)}/>
             </FormControl>
 
             <FormControl isRequired>
@@ -351,8 +360,7 @@ const FoodListingsPage = () => {
               <Input
                 type="file"
                 size="sm"
-                onChange={handleFileChange}
-              />
+                onChange={handleFileChange}/>
               {fileFormatError && (
                 <FormHelperText color="red">{fileFormatError}</FormHelperText>
               )}
@@ -377,8 +385,7 @@ const FoodListingsPage = () => {
                 colorScheme="blue"
                 color='white'
                 fontWeight='bold'
-                isDisabled
-              >
+                isDisabled>
                 Host
               </Button>
             ) : (
@@ -387,15 +394,13 @@ const FoodListingsPage = () => {
                   <Button
                     isLoading
                     loadingText='Submitting...'
-                    borderRadius={"10px"}
-                  >
+                    borderRadius={"10px"}>
                     Submitting...
                   </Button>
                 ) : (
                   <Button
                     onClick={handleSubmitListing}
-                    variant="MMPrimary"
-                  >
+                    variant="MMPrimary">
                     Host
                   </Button>
                 )}
