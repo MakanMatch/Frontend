@@ -169,6 +169,11 @@ const FoodListingsPage = () => {
   return (
     <div>
       <Heading as={"h1"} mb={4}>Food Listings</Heading>
+      <Box display="flex" justifyContent="center" mb={4}>
+        <Button onClick={onOpen} variant="MMPrimary">
+          Add Listing
+        </Button>
+      </Box>
       <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
       {listings.map((listing) => (
         <FoodListings
@@ -183,9 +188,6 @@ const FoodListingsPage = () => {
         />
       ))}
     </SimpleGrid>
-      <Button onClick={onOpen}variant={"MMPrimary"} mt={4}>
-        Add Listing
-      </Button>
       <Modal
         blockScrollOnMount={true}
         isOpen={isOpen}
