@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import Navbar from './components/Navbar'
 import CreateAccount from './pages/identity/CreateAccount'
 import Login from './pages/identity/Login'
+import EmailVerification from './pages/identity/EmailVerification';
 
 function App() {
     const [count, setCount] = useState(0)
@@ -17,8 +18,9 @@ function App() {
                 <Navbar />
                 <Routes>
                     <Route path={"/"} element={<Home />} />
-                    <Route path={"/createAccount"} element={<CreateAccount />} />
+                    <Route path={"/createaccount"} element={<CreateAccount />} />
                     <Route path={"/login"} element={<Login />} />
+                    <Route path={"/emailverification"} element={<EmailVerification />} />
                 </Routes>
             </Router>
 

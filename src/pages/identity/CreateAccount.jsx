@@ -30,8 +30,8 @@ function CreateAccount() {
         contactNum: Yup.lazy((value, context) =>
             isHostAccount
                 ? Yup.string()
-                      .matches(/^[0-9]{8}$/, 'Contact number must be exactly 8 digits')
-                      .required('Contact number is required')
+                    .matches(/^[0-9]{8}$/, 'Contact number must be exactly 8 digits')
+                    .required('Contact number is required')
                 : Yup.string().notRequired()
         ),
         address: Yup.lazy((value, context) =>
@@ -61,15 +61,15 @@ function CreateAccount() {
                 }
             })
                 .then((res) => {
-                    if (res && res.data) {
+                    if (res && res.data && res.data.redirectUrl) {
                         toast({
                             title: 'Account created.',
-                            description: "Welcome to MakanMatch!",
+                            description: "Please verify your email to continue.",
                             status: 'success',
                             duration: 3000,
                             isClosable: true,
                         });
-                        navigate("/");
+                        navigate(res.data.redirectUrl); // Redirect to EmailVerification page
                     } else {
                         toast({
                             title: 'Account creation failed.',
@@ -85,8 +85,6 @@ function CreateAccount() {
                         formik.setFieldError('username', 'Username already exists.');
                     } else if (err.response.data.message === "Email already exists.") {
                         formik.setFieldError('email', 'Email already exists.');
-                    } else if (err.response.data.message === "Contact number already exists.") {
-                        formik.setFieldError('contactNum', 'Contact number already exists.');
                     }
                     toast({
                         title: 'Account creation failed.',
@@ -100,6 +98,7 @@ function CreateAccount() {
             actions.setSubmitting(false);
         },
     });
+
 
     return (
         <Box
