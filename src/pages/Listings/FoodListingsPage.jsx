@@ -188,25 +188,11 @@ const FoodListingsPage = () => {
   , [title, shortDescription, longDescription, images]);
 
   useEffect(() => {
-    if (portionPrice < 1) {
-      setPortionPrice(1);
-      ShowToast("WARNING: You can't host a free meal!", "Fee must be at least $1", "error", 2500);
-    }
-  }, [portionPrice]);
-
-  useEffect(() => {
     if (portionPrice > 10) {
       setPortionPrice(10);
       ShowToast("WARNING: Woah, that's too expensive!", "Fee cannot exceed $10", "error", 2500);
     }
   }, [portionPrice]);
-
-  useEffect(() => {
-    if (totalSlots < 1) {
-      setTotalSlots(1);
-      ShowToast("WARNING: You must invite someone!", "You must invite at least 1 Guest", "error", 2500);
-    }
-  }, [totalSlots]);
 
   useEffect(() => {
     if (totalSlots > 5) {
@@ -287,7 +273,7 @@ const FoodListingsPage = () => {
                   max={10}
                   mb={4}
                   onChange={(valueAsString, valueAsNumber) =>
-                    setPortionPrice(valueAsNumber)
+                    setPortionPrice(valueAsNumber || 1)
                   }
                 >
                   <NumberInputField />
@@ -308,7 +294,7 @@ const FoodListingsPage = () => {
                   max={5}
                   mb={4}
                   onChange={(valueAsString, valueAsNumber) =>
-                    setTotalSlots(valueAsNumber)
+                    setTotalSlots(valueAsNumber || 1)
                   }
                 >
                   <NumberInputField />
