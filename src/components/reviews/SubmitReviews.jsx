@@ -174,14 +174,7 @@ function SubmitReviews() {
             <Button colorScheme='red' borderRadius='10px' mr={3} onClick={handleClose}>
               Close
             </Button>
-            <Button variant='MMPrimary' type='submit' onClick={() => {
-              handleSubmit();
-              toast({
-                title: `Review submitted successfully!`,
-                status: 'success',
-                isClosable: true,
-              });
-            }}>Submit</Button>
+            <Button variant='MMPrimary' type='submit' onClick={handleSubmit}>Submit</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
