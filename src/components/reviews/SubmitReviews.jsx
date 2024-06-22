@@ -39,72 +39,59 @@ function SubmitReviews() {
     
     setImages(prevImages => [...prevImages, ...newFiles]);
     setPreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
-  
+  };
+
+  const handleSubmit = async () => {
+    const currentDate = new Date().toLocaleDateString();
+    const formData = new FormData();
+    images.forEach((file) => {
+      formData.append('images', file);
+    });
+
     try {
-      const formData = new FormData();
-      newFiles.forEach((file, index) => {
-        formData.append(`images`, file);
-      });
-  
       const response = await server.post('/reviews/upload-images', formData);
       const imageUrls = response.data.urls;
   
-      setImageUrls(prevUrls => [...prevUrls, ...imageUrls]);
-      
-    } catch (error) {
-      console.error('Failed to upload images:', error);
+      const sendReviewData = {
+        sender: "Susie Jones",
+        receiver: "Jamie Oliver",
+        foodRating,
+        hygieneRating,
+        comments,
+        images: imageUrls,
+        dateCreated: currentDate,
+      };
+
+      await server.post('/reviews/', sendReviewData);
       toast({
-        title: 'Failed to upload images.',
+        title: 'Review submitted successfully!',
+        status: 'success',
+        isClosable: true,
+      });
+      console.log('Review submitted successfully!');
+
+      setComments('');
+      setImages([]);
+      setPreviews([]);
+      setReviewData(null);
+      onClose();
+
+    } catch (error) {
+      console.error('Failed to submit review:', error);
+      toast({
+        title: 'Failed to submit review.',
         status: 'error',
         isClosable: true,
       });
     }
   };
 
-  const handleSubmit = () => {
-    const currentDate = new Date().toLocaleDateString();
-    const sendReviewData = {
-      sender: "Susie Jones",
-      receiver: "Jamie Oliver",
-      foodRating,
-      hygieneRating,
-      comments,
-      images: imageUrls,
-      dateCreated: currentDate,
-    };
-
-    setReviewData(sendReviewData);
-    dispatch(submitReviews(sendReviewData));
-    setComments('');
-    setImages([]);
-    setPreviews([]);
-    onClose();
-  };
-
   useEffect(() => {
-    const postReview = async () => {
-      if (reviewData) {
-        try {
-          await server.post('/reviews/', reviewData);
-          toast({
-            title: 'Review submitted successfully!',
-            status: 'success',
-            isClosable: true,
-          });
-          console.log('Review submitted successfully!');
-        } catch (error) {
-          console.error('Failed to submit review:', error);
-          toast({
-            title: 'Failed to submit review.',
-            status: 'error',
-            isClosable: true,
-          });
-        }
-      }
-    };
+    if (reviewData) {
+      dispatch(submitReviews(reviewData));
+    }
+  }, [reviewData, dispatch]);
 
-    postReview();
-  }, [reviewData, toast]);
 
   const handleClose = () => {
     setComments('');
