@@ -35,6 +35,7 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   Flex,
+  SlideFade,
 } from "@chakra-ui/react";
 
 const FoodListingsPage = () => {
@@ -137,6 +138,16 @@ const FoodListingsPage = () => {
       setTimeout(() => {
         onClose();
         setIsSubmitting(false);
+        setFileFormatError("");
+        setModalError(true);
+        setValidListing(false);
+        setTitle("");
+        setShortDescription("");
+        setLongDescription("");
+        setPortionPrice(1);
+        setTotalSlots(1);
+        setDatetime(today.toISOString().slice(0, 16));
+        setImages(null);
         ShowToast("Listing published successfully!", "We'll notify you when all slots have been filled.", "success", 4000);
       }, 1500);
     }
@@ -253,18 +264,19 @@ const FoodListingsPage = () => {
         {listings.length > 0 ? (
           <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
             {listings.map((listing) => (
-              <FoodListings
-                key={listing.listingID}
-                title={listing.title}
-                hostName={hostName}
-                portionPrice={listing.portionPrice}
-                hostFoodRating={hostRating}
-                isFavourite={listing.isFavourite}
-                onToggleFavourite={() => toggleFavourite(listing.listingID)}
-                images={listing.images}/>
+              <SlideFade in={true} offsetY="20px" key={listing.listingID}>
+                <FoodListings
+                  key={listing.listingID}
+                  title={listing.title}
+                  hostName={hostName}
+                  portionPrice={listing.portionPrice}
+                  hostFoodRating={hostRating}
+                  isFavourite={listing.isFavourite}
+                  onToggleFavourite={() => toggleFavourite(listing.listingID)}
+                  images={listing.images}/>
+              </SlideFade>
             ))}
           </SimpleGrid>) : (
-            // Center the text both horizontally and vertically
             <Box display="flex" justifyContent="center" alignItems="center" height="65vh">
               <Text textAlign="center" fontSize="lg" color="gray.500" width="50%">
                 No listings available
@@ -273,7 +285,9 @@ const FoodListingsPage = () => {
           )}
       </Box>
         <Box flex="1" ml={5}>
-          <GoogleMaps />
+          <SlideFade in={true} offsetY="20px">
+            <GoogleMaps />
+          </SlideFade>
         </Box>
       </Flex>
       <Modal
