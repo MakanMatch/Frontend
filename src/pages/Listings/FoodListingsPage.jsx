@@ -36,6 +36,8 @@ import {
   AlertDialogFooter,
   Flex,
   SlideFade,
+  InputGroup,
+  InputLeftAddon,
 } from "@chakra-ui/react";
 
 const FoodListingsPage = () => {
@@ -328,22 +330,24 @@ const FoodListingsPage = () => {
             <Box display="flex" flexDirection="row" justifyContent="space-between" mb={-1}>
               <FormControl flex="1" mr={2} isRequired>
                 <FormLabel>Portion Fee (Max: $10)</FormLabel>
-                <NumberInput
-                  step={1}
-                  defaultValue={1}
-                  value={portionPrice}
-                  min={1}
-                  max={10}
-                  mb={4}
-                  onChange={(valueAsString, valueAsNumber) =>
-                    setPortionPrice(valueAsNumber || 1)
-                  }>
-                  <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
+                <InputGroup>
+                  <InputLeftAddon>$</InputLeftAddon>
+                  <NumberInput
+                    step={1}
+                    defaultValue={1}
+                    value={portionPrice}
+                    min={1}
+                    max={10}
+                    mb={4}
+                    onChange={(valueAsString, valueAsNumber) =>
+                      setPortionPrice(valueAsNumber || 1)}>
+                    <NumberInputField borderRadius={"0px 6px 6px 0px"}/>
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </InputGroup>
               </FormControl>
 
               <FormControl flex="1" ml={2} isRequired>
