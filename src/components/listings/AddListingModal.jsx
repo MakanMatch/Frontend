@@ -142,6 +142,8 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
             if (!isSuccess) {
+                onClose();
+                setDefaultState();
                 ShowToast("Request Timeout", "An error occured while getting image URL.", "error", 3000);
                 throw new Error('Request timeout');
             }
