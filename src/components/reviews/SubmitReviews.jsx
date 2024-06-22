@@ -44,22 +44,16 @@ function SubmitReviews() {
     images.forEach((file) => {
       formData.append('images', file);
     });
-
+    formData.append('sender', 'Susie Jones');
+    formData.append('receiver', 'Jamie Oliver');
+    formData.append('foodRating', foodRating);
+    formData.append('hygieneRating', hygieneRating);
+    formData.append('comments', comments);
+    formData.append('dateCreated', currentDate);
+    
     try {
-      const response = await server.post('/reviews/upload-images', formData);
-      const imageUrls = response.data.urls;
+      await server.post('/reviews', formData);
 
-      const sendReviewData = {
-        sender: "Susie Jones",
-        receiver: "Jamie Oliver",
-        foodRating,
-        hygieneRating,
-        comments,
-        images: imageUrls,
-        dateCreated: currentDate,
-      };
-
-      await server.post('/reviews', sendReviewData);
       toast({
         title: 'Review submitted successfully!',
         status: 'success',
