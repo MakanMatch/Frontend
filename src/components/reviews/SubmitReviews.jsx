@@ -20,7 +20,6 @@ import {
 } from '@chakra-ui/react'
 
 function SubmitReviews() {
-    const dispatch = useDispatch();
     const toast = useToast();
     const [foodRating, setFoodRating] = useState(0);
     const [hygieneRating, setHygieneRating] = useState(0);
@@ -65,7 +64,7 @@ function SubmitReviews() {
                 dateCreated: currentDate,
             };
 
-            await server.post('/reviews/', sendReviewData);
+            await server.post('/reviews', sendReviewData);
             toast({
                 title: 'Review submitted successfully!',
                 status: 'success',
@@ -88,13 +87,6 @@ function SubmitReviews() {
             });
         }
     };
-
-    useEffect(() => {
-        if (reviewData) {
-            dispatch(submitReviews(reviewData));
-        }
-    }, [reviewData, dispatch]);
-
 
     const handleClose = () => {
         setComments('');
