@@ -230,7 +230,7 @@ const FoodListingsPage = () => {
       <Box
         maxH="520px"
         overflowY="auto"
-        boxShadow={"0 4px 6px rgba(0.1, 0.1, 0.1, 0.1)"}
+        boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
         borderRadius="22px 8px 8px 22px"
         p="4"
         flex={2}
@@ -250,19 +250,27 @@ const FoodListingsPage = () => {
             backgroundColor: '#A1A1A1',
           },
         }}>
-        <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
-          {listings.map((listing) => (
-            <FoodListings
-              key={listing.listingID}
-              title={listing.title}
-              hostName={hostName}
-              portionPrice={listing.portionPrice}
-              hostFoodRating={hostRating}
-              isFavourite={listing.isFavourite}
-              onToggleFavourite={() => toggleFavourite(listing.listingID)}
-              images={listing.images}/>
-          ))}
-        </SimpleGrid>
+        {listings.length > 0 ? (
+          <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
+            {listings.map((listing) => (
+              <FoodListings
+                key={listing.listingID}
+                title={listing.title}
+                hostName={hostName}
+                portionPrice={listing.portionPrice}
+                hostFoodRating={hostRating}
+                isFavourite={listing.isFavourite}
+                onToggleFavourite={() => toggleFavourite(listing.listingID)}
+                images={listing.images}/>
+            ))}
+          </SimpleGrid>) : (
+            // Center the text both horizontally and vertically
+            <Box display="flex" justifyContent="center" alignItems="center" height="65vh">
+              <Text textAlign="center" fontSize="lg" color="gray.500" width="50%">
+                No listings available
+              </Text>
+            </Box>
+          )}
       </Box>
         <Box flex="1" ml={5}>
           <GoogleMaps />
