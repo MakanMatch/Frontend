@@ -41,16 +41,16 @@ function SubmitReviews() {
   const handleSubmit = async () => {
     const currentDate = new Date().toISOString();
     const formData = new FormData();
-    images.forEach((file) => {
-      formData.append('images', file);
-    });
     formData.append('sender', 'Susie Jones');
     formData.append('receiver', 'Jamie Oliver');
     formData.append('foodRating', foodRating);
     formData.append('hygieneRating', hygieneRating);
     formData.append('comments', comments);
+    images.forEach((file) => {
+      formData.append('file', file);
+    });
     formData.append('dateCreated', currentDate);
-    
+
     try {
       await server.post('/reviews', formData);
 
