@@ -72,6 +72,20 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         });
     }
 
+    function setDefaultState() {
+        setIsSubmitting(false);
+        setFileFormatError("");
+        setModalError(true);
+        setValidListing(false);
+        setTitle("");
+        setShortDescription("");
+        setLongDescription("");
+        setPortionPrice(1);
+        setTotalSlots(1);
+        setDatetime(today.toISOString().slice(0, 16));
+        setImages(null);
+    }
+
     function checkDate(date) {
         if (new Date(date) > new Date()) {
         setDatetime(date);
@@ -89,6 +103,14 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const handleSubmitListing = async () => {
         setIsSubmitting(true);
         var addedListingID = null;
+        let isTimedOut = false;
+        let isSuccess = false;
+        const timeoutPromise = new Promise((resolve, reject) => 
+            setTimeout(() => {
+                isTimedOut = true;
+                reject(new Error('Request timed out'));
+            }, 5000)
+        );
         try {
         const newListing = {
             title,
@@ -99,13 +121,30 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             totalSlots,
             datetime,
         }
-        const addListingResponse = await server.post("/listings/addListing", newListing);
+        const addListingResponse = await Promise.race([server.post("/listings/addListing", newListing), timeoutPromise]);
+        if (isTimedOut) throw new Error('Request timed out');
         addedListingID = addListingResponse.data.listingID;
         try {
             const formData = new FormData();
             formData.append("images", images);
             const addImageResponse = await server.post(`/listings/addImage?id=${addedListingID}`, formData);
-            await server.put("/listings/updateListingImageUrl", { listingID: addListingResponse.data.listingID, url: addImageResponse.data.url })
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const updateImageUrlResponse = await server.put("/listings/updateListingImageUrl", { listingID: addListingResponse.data.listingID, url: addImageResponse.data.url })
+                    if (updateImageUrlResponse.status === 200) {
+                        isSuccess = true;
+                        break;
+                    }
+                } catch (error) {
+                    ShowToast("Error updating listing image", "Please try again later.", "error", 2500);
+                    console.error("Error updating image URL:", error);
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            if (!isSuccess) {
+                ShowToast("Request Timeout", "An error occured while getting image URL.", "error", 3000);
+                throw new Error('Request timeout');
+            }
         } catch (error) {
             ShowToast("Error uploading listing image", "Please try again later.", "error", 2500);
             console.error("Error uploading listing image URL:", error);
@@ -117,17 +156,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         } finally {
         setTimeout(() => {
             onClose();
-            setIsSubmitting(false);
-            setFileFormatError("");
-            setModalError(true);
-            setValidListing(false);
-            setTitle("");
-            setShortDescription("");
-            setLongDescription("");
-            setPortionPrice(1);
-            setTotalSlots(1);
-            setDatetime(today.toISOString().slice(0, 16));
-            setImages(null);
+            setDefaultState();
             ShowToast("Listing published successfully!", "We'll notify you when all slots have been filled.", "success", 4000);
         }, 1500);
         }
