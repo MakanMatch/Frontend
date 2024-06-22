@@ -302,7 +302,7 @@ const FoodListingsPage = () => {
         <ModalContent overflow={"hidden"} maxH={"90vh"}>
           <ModalHeader>Host your next meal!</ModalHeader>
           <ModalBody>
-            <FormControl mb={3} isRequired>
+            <FormControl mb={2} mt={-3} isRequired>
               <FormLabel>What is the name of your dish?</FormLabel>
               <Input
                 type="text"
@@ -317,7 +317,7 @@ const FoodListingsPage = () => {
                 onChange={(event) => setShortDescription(event.target.value)}/>
             </FormControl>
 
-            <FormControl mb={3} isRequired>
+            <FormControl mb={2} isRequired>
               <FormLabel>Give a detailed description of this dish</FormLabel>
               <Input
                 type="text"
@@ -325,7 +325,7 @@ const FoodListingsPage = () => {
                 onChange={(event) => setLongDescription(event.target.value)}/>
             </FormControl>
 
-            <Box display="flex" flexDirection="row" justifyContent="space-between">
+            <Box display="flex" flexDirection="row" justifyContent="space-between" mb={-1}>
               <FormControl flex="1" mr={2} isRequired>
                 <FormLabel>Portion Fee (Max: $10)</FormLabel>
                 <NumberInput
