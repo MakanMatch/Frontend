@@ -45,7 +45,7 @@ function SubmitReviews() {
     };
 
     const handleSubmit = async () => {
-        const currentDate = new Date().toLocaleDateString();
+        const currentDate = new Date().toISOString();
         const formData = new FormData();
         images.forEach((file) => {
             formData.append('images', file);
