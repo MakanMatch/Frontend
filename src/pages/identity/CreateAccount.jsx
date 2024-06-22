@@ -69,7 +69,7 @@ function CreateAccount() {
                             duration: 3000,
                             isClosable: true,
                         });
-                        navigate(res.data.redirectUrl); // Redirect to EmailVerification page
+                        navigate(res.data.redirectUrl);
                     } else {
                         toast({
                             title: 'Account creation failed.',
@@ -249,7 +249,7 @@ function CreateAccount() {
                         </Button>
                     </Box>
                     <Text textAlign='center' fontSize='12px' mb={5}>
-                        Already have an account? <Link href='./login' color='teal.500'>Sign In</Link>
+                        Already have an account? <Link href='./login' color='teal.500'><Text as='u'>Sign In</Text></Link>
                     </Text>
                 </VStack>
             </Box>

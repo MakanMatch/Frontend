@@ -13,7 +13,6 @@ function EmailVerification() {
             bgPosition="center"
             display="flex"
             bgColor={'gray'}
-            minHeight="100vh"
         >
             <Box
                 w="50%"
@@ -28,7 +27,7 @@ function EmailVerification() {
                         Verify your email
                     </Heading>
                     <Image
-                        src="https://via.placeholder.com/300" // Replace with your image URL
+                        src="https://via.placeholder.com/300"
                         alt="Email verification"
                         boxSize="300px"
                         objectFit="cover"

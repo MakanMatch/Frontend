@@ -25,7 +25,7 @@ function Login() {
             const data = JSON.stringify(submitValues, null, 2);
             console.log(data)
             console.log(submitValues)
-            instance.post("/loginAccount", values, {
+            instance.post("/LoginAccount", values, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -131,12 +131,14 @@ function Login() {
                         </FormControl>
                         <Box w="100%" display="flex" justifyContent="start">
                             <Link
-                                href=''
+                                href='/accountrecovery'
                                 fontSize='12px'
                                 color='teal.500'
                                 mb={5}
                             >
-                                Forgot username or password?
+                                <Text as='u'>
+                                    Forgot username or password?
+                                </Text>
                             </Link>
                         </Box>
                         <Button
@@ -150,7 +152,7 @@ function Login() {
                         </Button>
                     </Box>
                     <Text textAlign='center' fontSize='12px' mb={5}>
-                        Don't have an account? <Link href='./createaccount' color='teal.500'>Sign Up</Link>
+                        Don't have an account? <Link href='./createaccount' color='teal.500'><Text as='u'>Sign Up</Text></Link>
                     </Text>
                 </VStack>
             </Box>
