@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StarRating from './StarRatings';
-import { submitReviews } from '../../slices/ReviewsState';
 import { Button, Box, Input, Flex, Avatar, Text, Center, Container, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
-import { useDispatch } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
 import server from '../../networking'
 import {
