@@ -41,6 +41,11 @@ function SubmitReviews() {
     setPreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
   };
 
+  const handleRemoveImage = (index) => {
+    setImages(prevImages => prevImages.filter((_, i) => i !== index));
+    setPreviews(prevPreviews => prevPreviews.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async () => {
     const currentDate = new Date().toLocaleDateString();
     const formData = new FormData();
@@ -143,16 +148,26 @@ function SubmitReviews() {
               <Text mt='16px' mb='8px'>Upload Images</Text>
               <Input pt="4px" type='file' accept='image/*' multiple onChange={handleImageChange} />
               <Flex mt={4} wrap="wrap">
-                {previews.map((preview, index) => (
-                  <Image
-                    key={index}
-                    src={preview}
-                    alt={`preview ${index}`}
-                    boxSize="100px"
-                    objectFit="cover"
-                    m={1}
-                    borderRadius="md"
-                  />
+              {previews.map((preview, index) => (
+                  <Box key={index} position="relative" boxSize="100px" m={1}>
+                    <Image
+                      src={preview}
+                      alt={`preview ${index}`}
+                      boxSize="100px"
+                      objectFit="cover"
+                      borderRadius="md"
+                    />
+                    <Button
+                      size="xs"
+                      position="absolute"
+                      top="0"
+                      right="0"
+                      colorScheme="red"
+                      onClick={() => handleRemoveImage(index)}
+                    >
+                      X
+                    </Button>
+                  </Box>
                 ))}
               </Flex>
             </FormControl>
