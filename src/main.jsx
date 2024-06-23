@@ -18,7 +18,7 @@ const store = configureStore({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
-        <ChakraProvider theme={MainTheme} toastOptions={{ defaultOptions: { position: 'bottom-right' }}}>
+        <ChakraProvider theme={MainTheme}>
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Layout />}>

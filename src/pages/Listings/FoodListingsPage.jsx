@@ -30,6 +30,7 @@ const FoodListingsPage = () => {
             console.log("Food listings fetched:", response.data);
             setListings(response.data);
         } catch (error) {
+            toast.closeAll();
             ShowToast(
                 "Error fetching food listings",
                 "Please try again later.",
@@ -57,6 +58,7 @@ const FoodListingsPage = () => {
             setHostRating(response.data.foodRating);
             console.log("Host name fetched:", response.data.username); // Debugging
         } catch (error) {
+            toast.closeAll();
             ShowToast(
                 "Error fetching required information",
                 "Please try again later.",

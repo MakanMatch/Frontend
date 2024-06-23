@@ -119,6 +119,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                             break;
                         }
                     } catch (error) {
+                        toast.closeAll();
                         ShowToast(
                             "Error updating listing image",
                             "Please try again later.",
@@ -132,6 +133,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 if (!isSuccess) {
                     onClose();
                     setDefaultState();
+                    toast.closeAll();
                     ShowToast(
                         "Request Timeout",
                         "An error occured while getting image URL.",
@@ -141,6 +143,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                     throw new Error("Request timeout");
                 }
             } catch (error) {
+                toast.closeAll();
                 ShowToast(
                     "Error uploading listing image",
                     "Please try again later.",
@@ -151,6 +154,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             }
             fetchListings();
         } catch (error) {
+            toast.closeAll();
             ShowToast(
                 "Error submitting listing",
                 "Please try again later.",
@@ -162,6 +166,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             setTimeout(() => {
                 onClose();
                 setDefaultState();
+                toast.closeAll();
                 ShowToast(
                     "Listing published successfully!",
                     "We'll notify you when all slots have been filled.",
@@ -220,6 +225,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     useEffect(() => {
         if (portionPrice > 10) {
             setPortionPrice(10);
+            toast.closeAll();
             ShowToast(
                 "Woah, that's too expensive!",
                 "Fee cannot exceed $10",
@@ -232,6 +238,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     useEffect(() => {
         if (totalSlots > 5) {
             setTotalSlots(5);
+            toast.closeAll();
             ShowToast(
                 "Too many Guests!",
                 "You can invite a maximum of 5 Guests",
