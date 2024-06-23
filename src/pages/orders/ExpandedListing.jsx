@@ -103,7 +103,6 @@ function ExpandedListing() {
     const handleFileSubmission = (e) => {
         if (e.target.files.length > 0) {
             setFile(e.target.files[0])
-            console.log("file set")
         }
     }
 
@@ -115,20 +114,20 @@ function ExpandedListing() {
         }
 
         const formData = new FormData()
-        console.log(file)
+        
         formData.append('file', file)
         formData.append('fileName', file.name)
         formData.append('listingID', listingData.listingID)
         const config = {
-            'content-type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data'
         }
 
-        server.post("/uploadListingImage", formData, config)
+        server.post("/uploadListingImage", formData, { headers: config, transformRequest: formData => formData })
             .then(res => {
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Success", "Image uploaded successfully", 2500, true, "success")
                     onClose()
-
+                    fetchListingDetails()
                     return
                 } else {
                     showToast("Error", "Failed to upload image", 5000, true, "error")
@@ -203,7 +202,7 @@ function ExpandedListing() {
                         <VStack textAlign={"left"} spacing={"25px"} p={"10px"}>
                             <Text width={"100%"}>Upload a new image for your dish!</Text>
                             <Text>Please be reminded that images must not contain explicit content; the images you upload should be real-life pictures of your dish only.</Text>
-                            <Input type={"file"} p={"10px"} h={"20%"} onChange={handleFileSubmission} />
+                            <Input type={"file"} p={"10px"} h={"20%"} accept='image/*' onChange={handleFileSubmission} />
                         </VStack>
                     </ModalBody>
                     <ModalFooter>
