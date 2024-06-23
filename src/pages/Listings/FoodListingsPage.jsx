@@ -25,7 +25,7 @@ const FoodListingsPage = () => {
     }
 
     function getImageLink(listingID, imageName) {
-        return `http://localhost:8000/listings/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
+        return `${import.meta.env.VITE_BACKEND_URL}/listings/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
     }
 
     const fetchListings = async () => {

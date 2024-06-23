@@ -75,14 +75,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         setIsSubmitting(true);
         let isTimedOut = false;
         const formData = new FormData();
-
-        const timeoutPromise = new Promise((resolve, reject) => {
-            setTimeout(() => {
-                isTimedOut = true;
-                reject(new Error("Request timed out"));
-            }, 10000);
-        }
-        );
         try {
             formData.append("title", title);
             formData.append("images", images);
@@ -102,6 +94,17 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             )
             if (addListingResponse.status === 200) {
                 fetchListings();
+                setTimeout(() => {
+                    onClose();
+                    setDefaultState();
+                    toast.closeAll();
+                    ShowToast(
+                        "Listing published successfully!",
+                        "We'll notify you when all slots have been filled.",
+                        "success",
+                        4000
+                    );
+                }, 1500);
             }
         } catch (error) {
             toast.closeAll();
@@ -124,18 +127,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 console.error("Error submitting listing:", error);
                 return;
             }
-        } finally {
-            setTimeout(() => {
-                onClose();
-                setDefaultState();
-                toast.closeAll();
-                ShowToast(
-                    "Listing published successfully!",
-                    "We'll notify you when all slots have been filled.",
-                    "success",
-                    4000
-                );
-            }, 1500);
         }
     };
 
