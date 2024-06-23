@@ -14,9 +14,9 @@ function AccountRecovery() {
     const navigate = useNavigate();
 
     const sendResetKey = () => {
-        server.post('/AccountRecovery/resetKey', { usernameOrEmail })
+        server.post('/accountRecovery/resetKey', { usernameOrEmail })
             .then((res) => {
-                if (res.data.message && res.data.message.startsWith("SUCCESS")) {
+                if (res.data && res.data.startsWith("SUCCESS")) {
                     setShowResetFields(true);
                     toast({
                         title: 'Reset key sent.',
@@ -28,7 +28,7 @@ function AccountRecovery() {
                 } else {
                     toast({
                         title: 'Error',
-                        description: res.data.message,
+                        description: res.data,
                         status: 'error',
                         duration: 3000,
                         isClosable: true,
@@ -36,12 +36,12 @@ function AccountRecovery() {
                 }
             })
             .catch((err) => {
-                if (err.response.data.message === "Username or email doesn't exist.") {
+                if (err.response.data === "Username or email doesn't exist.") {
                     formik.setFieldError('usernameOrEmail', "Username or email doesn't exist.");
                 }
                 toast({
                     title: 'Error',
-                    description: err.response.data.message,
+                    description: err.response.data,
                     status: 'error',
                     duration: 3000,
                     isClosable: true,
@@ -51,9 +51,9 @@ function AccountRecovery() {
 
     // Submit function
     const handleSubmit = (values, actions) => {
-        server.post('/AccountRecovery/resetPassword', { usernameOrEmail, ...values })
+        server.post('/accountRecovery/resetPassword', { usernameOrEmail, ...values })
             .then((res) => {
-                if (res.data.message && res.data.message.startsWith("SUCCESS")) {
+                if (res.data && res.data.startsWith("SUCCESS")) {
                     toast({
                         title: 'Password reset successfully.',
                         description: "You can now log in with your new password.",
@@ -65,12 +65,12 @@ function AccountRecovery() {
                 }
             })
             .catch((err) => {
-                if (err.response.data.message === "Invalid or expired reset key.") {
+                if (err.response.data === "Invalid or expired reset key.") {
                     formik.setFieldError('resetKey', 'Invalid or expired reset key')
                 }
                 toast({
                     title: 'Error',
-                    description: err.response.data.message,
+                    description: err.response.data,
                     status: 'error',
                     duration: 3000,
                     isClosable: true,

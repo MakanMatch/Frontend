@@ -44,13 +44,13 @@ function CreateAccount() {
     const handleSubmit = (values, actions) => {
         const { confirmPassword, ...submitValues } = values;
 
-        server.post("/CreateAccount", submitValues, {
+        server.post("/createAccount", submitValues, {
             headers: {
                 'Content-Type': 'application/json'
             }
         })
         .then((res) => {
-            if (res && res.data && res.data.message === "SUCCESS: Account created. Please verify your email.") {
+            if (res && res.data && res.data === "SUCCESS: Account created. Please verify your email.") {
                 toast({
                     title: 'Account created.',
                     description: "Please verify your email to continue.",
@@ -58,7 +58,7 @@ function CreateAccount() {
                     duration: 3000,
                     isClosable: true,
                 });
-                navigate('/EmailVerification');
+                navigate('/emailVerification');
             } else {
                 toast({
                     title: 'Account creation failed.',
@@ -70,16 +70,16 @@ function CreateAccount() {
             }
         })
         .catch((err) => {
-            if (err.response.data.message === "Username already exists.") {
+            if (err.response.data === "Username already exists.") {
                 actions.setFieldError('username', 'Username already exists.');
-            } else if (err.response.data.message === "Email already exists.") {
+            } else if (err.response.data === "Email already exists.") {
                 actions.setFieldError('email', 'Email already exists.');
-            } else if (err.response.data.message === "Contact number already exists.") {
+            } else if (err.response.data === "Contact number already exists.") {
                 actions.setFieldError('contactNum', 'Contact number already in use.');
             }
             toast({
                 title: 'Account creation failed.',
-                description: `${err.response.data.message}`,
+                description: `${err.response.data}`,
                 status: 'error',
                 duration: 3000,
                 isClosable: true,

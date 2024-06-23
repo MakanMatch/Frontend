@@ -14,7 +14,7 @@ function Login() {
 
     // Submit function
     const handleSubmit = (values, actions) => {
-        server.post("/LoginAccount", values, {
+        server.post("/loginAccount", values, {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -44,8 +44,8 @@ function Login() {
         })
         .catch((err) => {
             console.log("error")
-            console.log(`${err.response.data.message}`);
-            if (err.response.data.message === "Invalid username or email or password.") {
+            console.log(`${err.response.data}`);
+            if (err.response.data === "Invalid username or email or password.") {
                 formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
                 formik.setFieldError('password', 'Incorrect password.');
             }
@@ -131,7 +131,7 @@ function Login() {
                         </FormControl>
                         <Box w="100%" display="flex" justifyContent="start">
                             <Link
-                                href='/accountrecovery'
+                                href='/accountRecovery'
                                 fontSize='12px'
                                 color='teal.500'
                                 mb={5}
@@ -152,7 +152,7 @@ function Login() {
                         </Button>
                     </Box>
                     <Text textAlign='center' fontSize='12px' mb={5}>
-                        Don't have an account? <Link href='./createaccount' color='teal.500'><Text as='u'>Sign Up</Text></Link>
+                        Don't have an account? <Link href='./createAccount' color='teal.500'><Text as='u'>Sign Up</Text></Link>
                     </Text>
                 </VStack>
             </Box>

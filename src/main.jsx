@@ -27,10 +27,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Routes>
                     <Route path='/' element={<Layout />}>
                         <Route index element={<Home />} />
-                        <Route path={"/createaccount"} element={<CreateAccount />} />
+                        <Route path={"/createAccount"} element={<CreateAccount />} />
                         <Route path={"/login"} element={<Login />} />
-                        <Route path={"/emailverification"} element={<EmailVerification />} />
-                        <Route path={"/accountrecovery"} element={<AccountRecovery />} />
+                        <Route path={"/emailVerification"} element={<EmailVerification />} />
+                        <Route path={"/accountRecovery"} element={<AccountRecovery />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
