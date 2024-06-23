@@ -1,5 +1,5 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
@@ -26,10 +26,38 @@ function ExpandedListing() {
         datetime: null,
         published: null
     })
+    const [longDescription, setLongDescription] = useState(listingData.longDescription)
+    const [changesMade, setChangesMade] = useState(false)
     const [loading, setLoading] = useState(true)
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [file, setFile] = useState(null);
 
+    const handleClose = () => {
+        onClose()
+        setFile(null)
+    }
+
+    const handleFileSubmission = (e) => {
+        if (e.target.files.length > 0) {
+            setFile(e.target.files[0])
+        }
+    }
+    const handleDescriptionChange = (e) => {
+        setLongDescription(e.target.value);
+        if (e.target.value != listingData.longDescription) {
+            setChangesMade(true)
+        } else {
+            setChangesMade(false)
+        }
+    }
+    const togglePublished = (newValue) => {
+        setListingPublished(newValue)
+        console.log("Updating to: " + newValue)
+        handleSaveChanges(newValue, true)
+    }
+
+    const showComingSoon = () => { showToast("Coming soon", "This feature is not complete yet.", 3000) }
+    const imgBackendURL = (imgName) => `${backendAPIURL}/getListingImage/${imgName}`
     const showToast = (title, description, duration = 5000, isClosable = true, status = 'info', icon = null) => {
         if (!["success", "warning", "error", "info"].includes(status)) {
             status = "info"
@@ -48,10 +76,6 @@ function ExpandedListing() {
 
         toast(toastConfig)
     }
-
-    const showComingSoon = () => { showToast("Coming soon", "This feature is not complete yet.", 3000) }
-    const imgBackendURL = (imgName) => `${backendAPIURL}/img/${imgName}`
-
     const processData = (data) => {
         let datetime = new Date(data.datetime)
         let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
@@ -70,8 +94,10 @@ function ExpandedListing() {
         server.get("/listingDetails")
             .then(response => {
                 if (response.status == 200) {
-                    console.log(response.data)
-                    setListingData(processData(response.data))
+                    const processedData = processData(response.data)
+                    setListingData(processedData)
+                    setLongDescription(processedData.longDescription)
+                    setListingPublished(processedData.published)
                     setLoading(false)
                     return
                 } else {
@@ -84,6 +110,66 @@ function ExpandedListing() {
                 showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
                 console.log(err)
                 return
+            })
+    }
+
+    const uploadImage = (e) => {
+        e.preventDefault();
+        if (file == null) {
+            showToast("Error", "No file selected", 2500, true, "error")
+            return
+        }
+
+        const formData = new FormData()
+
+        formData.append('file', file)
+        formData.append('fileName', file.name)
+        formData.append('listingID', listingData.listingID)
+        const config = {
+            'Content-Type': 'multipart/form-data'
+        }
+
+        server.post("/uploadListingImage", formData, { headers: config, transformRequest: formData => formData })
+            .then(res => {
+                if (res.status == 200 && res.data.startsWith("SUCCESS")) {
+                    showToast("Success", "Image uploaded successfully", 2500, true, "success")
+                    handleClose()
+                    fetchListingDetails()
+                    return
+                } else {
+                    showToast("Error", "Failed to upload image", 5000, true, "error")
+                    console.log(res.data)
+                    return
+                }
+            })
+            .catch(err => {
+                showToast("Error", "Failed to upload image", 5000, true, "error")
+                console.log(err)
+                return
+            })
+    }
+
+    const handleSaveChanges = (value, fromPublishToggle) => {
+        const data = {
+            listingID: listingData.listingID,
+            longDescription: longDescription
+        }
+        if (fromPublishToggle) {
+            data.published = value
+        }
+
+        server.post("/updateListing", data)
+            .then(res => {
+                if (res.status == 200 && res.data.startsWith("SUCCESS")) {
+                    showToast("Success", "Changes saved successfully", 2500, true, "success")
+                    setChangesMade(false)
+                    fetchListingDetails()
+                    return
+                } else {
+                    showToast("Error", "Failed to save changes", 5000, true, "error")
+                    console.log(res.data)
+                    return
+                }
             })
     }
 
@@ -100,48 +186,6 @@ function ExpandedListing() {
         return (<Spinner />)
     }
 
-    const handleFileSubmission = (e) => {
-        if (e.target.files.length > 0) {
-            setFile(e.target.files[0])
-        }
-    }
-
-    const uploadImage = (e) => {
-        e.preventDefault();
-        if (file == null) {
-            showToast("Error", "No file selected", 2500, true, "error")
-            return
-        }
-
-        const formData = new FormData()
-        
-        formData.append('file', file)
-        formData.append('fileName', file.name)
-        formData.append('listingID', listingData.listingID)
-        const config = {
-            'Content-Type': 'multipart/form-data'
-        }
-
-        server.post("/uploadListingImage", formData, { headers: config, transformRequest: formData => formData })
-            .then(res => {
-                if (res.status == 200 && res.data.startsWith("SUCCESS")) {
-                    showToast("Success", "Image uploaded successfully", 2500, true, "success")
-                    onClose()
-                    fetchListingDetails()
-                    return
-                } else {
-                    showToast("Error", "Failed to upload image", 5000, true, "error")
-                    console.log(res.data)
-                    return
-                }
-            })
-            .catch(err => {
-                showToast("Error", "Failed to upload image", 5000, true, "error")
-                console.log(err)
-                return
-            })
-    }
-
     return (
         <>
             <Grid
@@ -150,15 +194,28 @@ function ExpandedListing() {
                 gap={4}
                 p={"10px"}
             >
-                <GridItem colSpan={3} mb={"20px"}>
+                <GridItem colSpan={2}>
                     <VStack alignItems={"flex-start"}>
                         <Text>{listingData.datetime}</Text>
                         <Heading>{listingData.title}</Heading>
-
+                    </VStack>
+                </GridItem>
+                <GridItem colSpan={1} alignContent={"flex-end"}>
+                    {changesMade && (
+                        <SlideFade in={true}>
+                            <HStack>
+                                <Spacer />
+                                <Button variant={"MMPrimary"} onClick={handleSaveChanges}>Save Changes</Button>
+                            </HStack>
+                        </SlideFade>
+                    )}
+                </GridItem>
+                <GridItem colSpan={3} mb={"20px"}>
+                    <VStack alignItems={"flex-start"}>
                         <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
-                            {listingData.images.map(imgName => {
+                            {listingData.images.map((imgName, index) => {
                                 return (
-                                    <Image maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
+                                    <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
                                 )
                             })}
                             <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={onOpen}>
@@ -171,7 +228,7 @@ function ExpandedListing() {
                     <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
                         <VStack alignItems={"flex-start"} width={"100%"}>
                             <Text fontWeight={"bold"} mb={"10px"}>Description</Text>
-                            <Textarea placeholder='Describe your dish here' value={listingData.longDescription} />
+                            <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleDescriptionChange} />
                         </VStack>
 
                         <Spacer />
@@ -190,10 +247,10 @@ function ExpandedListing() {
                 </GridItem>
 
                 <GridItem colSpan={1}>
-                    <ReservationSettingsCard listingPublished={listingPublished} setListingPublished={setListingPublished} pricePerPortion={pricePerPortion} setPricePerPortion={setPricePerPortion} />
+                    <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} setPricePerPortion={setPricePerPortion} />
                 </GridItem>
             </Grid>
-            <Modal onClose={onClose} isOpen={isOpen} isCentered>
+            <Modal onClose={handleClose} isOpen={isOpen} isCentered>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Upload New Image</ModalHeader>
@@ -207,7 +264,7 @@ function ExpandedListing() {
                     </ModalBody>
                     <ModalFooter>
                         <HStack spacing={"20px"}>
-                            <Button onClick={onClose}>Close</Button>
+                            <Button onClick={handleClose}>Close</Button>
                             <Button colorScheme={"blue"} onClick={uploadImage}>Upload</Button>
                         </HStack>
                     </ModalFooter>
