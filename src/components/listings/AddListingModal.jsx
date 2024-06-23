@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import { CheckCircleIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from "@chakra-ui/react";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, } from "@chakra-ui/react";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const toast = useToast();
@@ -29,16 +29,16 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const {
         isOpen: isAlertOpen,
         onOpen: onAlertOpen,
-        onClose: onAlertClose
+        onClose: onAlertClose,
     } = useDisclosure();
 
     function ShowToast(title, description, status, duration) {
         toast({
-        title: title,
-        description: description,
-        status: status,
-        duration: duration,
-        isClosable: false,
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: false,
         });
     }
 
@@ -61,8 +61,13 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             setDatetime(date);
         } else {
             toast.closeAll();
-            ShowToast("Invalid Date/Time", "Please select a date-time that's greater than today's date-time", "error", 3000);
-        return;
+            ShowToast(
+                "Invalid Date/Time",
+                "Please select a date-time that's greater than today's date-time",
+                "error",
+                3000
+            );
+            return;
         }
     }
 
@@ -71,76 +76,120 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         var addedListingID = null;
         let isTimedOut = false;
         let isSuccess = false;
-        const timeoutPromise = new Promise((resolve, reject) => 
+        const timeoutPromise = new Promise((resolve, reject) =>
             setTimeout(() => {
                 isTimedOut = true;
-                reject(new Error('Request timed out'));
+                reject(new Error("Request timed out"));
             }, 5000)
         );
         try {
-        const newListing = {
-            title,
-            images: "",
-            shortDescription,
-            longDescription,
-            portionPrice,
-            totalSlots,
-            datetime,
-        }
-        const addListingResponse = await Promise.race([server.post("/listings/addListing", newListing), timeoutPromise]);
-        if (isTimedOut) throw new Error('Request timed out');
-        addedListingID = addListingResponse.data.listingID;
-        try {
-            const formData = new FormData();
-            formData.append("images", images);
-            const addImageResponse = await server.post(`/listings/addImage?id=${addedListingID}`, formData);
-            for (let i = 0; i < 5; i++) {
-                try {
-                    const updateImageUrlResponse = await server.put("/listings/updateListingImageUrl", { listingID: addListingResponse.data.listingID, url: addImageResponse.data.url })
-                    if (updateImageUrlResponse.status === 200) {
-                        isSuccess = true;
-                        break;
+            const newListing = {
+                title,
+                images: "",
+                shortDescription,
+                longDescription,
+                portionPrice,
+                totalSlots,
+                datetime,
+            };
+            const addListingResponse = await Promise.race([
+                server.post("/listings/addListing", newListing),
+                timeoutPromise,
+            ]);
+            if (isTimedOut) throw new Error("Request timed out");
+            addedListingID = addListingResponse.data.listingID;
+            try {
+                const formData = new FormData();
+                formData.append("images", images);
+                const addImageResponse = await server.post(
+                    `/listings/addImage?id=${addedListingID}`,
+                    formData
+                );
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        const updateImageUrlResponse = await server.put(
+                            "/listings/updateListingImageUrl",
+                            {
+                                listingID: addListingResponse.data.listingID,
+                                url: addImageResponse.data.url,
+                            }
+                        );
+                        if (updateImageUrlResponse.status === 200) {
+                            isSuccess = true;
+                            break;
+                        }
+                    } catch (error) {
+                        ShowToast(
+                            "Error updating listing image",
+                            "Please try again later.",
+                            "error",
+                            2500
+                        );
+                        console.error("Error updating image URL:", error);
                     }
-                } catch (error) {
-                    ShowToast("Error updating listing image", "Please try again later.", "error", 2500);
-                    console.error("Error updating image URL:", error);
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
                 }
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                if (!isSuccess) {
+                    onClose();
+                    setDefaultState();
+                    ShowToast(
+                        "Request Timeout",
+                        "An error occured while getting image URL.",
+                        "error",
+                        3000
+                    );
+                    throw new Error("Request timeout");
+                }
+            } catch (error) {
+                ShowToast(
+                    "Error uploading listing image",
+                    "Please try again later.",
+                    "error",
+                    2500
+                );
+                console.error("Error uploading listing image URL:", error);
             }
-            if (!isSuccess) {
+            fetchListings();
+        } catch (error) {
+            ShowToast(
+                "Error submitting listing",
+                "Please try again later.",
+                "error",
+                2500
+            );
+            console.error("Error submitting listing:", error);
+        } finally {
+            setTimeout(() => {
                 onClose();
                 setDefaultState();
-                ShowToast("Request Timeout", "An error occured while getting image URL.", "error", 3000);
-                throw new Error('Request timeout');
-            }
-        } catch (error) {
-            ShowToast("Error uploading listing image", "Please try again later.", "error", 2500);
-            console.error("Error uploading listing image URL:", error);
-        }
-        fetchListings();
-        } catch (error) {
-        ShowToast("Error submitting listing", "Please try again later.", "error", 2500);
-        console.error("Error submitting listing:", error);
-        } finally {
-        setTimeout(() => {
-            onClose();
-            setDefaultState();
-            ShowToast("Listing published successfully!", "We'll notify you when all slots have been filled.", "success", 4000);
-        }, 1500);
+                ShowToast(
+                    "Listing published successfully!",
+                    "We'll notify you when all slots have been filled.",
+                    "success",
+                    4000
+                );
+            }, 1500);
         }
     };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/svg+xml"];
-        if (allowedTypes.includes(file.type)) {
-            setImages(file);
-            setFileFormatError("");
-        } else {
-            setImages("");
-            setFileFormatError("Invalid file format. Only JPEG, JPG, PNG and SVG are allowed.");
-        }
+            const allowedTypes = [
+                "image/jpeg",
+                "image/jpg",
+                "image/png",
+                "image/svg+xml",
+            ];
+            if (allowedTypes.includes(file.type)) {
+                setImages(file);
+                setFileFormatError("");
+            } else {
+                setImages("");
+                setFileFormatError(
+                    "Invalid file format. Only JPEG, JPG, PNG and SVG are allowed."
+                );
+            }
         }
     };
 
@@ -154,92 +203,129 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     };
 
     useEffect(() => {
-        if (title.trim() === "" || shortDescription.trim() === "" || longDescription.trim() === "" || !images) {
-        setModalError(true);
-        setValidListing(false);
+        if (
+            title.trim() === "" ||
+            shortDescription.trim() === "" ||
+            longDescription.trim() === "" ||
+            !images
+        ) {
+            setModalError(true);
+            setValidListing(false);
         } else {
-        setModalError(false);
-        setValidListing(true);
+            setModalError(false);
+            setValidListing(true);
         }
-    }
-    , [title, shortDescription, longDescription, images]);
+    }, [title, shortDescription, longDescription, images]);
 
     useEffect(() => {
         if (portionPrice > 10) {
-        setPortionPrice(10);
-        ShowToast("Woah, that's too expensive!", "Fee cannot exceed $10", "error", 2500);
+            setPortionPrice(10);
+            ShowToast(
+                "Woah, that's too expensive!",
+                "Fee cannot exceed $10",
+                "error",
+                2500
+            );
         }
     }, [portionPrice]);
 
     useEffect(() => {
         if (totalSlots > 5) {
-        setTotalSlots(5);
-        ShowToast("Too many Guests!", "You can invite a maximum of 5 Guests", "error", 2500);
+            setTotalSlots(5);
+            ShowToast(
+                "Too many Guests!",
+                "You can invite a maximum of 5 Guests",
+                "error",
+                2500
+            );
         }
     }, [totalSlots]);
     return (
         <div>
             <Modal
-            blockScrollOnMount={true}
-            isOpen={isOpen}
-            onClose={onClose}
-            size={"lg"}
-            scrollBehavior="inside"
-            closeOnOverlayClick={false}
-            isCentered>
+                blockScrollOnMount={true}
+                isOpen={isOpen}
+                onClose={onClose}
+                size={"lg"}
+                scrollBehavior="inside"
+                closeOnOverlayClick={false}
+                isCentered
+            >
                 <ModalOverlay
                     bg="blackAlpha.300"
-                    backdropFilter="blur(10px) hue-rotate(90deg)"/>
+                    backdropFilter="blur(3px) hue-rotate(90deg)"
+                />
                 <ModalContent overflow={"hidden"} maxH={"90vh"}>
                     <ModalHeader>Host your next meal!</ModalHeader>
                     <ModalBody>
-                        <FormControl mb={2} mt={-3} isRequired>
-                            <FormLabel>What is the name of your dish?</FormLabel>
+                        <FormControl mb={5} isRequired>
+                            <FormLabel>
+                                What is the name of your dish?
+                            </FormLabel>
                             <Input
-                            type="text"
-                            placeholder="E.g Pani Puri"
-                            onChange={(event) => setTitle(event.target.value)}/>
+                                type="text"
+                                placeholder="E.g Pani Puri"
+                                onChange={(event) =>
+                                    setTitle(event.target.value)
+                                }
+                            />
                         </FormControl>
 
-                        <FormControl mb={3} isRequired>
+                        <FormControl mb={5} isRequired>
                             <FormLabel>What is this dish?</FormLabel>
                             <Input
-                            type="text"
-                            placeholder="E.g Popular Indian Street Food"
-                            onChange={(event) => setShortDescription(event.target.value)}/>
+                                type="text"
+                                placeholder="E.g Popular Indian Street Food"
+                                onChange={(event) =>
+                                    setShortDescription(event.target.value)
+                                }
+                            />
                         </FormControl>
 
-                        <FormControl mb={2} isRequired>
-                            <FormLabel>Give a detailed description of this dish</FormLabel>
+                        <FormControl mb={5} isRequired>
+                            <FormLabel>
+                                Give a detailed description of this dish
+                            </FormLabel>
                             <Input
-                            type="text"
-                            placeholder="E.g Pani Puri offers a burst of flavors and textures in every bite. It is made of a crispy shell, a mixture of potato, onion, peas and chickpea."
-                            onChange={(event) => setLongDescription(event.target.value)}/>
+                                type="text"
+                                placeholder="E.g Pani Puri offers a burst of flavors and textures in every bite. It is made of a crispy shell, a mixture of potato, onion, peas and chickpea."
+                                onChange={(event) =>
+                                    setLongDescription(event.target.value)
+                                }
+                            />
                         </FormControl>
 
                         <Box
                             display="flex"
                             flexDirection="row"
                             justifyContent="space-between"
-                            mb={-1}>
+                            mb={3}
+                        >
                             <FormControl flex="1" mr={2} isRequired>
                                 <FormLabel>Portion Fee (Max: $10)</FormLabel>
                                 <InputGroup>
                                     <InputLeftAddon>$</InputLeftAddon>
                                     <NumberInput
-                                    step={1}
-                                    defaultValue={1}
-                                    value={portionPrice}
-                                    min={1}
-                                    max={10}
-                                    mb={4}
-                                    onChange={(valueAsString, valueAsNumber) =>
-                                    setPortionPrice(valueAsNumber || 1)}>
-                                    <NumberInputField borderRadius={"0px 6px 6px 0px"} />
-                                    <NumberInputStepper>
-                                        <NumberIncrementStepper />
-                                        <NumberDecrementStepper />
-                                    </NumberInputStepper>
+                                        step={1}
+                                        defaultValue={1}
+                                        value={portionPrice}
+                                        min={1}
+                                        max={10}
+                                        mb={4}
+                                        onChange={(
+                                            valueAsString,
+                                            valueAsNumber
+                                        ) =>
+                                            setPortionPrice(valueAsNumber || 1)
+                                        }
+                                    >
+                                        <NumberInputField
+                                            borderRadius={"0px 6px 6px 0px"}
+                                        />
+                                        <NumberInputStepper>
+                                            <NumberIncrementStepper />
+                                            <NumberDecrementStepper />
+                                        </NumberInputStepper>
                                     </NumberInput>
                                 </InputGroup>
                             </FormControl>
@@ -254,7 +340,9 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                                     max={5}
                                     mb={4}
                                     onChange={(valueAsString, valueAsNumber) =>
-                                    setTotalSlots(valueAsNumber || 1)}>
+                                        setTotalSlots(valueAsNumber || 1)
+                                    }
+                                >
                                     <NumberInputField />
                                     <NumberInputStepper>
                                         <NumberIncrementStepper />
@@ -264,63 +352,86 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                             </FormControl>
                         </Box>
 
-                        <FormControl mb={2} isRequired>
-                            <FormLabel>When will you be hosting this meal?</FormLabel>
+                        <FormControl mb={5} isRequired>
+                            <FormLabel>
+                                When will you be hosting this meal?
+                            </FormLabel>
                             <Input
-                            type="datetime-local"
-                            value={datetime}
-                            onChange={(event) => checkDate(event.target.value)}/>
+                                type="datetime-local"
+                                value={datetime}
+                                onChange={(event) =>
+                                    checkDate(event.target.value)
+                                }
+                            />
                         </FormControl>
 
                         <FormControl isRequired>
                             <FormLabel>Upload an image of your dish</FormLabel>
-                            <Input type="file" size="sm" onChange={handleFileChange} />
+                            <Input
+                                type="file"
+                                size="sm"
+                                onChange={handleFileChange}
+                            />
                             {fileFormatError && (
-                            <FormHelperText color="red">{fileFormatError}</FormHelperText>)}
+                                <FormHelperText color="red">
+                                    {fileFormatError}
+                                </FormHelperText>
+                            )}
                         </FormControl>
                     </ModalBody>
 
                     <ModalFooter>
                         <Box flex={"1"} textAlign={"left"}>
-                            {modalError && <Text color="red">All fields are required</Text>}
+                            {modalError && (
+                                <Text color="red">All fields are required</Text>
+                            )}
                             {validListing && (
-                            <Text color="green">
-                                <CheckCircleIcon color="green" mr={2} mb={1} />
-                                You are good to go!
-                            </Text>
+                                <Text color="green">
+                                    <CheckCircleIcon
+                                        color="green"
+                                        mr={2}
+                                        mb={1}
+                                    />
+                                    You are good to go!
+                                </Text>
                             )}
                         </Box>
                         <Button
                             colorScheme={"red"}
                             mr={3}
                             borderRadius={"10px"}
-                            onClick={handleCancelClick}>
+                            onClick={handleCancelClick}
+                        >
                             Cancel
                         </Button>
                         {modalError ? (
                             <Button
-                            borderRadius={"10px"}
-                            colorScheme="blue"
-                            color="white"
-                            fontWeight="bold"
-                            isDisabled>
-                            Host
+                                borderRadius={"10px"}
+                                colorScheme="blue"
+                                color="white"
+                                fontWeight="bold"
+                                isDisabled
+                            >
+                                Host
                             </Button>
                         ) : (
                             <>
-                            {isSubmitting ? (
-                                <Button
-                                isLoading
-                                loadingText="Submitting..."
-                                borderRadius={"10px"}
-                                >
-                                Submitting...
-                                </Button>
-                            ) : (
-                                <Button onClick={handleSubmitListing} variant="MMPrimary">
-                                Host
-                                </Button>
-                            )}
+                                {isSubmitting ? (
+                                    <Button
+                                        isLoading
+                                        loadingText="Submitting..."
+                                        borderRadius={"10px"}
+                                    >
+                                        Submitting...
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={handleSubmitListing}
+                                        variant="MMPrimary"
+                                    >
+                                        Host
+                                    </Button>
+                                )}
                             </>
                         )}
                     </ModalFooter>
@@ -330,27 +441,36 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 isOpen={isAlertOpen}
                 leastDestructiveRef={cancelRef}
                 onClose={onAlertClose}
-                motionPreset='slideInBottom'
-                closeOnOverlayClick={false}>
-                <AlertDialogOverlay bg='blackAlpha.300' backdropFilter='blur(10px) hue-rotate(90deg)'>
-                <AlertDialogContent>
-                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                    Discard changes
-                    </AlertDialogHeader>
+                motionPreset="slideInBottom"
+                closeOnOverlayClick={false}
+            >
+                <AlertDialogOverlay
+                    bg="blackAlpha.300"
+                    backdropFilter="blur(6px) hue-rotate(90deg)"
+                >
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Discard changes
+                        </AlertDialogHeader>
 
-                    <AlertDialogBody>
-                    Are you sure you want to cancel? All your changes will be lost.
-                    </AlertDialogBody>
+                        <AlertDialogBody>
+                            Are you sure you want to cancel? All your changes
+                            will be lost.
+                        </AlertDialogBody>
 
-                    <AlertDialogFooter>
-                    <Button ref={cancelRef} onClick={onAlertClose}>
-                        Go back
-                    </Button>
-                    <Button colorScheme="red" onClick={handleAlertConfirm} ml={3}>
-                        Discard
-                    </Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onAlertClose}>
+                                Go back
+                            </Button>
+                            <Button
+                                colorScheme="red"
+                                onClick={handleAlertConfirm}
+                                ml={3}
+                            >
+                                Discard
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
                 </AlertDialogOverlay>
             </AlertDialog>
         </div>

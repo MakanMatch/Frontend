@@ -12,7 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-const FoodListings = ({
+const FoodListing = ({
   title,
   hostName,
   portionPrice,
@@ -59,4 +59,4 @@ const FoodListings = ({
   );
 };
 
-export default FoodListings;
+export default FoodListing;

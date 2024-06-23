@@ -2,7 +2,7 @@
 // FoodListingsPage.jsx
 import { useState, useEffect } from "react";
 import server from "../../networking";
-import FoodListings from "../../components/listings/FoodListings";
+import FoodListing from "../../components/listings/FoodListing";
 import GoogleMaps from "../../components/listings/GoogleMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
 import {
@@ -55,19 +55,19 @@ const FoodListingsPage = () => {
     );
   };
 
-  useEffect(() => {
-    const fetchHostInfo = async () => {
-      try {
-        const response = await server.get("/listings/hostInfo");
-        setHostName(response.data.username);
-        setHostRating(response.data.foodRating);
-        console.log("Host name fetched:", response.data.username); // Debugging
-      } catch (error) {
-        ShowToast("Error fetching required information", "Please try again later.", "error", 2500);
-        console.error("Error fetching host info:", error);
-      }
-    };
+  const fetchHostInfo = async () => {
+    try {
+      const response = await server.get("/listings/hostInfo");
+      setHostName(response.data.username);
+      setHostRating(response.data.foodRating);
+      console.log("Host name fetched:", response.data.username); // Debugging
+    } catch (error) {
+      ShowToast("Error fetching required information", "Please try again later.", "error", 2500);
+      console.error("Error fetching host info:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchListings();
     fetchHostInfo();
   }, []);
@@ -108,7 +108,7 @@ const FoodListingsPage = () => {
           <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
             {listings.map((listing) => (
               <SlideFade in={true} offsetY="20px" key={listing.listingID}>
-                <FoodListings
+                <FoodListing
                   key={listing.listingID}
                   title={listing.title}
                   hostName={hostName}
