@@ -11,11 +11,15 @@ import Version from './pages/Version.jsx'
 import Home from './pages/Home.jsx'
 import ExpandedListing from './pages/orders/ExpandedListing.jsx'
 import FoodListingsPage from './pages/Listings/FoodListingsPage'
+import CreateAccount from './pages/identity/CreateAccount'
+import Login from './pages/identity/Login'
+import EmailVerification from './pages/identity/EmailVerification';
+import AccountRecovery from './pages/identity/AccountRecovery';
 import NotFound from './pages/404.jsx'
 
 const store = configureStore({
     reducer: {
-        universal: universalReducer
+        universal: universalReducer,
     }
 })
 
@@ -26,9 +30,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Routes>
                     <Route path='/' element={<Layout />}>
                         <Route index element={<Home />} />
-                        <Route path="listings" element={<FoodListingsPage />} />
-                        <Route path='version' element={<Version />} />
-                        <Route path="expandedListing" element={<ExpandedListing />} />
+                        <Route path={"listings"} element={<FoodListingsPage />} />
+                        <Route path={'version'} element={<Version />} />
+                        <Route path={"expandedListing"} element={<ExpandedListing />} />
+                        <Route path={"/createAccount"} element={<CreateAccount />} />
+                        <Route path={"/login"} element={<Login />} />
+                        <Route path={"/emailVerification"} element={<EmailVerification />} />
+                        <Route path={"/accountRecovery"} element={<AccountRecovery />} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>
