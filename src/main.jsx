@@ -15,6 +15,7 @@ import CreateAccount from './pages/identity/CreateAccount'
 import Login from './pages/identity/Login'
 import EmailVerification from './pages/identity/EmailVerification';
 import AccountRecovery from './pages/identity/AccountRecovery';
+import Reviews from './pages/reviews/Reviews.jsx'
 import NotFound from './pages/404.jsx'
 
 const store = configureStore({
@@ -37,6 +38,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"/login"} element={<Login />} />
                         <Route path={"/emailVerification"} element={<EmailVerification />} />
                         <Route path={"/accountRecovery"} element={<AccountRecovery />} />
+                        <Route path='reviews' element={<Reviews />} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>
