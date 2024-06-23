@@ -6,7 +6,7 @@ import server from "../../networking";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, } from "@chakra-ui/react";
 
-const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, fetchImages }) => {
+const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const toast = useToast();
     const today = new Date();
     today.setDate(today.getDate() + 1);
@@ -92,36 +92,38 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, fetchImages }
             formData.append("totalSlots", totalSlots);
             formData.append("datetime", datetime);
 
-            const addListingResponse = await Promise.race([
-                server.post("/listings/addListing", formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                    transformRequest: formData => formData,
-                }
-                ),
-                timeoutPromise,
-            ]);
-            for (let i = 0; i < 10;i++) {
-                if (addListingResponse.status === 200) {
-                    break;
-                }
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+            const addListingResponse = await server.post("/listings/addListing", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                transformRequest: formData => formData,
+                timeout: 10000,
             }
-            if (isTimedOut) { 
-                throw new Error("Request timed out");
-            } else {
+            )
+            if (addListingResponse.status === 200) {
                 fetchListings();
             }
         } catch (error) {
             toast.closeAll();
-            ShowToast(
-                "Error submitting listing",
-                "Please try again later.",
-                "error",
-                2500
-            );
-            console.error("Error submitting listing:", error);
+            if (error.code === "ECONNABORTED") {
+                ShowToast(
+                    "Request timed out",
+                    "Please try again later.",
+                    "error",
+                    2500
+                );
+                console.error("Request timed out:", error);
+                return;
+            } else {
+                ShowToast(
+                    "Error submitting listing",
+                    "Please try again later.",
+                    "error",
+                    2500
+                );
+                console.error("Error submitting listing:", error);
+                return;
+            }
         } finally {
             setTimeout(() => {
                 onClose();
