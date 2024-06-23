@@ -4,36 +4,7 @@
 import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import { CheckCircleIcon } from "@chakra-ui/icons";
-import {
-  Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  Input,
-  useDisclosure,
-  FormControl,
-  FormLabel,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  FormHelperText,
-  Text,
-  Box,
-  useToast,
-  InputGroup,
-  InputLeftAddon,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
-} from "@chakra-ui/react";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from "@chakra-ui/react";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const toast = useToast();
@@ -51,7 +22,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
-    const [dateToastActive, setDateToastActive] = useState(false);
     const [modalError, setModalError] = useState(false);
     const [validListing, setValidListing] = useState(false);
 
@@ -88,14 +58,10 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
 
     function checkDate(date) {
         if (new Date(date) > new Date()) {
-        setDatetime(date);
+            setDatetime(date);
         } else {
-        if (dateToastActive) return;
-        ShowToast("WARNING: Invalid Date/Time", "Please select a date-time that's greater than today's date-time", "error", 3000);
-        setDateToastActive(true);
-        setTimeout(() => {
-            setDateToastActive(false);
-        }, 3000);
+            toast.closeAll();
+            ShowToast("Invalid Date/Time", "Please select a date-time that's greater than today's date-time", "error", 3000);
         return;
         }
     }
@@ -201,14 +167,14 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     useEffect(() => {
         if (portionPrice > 10) {
         setPortionPrice(10);
-        ShowToast("WARNING: Woah, that's too expensive!", "Fee cannot exceed $10", "error", 2500);
+        ShowToast("Woah, that's too expensive!", "Fee cannot exceed $10", "error", 2500);
         }
     }, [portionPrice]);
 
     useEffect(() => {
         if (totalSlots > 5) {
         setTotalSlots(5);
-        ShowToast("WARNING: Too many Guests!", "You can invite a maximum of 5 Guests", "error", 2500);
+        ShowToast("Too many Guests!", "You can invite a maximum of 5 Guests", "error", 2500);
         }
     }, [totalSlots]);
     return (
