@@ -5,7 +5,7 @@ import {
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import instance from '../../networking';
+import server from '../../networking';
 
 function AccountRecovery() {
     const [showResetFields, setShowResetFields] = useState(false);
@@ -14,18 +14,31 @@ function AccountRecovery() {
     const navigate = useNavigate();
 
     const sendResetKey = () => {
-        instance.post('/AccountRecovery/ResetKey', { usernameOrEmail })
+        server.post('/AccountRecovery/resetKey', { usernameOrEmail })
             .then((res) => {
-                setShowResetFields(true);
-                toast({
-                    title: 'Reset key sent.',
-                    description: "Check your email for the reset key.",
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                if (res.data.message && res.data.message.startsWith("SUCCESS")) {
+                    setShowResetFields(true);
+                    toast({
+                        title: 'Reset key sent.',
+                        description: "Check your email for the reset key.",
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                } else {
+                    toast({
+                        title: 'Error',
+                        description: res.data.message,
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                }
             })
             .catch((err) => {
+                if (err.response.data.message === "Username or email doesn't exist.") {
+                    formik.setFieldError('usernameOrEmail', "Username or email doesn't exist.");
+                }
                 toast({
                     title: 'Error',
                     description: err.response.data.message,
@@ -36,6 +49,38 @@ function AccountRecovery() {
             });
     };
 
+    // Submit function
+    const handleSubmit = (values, actions) => {
+        server.post('/AccountRecovery/resetPassword', { usernameOrEmail, ...values })
+            .then((res) => {
+                if (res.data.message && res.data.message.startsWith("SUCCESS")) {
+                    toast({
+                        title: 'Password reset successfully.',
+                        description: "You can now log in with your new password.",
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                    navigate('/login');
+                }
+            })
+            .catch((err) => {
+                if (err.response.data.message === "Invalid or expired reset key.") {
+                    formik.setFieldError('resetKey', 'Invalid or expired reset key')
+                }
+                toast({
+                    title: 'Error',
+                    description: err.response.data.message,
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            });
+
+        actions.setSubmitting(false);
+    };
+
+    // Formik hook
     const formik = useFormik({
         initialValues: {
             resetKey: '',
@@ -51,41 +96,13 @@ function AccountRecovery() {
                 .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
                 .required('Confirm new password is required'),
         }),
-        onSubmit: (values) => {
-            instance.post('/AccountRecovery/ResetPassword', { usernameOrEmail, ...values })
-                .then(() => {
-                    toast({
-                        title: 'Password reset successfully.',
-                        description: "You can now log in with your new password.",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
-                    navigate('/login');
-                })
-                .catch((err) => {
-                    if (err.response.data.message === "Username or email doesn't exist.") {
-                        formik.setFieldError('usernameOrEmail', 'Username or email doesnt exist.');
-                    }
-                    if (err.response.data.message === "Invalid or expired reset key.") {
-                        formik.setFieldError('resetKey', 'Invalid or expired reset key')
-                    }
-                    toast({
-                        title: 'Error',
-                        description: err.response.data.message,
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
-                });
-        },
+        onSubmit: handleSubmit,
     });
 
     return (
         <Box
             bgPosition="center"
             display="flex"
-            bgColor={'gray'}
         >
             <Box
                 w="50%"

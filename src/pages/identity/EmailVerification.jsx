@@ -12,7 +12,6 @@ function EmailVerification() {
         <Box
             bgPosition="center"
             display="flex"
-            bgColor={'gray'}
         >
             <Box
                 w="50%"
@@ -34,7 +33,7 @@ function EmailVerification() {
                         mb={4}
                     />
                     <Text fontSize="lg" textAlign="center">
-                        We've just sent a verification email to {email}. Click the link provided to verify your email!
+                        We've just sent a verification link to your email. Click the link provided to verify your email!
                     </Text>
                 </VStack>
             </Box>

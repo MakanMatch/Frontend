@@ -3,14 +3,65 @@ import { Box, Heading, Input, Button, Text, VStack, useToast, InputGroup, InputR
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import instance from '../../networking';
+import server from '../../networking';
 
 function Login() {
     const navigate = useNavigate();
     const toast = useToast();
     const [showPassword, setShowPassword] = React.useState(false);
+
     const handleShowPassword = () => setShowPassword(!showPassword);
 
+    // Submit function
+    const handleSubmit = (values, actions) => {
+        server.post("/LoginAccount", values, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((res) => {
+            if (res && res.data) {
+                console.log(res.data);
+                console.log("Account logged in successfully.");
+                toast({
+                    title: 'Login successful.',
+                    description: "Welcome back to MakanMatch!",
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                });
+                navigate("/");
+            } else {
+                console.log("An error has occurred logging in to the account.")
+                toast({
+                    title: 'Login failed.',
+                    description: "Invalid username or password.",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+        })
+        .catch((err) => {
+            console.log("error")
+            console.log(`${err.response.data.message}`);
+            if (err.response.data.message === "Invalid username or email or password.") {
+                formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
+                formik.setFieldError('password', 'Incorrect password.');
+            }
+            toast({
+                title: 'Login failed.',
+                description: "Invalid username or password.",
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            });
+        });
+
+        actions.setSubmitting(false);
+    };
+
+    // Formik hook
     const formik = useFormik({
         initialValues: {
             usernameOrEmail: '',
@@ -20,64 +71,13 @@ function Login() {
             usernameOrEmail: Yup.string().required('Username or email is required'),
             password: Yup.string().required('Password is required'),
         }),
-        onSubmit: (values, actions) => {
-            const { confirmPassword, ...submitValues } = values;
-            const data = JSON.stringify(submitValues, null, 2);
-            console.log(data)
-            console.log(submitValues)
-            instance.post("/LoginAccount", values, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then((res) => {
-                    if (res && res.data) {
-                        console.log(res.data);
-                        console.log("Account logged in successfully.");
-                        toast({
-                            title: 'Login successful.',
-                            description: "Welcome back to MakanMatch!",
-                            status: 'success',
-                            duration: 3000,
-                            isClosable: true,
-                        });
-                        navigate("/");
-                    } else {
-                        console.log("An error has occured logging in to the account.")
-                        toast({
-                            title: 'Login failed.',
-                            description: "Invalid username, email or password.",
-                            status: 'error',
-                            duration: 3000,
-                            isClosable: true,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log("error")
-                    console.log(`${err.response.data.message}`);
-                    if (err.response.data.message === "Invalid username or email or password.") {
-                        formik.setFieldError('usernameOrEmail', 'Invalid username, email.');
-                        formik.setFieldError('password', 'Incorrect password.');
-                    }
-                    toast({
-                        title: 'Login failed.',
-                        description: "Invalid username, email or password.",
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
-                });
-
-            actions.setSubmitting(false);
-        },
+        onSubmit: handleSubmit,
     });
 
     return (
         <Box
             bgPosition="center"
             display="flex"
-            bgColor={'gray'}
         >
             <Box
                 w="50%"

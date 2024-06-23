@@ -6,7 +6,7 @@ import {
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import instance from '../../networking';
+import server from '../../networking';
 
 function CreateAccount() {
     const navigate = useNavigate();
@@ -18,6 +18,7 @@ function CreateAccount() {
     const handleShowPassword = () => setShowPassword(!showPassword);
     const handleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
+    // Validation schema
     const validationSchema = Yup.object().shape({
         username: Yup.string().required('Username is required'),
         email: Yup.string().email('Invalid email address').required('Email is required'),
@@ -39,6 +40,55 @@ function CreateAccount() {
         )
     });
 
+    // Submit function
+    const handleSubmit = (values, actions) => {
+        const { confirmPassword, ...submitValues } = values;
+
+        server.post("/CreateAccount", submitValues, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((res) => {
+            if (res && res.data && res.data.message === "SUCCESS: Account created. Please verify your email.") {
+                toast({
+                    title: 'Account created.',
+                    description: "Please verify your email to continue.",
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                });
+                navigate('/EmailVerification');
+            } else {
+                toast({
+                    title: 'Account creation failed.',
+                    description: "An error has occurred creating the account.",
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+        })
+        .catch((err) => {
+            if (err.response.data.message === "Username already exists.") {
+                actions.setFieldError('username', 'Username already exists.');
+            } else if (err.response.data.message === "Email already exists.") {
+                actions.setFieldError('email', 'Email already exists.');
+            } else if (err.response.data.message === "Contact number already exists.") {
+                actions.setFieldError('contactNum', 'Contact number already in use.');
+            }
+            toast({
+                title: 'Account creation failed.',
+                description: `${err.response.data.message}`,
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            });
+        });
+
+        actions.setSubmitting(false);
+    };
+
     const formik = useFormik({
         initialValues: {
             username: '',
@@ -50,61 +100,13 @@ function CreateAccount() {
             isHostAccount: false
         },
         validationSchema,
-        onSubmit: (values, actions) => {
-            const { confirmPassword, ...submitValues } = values;
-            const data = JSON.stringify(submitValues, null, 2);
-
-            const endpoint = isHostAccount ? "/CreateAccount/host" : "/CreateAccount/guest";
-            instance.post(endpoint, data, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then((res) => {
-                    if (res && res.data && res.data.redirectUrl) {
-                        toast({
-                            title: 'Account created.',
-                            description: "Please verify your email to continue.",
-                            status: 'success',
-                            duration: 3000,
-                            isClosable: true,
-                        });
-                        navigate(res.data.redirectUrl);
-                    } else {
-                        toast({
-                            title: 'Account creation failed.',
-                            description: "An error has occurred creating the account.",
-                            status: 'error',
-                            duration: 3000,
-                            isClosable: true,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    if (err.response.data.message === "Username already exists.") {
-                        formik.setFieldError('username', 'Username already exists.');
-                    } else if (err.response.data.message === "Email already exists.") {
-                        formik.setFieldError('email', 'Email already exists.');
-                    }
-                    toast({
-                        title: 'Account creation failed.',
-                        description: `${err.response.data.message}`,
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
-                });
-
-            actions.setSubmitting(false);
-        },
+        onSubmit: handleSubmit,
     });
-
 
     return (
         <Box
             bgPosition="center"
             display="flex"
-            bgColor={'gray'}
         >
             <Box
                 w="50%"
