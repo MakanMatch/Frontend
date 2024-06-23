@@ -24,6 +24,10 @@ const FoodListingsPage = () => {
         });
     }
 
+    function getImageLink(listingID, imageName) {
+        return `http://localhost:8000/listings/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
+    }
+
     const fetchListings = async () => {
         try {
             const response = await server.get("/listings");
@@ -130,7 +134,7 @@ const FoodListingsPage = () => {
                                         onToggleFavourite={() =>
                                             toggleFavourite(listing.listingID)
                                         }
-                                        images={listing.images}
+                                        images={getImageLink(listing.listingID, listing.images)}
                                     />
                                 </SlideFade>
                             ))}

@@ -6,7 +6,7 @@ import server from "../../networking";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, } from "@chakra-ui/react";
 
-const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
+const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, fetchImages }) => {
     const toast = useToast();
     const today = new Date();
     today.setDate(today.getDate() + 1);
@@ -73,86 +73,46 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
 
     const handleSubmitListing = async () => {
         setIsSubmitting(true);
-        var addedListingID = null;
         let isTimedOut = false;
-        let isSuccess = false;
-        const timeoutPromise = new Promise((resolve, reject) =>
+        const formData = new FormData();
+
+        const timeoutPromise = new Promise((resolve, reject) => {
             setTimeout(() => {
                 isTimedOut = true;
                 reject(new Error("Request timed out"));
-            }, 5000)
+            }, 10000);
+        }
         );
         try {
-            const newListing = {
-                title,
-                images: "",
-                shortDescription,
-                longDescription,
-                portionPrice,
-                totalSlots,
-                datetime,
-            };
+            formData.append("title", title);
+            formData.append("images", images);
+            formData.append("shortDescription", shortDescription);
+            formData.append("longDescription", longDescription);
+            formData.append("portionPrice", portionPrice);
+            formData.append("totalSlots", totalSlots);
+            formData.append("datetime", datetime);
+
             const addListingResponse = await Promise.race([
-                server.post("/listings/addListing", newListing),
+                server.post("/listings/addListing", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                    transformRequest: formData => formData,
+                }
+                ),
                 timeoutPromise,
             ]);
-            if (isTimedOut) throw new Error("Request timed out");
-            addedListingID = addListingResponse.data.listingID;
-            try {
-                const formData = new FormData();
-                formData.append("images", images);
-                const addImageResponse = await server.post(
-                    `/listings/addImage?id=${addedListingID}`,
-                    formData
-                );
-                for (let i = 0; i < 5; i++) {
-                    try {
-                        const updateImageUrlResponse = await server.put(
-                            "/listings/updateListingImageUrl",
-                            {
-                                listingID: addListingResponse.data.listingID,
-                                url: addImageResponse.data.url,
-                            }
-                        );
-                        if (updateImageUrlResponse.status === 200) {
-                            isSuccess = true;
-                            break;
-                        }
-                    } catch (error) {
-                        toast.closeAll();
-                        ShowToast(
-                            "Error updating listing image",
-                            "Please try again later.",
-                            "error",
-                            2500
-                        );
-                        console.error("Error updating image URL:", error);
-                    }
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
+            for (let i = 0; i < 10;i++) {
+                if (addListingResponse.status === 200) {
+                    break;
                 }
-                if (!isSuccess) {
-                    onClose();
-                    setDefaultState();
-                    toast.closeAll();
-                    ShowToast(
-                        "Request Timeout",
-                        "An error occured while getting image URL.",
-                        "error",
-                        3000
-                    );
-                    throw new Error("Request timeout");
-                }
-            } catch (error) {
-                toast.closeAll();
-                ShowToast(
-                    "Error uploading listing image",
-                    "Please try again later.",
-                    "error",
-                    2500
-                );
-                console.error("Error uploading listing image URL:", error);
+                await new Promise((resolve) => setTimeout(resolve, 1000));
             }
-            fetchListings();
+            if (isTimedOut) { 
+                throw new Error("Request timed out");
+            } else {
+                fetchListings();
+            }
         } catch (error) {
             toast.closeAll();
             ShowToast(
