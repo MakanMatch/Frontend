@@ -52,25 +52,37 @@ function SubmitReviews() {
         formData.append('dateCreated', currentDate);
 
         try {
-            await server.post('/reviews', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData });
+            await server.post('/reviews', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
+                .then((res) => {
+                    if (res.data && res.data.startsWith("SUCCESS")) {
+                        toast({
+                            title: 'Review submitted successfully.',
+                            status: 'success',
+                            duration: 3000,
+                            isClosable: true,
+                        });
+                        console.log('Review submitted successfully!');
 
-            toast({
-                title: 'Review submitted successfully!',
-                status: 'success',
-                isClosable: true,
-            });
-            console.log('Review submitted successfully!');
-
-            setComments('');
-            setImages([]);
-            setReviewData(null);
-            onClose();
-
+                        setComments('');
+                        setImages([]);
+                        setReviewData(null);
+                        onClose();
+                    } else {
+                        toast({
+                            title: 'Error',
+                            description: res.data,
+                            status: 'error',
+                            duration: 3000,
+                            isClosable: true,
+                        });
+                    }
+                })
         } catch (error) {
             console.error('Failed to submit review:', error);
             toast({
                 title: 'Failed to submit review.',
                 status: 'error',
+                duration: 3000,
                 isClosable: true,
             });
         }
