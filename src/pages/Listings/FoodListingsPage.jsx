@@ -134,7 +134,7 @@ const FoodListingsPage = () => {
                                         onToggleFavourite={() =>
                                             toggleFavourite(listing.listingID)
                                         }
-                                        images={getImageLink(listing.listingID, listing.images)}
+                                        images={getImageLink(listing.listingID, listing.images[0])}
                                     />
                                 </SlideFade>
                             ))}
