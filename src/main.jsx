@@ -17,7 +17,7 @@ import EmailVerification from './pages/identity/EmailVerification';
 import AccountRecovery from './pages/identity/AccountRecovery';
 import Reviews from './pages/reviews/Reviews.jsx'
 import NotFound from './pages/404.jsx'
-
+import Chat from './pages/chat/Chat.jsx'
 const store = configureStore({
     reducer: {
         universal: universalReducer,
@@ -39,6 +39,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"/emailVerification"} element={<EmailVerification />} />
                         <Route path={"/accountRecovery"} element={<AccountRecovery />} />
                         <Route path='reviews' element={<Reviews />} />
+                        <Route path='chat' element={<Chat />} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>
