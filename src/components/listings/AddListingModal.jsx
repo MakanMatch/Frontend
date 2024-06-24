@@ -3,8 +3,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
-import { CheckCircleIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, } from "@chakra-ui/react";
+import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card } from "@chakra-ui/react";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const toast = useToast();
@@ -18,10 +18,11 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const [portionPrice, setPortionPrice] = useState(1);
     const [totalSlots, setTotalSlots] = useState(1);
     const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
-    const [images, setImages] = useState(null);
+    const [images, setImages] = useState([]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
+    const [tooManyImagesError, setTooManyImagesError] = useState(false);
     const [modalError, setModalError] = useState(false);
     const [validListing, setValidListing] = useState(false);
 
@@ -53,7 +54,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         setPortionPrice(1);
         setTotalSlots(1);
         setDatetime(today.toISOString().slice(0, 16));
-        setImages(null);
+        setImages([]);
     }
 
     function checkDate(date) {
@@ -77,12 +78,14 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         const formData = new FormData();
         try {
             formData.append("title", title);
-            formData.append("images", images);
             formData.append("shortDescription", shortDescription);
             formData.append("longDescription", longDescription);
             formData.append("portionPrice", portionPrice);
             formData.append("totalSlots", totalSlots);
             formData.append("datetime", datetime);
+            images.forEach((image, index) => {
+                formData.append("images", image);
+            });
 
             const addListingResponse = await server.post("/listings/addListing", formData, {
                 headers: {
@@ -140,16 +143,25 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 "image/svg+xml",
             ];
             if (allowedTypes.includes(file.type)) {
-                setImages(file);
-                setFileFormatError("");
+                if (images.length >= 5) {
+                    setTooManyImagesError(true);
+                    return;
+                } else {
+                    setImages((prevImages) => [...prevImages, file])
+                    setFileFormatError("");
+                }
             } else {
-                setImages("");
                 setFileFormatError(
                     "Invalid file format. Only JPEG, JPG, PNG and SVG are allowed."
                 );
             }
         }
     };
+
+    const handleRemoveImage = (index) => {
+        setImages((prevImages) => prevImages.filter((image, imageIndex) => imageIndex !== index));
+    };
+    
 
     const handleCancelClick = () => {
         onAlertOpen();
@@ -165,7 +177,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             title.trim() === "" ||
             shortDescription.trim() === "" ||
             longDescription.trim() === "" ||
-            !images
+            images.length === 0
         ) {
             setModalError(true);
             setValidListing(false);
@@ -326,17 +338,40 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                         </FormControl>
 
                         <FormControl isRequired>
-                            <FormLabel>Upload an image of your dish</FormLabel>
+                            <FormLabel>Upload photos of your dish (Max: 5 images)</FormLabel>
                             <Input
                                 type="file"
                                 size="sm"
                                 onChange={handleFileChange}
+                                multiple
                             />
                             {fileFormatError && (
                                 <FormHelperText color="red">
                                     {fileFormatError}
                                 </FormHelperText>
                             )}
+                            <Box mt={2}>
+                                {images.length > 0 && (
+                                    <>
+                                        <FormLabel>Selected images:</FormLabel>
+                                        {images.map((image, index) => (
+                                            <Card key={index} mb={2} padding={"13px"} display="flex" flexDirection={"row"} justifyContent={"space-between"}>
+                                                <Text fontSize={"15px"} color={"green"} mt={2}>
+                                                    {image.name}
+                                                </Text>
+                                                <Button onClick={() => handleRemoveImage(index)}>
+                                                    <CloseIcon boxSize={3}/>
+                                                </Button>
+                                            </Card>
+                                        ))}
+                                        {tooManyImagesError && (
+                                            <Text color="red">
+                                                You can only upload a maximum of 5 images
+                                            </Text>
+                                        )}
+                                    </>
+                                )}
+                            </Box>
                         </FormControl>
                     </ModalBody>
 

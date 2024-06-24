@@ -134,7 +134,11 @@ const FoodListingsPage = () => {
                                         onToggleFavourite={() =>
                                             toggleFavourite(listing.listingID)
                                         }
-                                        images={getImageLink(listing.listingID, listing.images[0])}
+                                        // pass in images prop as an array of image links for every image there is. images is a string of image names separated by | symbol
+                                        images={String(listing.images).split(",").map((imageName) =>
+                                            getImageLink(listing.listingID, imageName)
+                                        )
+                                        }
                                     />
                                 </SlideFade>
                             ))}
