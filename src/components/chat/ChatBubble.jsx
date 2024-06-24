@@ -28,7 +28,7 @@ function ChatBubble({ message, timestamp, isSender, photoUrl }) {
             />
           )}
           {!isSender && (
-            <ChevronLeftIcon 
+            <ChevronRightIcon 
               color="black.200" 
               boxSize={8} 
               position="absolute" 
