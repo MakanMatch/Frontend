@@ -9,10 +9,10 @@ function ChatBubble({ message, timestamp, isSender }) {
       marginBottom={2}
     >
       {!isSender && (
-        <ChevronLeftIcon color="gray.200" boxSize={6} marginRight={2} />
+        <ChevronLeftIcon color="gray.500" boxSize={6} marginRight={-2} />
       )}
       <Box
-        bg={isSender ? 'blue.500' : 'gray.200'}
+        bg={isSender ? 'green.500' : 'gray.200'}
         color={isSender ? 'white' : 'black'}
         borderRadius="lg"
         p={3}
@@ -26,7 +26,7 @@ function ChatBubble({ message, timestamp, isSender }) {
         )}
       </Box>
       {isSender && (
-        <ChevronRightIcon color="blue.500" boxSize={6} marginLeft={2} />
+        <ChevronRightIcon color="green.500" boxSize={6} marginLeft={-2} />
       )}
     </Flex>
   );
