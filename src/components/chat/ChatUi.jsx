@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Input,
@@ -15,6 +15,72 @@ import ChatBubble from "../../components/chat/ChatBubble";
 import Sidebar from "../../components/chat/SideBar"; // Import the Sidebar component
 
 function ChatUi() {
+  const [messages, setMessages] = useState([]);
+  const [messageInput, setMessageInput] = useState("");
+  const ws = useRef(null);
+
+  useEffect(() => {
+    // Connect to WebSocket server
+    ws.current = new WebSocket("ws://localhost:8080");
+
+    ws.current.onopen = () => {
+      console.log("Connected to WebSocket server");
+    };
+
+    ws.current.onmessage = (event) => {
+      const receivedMessage = JSON.parse(event.data);
+      console.log("Received message:", receivedMessage);
+
+      // Update messages state with received message
+      setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+    };
+
+    ws.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    ws.current.onclose = () => {
+      console.log("Disconnected from WebSocket server");
+    };
+
+    // Cleanup function to close WebSocket connection on component unmount
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+        console.log("WebSocket connection closed");
+      }
+    };
+  }, []);
+
+  const sendMessage = () => {
+    if (ws.current && messageInput.trim() !== "") {
+      const newMessage = {
+        sender: "UserA", // Replace with dynamic sender information
+        message: messageInput,
+        timestamp:
+        new Date(Date.now()).getHours() +
+        ":" +
+        new Date(Date.now()).getMinutes().toString().padStart(2, "0")
+      };
+
+      // Send message to WebSocket server
+      ws.current.send(JSON.stringify(newMessage));
+      console.log("Sent message:", newMessage);
+
+      // Update messages state with sent message
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+      // Clear input field
+      setMessageInput("");
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  };
+
   return (
     <Flex>
       <Sidebar /> {/* Include the Sidebar component */}
@@ -43,7 +109,13 @@ function ChatUi() {
               Chat with Jamie Oliver (Host) Rating: 2 ⭐
             </Text>
             <Spacer h={4} />
-            <Text w="17%" fontSize={15} marginTop={-3} marginLeft={"7px"} color={"green"}>
+            <Text
+              w="17%"
+              fontSize={15}
+              marginTop={-3}
+              marginLeft={"7px"}
+              color={"green"}
+            >
               Online
             </Text>
           </Box>
@@ -60,32 +132,16 @@ function ChatUi() {
           borderBottom="1px"
           borderColor="black"
         >
-          <Text marginBottom={10}>24 June 2024</Text>
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
-            <ChatBubble
-              message="Hello! How can I help you today?"
-              timestamp="10:00 AM"
-              isSender={false}
-              photoUrl="https://bit.ly/dan-abramov"
-            />
-            <ChatBubble
-              message="Hi! I have a question about my order."
-              timestamp="10:01 AM"
-              isSender={true}
-              photoUrl="https://randomuser.me/api/portraits/women/1.jpg"
-            />
-            <ChatBubble
-              message="Sure, what would you like to know?"
-              timestamp="10:02 AM"
-              isSender={false}
-              photoUrl="https://bit.ly/dan-abramov"
-            />
-            <ChatBubble
-              message="I haven't received my package yet."
-              timestamp="10:03 AM"
-              isSender={true}
-              photoUrl="https://randomuser.me/api/portraits/women/1.jpg"
-            />
+            {messages.map((msg, index) => (
+              <ChatBubble
+                key={index}
+                message={msg.message}
+                timestamp={msg.timestamp}
+                isSender={msg.sender === "UserA"} // Replace with appropriate logic
+                photoUrl={msg.sender === "UserA" ? "https://bit.ly/dan-abramov" : "https://randomuser.me/api/portraits/women/1.jpg"} // Replace with appropriate avatar URL
+              />
+            ))}
           </VStack>
           <Flex mt={4} align="center">
             <IconButton
@@ -112,6 +168,9 @@ function ChatUi() {
               height="48px"
               fontSize="lg"
               padding={4}
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
           </Flex>
         </Box>
