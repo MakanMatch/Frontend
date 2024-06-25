@@ -11,6 +11,7 @@ const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
     const [hostName, setHostName] = useState("");
     const [hostRating, setHostRating] = useState(0);
+    const [guestUserID, setGuestUserID] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
 
@@ -87,12 +88,62 @@ const FoodListingsPage = () => {
                     2500
                 );
             }
+        } else {
+            toast.closeAll();
+            ShowToast(
+                "Error fetching required information",
+                "Please try again later.",
+                "error",
+                2500
+            );
         }
     };
+
+    const fetchGuestID = async () => {
+        const response = await server.get(`/cdn/accountInfo?userID=${"47f4497b-1331-4b8a-97a4-095a79a1fd48"}`);
+        if (response.status === 200) {
+            setGuestUserID(response.data.userID);
+        } else if (response.status === 404) {
+            const guestData = {
+                userID: "47f4497b-1331-4b8a-97a4-095a79a1fd48",
+                username: "Susie Jones",
+                email: "susie_jones@gmail.com",
+                password: "SusieJones123",
+                contactNum: "82228111",
+                address: "Block 321, Hougang Avenue 10, #10-567",
+                emailVerified: "false",
+                favCuisine: "Nasi Lemak",
+                mealsMatched: "0",
+                resetKey: "265c18",
+                resetKeyExpiration: "2024-06-22T14:30:00.000Z"
+            }
+            const createSampleGuest = await server.post("/listings/createGuest", guestData);
+            if (createSampleGuest.status === 200) {
+                setGuestUserID(guestData.userID);
+            } else {
+                toast.closeAll();
+                ShowToast(
+                    "Error fetching required information",
+                    "Please try again later.",
+                    "error",
+                    2500
+                );
+            }
+        } else {
+            toast.closeAll();
+            ShowToast(
+                "Error fetching required information",
+                "Please try again later.",
+                "error",
+                2500
+            );
+        }
+    }
 
     useEffect(() => {
         fetchListings();
         fetchHostInfo();
+        fetchGuestID();
     }, []);
 
     return (
@@ -148,6 +199,7 @@ const FoodListingsPage = () => {
                                         portionPrice={listing.portionPrice}
                                         hostFoodRating={hostRating}
                                         isFavourite={listing.isFavourite}
+                                        userID={guestUserID}
                                         onToggleFavourite={() =>
                                             toggleFavourite(listing.listingID)
                                         }
