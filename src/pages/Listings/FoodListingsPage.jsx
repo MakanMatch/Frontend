@@ -55,19 +55,38 @@ const FoodListingsPage = () => {
     };
 
     const fetchHostInfo = async () => {
-        try {
-            const response = await server.get(`/cdn/accountInfo?userID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}`);
+        const response = await server.get(`/cdn/accountInfo?userID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}`);
+        if (response.status === 200) {
             setHostName(response.data.username);
             setHostRating(response.data.foodRating);
-        } catch (error) {
-            toast.closeAll();
-            ShowToast(
-                "Error fetching required information",
-                "Please try again later.",
-                "error",
-                2500
-            );
-            console.error("Error fetching host info:", error);
+        } else if (response.status === 404) {
+            const hostData = {
+                userID: "272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4",
+                username: "Jamie Oliver",
+                email: "jamie_oliver@gmail.com",
+                password: "JamieOliver123",
+                contactNum: "81118222",
+                address: "Block 123, Hougang Avenue 1, #01-234",
+                emailVerified: "false",
+                favCuisine: "Chilli Crab",
+                mealsMatched: "0",
+                foodRating: "4",
+                hygieneGrade: "5",
+                paymentImage: "public/Sample PayNow QR.png"
+            };
+            const createSampleHost = await server.post("/listings/createHost", hostData);
+            if (createSampleHost.status === 200) {
+                setHostName(hostData.username);
+                setHostRating(hostData.foodRating);
+            } else {
+                toast.closeAll();
+                ShowToast(
+                    "Error fetching required information",
+                    "Please try again later.",
+                    "error",
+                    2500
+                );
+            }
         }
     };
 
