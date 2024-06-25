@@ -31,7 +31,6 @@ const FoodListingsPage = () => {
     const fetchListings = async () => {
         try {
             const response = await server.get("/cdn/listings");
-            console.log("Food listings fetched:", response.data);
             setListings(response.data);
         } catch (error) {
             toast.closeAll();
@@ -60,7 +59,6 @@ const FoodListingsPage = () => {
             const response = await server.get(`/cdn/accountInfo?userID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}`);
             setHostName(response.data.username);
             setHostRating(response.data.foodRating);
-            console.log("Host name fetched:", response.data.username); // Debugging
         } catch (error) {
             toast.closeAll();
             ShowToast(

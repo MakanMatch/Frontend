@@ -74,7 +74,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
 
     const handleSubmitListing = async () => {
         setIsSubmitting(true);
-        let isTimedOut = false;
         const formData = new FormData();
         try {
             formData.append("title", title);
@@ -135,13 +134,8 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
-        console.log("Number of files selected: " + files.length);
         let filesAccepted = false;
-        if (files.length > 5) {
-            return;
-        }
         for (const file of files) {
-            console.log("File type: " + file.type);
             const allowedTypes = [
                 "image/jpeg",
                 "image/jpg",
@@ -151,14 +145,17 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             if (allowedTypes.includes(file.type)) {
                 filesAccepted = true;
             } else {
-                setFileFormatError("Invalid file format. Only JPEG, JPG, PNG, and SVG are allowed.");
                 filesAccepted = false;
                 break;
             }
         }
         if (filesAccepted) {
-            setImages(files);
-            console.log("Files accepted:", files);
+            // set images to previous images + files
+            setImages((prevImages) => [...prevImages, ...files]);
+            setFileFormatError("");
+
+        } else {
+            setFileFormatError("Invalid file format. Only JPEG, JPG, PNG, and SVG are allowed.");
         }
     };    
 
@@ -181,13 +178,16 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             title.trim() === "" ||
             shortDescription.trim() === "" ||
             longDescription.trim() === "" ||
-            images.length === 0
+            images.length === 0 ||
+            images.length > 5
         ) {
             setModalError(true);
             setValidListing(false);
+            setTooManyImagesError(true);
         } else {
             setModalError(false);
             setValidListing(true);
+            setTooManyImagesError(false);
         }
     }, [title, shortDescription, longDescription, images]);
 
