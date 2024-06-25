@@ -57,7 +57,7 @@ function ExpandedListing() {
     }
 
     const showComingSoon = () => { showToast("Coming soon", "This feature is not complete yet.", 3000) }
-    const imgBackendURL = (imgName) => `${backendAPIURL}/getListingImage/${imgName}`
+    const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
     const showToast = (title, description, duration = 5000, isClosable = true, status = 'info', icon = null) => {
         if (!["success", "warning", "error", "info"].includes(status)) {
             status = "info"
