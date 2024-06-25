@@ -54,12 +54,12 @@ function AccountRecovery() {
                 }
             })
             .catch((err) => {
-                if (err.response.data === "Username or email doesn't exist.") {
+                if (err.response.data === "UERROR: Username or email doesn't exist.") {
                     formik.setFieldError('usernameOrEmail', "Username or email doesn't exist.");
                 }
                 toast({
                     title: 'Error',
-                    description: err.response.data,
+                    description: "Username or email doesn' exist.",
                     status: 'error',
                     duration: 3000,
                     isClosable: true,
@@ -83,12 +83,12 @@ function AccountRecovery() {
                 }
             })
             .catch((err) => {
-                if (err.response.data === "Invalid or expired reset key.") {
-                    formik.setFieldError('resetKey', 'Invalid or expired reset key');
+                if (err.response.data === "UERROR: Invalid or expired reset key.") {
+                    formik.setFieldError('resetKey', 'Invalid or expired reset key.')
                 }
                 toast({
                     title: 'Error',
-                    description: err.response.data,
+                    description: "Invalid or expired reset key.",
                     status: 'error',
                     duration: 3000,
                     isClosable: true,

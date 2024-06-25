@@ -70,22 +70,41 @@ function CreateAccount() {
                     });
                 }
             })
-            .catch((err) => {
-                if (err.response.data === "Username already exists.") {
-                    actions.setFieldError('username', 'Username already exists.');
-                } else if (err.response.data === "Email already exists.") {
-                    actions.setFieldError('email', 'Email already exists.');
-                } else if (err.response.data === "Contact number already exists.") {
-                    actions.setFieldError('contactNum', 'Contact number already in use.');
-                }
-                toast({
-                    title: 'Account creation failed.',
-                    description: `${err.response.data}`,
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
-            });
+//             .catch((err) => {
+//                 if (err.response.data === "Username already exists.") {
+//                     actions.setFieldError('username', 'Username already exists.');
+//                 } else if (err.response.data === "Email already exists.") {
+//                     actions.setFieldError('email', 'Email already exists.');
+//                 } else if (err.response.data === "Contact number already exists.") {
+//                     actions.setFieldError('contactNum', 'Contact number already in use.');
+//                 }
+//                 toast({
+//                     title: 'Account creation failed.',
+//                     description: `${err.response.data}`,
+//                     status: 'error',
+//                     duration: 3000,
+//                     isClosable: true,
+//                 });
+// <<<<<<< main
+//             }
+//         })
+//         .catch((err) => {
+//             if (err.response.data === "UERROR: Username already exists.") {
+//                 actions.setFieldError('username', 'Username already exists.');
+//             } else if (err.response.data === "UERROR: Email already exists.") {
+//                 actions.setFieldError('email', 'Email already exists.');
+//             } else if (err.response.data === "UERROR: Contact number already exists.") {
+//                 actions.setFieldError('contactNum', 'Contact number already in use.');
+//             }
+//             toast({
+//                 title: 'Account creation failed.',
+//                 description: `${err.response.data}`.substring("UERROR: ".length),
+//                 status: 'error',
+//                 duration: 3000,
+//                 isClosable: true,
+// =======
+// >>>>>>> junhan
+//             });
 
         actions.setSubmitting(false);
     };
