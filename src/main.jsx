@@ -30,8 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Layout />}>
-                        <Route index element={<Home />} />
-                        <Route path={"listings"} element={<FoodListingsPage />} />
+                        <Route index element={<FoodListingsPage />} />
                         <Route path={'version'} element={<Version />} />
                         <Route path={"expandedListing"} element={<ExpandedListing />} />
                         <Route path={"/createAccount"} element={<CreateAccount />} />

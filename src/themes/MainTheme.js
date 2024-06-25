@@ -1,4 +1,4 @@
-import { extendTheme } from "@chakra-ui/react";
+import { Drawer, extendTheme } from "@chakra-ui/react";
 
 const colors = {
     primaryButton: "#6f06f5"
@@ -22,6 +22,11 @@ const MainTheme = extendTheme({
                     fontWeight: 'bold',
                     _hover: {
                         bg: 'purple.700'
+                    }
+                },
+                DrawerButton: {
+                    _hover: {
+                        bg: '#E3E8E5'
                     }
                 }
             }
