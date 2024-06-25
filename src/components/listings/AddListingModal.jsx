@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card } from "@chakra-ui/react";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const toast = useToast();
@@ -22,7 +22,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
-    const [tooManyImagesError, setTooManyImagesError] = useState(false);
     const [modalError, setModalError] = useState(false);
     const [validListing, setValidListing] = useState(false);
 
@@ -141,6 +140,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 "image/jpg",
                 "image/png",
                 "image/svg+xml",
+                "image/heic"
             ];
             if (allowedTypes.includes(file.type)) {
                 filesAccepted = true;
@@ -178,16 +178,21 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             title.trim() === "" ||
             shortDescription.trim() === "" ||
             longDescription.trim() === "" ||
-            images.length === 0 ||
-            images.length > 5
+            images.length === 0
         ) {
             setModalError(true);
             setValidListing(false);
-            setTooManyImagesError(true);
+            if (images.length > 5) {
+                ShowToast(
+                    "That's too many images!",
+                    "You can upload a maximum of 5 images",
+                    "error",
+                    2500
+                );
+            }
         } else {
             setModalError(false);
             setValidListing(true);
-            setTooManyImagesError(false);
         }
     }, [title, shortDescription, longDescription, images]);
 
@@ -368,11 +373,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                                                 </Button>
                                             </Card>
                                         ))}
-                                        {tooManyImagesError && (
-                                            <Text color="red">
-                                                You can only upload a maximum of 5 images
-                                            </Text>
-                                        )}
                                     </>
                                 )}
                             </Box>
