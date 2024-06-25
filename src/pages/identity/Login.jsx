@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Box, Heading, Input, Button, Text, VStack, useToast, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link } from '@chakra-ui/react';
+import { Box, Heading, Input, Button, Text, VStack, useToast, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link, IconButton } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import server from '../../networking';
 
 function Login() {
     const navigate = useNavigate();
     const toast = useToast();
-    const [showPassword, setShowPassword] = React.useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleShowPassword = () => setShowPassword(!showPassword);
 
@@ -122,9 +123,14 @@ function Login() {
                                     value={formik.values.password}
                                 />
                                 <InputRightElement width='4.5rem'>
-                                    <Button mb='8px' h='1.5rem' size='xs' onClick={handleShowPassword}>
-                                        {showPassword ? 'Hide' : 'Show'}
-                                    </Button>
+                                    <IconButton
+                                        h='1.5rem'
+                                        size='sm'
+                                        mb={2}
+                                        onClick={handleShowPassword}
+                                        icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                    />
                                 </InputRightElement>
                             </InputGroup>
                             <FormErrorMessage fontSize='12px'>{formik.errors.password}</FormErrorMessage>
