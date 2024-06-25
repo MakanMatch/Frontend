@@ -134,8 +134,14 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     };
 
     const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
+        const files = Array.from(event.target.files);
+        console.log("Number of files selected: " + files.length);
+        let filesAccepted = false;
+        if (files.length > 5) {
+            return;
+        }
+        for (const file of files) {
+            console.log("File type: " + file.type);
             const allowedTypes = [
                 "image/jpeg",
                 "image/jpg",
@@ -143,20 +149,18 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 "image/svg+xml",
             ];
             if (allowedTypes.includes(file.type)) {
-                if (images.length >= 5) {
-                    setTooManyImagesError(true);
-                    return;
-                } else {
-                    setImages((prevImages) => [...prevImages, file])
-                    setFileFormatError("");
-                }
+                filesAccepted = true;
             } else {
-                setFileFormatError(
-                    "Invalid file format. Only JPEG, JPG, PNG and SVG are allowed."
-                );
+                setFileFormatError("Invalid file format. Only JPEG, JPG, PNG, and SVG are allowed.");
+                filesAccepted = false;
+                break;
             }
         }
-    };
+        if (filesAccepted) {
+            setImages(files);
+            console.log("Files accepted:", files);
+        }
+    };    
 
     const handleRemoveImage = (index) => {
         setImages((prevImages) => prevImages.filter((image, imageIndex) => imageIndex !== index));
