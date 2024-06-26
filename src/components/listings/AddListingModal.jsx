@@ -116,7 +116,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                     "error",
                     2500
                 );
-                console.error("Request timed out:", error);
                 return;
             } else {
                 ShowToast(
@@ -125,7 +124,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                     "error",
                     2500
                 );
-                console.error("Error submitting listing:", error);
                 return;
             }
         }

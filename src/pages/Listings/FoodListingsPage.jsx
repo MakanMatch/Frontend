@@ -41,18 +41,7 @@ const FoodListingsPage = () => {
                 "error",
                 2500
             );
-            console.error("Error fetching food listings:", error);
         }
-    };
-
-    const toggleFavourite = (listingID) => {
-        setListings((prevListings) =>
-            prevListings.map((listing) =>
-                listing.listingID === listingID
-                    ? { ...listing, isFavourite: !listing.isFavourite }
-                    : listing
-            )
-        );
     };
 
     const fetchHostInfo = async () => {
@@ -193,16 +182,13 @@ const FoodListingsPage = () => {
                                     key={listing.listingID}
                                 >
                                     <FoodListing
-                                        key={listing.listingID}
+                                        listingID={listing.listingID}
                                         title={listing.title}
                                         hostName={hostName}
                                         portionPrice={listing.portionPrice}
                                         hostFoodRating={hostRating}
-                                        isFavourite={listing.isFavourite}
                                         userID={guestUserID}
-                                        onToggleFavourite={() =>
-                                            toggleFavourite(listing.listingID)
-                                        }
+                                        ShowToast={ShowToast}
                                         // pass in images prop as an array of image links for every image there is. images is a string of image names separated by | symbol
                                         images={listing.images.map((imageName) =>
                                             getImageLink(listing.listingID, imageName)
