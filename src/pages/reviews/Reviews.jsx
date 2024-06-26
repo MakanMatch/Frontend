@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Input, Flex, Card, Text, Container, Image, Textarea, Spacer, useToast, Heading, Center, useClipboard, Tooltip } from '@chakra-ui/react';
+import { Button, Box, Input, Flex, HStack, Text, Container, Image, Textarea, Spacer, useToast, Heading, Center, useClipboard, Tooltip } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import server from '../../networking'
 import { ArrowBackIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
@@ -32,6 +32,10 @@ function Reviews() {
         if (hygieneGrade >= 2) return 'orange';
         return 'red';
     };
+
+    const handleGoBack = () => {
+        window.history.back();
+    }
 
     const colorScheme = getColorScheme(hostHygieneGrade);
 
@@ -77,44 +81,46 @@ function Reviews() {
 
     return (
         <Box p={4}>
-            <Flex>
+            <Flex direction={{ base: 'column', md: 'row' }} wrap='wrap' align='center' justify='center' >
                 <Box>
-                    <Flex direction="row" align="center" mb={4} gap={3}>
-                        <Button><ArrowBackIcon /></Button>
-                        <Spacer />
+                    <Flex direction={{ base: 'column', md: 'row' }} align="center" mb={4} gap={3}>
+                        <Button onClick={handleGoBack}>
+                            <ArrowBackIcon />
+                        </Button>
+                        <Spacer display={{ base: 'none', lg: 'block' }} />
                         <Image
                             borderRadius='full'
                             boxSize='100px'
                             src='https://bit.ly/dan-abramov'
                             alt='Dan Abramov'
                         />
-                        <Spacer />
-                        <Flex direction="column" align="left" ml={4}>
-                            <Text fontSize="4xl">{hostName}</Text>
-                            <Flex direction="row" align="center" gap={2}>
+                        <Spacer display={{ base: 'none', md: 'block' }} />
+                        <Flex direction="column" align={{ base: 'center', md: 'left' }} ml={{ base: 0, md: 4 }} textAlign={{ base: 'center', md: 'left' }}>
+                            <Text fontSize={{ base: '2xl', md: '4xl' }}>{hostName}</Text>
+                            <HStack spacing={2}>
                                 <PhoneIcon />
                                 <Tooltip label={hasCopied ? "Copied!" : "Click to copy"} closeOnClick={false}>
                                     <Text fontSize={{ base: 'sm', md: 'md' }} cursor="pointer" onClick={onCopy}>
                                         {hostContactNum}
                                     </Text>
                                 </Tooltip>
-                            </Flex>
+                            </HStack>
                         </Flex>
-                        <Spacer />
-                        <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px">
+                        <Spacer display={{ base: 'none', md: 'block' }} />
+                        <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
                             {hostHygieneGrade}
                         </Button>
-                        <Spacer />
+                        <Spacer display={{ base: 'none', md: 'block' }} />
                         <SubmitReviews />
                     </Flex>
                 </Box>
-                <Spacer />
-                <Box display="flex" justifyContent="center" alignItems="center" background="gray.200" borderRadius="20px" p={3}>
+                <Spacer display={{ base: 'none', md: 'block' }} />
+                <Box display="flex" justifyContent="center" alignItems="center" background="gray.200" borderRadius="15px" p={5} mb={4}>
                     <Flex alignItems="center" maxWidth="100%">
                         <Tooltip label="This box contains the host address" aria-label="Host address tooltip">
                             <InfoOutlineIcon mr={2} />
                         </Tooltip>
-                        <Text fontSize="xl" whiteSpace="normal" wordBreak="break-word">
+                        <Text fontSize="m" whiteSpace="normal" wordBreak="break-word">
                             {hostAddress}
                         </Text>
                     </Flex>

@@ -56,7 +56,7 @@ function SubmitReviews() {
         } else {
             setFileFormatError("Invalid file format. Only JPEG, JPG, PNG, and SVG are allowed.");
         }
-    };    
+    };
 
     const handleRemoveImage = (index) => {
         setImages((prevImages) => prevImages.filter((image, imageIndex) => imageIndex !== index));
@@ -120,7 +120,7 @@ function SubmitReviews() {
 
     return (
         <Box>
-            <Button onClick={onOpen} variant={"MMPrimary"}><EditIcon/></Button>
+            <Button onClick={onOpen} variant={"MMPrimary"}><EditIcon /></Button>
             <Modal isOpen={isOpen} onClose={handleClose} motionPreset='slideInBottom' isCentered >
                 <ModalOverlay />
                 <ModalContent>
@@ -128,30 +128,30 @@ function SubmitReviews() {
                     </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <Flex direction="column" align="center" mb={4}>
+                        <Flex direction='column' align="center" mb={4}>
                             <Image
                                 borderRadius='full'
                                 boxSize='100px'
                                 src='https://bit.ly/dan-abramov'
                                 alt='Dan Abramov'
                             />
-                            <Text fontSize='3xl' textAlign='center'>Jamie Oliver</Text>
+                            <Text fontSize={{ base: '2xl', md: '3xl' }} textAlign='center' mt={{ base: 2, md: 0 }} ml={{ base: 0, md: 4 }}>
+                                Jamie Oliver
+                            </Text>
                         </Flex>
                         <FormControl>
-                            <Box>
-                                <Flex>
-                                    <Flex direction='column'>
-                                        <Text mt='8px' mb='8px'>Food Rating</Text>
-                                        <StarRating maxStars={5} rating={foodRating} onChange={setFoodRating} />
-                                    </Flex>
-                                    <Spacer />
-                                    <Flex direction='column'>
-                                        <Text mt='8px' mb='8px'>Hygiene Rating</Text>
-                                        <StarRating maxStars={5} rating={hygieneRating} onChange={setHygieneRating} />
-                                    </Flex>
+                            <Flex direction={{ base: 'column', md: 'row' }} align="center">
+                                <Flex direction='column'>
+                                <Text mt='8px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Food Rating</Text>
+                                <StarRating maxStars={5} rating={foodRating} onChange={setFoodRating} />
                                 </Flex>
-                            </Box>
-                            <Text mt='16px' mb='8px'>Comments</Text>
+                                <Spacer display={{ base: 'none', md: 'block' }} />
+                                <Flex direction='column'>
+                                <Text mt="8px" mb="8px" textAlign={{ base: 'center', md: 'left' }}>Hygiene Rating</Text>
+                                <StarRating maxStars={5} rating={hygieneRating} onChange={setHygieneRating} />
+                                </Flex>
+                            </Flex>
+                            <Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Comments</Text>
                             <Textarea
                                 placeholder='Write something to the host...'
                                 size='sm'
@@ -159,7 +159,7 @@ function SubmitReviews() {
                                 value={comments}
                                 onChange={(e) => setComments(e.target.value)}
                             />
-                            <Text>Upload Images</Text>
+                            <Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Upload Images</Text>
                             <Input
                                 pt={0.5}
                                 type="file"
@@ -177,12 +177,12 @@ function SubmitReviews() {
                                     <>
                                         <FormLabel>Selected images:</FormLabel>
                                         {images.map((image, index) => (
-                                            <Card key={index} mb={2} padding={"13px"} display="flex" flexDirection={"row"} justifyContent={"space-between"}>
+                                            <Card key={index} mb={2} padding={"13px"} display="flex" flexDirection="row" alignItems="center">
                                                 <Text fontSize={"15px"} color={"green"} mt={2}>
                                                     {image.name}
                                                 </Text>
                                                 <Button onClick={() => handleRemoveImage(index)}>
-                                                    <CloseIcon boxSize={3}/>
+                                                    <CloseIcon boxSize={3} />
                                                 </Button>
                                             </Card>
                                         ))}
@@ -200,7 +200,6 @@ function SubmitReviews() {
                 </ModalContent>
             </Modal>
         </Box>
-
     )
 }
 

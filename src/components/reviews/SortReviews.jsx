@@ -6,8 +6,8 @@ import server from '../../networking'
 
 function SortReviews() {
   return (
-      <Tabs mt={8}>
-        <TabList>
+      <Tabs mt={8} variant="soft-rounded" size='md'>
+        <TabList justifyContent={{ base:'none', sd:'center'}} >
           <Tab>Most Recent</Tab>
           <Tab>Highest Rating</Tab>
           <Tab>Lowest Rating</Tab>
