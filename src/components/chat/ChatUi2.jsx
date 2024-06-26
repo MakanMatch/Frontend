@@ -12,9 +12,9 @@ import {
 } from "@chakra-ui/react";
 import { FiSmile, FiCamera } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
-import Sidebar from "../../components/chat/SideBar"; // Import the Sidebar component
+import Sidebar2 from "../../components/chat/SideBar2"; // Import the Sidebar component
 
-function ChatUi() {
+function ChatUi2() {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
   const ws = useRef(null);
@@ -73,7 +73,7 @@ function ChatUi() {
   const sendMessage = () => {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
-        sender: "UserA", // Replace with dynamic sender information
+        sender: "James", // Replace with dynamic sender information
         message: messageInput,
         timestamp: `${new Date().getHours()}:${new Date()
           .getMinutes()
@@ -101,7 +101,7 @@ function ChatUi() {
 
   return (
     <Flex>
-      <Sidebar /> {/* Include the Sidebar component */}
+      <Sidebar2 /> 
       <Center flexDirection="column" alignItems="center" p={5} flex="1">
         <Box
           bg="white"
@@ -116,7 +116,7 @@ function ChatUi() {
           borderColor="black"
         >
           <Image
-            src="https://randomuser.me/api/portraits/men/4.jpg"
+            src="https://bit.ly/dan-abramov"
             alt="Dan Abramov"
             borderRadius="full"
             w="10%"
@@ -124,15 +124,15 @@ function ChatUi() {
           />
           <Box>
             <Text marginLeft={5} fontSize={20}>
-              Chat with James Davies
+              Chat with Jamie Oliver (Host) Rating: 2 ⭐
             </Text>
             <Spacer h={4} />
             <Text
+              w="17%"
               fontSize={15}
               marginTop={-3}
+              marginLeft={"7px"}
               color={"green"}
-              textAlign={"left"}
-              marginLeft={"22px"}
             >
               Online
             </Text>
@@ -156,11 +156,11 @@ function ChatUi() {
                 key={index}
                 message={msg.message}
                 timestamp={msg.timestamp}
-                isSender={msg.sender === "UserA"} // Replace with appropriate logic
+                isSender={msg.sender === "James"} 
                 photoUrl={
-                  msg.sender === "UserA"
-                    ? "https://bit.ly/dan-abramov"
-                    : "https://randomuser.me/api/portraits/men/4.jpg"
+                  msg.sender === "James"
+                    ? "https://randomuser.me/api/portraits/men/4.jpg"
+                    : "https://bit.ly/dan-abramov"
                 } // Replace with appropriate avatar URL
               />
             ))}
@@ -201,4 +201,4 @@ function ChatUi() {
   );
 }
 
-export default ChatUi;
+export default ChatUi2;
