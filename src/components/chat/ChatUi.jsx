@@ -9,6 +9,13 @@ import {
   VStack,
   Spacer,
   IconButton,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Button,
 } from "@chakra-ui/react";
 import { FiSmile, FiCamera } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
@@ -17,7 +24,11 @@ import Sidebar from "../../components/chat/SideBar"; // Import the Sidebar compo
 function ChatUi() {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
+  const [editMode, setEditMode] = useState({ active: false, messageId: null });
+  const [editedMessage, setEditedMessage] = useState("");
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const ws = useRef(null);
+  const cancelRef = useRef();
 
   useEffect(() => {
     // Connect to WebSocket server
@@ -50,7 +61,11 @@ function ChatUi() {
     
       console.log("Received message:", receivedMessage);
       // Update messages state with received message
-      setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === receivedMessage.id ? receivedMessage : msg
+        )
+      );
     };
 
     ws.current.onerror = (error) => {
@@ -73,6 +88,7 @@ function ChatUi() {
   const sendMessage = () => {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
+        id: Math.random().toString(36).substr(2, 9),
         sender: "UserA", // Replace with dynamic sender information
         message: messageInput,
         timestamp: `${new Date().getHours()}:${new Date()
@@ -92,6 +108,65 @@ function ChatUi() {
       setMessageInput("");
     }
   };
+
+  const handleEditPrompt = (messageId, currentMessage) => {
+    const editedMessage = window.prompt("Edit Message:", currentMessage);
+    if (editedMessage !== null) {
+      handleEdit(messageId, editedMessage);
+    }
+  };
+
+  const handleEdit = (messageId, editedMessage) => {
+    if (ws.current && editedMessage.trim() !== "") {
+      const editedMessageObj = {
+        id: messageId, // Ensure you're passing the correct message ID
+        sender: "UserA", // Replace with actual sender info
+        message: editedMessage,
+        edited: true,
+        timestamp: `${new Date().getHours()}:${new Date()
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`,
+      };
+  
+      ws.current.send(JSON.stringify(editedMessageObj));
+      console.log("Editing message:", editedMessageObj);
+  
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === editedMessageObj.id ? editedMessageObj : msg
+        )
+      );
+    }
+  };
+  
+
+  const handleDeletePrompt = (messageId) => {
+    setEditMode({ active: true, messageId: messageId }); // Ensure editMode is set correctly
+    setDeleteConfirmation(true);
+    cancelRef.current = () => setDeleteConfirmation(false);
+  };
+  
+  const handleDelete = () => {
+    const messageId = editMode.messageId; // Retrieve messageId from editMode
+    if (ws.current && messageId) { // Ensure messageId is valid
+      const deleteMessageObj = {
+        id: messageId,
+        sender: "UserA", // Replace with actual sender info if needed
+        action: "delete",
+      };
+  
+      ws.current.send(JSON.stringify(deleteMessageObj));
+      console.log("Deleting message:", deleteMessageObj);
+  
+      setMessages((prevMessages) =>
+        prevMessages.filter((msg) => msg.id !== messageId)
+      );
+    }
+    setDeleteConfirmation(false);
+  };
+  
+  
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -151,9 +226,9 @@ function ChatUi() {
           borderColor="black"
         >
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
-            {messages.map((msg, index) => (
+            {messages.map((msg) => (
               <ChatBubble
-                key={index}
+                key={msg.id}
                 message={msg.message}
                 timestamp={msg.timestamp}
                 isSender={msg.sender === "UserA"} // Replace with appropriate logic
@@ -162,6 +237,9 @@ function ChatUi() {
                     ? "https://bit.ly/dan-abramov"
                     : "https://randomuser.me/api/portraits/men/4.jpg"
                 } // Replace with appropriate avatar URL
+                onEdit={() => handleEditPrompt(msg.id, msg.message)}
+                onDelete={() => handleDeletePrompt(msg.id)}
+                edited={msg.edited}
               />
             ))}
           </VStack>
@@ -197,6 +275,30 @@ function ChatUi() {
           </Flex>
         </Box>
       </Center>
+      <AlertDialog
+        isOpen={deleteConfirmation}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setDeleteConfirmation(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Message
+            </AlertDialogHeader>
+            <AlertDialogBody>
+              Are you sure you want to delete this message?
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setDeleteConfirmation(false)}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={() => handleDelete(editMode.messageId)} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Flex>
   );
 }
