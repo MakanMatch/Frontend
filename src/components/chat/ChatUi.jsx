@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { FiSmile, FiCamera } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
-import Sidebar from "../../components/chat/SideBar"; // Import the Sidebar component
+import Sidebar from "../../components/chat/SideBar"; 
 
 function ChatUi() {
   const [messages, setMessages] = useState([]);
@@ -31,7 +31,6 @@ function ChatUi() {
   const cancelRef = useRef();
 
   useEffect(() => {
-    // Connect to WebSocket server
     ws.current = new WebSocket("ws://localhost:8080");
 
     ws.current.onopen = () => {
@@ -42,7 +41,6 @@ function ChatUi() {
       let receivedMessage;
     
       if (event.data instanceof Blob) {
-        // Convert Blob to text
         const text = await event.data.text();
         try {
           receivedMessage = JSON.parse(text);
@@ -60,7 +58,6 @@ function ChatUi() {
       }
     
       console.log("Received message:", receivedMessage);
-      // Update messages state with received message
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           msg.id === receivedMessage.id ? receivedMessage : msg
@@ -76,7 +73,6 @@ function ChatUi() {
       console.log("Disconnected from WebSocket server");
     };
 
-    // Cleanup function to close WebSocket connection on component unmount
     return () => {
       if (ws.current) {
         ws.current.close();
@@ -89,7 +85,7 @@ function ChatUi() {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
         id: Math.random().toString(36).substr(2, 9),
-        sender: "UserA", // Replace with dynamic sender information
+        sender: "UserA", 
         message: messageInput,
         timestamp: `${new Date().getHours()}:${new Date()
           .getMinutes()
@@ -97,14 +93,11 @@ function ChatUi() {
           .padStart(2, "0")}`,
       };
 
-      // Send message to WebSocket server
       ws.current.send(JSON.stringify(newMessage));
       console.log("Sent message:", newMessage);
 
-      // Update messages state with sent message
       setMessages((prevMessages) => [...prevMessages, newMessage]);
 
-      // Clear input field
       setMessageInput("");
     }
   };
@@ -119,8 +112,8 @@ function ChatUi() {
   const handleEdit = (messageId, editedMessage) => {
     if (ws.current && editedMessage.trim() !== "") {
       const editedMessageObj = {
-        id: messageId, // Ensure you're passing the correct message ID
-        sender: "UserA", // Replace with actual sender info
+        id: messageId,
+        sender: "UserA",
         message: editedMessage,
         edited: true,
         timestamp: `${new Date().getHours()}:${new Date()
@@ -142,17 +135,17 @@ function ChatUi() {
   
 
   const handleDeletePrompt = (messageId) => {
-    setEditMode({ active: true, messageId: messageId }); // Ensure editMode is set correctly
+    setEditMode({ active: true, messageId: messageId });
     setDeleteConfirmation(true);
     cancelRef.current = () => setDeleteConfirmation(false);
   };
   
   const handleDelete = () => {
-    const messageId = editMode.messageId; // Retrieve messageId from editMode
-    if (ws.current && messageId) { // Ensure messageId is valid
+    const messageId = editMode.messageId;
+    if (ws.current && messageId) { 
       const deleteMessageObj = {
         id: messageId,
-        sender: "UserA", // Replace with actual sender info if needed
+        sender: "UserA", 
         action: "delete",
       };
   
@@ -176,7 +169,7 @@ function ChatUi() {
 
   return (
     <Flex>
-      <Sidebar /> {/* Include the Sidebar component */}
+      <Sidebar />
       <Center flexDirection="column" alignItems="center" p={5} flex="1">
         <Box
           bg="white"
@@ -231,12 +224,12 @@ function ChatUi() {
                 key={msg.id}
                 message={msg.message}
                 timestamp={msg.timestamp}
-                isSender={msg.sender === "UserA"} // Replace with appropriate logic
+                isSender={msg.sender === "UserA"}
                 photoUrl={
                   msg.sender === "UserA"
                     ? "https://bit.ly/dan-abramov"
                     : "https://randomuser.me/api/portraits/men/4.jpg"
-                } // Replace with appropriate avatar URL
+                }
                 onEdit={() => handleEditPrompt(msg.id, msg.message)}
                 onDelete={() => handleDeletePrompt(msg.id)}
                 edited={msg.edited}
