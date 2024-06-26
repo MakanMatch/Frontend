@@ -7,7 +7,8 @@ import {
   IconButton,
   Tooltip,
 } from "@chakra-ui/react";
-import { ChevronRightIcon, ChevronLeftIcon, EditIcon, DeleteIcon } from "@chakra-ui/icons";
+import { ChevronRightIcon, ChevronLeftIcon } from "@chakra-ui/icons";
+import { FiEdit, FiTrash2 } from "react-icons/fi"; // Import icons from react-icons/fi
 
 function ChatBubble({ message, timestamp, isSender, photoUrl, onEdit, onDelete }) {
   return (
@@ -57,27 +58,29 @@ function ChatBubble({ message, timestamp, isSender, photoUrl, onEdit, onDelete }
                 {timestamp}
               </Text>
             )}
-            <Flex mt={2} justifyContent="flex-end">
-              <Tooltip label="Edit" hasArrow>
-                <IconButton
-                  icon={<EditIcon />}
-                  size="sm"
-                  onClick={onEdit}
-                  mr={2}
-                  variant="ghost"
-                  colorScheme="gray"
-                />
-              </Tooltip>
-              <Tooltip label="Delete" hasArrow>
-                <IconButton
-                  icon={<DeleteIcon />}
-                  size="sm"
-                  onClick={onDelete}
-                  variant="ghost"
-                  colorScheme="red"
-                />
-              </Tooltip>
-            </Flex>
+            {isSender && (
+              <Flex mt={2} justifyContent="flex-end">
+                <Tooltip label="Edit" hasArrow>
+                  <IconButton
+                    icon={<FiEdit />}
+                    size="sm"
+                    onClick={onEdit}
+                    mr={2}
+                    variant="ghost"
+                    colorScheme="gray"
+                  />
+                </Tooltip>
+                <Tooltip label="Delete" hasArrow>
+                  <IconButton
+                    icon={<FiTrash2 />}
+                    size="sm"
+                    onClick={onDelete}
+                    variant="ghost"
+                    colorScheme="red"
+                  />
+                </Tooltip>
+              </Flex>
+            )}
           </Box>
         </Box>
         {isSender && (
