@@ -187,6 +187,11 @@ const FoodListingsPage = () => {
                                     <FoodListing
                                         listingID={listing.listingID}
                                         title={listing.title}
+                                        shortDescription={listing.shortDescription}
+                                        longDescription={listing.longDescription}
+                                        portionFee={listing.portionFee}
+                                        totalSlots={listing.totalSlots}
+                                        datetime={listing.datetime}
                                         hostName={hostName}
                                         portionPrice={listing.portionPrice}
                                         hostFoodRating={hostRating}

@@ -6,19 +6,20 @@ import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
 
-const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID }) => {
+const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, previousTitle, previousShortDescription, previousLongDescription, previousPortionFee, previousTotalSlots, previousDatetime, previousImages }) => {
     const toast = useToast();
     const today = new Date();
     today.setDate(today.getDate() + 1);
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
 
-    const [title, setTitle] = useState("");
-    const [shortDescription, setShortDescription] = useState("");
-    const [longDescription, setLongDescription] = useState("");
-    const [portionPrice, setPortionPrice] = useState(1);
-    const [totalSlots, setTotalSlots] = useState(1);
-    const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
-    const [images, setImages] = useState([]);
+    const [title, setTitle] = useState(previousTitle);
+    const [shortDescription, setShortDescription] = useState(previousShortDescription);
+    const [longDescription, setLongDescription] = useState(previousLongDescription);
+    const [portionPrice, setPortionPrice] = useState(previousPortionFee);
+    const [totalSlots, setTotalSlots] = useState(previousTotalSlots);
+    const [datetime, setDatetime] = useState(previousDatetime);
+    // set images to an array of previousImages. previousImages is a string of images split by a | symbol
+    const [images, setImages] = useState(String(previousImages).split("|"));
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
@@ -245,6 +246,7 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID })
                             <Input
                                 type="text"
                                 placeholder="E.g Pani Puri"
+                                value={title}
                                 onChange={(event) =>
                                     setTitle(event.target.value)
                                 }
@@ -256,6 +258,7 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID })
                             <Input
                                 type="text"
                                 placeholder="E.g Popular Indian Street Food"
+                                value={shortDescription}
                                 onChange={(event) =>
                                     setShortDescription(event.target.value)
                                 }
@@ -269,6 +272,7 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID })
                             <Input
                                 type="text"
                                 placeholder="E.g Pani Puri offers a burst of flavors and textures in every bite. It is made of a crispy shell, a mixture of potato, onion, peas and chickpea."
+                                value={longDescription}
                                 onChange={(event) =>
                                     setLongDescription(event.target.value)
                                 }
@@ -287,7 +291,6 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID })
                                     <InputLeftAddon>$</InputLeftAddon>
                                     <NumberInput
                                         step={1}
-                                        defaultValue={1}
                                         value={portionPrice}
                                         min={1}
                                         max={10}
@@ -314,7 +317,6 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID })
                                 <FormLabel>No. of Guests (Max: 5)</FormLabel>
                                 <NumberInput
                                     step={1}
-                                    defaultValue={1}
                                     value={totalSlots}
                                     min={1}
                                     max={5}
@@ -365,7 +367,7 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID })
                                         {images.map((image, index) => (
                                             <Card key={index} mb={2} padding={"13px"} display="flex" flexDirection={"row"} justifyContent={"space-between"}>
                                                 <Text fontSize={"15px"} color={"green"} mt={2}>
-                                                    {image.name}
+                                                    {image}
                                                 </Text>
                                                 <Button onClick={() => handleRemoveImage(index)}>
                                                     <CloseIcon boxSize={3}/>

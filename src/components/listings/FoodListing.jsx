@@ -17,6 +17,11 @@ const VerticalEllipsisIcon = (props) => (
 const FoodListing = ({
     listingID,
     title,
+    shortDescription,
+    longDescription,
+    portionFee,
+    totalSlots,
+    datetime,
     hostName,
     portionPrice,
     hostFoodRating,
@@ -180,6 +185,13 @@ const FoodListing = ({
                 onOpen={onOpen}
                 fetchListings={fetchListings}
                 listingID={listingID}
+                previousTitle={title}
+                previousShortDescription={shortDescription}
+                previousLongDescription={longDescription}
+                previousPortionFee={portionFee}
+                previousTotalSlots={totalSlots}
+                previousDatetime={datetime}
+                previousImages={images}
             />
         </>
     );
