@@ -1,11 +1,12 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
 import server from '../../networking';
 import axios from 'axios'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
 
 function ExpandedListing() {
     // const Universal = useSelector(state => state.universal)
@@ -34,13 +35,18 @@ function ExpandedListing() {
     const [changesMade, setChangesMade] = useState(false)
     const [loading, setLoading] = useState(true)
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen: deleteImageDialogOpen, onOpen: openDeleteImageDialog, onClose: closeDeleteImageDialog } = useDisclosure()
+    const [imageToBeDeleted, setImageToBeDeleted] = useState(null)
     const [file, setFile] = useState(null);
 
     const handleClose = () => {
         onClose()
         setFile(null)
     }
-
+    const handleDeleteImageDialogClosure = () => {
+        closeDeleteImageDialog()
+        setImageToBeDeleted(null)
+    }
     const handleFileSubmission = (e) => {
         if (e.target.files.length > 0) {
             setFile(e.target.files[0])
@@ -53,6 +59,9 @@ function ExpandedListing() {
         } else {
             setChangesMade(false)
         }
+    }
+    const handleDeleteImage = (imageName) => {
+        openDeleteImageDialog()
     }
     const togglePublished = (newValue) => {
         setListingPublished(newValue)
@@ -232,7 +241,12 @@ function ExpandedListing() {
                             {listingData.images.map((imgName, index) => {
                                 if (imgName) {
                                     return (
-                                        <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
+                                        <Box key={index} position={"relative"} height={"100%"}>
+                                            <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
+                                            <Tooltip hasArrow label={"Delete image"} placement={"top"}>
+                                                <CloseButton size={"md"} position={"absolute"} top={"0"} right={"0"} m={"2"} bgColor={"red"} color={"white"} onClick={() => { handleDeleteImage(imgName) }} />
+                                            </Tooltip>
+                                        </Box>
                                     )
                                 }
                             })}
@@ -288,6 +302,7 @@ function ExpandedListing() {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
+            <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} />
         </>
     )
 }
