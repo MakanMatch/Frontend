@@ -5,12 +5,16 @@ import { useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
 import server from '../../networking';
 import axios from 'axios'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 function ExpandedListing() {
     // const Universal = useSelector(state => state.universal)
     const toast = useToast()
+    const navigate = useNavigate()
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
+    const [searchParams, setSearchParams] = useSearchParams()
+    const [listingID, setListingID] = useState(searchParams.get("id"))
     const [pricePerPortion, setPricePerPortion] = useState('0.00')
     const [listingPublished, setListingPublished] = useState(false)
     const [listingData, setListingData] = useState({
@@ -87,11 +91,15 @@ function ExpandedListing() {
     }
 
     useEffect(() => {
+        if (!listingID) {
+            navigate("/")
+            return
+        }
         fetchListingDetails()
     }, [])
 
     const fetchListingDetails = () => {
-        server.get("/listingDetails")
+        server.get(`/cdn/getListing?id=${listingID}`)
             .then(response => {
                 if (response.status == 200) {
                     const processedData = processData(response.data)
@@ -100,15 +108,23 @@ function ExpandedListing() {
                     setListingPublished(processedData.published)
                     setLoading(false)
                     return
+                } else if (response.status == 404) {
+                    console.log("Listing not found, re-directing to home.")
+                    navigate("/")
+                    return
                 } else {
                     showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
+                    console.log("EXPANDEDLISTING: Failed to retrieve listing details, redirecting to home. Response below.")
                     console.log(response.data)
+                    navigate("/")
                     return
                 }
             })
             .catch(err => {
                 showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
+                console.log("EXPANDEDLISTING: Failed to retrieve listing details, redirecting to home. Response below.")
                 console.log(err)
+                navigate("/")
                 return
             })
     }
