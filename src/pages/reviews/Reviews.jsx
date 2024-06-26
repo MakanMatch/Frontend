@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Input, Flex, Card, Text, Container, Image, Textarea, Spacer, useToast, Heading, Center } from '@chakra-ui/react';
+import { Button, Box, Input, Flex, Card, Text, Container, Image, Textarea, Spacer, useToast, Heading, Center, useClipboard, Tooltip } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import server from '../../networking'
 import { ArrowBackIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
@@ -13,6 +13,7 @@ function Reviews() {
     const [hostAddress, setHostAddress] = useState("");
     const [hostContactNum, setHostContactNum] = useState(0);
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
+    const { onCopy, hasCopied } = useClipboard(hostContactNum)
 
     function ShowToast(title, description, status, duration) {
         toast({
@@ -92,7 +93,11 @@ function Reviews() {
                             <Text fontSize="4xl">{hostName}</Text>
                             <Flex direction="row" align="center" gap={2}>
                                 <PhoneIcon />
-                                <Text fontSize="md">{hostContactNum}</Text>
+                                <Tooltip label={hasCopied ? "Copied!" : "Click to copy"} closeOnClick={false}>
+                                <Text fontSize={{ base: 'sm', md: 'md' }} cursor="pointer" onClick={onCopy}>
+                                    {hostContactNum}
+                                </Text>
+                            </Tooltip>
                             </Flex>
                         </Flex>
                         <Spacer />
