@@ -230,11 +230,13 @@ function ExpandedListing() {
                     <VStack alignItems={"flex-start"}>
                         <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
                             {listingData.images.map((imgName, index) => {
-                                return (
-                                    <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
-                                )
+                                if (imgName) {
+                                    return (
+                                        <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
+                                    )
+                                }
                             })}
-                            <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={onOpen}>
+                            <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={onOpen} rounded={"10px"}>
                                 <SmallAddIcon boxSize={"10"} />
                             </Center>
                         </HStack>
