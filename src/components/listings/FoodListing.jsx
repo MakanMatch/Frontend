@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, Icon } from "@chakra-ui/react";
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, Icon, useDisclosure } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
+import EditListingModal from "./EditListingModal";
 import server from "../../networking";
 
 const VerticalEllipsisIcon = (props) => (
@@ -30,6 +31,7 @@ const FoodListing = ({
     const [loading, setLoading] = useState(true);
     const [favouriteLoaded, setFavouriteLoaded] = useState(false);
     const [moreActionsActive, setMoreActionsActive] = useState(false);
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     useEffect(() => {
         const checkFavouriteListing = async () => {
@@ -93,10 +95,6 @@ const FoodListing = ({
 
     const toggleActiveActions = () => {
         setMoreActionsActive(!moreActionsActive);
-    }
-
-    const handleEditListing = async () => {
-        console.log("Edit listing clicked");
     }
 
     const handleDeleteListing = async () => {
@@ -165,7 +163,7 @@ const FoodListing = ({
                         </ButtonGroup>
                         {moreActionsActive && (
                             <ButtonGroup flex={1} spacing="2" mt={2} justifyContent={"space-between"}>
-                                <Button onClick={handleEditListing} flex={1}>
+                                <Button onClick={onOpen} flex={1}>
                                     <Text color="blue" fontSize={"13px"}>Edit</Text>
                                 </Button>
                                 <Button onClick={handleDeleteListing} flex={1}>
@@ -176,6 +174,13 @@ const FoodListing = ({
                     </CardFooter>
                 </Skeleton>
             </Card>
+            <EditListingModal 
+                isOpen={isOpen}
+                onClose={onClose}
+                onOpen={onOpen}
+                fetchListings={fetchListings}
+                listingID={listingID}
+            />
         </>
     );
 };
