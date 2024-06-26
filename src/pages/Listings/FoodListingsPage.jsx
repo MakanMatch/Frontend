@@ -5,13 +5,14 @@ import server from "../../networking";
 import FoodListing from "../../components/listings/FoodListing";
 import GoogleMaps from "../../components/listings/GoogleMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
-import { Button, Heading, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, } from "@chakra-ui/react";
+import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, } from "@chakra-ui/react";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
     const [hostName, setHostName] = useState("");
     const [hostRating, setHostRating] = useState(0);
     const [guestUserID, setGuestUserID] = useState("");
+    const [guestName, setGuestName] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
 
@@ -92,6 +93,7 @@ const FoodListingsPage = () => {
         const response = await server.get(`/cdn/accountInfo?userID=${"47f4497b-1331-4b8a-97a4-095a79a1fd48"}`);
         if (response.status === 200) {
             setGuestUserID(response.data.userID);
+            setGuestName(response.data.username);
         } else if (response.status === 404) {
             const guestData = {
                 userID: "47f4497b-1331-4b8a-97a4-095a79a1fd48",
@@ -109,6 +111,7 @@ const FoodListingsPage = () => {
             const createSampleGuest = await server.post("/listings/createGuest", guestData);
             if (createSampleGuest.status === 200) {
                 setGuestUserID(guestData.userID);
+                setGuestName(guestData.username);
             } else {
                 toast.closeAll();
                 ShowToast(
@@ -137,9 +140,9 @@ const FoodListingsPage = () => {
 
     return (
         <div>
-            <Heading as={"h1"} mb={4}>
-                Food Listings
-            </Heading>
+            <Text fontSize={"30px"} mb={4}>
+                Welcome, {guestName}!
+            </Text>
             <Box display="flex" justifyContent="center" mb={4}>
                 <Button onClick={onOpen} variant="MMPrimary">
                     Add Listing
@@ -192,8 +195,8 @@ const FoodListingsPage = () => {
                                         // pass in images prop as an array of image links for every image there is. images is a string of image names separated by | symbol
                                         images={listing.images.map((imageName) =>
                                             getImageLink(listing.listingID, imageName)
-                                        )
-                                        }
+                                        )}
+                                        fetchListings={fetchListings}
                                     />
                                 </SlideFade>
                             ))}

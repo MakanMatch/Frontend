@@ -1,25 +1,35 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton } from "@chakra-ui/react";
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, Icon } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import server from "../../networking";
 
+const VerticalEllipsisIcon = (props) => (
+    <Icon viewBox="0 0 24 24" {...props}>
+      <circle cx="12" cy="5" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="12" cy="19" r="2" />
+    </Icon>
+);
+
 const FoodListing = ({
     listingID,
-    userID,
     title,
     hostName,
     portionPrice,
     hostFoodRating,
-    images, // Array of image links
-    ShowToast
+    userID,
+    ShowToast,
+    images,
+    fetchListings,
 }) => {
     const toast = useToast();
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [loading, setLoading] = useState(true);
     const [favouriteLoaded, setFavouriteLoaded] = useState(false);
+    const [moreActionsActive, setMoreActionsActive] = useState(false);
 
     useEffect(() => {
         const checkFavouriteListing = async () => {
@@ -80,6 +90,18 @@ const FoodListing = ({
             ShowToast("Error", "Failed to add/remove listing from favourites", "error", 3000);
         }
     };
+
+    const toggleActiveActions = () => {
+        setMoreActionsActive(!moreActionsActive);
+    }
+
+    const handleEditListing = async () => {
+        console.log("Edit listing clicked");
+    }
+
+    const handleDeleteListing = async () => {
+        console.log("Delete listing clicked");
+    }
     return (
         <>
             <style>
@@ -131,13 +153,26 @@ const FoodListing = ({
                 </CardBody>
                 <Divider />
                 <Skeleton isLoaded={favouriteLoaded && !loading}>
-                    <CardFooter justifyContent="center">
-                        <ButtonGroup spacing="2">
+                    <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
+                        <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-between"}>
                             <Button variant="MMPrimary">View more</Button>
                             <Button onClick={toggleFavourite}>
                                 {favourite ? "🩷" : "🤍"}
                             </Button>
+                            <Button onClick={toggleActiveActions}>
+                                <VerticalEllipsisIcon/>
+                            </Button>
                         </ButtonGroup>
+                        {moreActionsActive && (
+                            <ButtonGroup flex={1} spacing="2" mt={2} justifyContent={"space-between"}>
+                                <Button onClick={handleEditListing} flex={1}>
+                                    <Text color="blue" fontSize={"13px"}>Edit</Text>
+                                </Button>
+                                <Button onClick={handleDeleteListing} flex={1}>
+                                    <Text color="red" fontSize={"13px"}>Remove</Text>
+                                </Button>
+                            </ButtonGroup>
+                        )}
                     </CardFooter>
                 </Skeleton>
             </Card>
