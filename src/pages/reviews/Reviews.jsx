@@ -94,10 +94,10 @@ function Reviews() {
                             <Flex direction="row" align="center" gap={2}>
                                 <PhoneIcon />
                                 <Tooltip label={hasCopied ? "Copied!" : "Click to copy"} closeOnClick={false}>
-                                <Text fontSize={{ base: 'sm', md: 'md' }} cursor="pointer" onClick={onCopy}>
-                                    {hostContactNum}
-                                </Text>
-                            </Tooltip>
+                                    <Text fontSize={{ base: 'sm', md: 'md' }} cursor="pointer" onClick={onCopy}>
+                                        {hostContactNum}
+                                    </Text>
+                                </Tooltip>
                             </Flex>
                         </Flex>
                         <Spacer />
@@ -111,7 +111,9 @@ function Reviews() {
                 <Spacer />
                 <Box display="flex" justifyContent="center" alignItems="center" background="gray.200" borderRadius="20px" p={3}>
                     <Flex alignItems="center" maxWidth="100%">
-                        <InfoOutlineIcon mr={2} />
+                        <Tooltip label="This box contains the host address" aria-label="Host address tooltip">
+                            <InfoOutlineIcon mr={2} />
+                        </Tooltip>
                         <Text fontSize="xl" whiteSpace="normal" wordBreak="break-word">
                             {hostAddress}
                         </Text>
