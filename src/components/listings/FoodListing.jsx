@@ -103,7 +103,10 @@ const FoodListing = ({
                                 <Image
                                     key={images[imageIndex]}
                                     src={images[imageIndex]}
-                                    alt="Food listing image"
+                                    onError={(e) => {
+                                        e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
+                                        e.target.src = "/public/placeholderImage.png"; // Path to your placeholder image
+                                    }}
                                     borderRadius="lg"
                                     minWidth={"100%"}
                                     minHeight={"108px"}
