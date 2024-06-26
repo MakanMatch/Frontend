@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StarRating from './StarRatings';
-import { Button, Box, Input, Flex, Avatar, Text, Center, Container, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
+import { Button, Box, Input, Flex, Card, Text, Container, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
+import { CloseIcon } from '@chakra-ui/icons';
 import { useDisclosure } from '@chakra-ui/react'
 import server from '../../networking'
 import {
@@ -25,17 +26,40 @@ function SubmitReviews() {
     const [hygieneRating, setHygieneRating] = useState(0);
     const [comments, setComments] = useState('');
     const [images, setImages] = useState([]);
-    const [imageUrls, setImageUrls] = useState([]);
     const [reviewData, setReviewData] = useState(null);
+    const [fileFormatError, setFileFormatError] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const handleImageChange = async (event) => {
-        const newFiles = Array.from(event.target.files);
-        setImages(prevImages => [...prevImages, ...newFiles]);
-    };
+    const handleFileChange = (event) => {
+        const files = Array.from(event.target.files);
+        let filesAccepted = false;
+        for (const file of files) {
+            const allowedTypes = [
+                "image/jpeg",
+                "image/jpg",
+                "image/png",
+                "image/svg+xml",
+                "image/heic"
+            ];
+            if (allowedTypes.includes(file.type)) {
+                filesAccepted = true;
+            } else {
+                filesAccepted = false;
+                break;
+            }
+        }
+        if (filesAccepted) {
+            // set images to previous images + files
+            setImages((prevImages) => [...prevImages, ...files]);
+            setFileFormatError("");
+
+        } else {
+            setFileFormatError("Invalid file format. Only JPEG, JPG, PNG, and SVG are allowed.");
+        }
+    };    
 
     const handleRemoveImage = (index) => {
-        setImages(prevImages => prevImages.filter((_, i) => i !== index));
+        setImages((prevImages) => prevImages.filter((image, imageIndex) => imageIndex !== index));
     };
 
     const handleSubmit = async () => {
@@ -134,31 +158,36 @@ function SubmitReviews() {
                                 value={comments}
                                 onChange={(e) => setComments(e.target.value)}
                             />
-                            <Text mt='16px' mb='8px'>Upload Images</Text>
-                            <Input pt="4px" type='file' accept='image/*' multiple onChange={handleImageChange} />
-                            <Flex mt={4} wrap="wrap">
-                                {images.map((image, index) => (
-                                    <Box key={index} position="relative" boxSize="100px" m={1}>
-                                        <Image
-                                            src={URL.createObjectURL(image)}
-                                            alt={`preview ${index}`}
-                                            boxSize="100px"
-                                            objectFit="cover"
-                                            borderRadius="md"
-                                        />
-                                        <Button
-                                            size="xs"
-                                            position="absolute"
-                                            top="0"
-                                            right="0"
-                                            colorScheme="red"
-                                            onClick={() => handleRemoveImage(index)}
-                                        >
-                                            X
-                                        </Button>
-                                    </Box>
-                                ))}
-                            </Flex>
+                            <Text>Upload Images</Text>
+                            <Input
+                                pt={0.5}
+                                type="file"
+                                size="sm"
+                                onChange={handleFileChange}
+                                multiple
+                            />
+                            {fileFormatError && (
+                                <FormHelperText color="red">
+                                    {fileFormatError}
+                                </FormHelperText>
+                            )}
+                            <Box mt={2}>
+                                {images.length > 0 && (
+                                    <>
+                                        <FormLabel>Selected images:</FormLabel>
+                                        {images.map((image, index) => (
+                                            <Card key={index} mb={2} padding={"13px"} display="flex" flexDirection={"row"} justifyContent={"space-between"}>
+                                                <Text fontSize={"15px"} color={"green"} mt={2}>
+                                                    {image.name}
+                                                </Text>
+                                                <Button onClick={() => handleRemoveImage(index)}>
+                                                    <CloseIcon boxSize={3}/>
+                                                </Button>
+                                            </Card>
+                                        ))}
+                                    </>
+                                )}
+                            </Box>
                         </FormControl>
                     </ModalBody>
                     <ModalFooter>
