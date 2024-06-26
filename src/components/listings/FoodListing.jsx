@@ -19,23 +19,28 @@ const FoodListing = ({
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [favouriteLoaded, setFavouriteLoaded] = useState(false);
 
     useEffect(() => {
         const checkFavouriteListing = async () => {
-            try {
-                await new Promise(resolve => setTimeout(resolve, 800)); // Adding a delay of 500ms
-                const response = await server.get(`/cdn/checkFavouriteListing?userID=${userID}&listingID=${listingID}`);
-                if (response.status === 200) {
-                    setFavourite(response.data.listingIsFavourite);
-                } else {
+            let timer = setTimeout(() => {
+                if (loading && !favouriteLoaded) {
                     toast.closeAll();
-                    ShowToast("Failed to fetch info", "Please reload the page", "error", 3000);
+                    ShowToast("Content taking longer to load", "Please wait a moment or try reloading the page", "info", 3000);
                 }
-            } catch (error) {
-                toast.closeAll();
-                ShowToast("Failed to fetch info", "Please reload the page", "error", 3000);
-            } finally {
+            }, 7000);
+
+            const response = await server.get(`/cdn/checkFavouriteListing?userID=${userID}&listingID=${listingID}`);
+            if (response.status === 200) {
+                setFavourite(response.data.listingIsFavourite);
                 setLoading(false);
+                setFavouriteLoaded(true);
+                clearTimeout(timer);
+            } else {
+                setTimeout(() => {
+                    toast.closeAll();
+                    ShowToast("Failed to fetch information", "Please try again later", "error", 3000);
+                }, 5000);
             }
         };
 
@@ -99,22 +104,20 @@ const FoodListing = ({
                             </Box>
                         )}
                         <SlideFade in={true} offsetY="20px">
-                            <Skeleton isLoaded={!loading} borderRadius="lg" minWidth={"100%"} minHeight={"108px"} maxHeight={"108px"} objectFit="cover" style={{ pointerEvents: "none" }}>
-                                <Image
-                                    key={images[imageIndex]}
-                                    src={images[imageIndex]}
-                                    onError={(e) => {
-                                        e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
-                                        e.target.src = "/public/placeholderImage.png"; // Path to your placeholder image
-                                    }}
-                                    borderRadius="lg"
-                                    minWidth={"100%"}
-                                    minHeight={"108px"}
-                                    maxHeight={"108px"}
-                                    objectFit="cover"
-                                    style={{ pointerEvents: "none" }}
-                                />
-                            </Skeleton>
+                            <Image
+                                key={images[imageIndex]}
+                                src={images[imageIndex]}
+                                onError={(e) => {
+                                    e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
+                                    e.target.src = "/placeholderImage.png"; // Path to your placeholder image
+                                }}
+                                borderRadius="lg"
+                                minWidth={"100%"}
+                                minHeight={"108px"}
+                                maxHeight={"108px"}
+                                objectFit="cover"
+                                style={{ pointerEvents: "none" }}
+                            />
                         </SlideFade>
                     </Box>
                     <Stack mt="6" spacing="3">
@@ -127,14 +130,16 @@ const FoodListing = ({
                     </Stack>
                 </CardBody>
                 <Divider />
-                <CardFooter justifyContent="center">
-                    <ButtonGroup spacing="2">
-                        <Button variant="MMPrimary">View more</Button>
-                        <Button onClick={toggleFavourite}>
-                            {favourite ? "🩷" : "🤍"}
-                        </Button>
-                    </ButtonGroup>
-                </CardFooter>
+                <Skeleton isLoaded={favouriteLoaded && !loading}>
+                    <CardFooter justifyContent="center">
+                        <ButtonGroup spacing="2">
+                            <Button variant="MMPrimary">View more</Button>
+                            <Button onClick={toggleFavourite}>
+                                {favourite ? "🩷" : "🤍"}
+                            </Button>
+                        </ButtonGroup>
+                    </CardFooter>
+                </Skeleton>
             </Card>
         </>
     );
