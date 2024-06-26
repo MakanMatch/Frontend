@@ -4,9 +4,9 @@
 import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Image } from "@chakra-ui/react";
 
-const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, previousTitle, previousShortDescription, previousLongDescription, previousPortionFee, previousTotalSlots, previousDatetime, previousImages }) => {
+const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, previousTitle, previousShortDescription, previousLongDescription, previousPortionFee, previousTotalSlots, previousDatetime }) => {
     const toast = useToast();
     const today = new Date();
     today.setDate(today.getDate() + 1);
@@ -19,7 +19,7 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, p
     const [totalSlots, setTotalSlots] = useState(previousTotalSlots);
     const [datetime, setDatetime] = useState(previousDatetime);
     // set images to an array of previousImages. previousImages is a string of images split by a | symbol
-    const [images, setImages] = useState(String(previousImages).split("|"));
+    const [images, setImages] = useState([]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
@@ -171,6 +171,7 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, p
     const handleAlertConfirm = () => {
         onAlertClose();
         onClose();
+        setImages([]);
     };
 
     useEffect(() => {
@@ -367,7 +368,7 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, p
                                         {images.map((image, index) => (
                                             <Card key={index} mb={2} padding={"13px"} display="flex" flexDirection={"row"} justifyContent={"space-between"}>
                                                 <Text fontSize={"15px"} color={"green"} mt={2}>
-                                                    {image}
+                                                    {image.name}
                                                 </Text>
                                                 <Button onClick={() => handleRemoveImage(index)}>
                                                     <CloseIcon boxSize={3}/>
@@ -412,7 +413,7 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, p
                                 fontWeight="bold"
                                 isDisabled
                             >
-                                Host
+                                Update
                             </Button>
                         ) : (
                             <>
@@ -429,7 +430,7 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, p
                                         onClick={handleUpdateListing}
                                         variant="MMPrimary"
                                     >
-                                        Host
+                                        Update
                                     </Button>
                                 )}
                             </>

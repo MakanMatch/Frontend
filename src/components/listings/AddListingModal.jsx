@@ -169,6 +169,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const handleAlertConfirm = () => {
         onAlertClose();
         onClose();
+        setDefaultState();
     };
 
     useEffect(() => {
