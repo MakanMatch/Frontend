@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StarRating from './StarRatings';
-import { Button, Box, Input, Flex, Card, Text, Container, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
-import { CloseIcon } from '@chakra-ui/icons';
+import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
+import { EditIcon } from '@chakra-ui/icons';
 import { useDisclosure } from '@chakra-ui/react'
 import server from '../../networking'
 import {
@@ -120,11 +120,12 @@ function SubmitReviews() {
 
     return (
         <Box>
-            <Button onClick={onOpen} variant={"MMPrimary"}> Submit Reviews </Button>
+            <Button onClick={onOpen} variant={"MMPrimary"}><EditIcon/></Button>
             <Modal isOpen={isOpen} onClose={handleClose} motionPreset='slideInBottom' isCentered >
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Submit A Review</ModalHeader>
+                    <ModalHeader>Rate & Tell Your Experience!
+                    </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <Flex direction="column" align="center" mb={4}>
