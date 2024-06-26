@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, Icon, useDisclosure } from "@chakra-ui/react";
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, Icon, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import EditListingModal from "./EditListingModal";
@@ -37,6 +37,7 @@ const FoodListing = ({
     const [favouriteLoaded, setFavouriteLoaded] = useState(false);
     const [moreActionsActive, setMoreActionsActive] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
 
     useEffect(() => {
         const checkFavouriteListing = async () => {
@@ -103,7 +104,15 @@ const FoodListing = ({
     }
 
     const handleDeleteListing = async () => {
-        console.log("Delete listing clicked");
+        const deleteListing = await server.delete("/listings/deleteListing", { data: { listingID: listingID } });
+        if (deleteListing.status === 200) {
+            toast.closeAll();
+            ShowToast("Listing removed", "Your listing has been successfully removed!", "success", 3000);
+            fetchListings();
+        } else {
+            toast.closeAll();
+            ShowToast("Error", "Failed to remove listing", "error", 3000);
+        }
     }
     return (
         <>
@@ -171,7 +180,7 @@ const FoodListing = ({
                                 <Button onClick={onOpen} flex={1}>
                                     <Text color="blue" fontSize={"13px"}>Edit</Text>
                                 </Button>
-                                <Button onClick={handleDeleteListing} flex={1}>
+                                <Button onClick={onOpenAlert} flex={1}>
                                     <Text color="red" fontSize={"13px"}>Remove</Text>
                                 </Button>
                             </ButtonGroup>
@@ -193,6 +202,31 @@ const FoodListing = ({
                 previousDatetime={datetime}
                 previousImages={images}
             />
+            <AlertDialog
+                isOpen={isOpenAlert}
+                leastDestructiveRef={undefined}
+                onClose={onCloseAlert}
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Remove Listing
+                        </AlertDialogHeader>
+                        <AlertDialogCloseButton />
+                        <AlertDialogBody>
+                            Are you sure you want to remove this listing?
+                        </AlertDialogBody>
+                        <AlertDialogFooter>
+                            <Button onClick={onCloseAlert}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme="red" onClick={handleDeleteListing} ml={3}>
+                                Remove
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </>
     );
 };
