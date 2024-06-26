@@ -1,8 +1,15 @@
 import React from "react";
-import { Box, Text, Flex, Image } from "@chakra-ui/react";
-import { ChevronRightIcon, ChevronLeftIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Text,
+  Flex,
+  Image,
+  IconButton,
+  Tooltip,
+} from "@chakra-ui/react";
+import { ChevronRightIcon, ChevronLeftIcon, EditIcon, DeleteIcon } from "@chakra-ui/icons";
 
-function ChatBubble({ message, timestamp, isSender, photoUrl }) {
+function ChatBubble({ message, timestamp, isSender, photoUrl, onEdit, onDelete }) {
   return (
     <Box position="relative" marginY={2} maxW="70%" alignSelf={isSender ? 'flex-end' : 'flex-start'}>
       <Flex alignItems="center">
@@ -42,6 +49,7 @@ function ChatBubble({ message, timestamp, isSender, photoUrl }) {
             color={isSender ? 'white' : 'black'}
             borderRadius="lg"
             p={3}
+            position="relative"
           >
             <Text>{message}</Text>
             {timestamp && (
@@ -49,6 +57,27 @@ function ChatBubble({ message, timestamp, isSender, photoUrl }) {
                 {timestamp}
               </Text>
             )}
+            <Flex mt={2} justifyContent="flex-end">
+              <Tooltip label="Edit" hasArrow>
+                <IconButton
+                  icon={<EditIcon />}
+                  size="sm"
+                  onClick={onEdit}
+                  mr={2}
+                  variant="ghost"
+                  colorScheme="gray"
+                />
+              </Tooltip>
+              <Tooltip label="Delete" hasArrow>
+                <IconButton
+                  icon={<DeleteIcon />}
+                  size="sm"
+                  onClick={onDelete}
+                  variant="ghost"
+                  colorScheme="red"
+                />
+              </Tooltip>
+            </Flex>
           </Box>
         </Box>
         {isSender && (
