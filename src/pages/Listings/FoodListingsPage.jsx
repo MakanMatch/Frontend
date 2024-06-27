@@ -191,25 +191,29 @@ const FoodListingsPage = () => {
                                     offsetY="20px"
                                     key={listing.listingID}
                                 >
-                                    <FoodListing
-                                        listingID={listing.listingID}
-                                        title={listing.title}
-                                        shortDescription={listing.shortDescription}
-                                        longDescription={listing.longDescription}
-                                        portionFee={listing.portionFee}
-                                        totalSlots={listing.totalSlots}
-                                        datetime={listing.datetime}
-                                        hostName={hostName}
-                                        portionPrice={listing.portionPrice}
-                                        hostFoodRating={hostRating}
-                                        userID={guestUserID}
-                                        ShowToast={ShowToast}
-                                        // pass in images prop as an array of image links for every image there is. images is a string of image names separated by | symbol
-                                        images={listing.images.map((imageName) =>
-                                            getImageLink(listing.listingID, imageName)
-                                        )}
-                                        fetchListings={fetchListings}
-                                    />
+                                    <Box 
+                                        display={isBetween701And739 ? "flex" : "initial"}
+                                        justifyContent={isBetween701And739 ? "center" : "initial"}>
+                                        <FoodListing
+                                            listingID={listing.listingID}
+                                            title={listing.title}
+                                            shortDescription={listing.shortDescription}
+                                            longDescription={listing.longDescription}
+                                            portionFee={listing.portionFee}
+                                            totalSlots={listing.totalSlots}
+                                            datetime={listing.datetime}
+                                            hostName={hostName}
+                                            portionPrice={listing.portionPrice}
+                                            hostFoodRating={hostRating}
+                                            userID={guestUserID}
+                                            ShowToast={ShowToast}
+                                            // pass in images prop as an array of image links for every image there is. images is a string of image names separated by | symbol
+                                            images={listing.images.map((imageName) =>
+                                                getImageLink(listing.listingID, imageName)
+                                            )}
+                                            fetchListings={fetchListings}
+                                        />
+                                    </Box>
                                 </SlideFade>
                             ))}
                         </SimpleGrid>
