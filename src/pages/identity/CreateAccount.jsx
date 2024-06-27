@@ -22,7 +22,12 @@ function CreateAccount() {
     // Validation schema
     const validationSchema = Yup.object().shape({
         username: Yup.string().required('Username is required'),
-        email: Yup.string().email('Invalid email address').required('Email is required'),
+        email: Yup.string()
+        .matches(
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+            'Invalid email address'
+        )
+        .required('Email is required'),
         password: Yup.string()
             .min(6, 'Password must be at least 6 characters')
             .required('Password is required'),
@@ -70,227 +75,209 @@ function CreateAccount() {
                     });
                 }
             })
-//             .catch((err) => {
-//                 if (err.response.data === "Username already exists.") {
-//                     actions.setFieldError('username', 'Username already exists.');
-//                 } else if (err.response.data === "Email already exists.") {
-//                     actions.setFieldError('email', 'Email already exists.');
-//                 } else if (err.response.data === "Contact number already exists.") {
-//                     actions.setFieldError('contactNum', 'Contact number already in use.');
-//                 }
-//                 toast({
-//                     title: 'Account creation failed.',
-//                     description: `${err.response.data}`,
-//                     status: 'error',
-//                     duration: 3000,
-//                     isClosable: true,
-//                 });
-// <<<<<<< main
-//             }
-//         })
-//         .catch((err) => {
-//             if (err.response.data === "UERROR: Username already exists.") {
-//                 actions.setFieldError('username', 'Username already exists.');
-//             } else if (err.response.data === "UERROR: Email already exists.") {
-//                 actions.setFieldError('email', 'Email already exists.');
-//             } else if (err.response.data === "UERROR: Contact number already exists.") {
-//                 actions.setFieldError('contactNum', 'Contact number already in use.');
-//             }
-//             toast({
-//                 title: 'Account creation failed.',
-//                 description: `${err.response.data}`.substring("UERROR: ".length),
-//                 status: 'error',
-//                 duration: 3000,
-//                 isClosable: true,
-// =======
-// >>>>>>> junhan
-//             });
+            .catch((err) => {
+                if (err.response.data === "UERROR: Username already exists.") {
+                    actions.setFieldError('username', 'Username already exists.');
+                } else if (err.response.data === "UERROR: Email already exists.") {
+                    actions.setFieldError('email', 'Email already exists.');
+                } else if (err.response.data === "UERROR: Contact number already exists.") {
+                    actions.setFieldError('contactNum', 'Contact number already in use.');
+                }
+                toast({
+                    title: 'Account creation failed.',
+                    description: `${err.response.data}`.substring("UERROR: ".length),
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
 
-        actions.setSubmitting(false);
-    };
+                });
 
-    const formik = useFormik({
-        initialValues: {
-            username: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-            contactNum: '',
-            address: '',
-            isHostAccount: false
-        },
-        validationSchema,
-        onSubmit: handleSubmit,
-    });
+                actions.setSubmitting(false);
+            });
+        };
 
-    return (
-        <Box
-            bgPosition="center"
-            display="flex"
-            bgColor={'gray'}
-        >
+        const formik = useFormik({
+            initialValues: {
+                username: '',
+                email: '',
+                password: '',
+                confirmPassword: '',
+                contactNum: '',
+                address: '',
+                isHostAccount: false
+            },
+            validationSchema,
+            onSubmit: handleSubmit,
+        });
+
+        return (
             <Box
-                w="50%"
-                h="100%"
-                bg="rgba(255, 255, 255, 0.8)"
+                bgPosition="center"
                 display="flex"
-                alignItems="center"
-                justifyContent="center"
             >
-                <VStack spacing={4} w="full">
-                    <Heading as="h1" size="xl" mb={4} mt={20} textAlign="center">
-                        Create an account
-                    </Heading>
-                    <Box as="form" onSubmit={formik.handleSubmit}>
-                        <FormControl isInvalid={formik.errors.username && formik.touched.username} mb={4}>
-                            <FormLabel fontSize='15px'>Username</FormLabel>
-                            <Input
-                                name="username"
-                                placeholder='Username'
-                                borderColor='black'
-                                size='sm'
-                                borderRadius='5px'
-                                w="400px"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.username}
-                            />
-                            <FormErrorMessage fontSize='12px'>{formik.errors.username}</FormErrorMessage>
-                        </FormControl>
-                        <FormControl isInvalid={formik.errors.email && formik.touched.email} mb={4}>
-                            <FormLabel fontSize='15px'>Email</FormLabel>
-                            <Input
-                                name="email"
-                                placeholder='Email'
-                                type='email'
-                                borderColor='black'
-                                size='sm'
-                                borderRadius='5px'
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.email}
-                            />
-                            <FormErrorMessage fontSize='12px'>{formik.errors.email}</FormErrorMessage>
-                        </FormControl>
-                        <FormControl isInvalid={formik.errors.password && formik.touched.password} mb={4}>
-                            <FormLabel fontSize='15px'>Password</FormLabel>
-                            <InputGroup>
+                <Box
+                    w="50%"
+                    h="100%"
+                    bg="rgba(255, 255, 255, 0.8)"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                >
+                    <VStack spacing={4} w="full">
+                        <Heading as="h1" size="xl" mb={4} mt={20} textAlign="center">
+                            Create an account
+                        </Heading>
+                        <Box as="form" onSubmit={formik.handleSubmit}>
+                            <FormControl isInvalid={formik.errors.username && formik.touched.username} mb={4}>
+                                <FormLabel fontSize='15px'>Username</FormLabel>
                                 <Input
-                                    name="password"
-                                    placeholder='Password'
-                                    type={showPassword ? 'text' : 'password'}
+                                    name="username"
+                                    placeholder='Username'
                                     borderColor='black'
                                     size='sm'
                                     borderRadius='5px'
+                                    w="400px"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.password}
+                                    value={formik.values.username}
                                 />
-                                <InputRightElement width='4.5rem'>
-                                    <IconButton
-                                        h='1.5rem'
-                                        size='sm'
-                                        mb={2}
-                                        onClick={handleShowPassword}
-                                        icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
-                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
-                                    />
-                                </InputRightElement>
-                            </InputGroup>
-                            <FormErrorMessage fontSize='12px'>{formik.errors.password}</FormErrorMessage>
-                        </FormControl>
-                        <FormControl isInvalid={formik.errors.confirmPassword && formik.touched.confirmPassword} mb={4}>
-                            <FormLabel fontSize='15px'>Confirm Password</FormLabel>
-                            <InputGroup>
+                                <FormErrorMessage fontSize='12px'>{formik.errors.username}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl isInvalid={formik.errors.email && formik.touched.email} mb={4}>
+                                <FormLabel fontSize='15px'>Email</FormLabel>
                                 <Input
-                                    name="confirmPassword"
-                                    placeholder='Confirm Password'
-                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    name="email"
+                                    placeholder='Email'
+                                    type='email'
                                     borderColor='black'
                                     size='sm'
                                     borderRadius='5px'
+                                    required
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.confirmPassword}
+                                    value={formik.values.email}
                                 />
-                                <InputRightElement width='4.5rem'>
-                                    <IconButton
-                                        h='1.5rem'
+                                <FormErrorMessage fontSize='12px'>{formik.errors.email}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl isInvalid={formik.errors.password && formik.touched.password} mb={4}>
+                                <FormLabel fontSize='15px'>Password</FormLabel>
+                                <InputGroup>
+                                    <Input
+                                        name="password"
+                                        placeholder='Password'
+                                        type={showPassword ? 'text' : 'password'}
+                                        borderColor='black'
                                         size='sm'
-                                        mb={2}
-                                        onClick={handleShowConfirmPassword}
-                                        icon={showConfirmPassword ? <ViewOffIcon /> : <ViewIcon />}
-                                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                                        borderRadius='5px'
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.password}
                                     />
-                                </InputRightElement>
-                            </InputGroup>
-                            <FormErrorMessage fontSize='12px'>{formik.errors.confirmPassword}</FormErrorMessage>
-                        </FormControl>
-                        <Box w="100%" display="flex" justifyContent="start">
-                            <Checkbox
-                                fontSize='15px'
+                                    <InputRightElement width='4.5rem'>
+                                        <IconButton
+                                            h='1.5rem'
+                                            size='sm'
+                                            mb={2}
+                                            onClick={handleShowPassword}
+                                            icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                        />
+                                    </InputRightElement>
+                                </InputGroup>
+                                <FormErrorMessage fontSize='12px'>{formik.errors.password}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl isInvalid={formik.errors.confirmPassword && formik.touched.confirmPassword} mb={4}>
+                                <FormLabel fontSize='15px'>Confirm Password</FormLabel>
+                                <InputGroup>
+                                    <Input
+                                        name="confirmPassword"
+                                        placeholder='Confirm Password'
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        borderColor='black'
+                                        size='sm'
+                                        borderRadius='5px'
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.confirmPassword}
+                                    />
+                                    <InputRightElement width='4.5rem'>
+                                        <IconButton
+                                            h='1.5rem'
+                                            size='sm'
+                                            mb={2}
+                                            onClick={handleShowConfirmPassword}
+                                            icon={showConfirmPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                            aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                                        />
+                                    </InputRightElement>
+                                </InputGroup>
+                                <FormErrorMessage fontSize='12px'>{formik.errors.confirmPassword}</FormErrorMessage>
+                            </FormControl>
+                            <Box w="100%" display="flex" justifyContent="start">
+                                <Checkbox
+                                    fontSize='15px'
+                                    mb={5}
+                                    onChange={() => {
+                                        setIsHostAccount(!isHostAccount);
+                                        formik.setFieldValue('isHostAccount', !isHostAccount);
+                                    }}
+                                >
+                                    I want to be a host
+                                </Checkbox>
+                            </Box>
+                            {formik.values.isHostAccount && (
+                                <>
+                                    <FormControl isInvalid={formik.errors.contactNum && formik.touched.contactNum} mb={4}>
+                                        <FormLabel fontSize='15px'>Contact Number</FormLabel>
+                                        <Input
+                                            name="contactNum"
+                                            placeholder='Contact Number'
+                                            borderColor='black'
+                                            size='sm'
+                                            borderRadius='5px'
+                                            w="400px"
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.contactNum}
+                                        />
+                                        <FormErrorMessage fontSize='12px'>{formik.errors.contactNum}</FormErrorMessage>
+                                    </FormControl>
+                                    <FormControl isInvalid={formik.errors.address && formik.touched.address} mb={4}>
+                                        <FormLabel fontSize='15px'>Address</FormLabel>
+                                        <Input
+                                            name="address"
+                                            placeholder='Address'
+                                            borderColor='black'
+                                            size='sm'
+                                            borderRadius='5px'
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.address}
+                                        />
+                                        <FormErrorMessage fontSize='12px'>{formik.errors.address}</FormErrorMessage>
+                                    </FormControl>
+                                </>
+                            )}
+                            <Button
+                                colorScheme='purple'
+                                isLoading={formik.isSubmitting}
+                                type='submit'
+                                width='150px'
                                 mb={5}
-                                onChange={() => {
-                                    setIsHostAccount(!isHostAccount);
-                                    formik.setFieldValue('isHostAccount', !isHostAccount);
-                                }}
                             >
-                                I want to be a host
-                            </Checkbox>
+                                Get Started
+                            </Button>
                         </Box>
-                        {formik.values.isHostAccount && (
-                            <>
-                                <FormControl isInvalid={formik.errors.contactNum && formik.touched.contactNum} mb={4}>
-                                    <FormLabel fontSize='15px'>Contact Number</FormLabel>
-                                    <Input
-                                        name="contactNum"
-                                        placeholder='Contact Number'
-                                        borderColor='black'
-                                        size='sm'
-                                        borderRadius='5px'
-                                        w="400px"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.contactNum}
-                                    />
-                                    <FormErrorMessage fontSize='12px'>{formik.errors.contactNum}</FormErrorMessage>
-                                </FormControl>
-                                <FormControl isInvalid={formik.errors.address && formik.touched.address} mb={4}>
-                                    <FormLabel fontSize='15px'>Address</FormLabel>
-                                    <Input
-                                        name="address"
-                                        placeholder='Address'
-                                        borderColor='black'
-                                        size='sm'
-                                        borderRadius='5px'
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.address}
-                                    />
-                                    <FormErrorMessage fontSize='12px'>{formik.errors.address}</FormErrorMessage>
-                                </FormControl>
-                            </>
-                        )}
-                        <Button
-                            colorScheme='purple'
-                            isLoading={formik.isSubmitting}
-                            type='submit'
-                            width='150px'
-                            mb={5}
-                        >
-                            Get Started
-                        </Button>
-                    </Box>
-                    <Text textAlign='center' fontSize='12px' mb={5}>
-                        Already have an account? <Link href='./login' color='teal.500'><Text as='u'>Sign In</Text></Link>
-                    </Text>
-                </VStack>
+                        <Text textAlign='center' fontSize='12px' mb={5}>
+                            Already have an account? <Link href='./login' color='teal.500'><Text as='u'>Sign In</Text></Link>
+                        </Text>
+                    </VStack>
+                </Box>
             </Box>
-        </Box>
-    );
-}
+        );
+    }
 
-export default CreateAccount;
+    export default CreateAccount;
 
 // CODE FOR CONSIDERATION TO FIX UI:
 // return (
