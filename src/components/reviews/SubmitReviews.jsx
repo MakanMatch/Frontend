@@ -165,9 +165,9 @@ function SubmitReviews() {
                             />
                             <Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Upload Images</Text>
                             <Input
-                                pt={0.5}
+                                pt={1}
                                 type="file"
-                                size="sm"
+                                size="md"
                                 onChange={handleFileChange}
                                 multiple
                             />
