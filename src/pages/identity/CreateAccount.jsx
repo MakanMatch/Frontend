@@ -22,7 +22,12 @@ function CreateAccount() {
     // Validation schema
     const validationSchema = Yup.object().shape({
         username: Yup.string().required('Username is required'),
-        email: Yup.string().email('Invalid email address').required('Email is required'),
+        email: Yup.string()
+        .matches(
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+            'Invalid email address'
+        )
+        .required('Email is required'),
         password: Yup.string()
             .min(6, 'Password must be at least 6 characters')
             .required('Password is required'),
@@ -70,24 +75,6 @@ function CreateAccount() {
                     });
                 }
             })
-            //             .catch((err) => {
-            //                 if (err.response.data === "Username already exists.") {
-            //                     actions.setFieldError('username', 'Username already exists.');
-            //                 } else if (err.response.data === "Email already exists.") {
-            //                     actions.setFieldError('email', 'Email already exists.');
-            //                 } else if (err.response.data === "Contact number already exists.") {
-            //                     actions.setFieldError('contactNum', 'Contact number already in use.');
-            //                 }
-            //                 toast({
-            //                     title: 'Account creation failed.',
-            //                     description: `${err.response.data}`,
-            //                     status: 'error',
-            //                     duration: 3000,
-            //                     isClosable: true,
-            //                 });
-            // <<<<<<< main
-            //             }
-            //         })
             .catch((err) => {
                 if (err.response.data === "UERROR: Username already exists.") {
                     actions.setFieldError('username', 'Username already exists.');
@@ -165,6 +152,7 @@ function CreateAccount() {
                                     borderColor='black'
                                     size='sm'
                                     borderRadius='5px'
+                                    required
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     value={formik.values.email}
