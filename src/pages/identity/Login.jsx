@@ -20,20 +20,38 @@ function Login() {
                 'Content-Type': 'application/json'
             }
         })
-        .then((res) => {
-            if (res && res.data) {
-                console.log(res.data);
-                console.log("Account logged in successfully.");
-                toast({
-                    title: 'Login successful.',
-                    description: "Welcome back to MakanMatch!",
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                });
-                navigate("/");
-            } else {
-                console.log("An error has occurred logging in to the account.")
+            .then((res) => {
+                if (res && res.data) {
+                    console.log(res.data);
+                    console.log("Account logged in successfully.");
+                    toast({
+                        title: 'Login successful.',
+                        description: "Welcome back to MakanMatch!",
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                    // Set the JWT token in localStorage
+                    localStorage.setItem('jwt', res.data.accessToken);
+                    navigate("/");
+                } else {
+                    console.log("An error has occurred logging in to the account.")
+                    toast({
+                        title: 'Login failed.',
+                        description: "Invalid username or password.",
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log("error")
+                console.log(`${err.response.data}`);
+                if (err.response.data === "UERROR: Invalid username or email or password.") {
+                    formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
+                    formik.setFieldError('password', 'Incorrect password.');
+                }
                 toast({
                     title: 'Login failed.',
                     description: "Invalid username or password.",
@@ -41,23 +59,7 @@ function Login() {
                     duration: 3000,
                     isClosable: true,
                 });
-            }
-        })
-        .catch((err) => {
-            console.log("error")
-            console.log(`${err.response.data}`);
-            if (err.response.data === "UERROR: Invalid username or email or password.") {
-                formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
-                formik.setFieldError('password', 'Incorrect password.');
-            }
-            toast({
-                title: 'Login failed.',
-                description: "Invalid username or password.",
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
             });
-        });
 
         actions.setSubmitting(false);
     };
