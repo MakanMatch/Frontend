@@ -9,18 +9,29 @@ import {
   VStack,
   Spacer,
   IconButton,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Button,
+  useMediaQuery
 } from "@chakra-ui/react";
 import { FiSmile, FiCamera } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
-import Sidebar2 from "../../components/chat/SideBar2"; // Import the Sidebar component
+import Sidebar from "../../components/chat/SideBar";
 
 function ChatUi2() {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
+  const [messageToDelete, setMessageToDelete] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)")
+
   const ws = useRef(null);
 
   useEffect(() => {
-    // Connect to WebSocket server
     ws.current = new WebSocket("ws://localhost:8080");
 
     ws.current.onopen = () => {
@@ -29,9 +40,7 @@ function ChatUi2() {
 
     ws.current.onmessage = async (event) => {
       let receivedMessage;
-    
       if (event.data instanceof Blob) {
-        // Convert Blob to text
         const text = await event.data.text();
         try {
           receivedMessage = JSON.parse(text);
@@ -47,10 +56,25 @@ function ChatUi2() {
           return;
         }
       }
-    
+
       console.log("Received message:", receivedMessage);
-      // Update messages state with received message
-      setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+      if (receivedMessage.action === "edit") {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === receivedMessage.id
+              ? { ...msg, message: receivedMessage.message, edited: true }
+              : msg
+          )
+        );
+      } else if (receivedMessage.action === "delete") {
+        setMessages((prevMessages) =>
+          prevMessages.filter((msg) => msg.id !== receivedMessage.id)
+        );
+      } else if (receivedMessage.action === "reload") {
+        window.location.reload();
+      } else {
+        setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+      }
     };
 
     ws.current.onerror = (error) => {
@@ -61,7 +85,6 @@ function ChatUi2() {
       console.log("Disconnected from WebSocket server");
     };
 
-    // Cleanup function to close WebSocket connection on component unmount
     return () => {
       if (ws.current) {
         ws.current.close();
@@ -74,7 +97,7 @@ function ChatUi2() {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
         id: Math.random().toString(36).substr(2, 9),
-        sender: "James", // Replace with dynamic sender information
+        sender: "James",
         message: messageInput,
         timestamp: `${new Date().getHours()}:${new Date()
           .getMinutes()
@@ -82,14 +105,10 @@ function ChatUi2() {
           .padStart(2, "0")}`,
       };
 
-      // Send message to WebSocket server
       ws.current.send(JSON.stringify(newMessage));
       console.log("Sent message:", newMessage);
 
-      // Update messages state with sent message
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-
-      // Clear input field
       setMessageInput("");
     }
   };
@@ -100,69 +119,108 @@ function ChatUi2() {
     }
   };
 
+  const handleEditPrompt = (messageId, currentMessage) => {
+    const newMessage = prompt("Edit your message:", currentMessage);
+    if (newMessage && newMessage.trim() !== "") {
+      const editedMessage = {
+        id: messageId,
+        action: "edit",
+        sender: "James",
+        message: newMessage,
+        timestamp: `${new Date().getHours()}:${new Date()
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`,
+      };
+      ws.current.send(JSON.stringify(editedMessage));
+    }
+  };
+
+  const handleDeletePrompt = (messageId) => {
+    setMessageToDelete(messageId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteMessage = () => {
+    if (messageToDelete) {
+      const deleteMessage = {
+        id: messageToDelete,
+        action: "delete",
+      };
+      ws.current.send(JSON.stringify(deleteMessage));
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+  };
+
   return (
     <Flex>
-      <Sidebar2 /> 
-      <Center flexDirection="column" alignItems="center" p={5} flex="1">
-        <Box
-          bg="white"
-          w="70%"
-          p={2}
-          borderTopRadius={20}
-          h="auto"
-          textColor="black"
-          alignItems="center"
-          display="flex"
-          border="1px"
-          borderColor="black"
-        >
-          <Image
-            src="https://bit.ly/dan-abramov"
-            alt="Dan Abramov"
+    <Sidebar />
+    <Center flexDirection="column" alignItems="center" p={5} flex="1">
+      <Box
+        bg="white"
+        w="75%"
+        p={2}
+        borderRadius={20}
+        h="auto"
+        textColor="black"
+        alignItems="center"
+        display="flex"
+        boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
+        mb={4}
+        mt={-4}
+      >
+           <Image
+            src="https://randomuser.me/api/portraits/men/4.jpg"
+            alt="UserA"
             borderRadius="full"
-            w="10%"
+            w={{ base: "20%", md: "10%" }}
             h="100%"
+            minH={"55px"}
+            maxH={"55px"}
+            minW={"55px"}
+            maxW={"55px"}
           />
-          <Box>
-            <Text marginLeft={5} fontSize={20}>
-              Chat with Jamie Oliver (Host) Rating: 2 ⭐
-            </Text>
-            <Spacer h={4} />
-            <Text
-              w="17%"
-              fontSize={15}
-              marginTop={-3}
-              marginLeft={"7px"}
-              color={"green"}
-            >
+          <Box
+            mt={-10}
+            ml={{ base: 0, md: 5 }}
+            minW={"495px"}
+          >
+            <Text fontSize={20} mt={2} textAlign={"left"}>Chat with Jamie Oliver (Host) Rating: 2 ⭐</Text>
+            <Spacer h={3} />
+            <Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
               Online
             </Text>
           </Box>
         </Box>
         <Box
           bg="gray.100"
-          w="70%"
-          h="calc(100vh - 160px)"
+          w="75%"
+          h="70vh"
           p={4}
           display="flex"
           flexDirection="column"
-          borderLeft="1px"
-          borderRight="1px"
-          borderBottom="1px"
-          borderColor="black"
+          borderRadius={20}
+          boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
         >
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
-            {messages.map((msg, index) => (
+            {messages.map((msg) => (
               <ChatBubble
-                key={index}
+                key={msg.id}
                 message={msg.message}
                 timestamp={msg.timestamp}
-                isSender={msg.sender === "James"} 
+                isSender={msg.sender === "James"}
                 photoUrl={
                   msg.sender === "James"
                     ? "https://randomuser.me/api/portraits/men/4.jpg"
                     : "https://bit.ly/dan-abramov"
-                } // Replace with appropriate avatar URL
+                }
+                onEdit={() => handleEditPrompt(msg.id, msg.message)}
+                onDelete={() => handleDeletePrompt(msg.id)}
+                edited={msg.edited}
               />
             ))}
           </VStack>
@@ -198,6 +256,34 @@ function ChatUi2() {
           </Flex>
         </Box>
       </Center>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        isOpen={deleteDialogOpen}
+        leastDestructiveRef={undefined}
+        onClose={closeDeleteDialog}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Message
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to delete this message?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button variant="ghost" onClick={closeDeleteDialog}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Flex>
   );
 }

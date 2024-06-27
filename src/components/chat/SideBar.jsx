@@ -9,14 +9,14 @@ const users = [
 ];
 
 function Sidebar() {
-  const [isLargerThan100px] = useMediaQuery("(min-width: 100px)");
+  const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
 
-  if (!isLargerThan100px) {
+  if (!isSmallerThan950px) {
     return null;
   }
 
   return (
-    <Box bg="white" w="20%" minW="100px" h="100vh" p={4} borderRight="1px" borderColor="gray.200">
+    <Box bg="white" w="30%" minW="100px" h="90%" p={4} boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"} borderRadius={"10px"} overflow={"hidden"} borderColor="gray.200">
       <Text fontSize="2xl" mb={6} textAlign={"left"}>Messages</Text>
       <VStack spacing={4} align="stretch" alignContent={"left"}>
         {users.map((user, index) => (
@@ -28,10 +28,10 @@ function Sidebar() {
             borderRadius="md" 
             w="100%"
           >
-            <Avatar src={user.avatar} name={user.name} size="md" mr={3} />
-            <Box flex="1">
-              <Text fontWeight="bold">{user.name}</Text>
-              <Text fontSize="sm" color="gray.500" isTruncated maxW="125px">
+            <Avatar src={user.avatar} name={user.name} mr={3} minW={"55px"} minH={"55px"} />
+            <Box flex="1" minW={0}>
+              <Text fontWeight="bold" textAlign={"left"}>{user.name}</Text>
+              <Text fontSize="sm" color="gray.500" maxW="100%" textAlign={"left"} isTruncated>
                 {user.lastMessage}
               </Text>
             </Box>

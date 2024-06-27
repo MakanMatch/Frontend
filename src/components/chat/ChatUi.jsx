@@ -9,6 +9,14 @@ import {
   VStack,
   Spacer,
   IconButton,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Button,
+  useMediaQuery
 } from "@chakra-ui/react";
 import { FiSmile, FiCamera } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
@@ -17,10 +25,13 @@ import Sidebar from "../../components/chat/SideBar";
 function ChatUi() {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
+  const [messageToDelete, setMessageToDelete] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)")
+
   const ws = useRef(null);
 
   useEffect(() => {
-    // Connect to WebSocket server
     ws.current = new WebSocket("ws://localhost:8080");
 
     ws.current.onopen = () => {
@@ -29,9 +40,7 @@ function ChatUi() {
 
     ws.current.onmessage = async (event) => {
       let receivedMessage;
-
       if (event.data instanceof Blob) {
-        // Convert Blob to text
         const text = await event.data.text();
         try {
           receivedMessage = JSON.parse(text);
@@ -49,8 +58,23 @@ function ChatUi() {
       }
 
       console.log("Received message:", receivedMessage);
-      // Update messages state with received message
-      setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+      if (receivedMessage.action === "edit") {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === receivedMessage.id
+              ? { ...msg, message: receivedMessage.message, edited: true }
+              : msg
+          )
+        );
+      } else if (receivedMessage.action === "delete") {
+        setMessages((prevMessages) =>
+          prevMessages.filter((msg) => msg.id !== receivedMessage.id)
+        );
+      } else if (receivedMessage.action === "reload") {
+        window.location.reload();
+      } else {
+        setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+      }
     };
 
     ws.current.onerror = (error) => {
@@ -61,7 +85,6 @@ function ChatUi() {
       console.log("Disconnected from WebSocket server");
     };
 
-    // Cleanup function to close WebSocket connection on component unmount
     return () => {
       if (ws.current) {
         ws.current.close();
@@ -74,7 +97,7 @@ function ChatUi() {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
         id: Math.random().toString(36).substr(2, 9),
-        sender: "Jamie", // Replace with dynamic sender information
+        sender: "Jamie",
         message: messageInput,
         timestamp: `${new Date().getHours()}:${new Date()
           .getMinutes()
@@ -82,14 +105,10 @@ function ChatUi() {
           .padStart(2, "0")}`,
       };
 
-      // Send message to WebSocket server
       ws.current.send(JSON.stringify(newMessage));
       console.log("Sent message:", newMessage);
 
-      // Update messages state with sent message
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-
-      // Clear input field
       setMessageInput("");
     }
   };
@@ -100,21 +119,59 @@ function ChatUi() {
     }
   };
 
+  const handleEditPrompt = (messageId, currentMessage) => {
+    const newMessage = prompt("Edit your message:", currentMessage);
+    if (newMessage && newMessage.trim() !== "") {
+      const editedMessage = {
+        id: messageId,
+        action: "edit",
+        sender: "Jamie",
+        message: newMessage,
+        timestamp: `${new Date().getHours()}:${new Date()
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`,
+      };
+      ws.current.send(JSON.stringify(editedMessage));
+    }
+  };
+
+  const handleDeletePrompt = (messageId) => {
+    setMessageToDelete(messageId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteMessage = () => {
+    if (messageToDelete) {
+      const deleteMessage = {
+        id: messageToDelete,
+        action: "delete",
+      };
+      ws.current.send(JSON.stringify(deleteMessage));
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+  };
+
   return (
     <Flex>
       <Sidebar />
       <Center flexDirection="column" alignItems="center" p={5} flex="1">
         <Box
           bg="white"
-          w="70%"
+          w="75%"
           p={2}
-          borderTopRadius={20}
+          borderRadius={20}
           h="auto"
           textColor="black"
           alignItems="center"
           display="flex"
-          border="1px"
-          borderColor="black"
+          boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
+          mb={4}
+          mt={-4}
         >
           <Image
             src="https://randomuser.me/api/portraits/men/4.jpg"
@@ -122,32 +179,34 @@ function ChatUi() {
             borderRadius="full"
             w={{ base: "20%", md: "10%" }}
             h="100%"
+            minH={"55px"}
+            maxH={"55px"}
+            minW={"55px"}
+            maxW={"55px"}
           />
           <Box
-            textAlign={{ base: "center", md: "left" }}
-            mt={{ base: 2, md: 0 }}
+            mt={-10}
             ml={{ base: 0, md: 5 }}
+            minW={"495px"}
           >
-            <Text fontSize={20}>Chat with James Davies</Text>
-            <Spacer h={4} />
-            <Text fontSize={15} mt={{ base: -1, md: -3 }} color="green">
+            <Text fontSize={20} mt={2} textAlign={"left"}>Chat with James Davies</Text>
+            <Spacer h={3} />
+            <Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
               Online
             </Text>
           </Box>
         </Box>
         <Box
           bg="gray.100"
-          w="70%"
-          h="calc(100vh - 160px)"
+          w="75%"
+          h="70vh"
           p={4}
           display="flex"
           flexDirection="column"
-          borderLeft="1px"
-          borderRight="1px"
-          borderBottom="1px"
-          borderColor="black"
+          borderRadius={20}
+          boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
         >
-        <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
+          <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
             {messages.map((msg) => (
               <ChatBubble
                 key={msg.id}
@@ -164,6 +223,7 @@ function ChatUi() {
                 edited={msg.edited}
               />
             ))}
+          </VStack>
           <Flex mt={4} align="center">
             <IconButton
               aria-label="Add emoji"
@@ -194,12 +254,38 @@ function ChatUi() {
               onKeyDown={handleKeyDown}
             />
           </Flex>
-        </VStack>
         </Box>
       </Center>
-    </Flex>
-    );
-}
 
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        isOpen={deleteDialogOpen}
+        leastDestructiveRef={undefined}
+        onClose={closeDeleteDialog}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Message
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to delete this message?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button variant="ghost" onClick={closeDeleteDialog}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </Flex>
+  );
+}
 
 export default ChatUi;
