@@ -43,20 +43,6 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, p
         });
     }
 
-    function setDefaultState() {
-        setIsSubmitting(false);
-        setFileFormatError("");
-        setModalError(true);
-        setValidListing(false);
-        setTitle("");
-        setShortDescription("");
-        setLongDescription("");
-        setPortionPrice(1);
-        setTotalSlots(1);
-        setDatetime(today.toISOString().slice(0, 16));
-        setImages([]);
-    }
-
     function checkDate(date) {
         if (new Date(date) > new Date()) {
             setDatetime(date);
@@ -99,7 +85,8 @@ const EditListingModal = ({ isOpen, onOpen, onClose, fetchListings, listingID, p
                 fetchListings();
                 setTimeout(() => {
                     onClose();
-                    setDefaultState();
+                    setImages([]);
+                    setIsSubmitting(false);
                     toast.closeAll();
                     ShowToast(
                         "Listing updated successfully!",

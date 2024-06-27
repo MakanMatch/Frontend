@@ -98,6 +98,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 setTimeout(() => {
                     onClose();
                     setDefaultState();
+                    setIsSubmitting(false);
                     toast.closeAll();
                     ShowToast(
                         "Listing published successfully!",
