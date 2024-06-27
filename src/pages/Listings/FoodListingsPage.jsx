@@ -124,6 +124,7 @@ const FoodListingsPage = () => {
                                 >
                                     <FoodListing
                                         key={listing.listingID}
+                                        id={listing.listingID}
                                         title={listing.title}
                                         hostName={hostName}
                                         portionPrice={listing.portionPrice}
