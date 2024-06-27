@@ -79,11 +79,11 @@ function Reviews() {
     }, []);
 
     return (
-        <Box p={4} position="relative" width="100%">
+        <Box p={2} position="relative" width="100%">
             <Button
                 onClick={handleGoBack}
                 position='absolute'
-                top={{ md:12, base: 12}}
+                top={{ md:10, base: 10}}
                 left={{ md: 4, base: 0}}
                 zIndex={10}
             >

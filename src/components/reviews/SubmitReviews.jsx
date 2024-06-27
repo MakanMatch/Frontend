@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StarRating from './StarRatings';
 import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
-import { EditIcon } from '@chakra-ui/icons';
+import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 import { useDisclosure } from '@chakra-ui/react'
 import server from '../../networking'
 import {
@@ -29,6 +29,7 @@ function SubmitReviews() {
     const [reviewData, setReviewData] = useState(null);
     const [fileFormatError, setFileFormatError] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
@@ -63,6 +64,7 @@ function SubmitReviews() {
     };
 
     const handleSubmit = async () => {
+        setIsSubmitting(true);
         const currentDate = new Date().toISOString();
         const formData = new FormData();
         formData.append('sender', 'Susie Jones');
@@ -86,6 +88,7 @@ function SubmitReviews() {
                             isClosable: true,
                         });
                         console.log('Review submitted successfully!');
+                        setIsSubmitting(false);
 
                         setComments('');
                         setImages([]);
@@ -103,6 +106,7 @@ function SubmitReviews() {
                 })
         } catch (error) {
             console.error('Failed to submit review:', error);
+            setIsSubmitting(false);
             toast({
                 title: 'Failed to submit review.',
                 status: 'error',
@@ -121,9 +125,9 @@ function SubmitReviews() {
     return (
         <Box>
             <Button onClick={onOpen} variant={"MMPrimary"}><EditIcon /></Button>
-            <Modal isOpen={isOpen} onClose={handleClose} motionPreset='slideInBottom' isCentered >
+            <Modal isOpen={isOpen} onClose={handleClose} motionPreset='slideInBottom' isCentered size="lg" scrollBehavior="inside">
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent overflow="hidden" maxH="90vh" >
                     <ModalHeader>Rate & Tell Your Experience!
                     </ModalHeader>
                     <ModalCloseButton />
@@ -177,7 +181,7 @@ function SubmitReviews() {
                                     <>
                                         <FormLabel>Selected images:</FormLabel>
                                         {images.map((image, index) => (
-                                            <Card key={index} mb={2} padding={"13px"} display="flex" flexDirection="row" alignItems="center">
+                                            <Card key={index} mb={2} padding={"13px"} display="flex" flexDirection="row" justifyContent="space-between">
                                                 <Text fontSize={"15px"} color={"green"} mt={2}>
                                                     {image.name}
                                                 </Text>
@@ -195,7 +199,25 @@ function SubmitReviews() {
                         <Button colorScheme='red' borderRadius='10px' mr={3} onClick={handleClose}>
                             Close
                         </Button>
-                        <Button variant='MMPrimary' type='submit' onClick={handleSubmit}>Submit</Button>
+                    
+                            <>
+                                {isSubmitting ? (
+                                    <Button
+                                        isLoading
+                                        loadingText="Submitting..."
+                                        borderRadius={"10px"}
+                                    >
+                                        Submitting...
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={handleSubmit}
+                                        variant="MMPrimary"
+                                    >
+                                        Submit
+                                    </Button>
+                                )}
+                            </>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
