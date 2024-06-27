@@ -48,17 +48,25 @@ const FoodListing = ({
                 }
             }, 7000);
 
-            const response = await server.get(`/cdn/checkFavouriteListing?userID=${userID}&listingID=${listingID}`);
-            if (response.status === 200) {
-                setFavourite(response.data.listingIsFavourite);
-                setLoading(false);
-                setFavouriteLoaded(true);
+            const interval = setInterval(async () => {
+                const response = await server.get(`/cdn/checkFavouriteListing?userID=${userID}&listingID=${listingID}`);
+                if (response.status === 200) {
+                    setFavourite(response.data.listingIsFavourite);
+                    setLoading(false);
+                    setFavouriteLoaded(true);
+                    clearTimeout(timer);
+                    clearInterval(interval);
+                } else {
+                    setTimeout(() => {
+                        toast.closeAll();
+                        ShowToast("Failed to fetch information", "Please try again later", "error", 3000);
+                    }, 5000);
+                }
+            }, 1000);
+
+            return () => {
+                clearInterval(interval);
                 clearTimeout(timer);
-            } else {
-                setTimeout(() => {
-                    toast.closeAll();
-                    ShowToast("Failed to fetch information", "Please try again later", "error", 3000);
-                }, 5000);
             }
         };
 
