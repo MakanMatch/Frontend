@@ -1,27 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, Icon, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton } from "@chakra-ui/react";
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton } from "@chakra-ui/react";
+import { ChevronLeftIcon, ChevronRightIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
-import EditListingModal from "./EditListingModal";
 import server from "../../networking";
-
-const VerticalEllipsisIcon = (props) => (
-    <Icon viewBox="0 0 24 24" {...props}>
-      <circle cx="12" cy="5" r="2" />
-      <circle cx="12" cy="12" r="2" />
-      <circle cx="12" cy="19" r="2" />
-    </Icon>
-);
 
 const FoodListing = ({
     listingID,
     title,
-    shortDescription,
-    longDescription,
-    portionFee,
-    totalSlots,
-    datetime,
     hostName,
     portionPrice,
     hostFoodRating,
@@ -35,8 +21,6 @@ const FoodListing = ({
     const [favourite, setFavourite] = useState(false);
     const [loading, setLoading] = useState(true);
     const [favouriteLoaded, setFavouriteLoaded] = useState(false);
-    const [moreActionsActive, setMoreActionsActive] = useState(false);
-    const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
 
     useEffect(() => {
@@ -107,10 +91,6 @@ const FoodListing = ({
         }
     };
 
-    const toggleActiveActions = () => {
-        setMoreActionsActive(!moreActionsActive);
-    }
-
     const handleDeleteListing = async () => {
         const deleteListing = await server.delete("/listings/deleteListing", { data: { listingID: listingID } });
         if (deleteListing.status === 200) {
@@ -179,37 +159,13 @@ const FoodListing = ({
                             <Button onClick={toggleFavourite}>
                                 {favourite ? "🩷" : "🤍"}
                             </Button>
-                            <Button onClick={toggleActiveActions}>
-                                <VerticalEllipsisIcon/>
+                            <Button onClick={onOpenAlert}>
+                                <DeleteIcon color="red" />
                             </Button>
                         </ButtonGroup>
-                        {moreActionsActive && (
-                            <ButtonGroup flex={1} spacing="2" mt={2} justifyContent={"space-between"}>
-                                <Button onClick={onOpen} flex={1}>
-                                    <Text color="blue" fontSize={"13px"}>Edit</Text>
-                                </Button>
-                                <Button onClick={onOpenAlert} flex={1}>
-                                    <Text color="red" fontSize={"13px"}>Remove</Text>
-                                </Button>
-                            </ButtonGroup>
-                        )}
                     </CardFooter>
                 </Skeleton>
             </Card>
-            <EditListingModal 
-                isOpen={isOpen}
-                onClose={onClose}
-                onOpen={onOpen}
-                fetchListings={fetchListings}
-                listingID={listingID}
-                previousTitle={title}
-                previousShortDescription={shortDescription}
-                previousLongDescription={longDescription}
-                previousPortionFee={portionFee}
-                previousTotalSlots={totalSlots}
-                previousDatetime={datetime}
-                previousImages={images}
-            />
             <AlertDialog
                 isOpen={isOpenAlert}
                 leastDestructiveRef={undefined}
