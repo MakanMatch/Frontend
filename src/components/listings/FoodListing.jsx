@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useMediaQuery } from "@chakra-ui/react";
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useMediaQuery, Skeleton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import server from "../../networking";
@@ -8,56 +8,22 @@ import server from "../../networking";
 const FoodListing = ({
     listingID,
     title,
-    hostName,
     portionPrice,
+    hostName,
     hostFoodRating,
     userID,
+    isFavourite,
     ShowToast,
     images,
     fetchListings,
 }) => {
     const toast = useToast();
     const [imageIndex, setImageIndex] = useState(0);
-    const [favourite, setFavourite] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [favouriteLoaded, setFavouriteLoaded] = useState(false);
+    const [favourite, setFavourite] = useState(isFavourite);
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
+    const [loading, setLoading] = useState(true);
     const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
-
-    useEffect(() => {
-        const checkFavouriteListing = async () => {
-            let timer = setTimeout(() => {
-                if (loading && !favouriteLoaded) {
-                    toast.closeAll();
-                    ShowToast("Content taking longer to load", "Please wait a moment or try reloading the page", "info", 3000);
-                }
-            }, 6000);
-
-            const interval = setInterval(async () => {
-                const response = await server.get(`/cdn/checkFavouriteListing?userID=${userID}&listingID=${listingID}`);
-                if (response.status === 200) {
-                    setFavourite(response.data.listingIsFavourite);
-                    setLoading(false);
-                    setFavouriteLoaded(true);
-                    clearTimeout(timer);
-                    clearInterval(interval);
-                } else {
-                    setTimeout(() => {
-                        toast.closeAll();
-                        ShowToast("Failed to fetch information", "Please try again later", "error", 3000);
-                    }, 5000);
-                }
-            }, 2000);
-
-            return () => {
-                clearInterval(interval);
-                clearTimeout(timer);
-            }
-        };
-
-        checkFavouriteListing();
-    }, []);
-
+        
     const handlePrevImage = () => {
         if (imageIndex === 0) {
             setImageIndex(images.length - 1);
@@ -102,7 +68,12 @@ const FoodListing = ({
             toast.closeAll();
             ShowToast("Error", "Failed to remove listing", "error", 3000);
         }
-    }
+    };
+
+    useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 1000);
+        return () => clearTimeout(timer);
+    }, []);    
     return (
         <>
             <style>
@@ -153,7 +124,7 @@ const FoodListing = ({
                     </Stack>
                 </CardBody>
                 <Divider />
-                <Skeleton isLoaded={favouriteLoaded && !loading}>
+                <Skeleton isLoaded={!loading}>
                     {isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>

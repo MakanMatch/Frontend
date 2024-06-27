@@ -12,7 +12,8 @@ const FoodListingsPage = () => {
     const [hostName, setHostName] = useState("");
     const [hostRating, setHostRating] = useState(0);
     const [guestUserID, setGuestUserID] = useState("");
-    const [guestName, setGuestName] = useState("");
+    const [guestUsername, setGuestUsername] = useState("");
+    const [guestFavCuisine, setGuestFavCuisine] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
@@ -47,103 +48,32 @@ const FoodListingsPage = () => {
         }
     };
 
-    const fetchHostInfo = async () => {
-        const response = await server.get(`/cdn/accountInfo?userID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}`);
-        if (response.status === 200) {
-            setHostName(response.data.username);
-            setHostRating(response.data.foodRating);
-        } else if (response.status === 404) {
-            const hostData = {
-                userID: "272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4",
-                username: "Jamie Oliver",
-                email: "jamie_oliver@gmail.com",
-                password: "JamieOliver123",
-                contactNum: "81118222",
-                address: "Block 123, Hougang Avenue 1, #01-234",
-                emailVerified: "false",
-                favCuisine: "Chilli Crab",
-                mealsMatched: "0",
-                foodRating: "4",
-                hygieneGrade: "5",
-                paymentImage: "public/Sample PayNow QR.png"
-            };
-            const createSampleHost = await server.post("/listings/createHost", hostData);
-            if (createSampleHost.status === 200) {
-                setHostName(hostData.username);
-                setHostRating(hostData.foodRating);
-            } else {
-                toast.closeAll();
-                ShowToast(
-                    "Error fetching required information",
-                    "Please try again later.",
-                    "error",
-                    2500
-                );
-            }
-        } else {
-            toast.closeAll();
-            ShowToast(
-                "Error fetching required information",
-                "Please try again later.",
-                "error",
-                2500
-            );
-        }
+    const fetchHostDetails = async () => {
+        const response = await server.get("/cdn/fetchHostdetails");
+        setHostName(response.data.hostUsername);
+        setHostRating(response.data.hostFoodRating);
     };
 
-    const fetchGuestID = async () => {
-        const response = await server.get(`/cdn/accountInfo?userID=${"47f4497b-1331-4b8a-97a4-095a79a1fd48"}`);
-        if (response.status === 200) {
-            setGuestUserID(response.data.userID);
-            setGuestName(response.data.username);
-        } else if (response.status === 404) {
-            const guestData = {
-                userID: "47f4497b-1331-4b8a-97a4-095a79a1fd48",
-                username: "Susie Jones",
-                email: "susie_jones@gmail.com",
-                password: "SusieJones123",
-                contactNum: "82228111",
-                address: "Block 321, Hougang Avenue 10, #10-567",
-                emailVerified: "false",
-                favCuisine: "Nasi Lemak",
-                mealsMatched: "0",
-                resetKey: "265c18",
-                resetKeyExpiration: "2024-06-22T14:30:00.000Z"
-            }
-            const createSampleGuest = await server.post("/listings/createGuest", guestData);
-            if (createSampleGuest.status === 200) {
-                setGuestUserID(guestData.userID);
-                setGuestName(guestData.username);
-            } else {
-                toast.closeAll();
-                ShowToast(
-                    "Error fetching required information",
-                    "Please try again later.",
-                    "error",
-                    2500
-                );
-            }
-        } else {
-            toast.closeAll();
-            ShowToast(
-                "Error fetching required information",
-                "Please try again later.",
-                "error",
-                2500
-            );
-        }
+    const fetchGuestDetails = async () => {
+        const response = await server.get("/cdn/fetchGuestDetails");
+        setGuestUserID(response.data.guestUserID);
+        setGuestUsername(response.data.guestUsername);
+        setGuestFavCuisine(response.data.guestFavCuisine);
     }
 
     useEffect(() => {
-        fetchListings();
-        fetchHostInfo();
-        fetchGuestID();
+        const fetchData = async () => {
+            await fetchHostDetails();
+            await fetchGuestDetails();
+            await fetchListings();
+        }
+        fetchData();
     }, []);
 
     return (
         <div>
             <Text fontSize={"30px"} mb={4}>
-                Welcome, {guestName}!
+                Welcome, {guestUsername}!
             </Text>
             <Box display="flex" justifyContent="center" mb={4}>
                 <Button onClick={onOpen} variant="MMPrimary">
@@ -197,17 +127,12 @@ const FoodListingsPage = () => {
                                         <FoodListing
                                             listingID={listing.listingID}
                                             title={listing.title}
-                                            shortDescription={listing.shortDescription}
-                                            longDescription={listing.longDescription}
-                                            portionFee={listing.portionFee}
-                                            totalSlots={listing.totalSlots}
-                                            datetime={listing.datetime}
-                                            hostName={hostName}
                                             portionPrice={listing.portionPrice}
+                                            hostName={hostName}
                                             hostFoodRating={hostRating}
                                             userID={guestUserID}
+                                            isFavourite={guestFavCuisine.split("|").includes(listing.listingID)}
                                             ShowToast={ShowToast}
-                                            // pass in images prop as an array of image links for every image there is. images is a string of image names separated by | symbol
                                             images={listing.images.map((imageName) =>
                                                 getImageLink(listing.listingID, imageName)
                                             )}
