@@ -21,11 +21,10 @@ function App() {
                 })
                     .then((res) => {
                         if (res && res.data) {
-                            console.log(res.data);
-                            console.log("yes.");
                             setUser(res.data)
                         } else {
                             console.log("An error has occurred.")
+                            console.log(res.data)
                         }
                         setLoaded(true)
                     })

@@ -64,7 +64,7 @@ const MyAccount = () => {
     return (
         <div>
             <h1>My Account</h1>
-            <p>Username: {user.userID}</p>
+            <p>Username: {user.username}</p>
             <p>Email: {user.email}</p>
             <Button
                 colorScheme='purple'
