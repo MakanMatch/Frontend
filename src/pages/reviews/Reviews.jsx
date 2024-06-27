@@ -86,7 +86,7 @@ function Reviews() {
                         <Button onClick={handleGoBack}>
                             <ArrowBackIcon />
                         </Button>
-                        <Spacer display={{ base: 'none', lg: 'block' }} />
+                        <Spacer display={{ base: 'none',md: 'block' }} />
                         <Image
                             borderRadius='full'
                             boxSize='100px'
