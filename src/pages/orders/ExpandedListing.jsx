@@ -37,6 +37,7 @@ function ExpandedListing() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: deleteImageDialogOpen, onOpen: openDeleteImageDialog, onClose: closeDeleteImageDialog } = useDisclosure()
     const [imageToBeDeleted, setImageToBeDeleted] = useState(null)
+    const [isUploading, setIsUploading] = useState(false)
     const [file, setFile] = useState(null);
 
     const handleClose = () => {
@@ -142,8 +143,11 @@ function ExpandedListing() {
 
     const uploadImage = (e) => {
         e.preventDefault();
+        setIsUploading(true)
+
         if (file == null) {
             showToast("Error", "No file selected", 2500, true, "error")
+            setIsUploading(false)
             return
         }
 
@@ -160,18 +164,21 @@ function ExpandedListing() {
             .then(res => {
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Success", "Image uploaded successfully", 2500, true, "success")
+                    setIsUploading(false)
                     handleClose()
                     fetchListingDetails()
                     return
                 } else {
                     showToast("Error", "Failed to upload image", 5000, true, "error")
                     console.log(res.data)
+                    setIsUploading(false)
                     return
                 }
             })
             .catch(err => {
                 showToast("Error", "Failed to upload image", 5000, true, "error")
                 console.log(err)
+                setIsUploading(false)
                 return
             })
     }
@@ -299,7 +306,7 @@ function ExpandedListing() {
                     <ModalFooter>
                         <HStack spacing={"20px"}>
                             <Button onClick={handleClose}>Close</Button>
-                            <Button colorScheme={"blue"} onClick={uploadImage}>Upload</Button>
+                            <Button variant={isUploading ? "": "MMPrimary"} isLoading={isUploading} loadingText="Uploading..." onClick={uploadImage}>Upload</Button>
                         </HStack>
                     </ModalFooter>
                 </ModalContent>
