@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Box, Heading, Input, Button, Text, VStack, useToast, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link, IconButton } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import UserContext from '../../context/UserContext';
 import server from '../../networking';
 
 function Login() {
     const navigate = useNavigate();
     const toast = useToast();
     const [showPassword, setShowPassword] = useState(false);
+    const { user, setUser } = useContext(UserContext);
 
     const handleShowPassword = () => setShowPassword(!showPassword);
 
@@ -33,6 +35,7 @@ function Login() {
                     });
                     // Set the JWT token in localStorage
                     localStorage.setItem('jwt', res.data.accessToken);
+                    setUser(res.data.user)
                     navigate("/");
                 } else {
                     console.log("An error has occurred logging in to the account.")

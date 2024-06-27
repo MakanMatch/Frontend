@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client'
 import './index.css'
+import { useState, useEffect } from 'react';
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import { ChakraProvider } from '@chakra-ui/react'
@@ -7,6 +8,7 @@ import universalReducer from './slices/UniversalState.js'
 import MainTheme from './themes/MainTheme.js'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './Layout.jsx'
+import UserContext from './context/UserContext.js'
 import Version from './pages/Version.jsx'
 import Home from './pages/Home.jsx'
 import ExpandedListing from './pages/orders/ExpandedListing.jsx'
@@ -21,13 +23,13 @@ import MyAccount from './pages/identity/MyAccount.jsx'
 
 const store = configureStore({
     reducer: {
-        universal: universalReducer,
+        universal: universalReducer
     }
 })
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
-        <ChakraProvider theme={MainTheme} toastOptions={{ defaultOptions: { position: 'bottom-right' }}}>
+        <ChakraProvider theme={MainTheme} toastOptions={{ defaultOptions: { position: 'bottom-right' } }}>
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Layout />}>
@@ -46,4 +48,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             </BrowserRouter>
         </ChakraProvider>
     </Provider>
+
 )
