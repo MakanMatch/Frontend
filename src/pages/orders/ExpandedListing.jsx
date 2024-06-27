@@ -62,6 +62,7 @@ function ExpandedListing() {
     }
     const handleDeleteImage = (imageName) => {
         openDeleteImageDialog()
+        setImageToBeDeleted(imageName)
     }
     const togglePublished = (newValue) => {
         setListingPublished(newValue)
