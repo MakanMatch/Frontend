@@ -2,13 +2,13 @@ import React from "react";
 import { Box, Flex, Text, Avatar, VStack, useMediaQuery } from "@chakra-ui/react";
 
 const users = [
-  { name: "James Davis", lastMessage: "Can we discuss this later?", avatar: "https://randomuser.me/api/portraits/men/4.jpg" },
-  { name: "Charlie", lastMessage: "Hey, how are you?", avatar: "https://media.istockphoto.com/id/510177292/photo/pretty-high-school-girl-in-school-library.webp?b=1&s=170667a&w=0&k=20&c=JTm5ShDmHSyz9-8C4DoC8laMt94apClJH3BiOZdNgaY=" },
+  { name: "Jamie Oliver", lastMessage: "Hey, how are you?", avatar: "https://bit.ly/dan-abramov" },
   { name: "Kent C. Dodds", lastMessage: "I'll be offline for a while.", avatar: "https://bit.ly/kent-c-dodds" },
   { name: "Ryan Florence", lastMessage: "Let's catch up later this week.", avatar: "https://bit.ly/ryan-florence" },
+  { name: "Charlie", lastMessage: "Hey, how are you?", avatar: "https://media.istockphoto.com/id/510177292/photo/pretty-high-school-girl-in-school-library.webp?b=1&s=170667a&w=0&k=20&c=JTm5ShDmHSyz9-8C4DoC8laMt94apClJH3BiOZdNgaY=" }
 ];
 
-function Sidebar() {
+function ChatHistory2() {
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
 
   if (!isSmallerThan950px) {
@@ -42,4 +42,4 @@ function Sidebar() {
   );
 }
 
-export default Sidebar;
+export default ChatHistory2;

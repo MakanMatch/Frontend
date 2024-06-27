@@ -16,23 +16,24 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   Button,
-  useMediaQuery
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { FiSmile, FiCamera } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
-import Sidebar from "../../components/chat/SideBar";
+import ChatHistory from "../../components/chat/ChatHistory";
 
 function ChatUi() {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
   const [messageToDelete, setMessageToDelete] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)")
+  const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
 
   const ws = useRef(null);
 
   useEffect(() => {
-    ws.current = new WebSocket("ws://localhost:8080");
+    const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
+    ws.current = new WebSocket(wsUrl);
 
     ws.current.onopen = () => {
       console.log("Connected to WebSocket server");
@@ -83,13 +84,6 @@ function ChatUi() {
 
     ws.current.onclose = () => {
       console.log("Disconnected from WebSocket server");
-    };
-
-    return () => {
-      if (ws.current) {
-        ws.current.close();
-        console.log("WebSocket connection closed");
-      }
     };
   }, []);
 
@@ -149,6 +143,7 @@ function ChatUi() {
       };
       ws.current.send(JSON.stringify(deleteMessage));
       setDeleteDialogOpen(false);
+      setMessageToDelete(null);
     }
   };
 
@@ -158,7 +153,7 @@ function ChatUi() {
 
   return (
     <Flex>
-      <Sidebar />
+      <ChatHistory />
       <Center flexDirection="column" alignItems="center" p={5} flex="1">
         <Box
           bg="white"
@@ -184,12 +179,10 @@ function ChatUi() {
             minW={"55px"}
             maxW={"55px"}
           />
-          <Box
-            mt={-10}
-            ml={{ base: 0, md: 5 }}
-            minW={"495px"}
-          >
-            <Text fontSize={20} mt={2} textAlign={"left"}>Chat with James Davies</Text>
+          <Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
+            <Text fontSize={20} mt={2} textAlign={"left"}>
+              Chat with James Davies
+            </Text>
             <Spacer h={3} />
             <Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
               Online
@@ -258,11 +251,7 @@ function ChatUi() {
       </Center>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        isOpen={deleteDialogOpen}
-        leastDestructiveRef={undefined}
-        onClose={closeDeleteDialog}
-      >
+      <AlertDialog isOpen={deleteDialogOpen}>
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
