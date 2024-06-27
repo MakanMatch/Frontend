@@ -31,7 +31,7 @@ const FoodListing = ({
                     toast.closeAll();
                     ShowToast("Content taking longer to load", "Please wait a moment or try reloading the page", "info", 3000);
                 }
-            }, 7000);
+            }, 6000);
 
             const interval = setInterval(async () => {
                 const response = await server.get(`/cdn/checkFavouriteListing?userID=${userID}&listingID=${listingID}`);
@@ -47,7 +47,7 @@ const FoodListing = ({
                         ShowToast("Failed to fetch information", "Please try again later", "error", 3000);
                     }, 5000);
                 }
-            }, 500);
+            }, 2000);
 
             return () => {
                 clearInterval(interval);
