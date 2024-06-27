@@ -11,7 +11,6 @@ function App() {
     const [loaded, setLoaded] = useState(false);
 
     const fetchUser = () => {
-        setTimeout(() => {
             if (localStorage.getItem("jwt")) {
                 server.get("/cdn/MyAccount", {
                     headers: {
@@ -36,8 +35,7 @@ function App() {
             } else {
                 console.log("No active user session locally.")
                 setLoaded(true)
-            }
-        });
+            };
     }
 
     useEffect(() => {
@@ -45,6 +43,7 @@ function App() {
     }, [])
 
     return (
+        // This is a temporary measure. Pivot to using redux soon.
         <UserContext.Provider value={{ user, setUser, loaded, setLoaded }}>
             <Navbar />
             <Outlet />

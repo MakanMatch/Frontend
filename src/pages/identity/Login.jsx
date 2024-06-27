@@ -24,7 +24,6 @@ function Login() {
         })
             .then((res) => {
                 if (res && res.data) {
-                    console.log(res.data);
                     console.log("Account logged in successfully.");
                     toast({
                         title: 'Login successful.',
@@ -49,8 +48,7 @@ function Login() {
                 }
             })
             .catch((err) => {
-                console.log("error")
-                console.log(`${err.response.data}`);
+                console.log(err)
                 if (err.response.data === "UERROR: Invalid username or email or password.") {
                     formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
                     formik.setFieldError('password', 'Incorrect password.');

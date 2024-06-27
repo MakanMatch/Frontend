@@ -4,7 +4,6 @@ import {
     Spinner
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
-import withAuth from '../../components/identity/withAuth';
 import UserContext from '../../context/UserContext';
 import server from '../../networking';
 import { useNavigate } from 'react-router-dom';
@@ -15,27 +14,6 @@ const MyAccount = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { user, setUser, loaded } = useContext(UserContext);
-
-    // useEffect(() => {
-    //     const fetchUserInfo = async () => {
-    //         try {
-    //             const response = await server.get('/cdn/MyAccount', {
-    //                 headers: {
-    //                     Authorization: `Bearer ${localStorage.getItem('jwt')}`
-    //                 }
-    //             });
-    //             // setUserInfo(response.data);
-    //         } catch (err) {
-    //             console.log(err)
-    //             setError('Failed to fetch user information.');
-    //             console.log("Fail to fetch")
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     fetchUserInfo();
-    // }, []);
 
     const handleLogout = () => {
         setUser(null)

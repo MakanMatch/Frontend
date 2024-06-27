@@ -20,7 +20,7 @@ function EmailVerification() {
     }, [cooldown]);
 
     const sendEmailVerification = () => {
-        server.post('/emailVerification/sendVerificationEmail', { email })
+        server.post('/identity/emailVerification/sendVerificationEmail', { email })
             .then((res) => {
                 if (res.data && res.data.startsWith("SUCCESS")) {
                     setCooldown(30);
@@ -42,6 +42,7 @@ function EmailVerification() {
                 }
             })
             .catch((err) => {
+                console.log(err)
                 toast({
                     title: 'Error',
                     description: err.response?.data || 'Failed to send verification email.',
