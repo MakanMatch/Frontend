@@ -14,7 +14,7 @@ const FoodListingsPage = () => {
     const [guestUserID, setGuestUserID] = useState("");
     const [guestName, setGuestName] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [isSmallerThan700] = useMediaQuery("(max-width: 700px)");
+    const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const toast = useToast();
 
@@ -150,7 +150,7 @@ const FoodListingsPage = () => {
                     Add Listing
                 </Button>
             </Box>
-            {isSmallerThan700 && (
+            {isSmallerThan1095 && (
                 <Box mb={4}>
                     <GoogleMaps maxHeight="250px"/>
                 </Box>
@@ -235,7 +235,7 @@ const FoodListingsPage = () => {
                         </Box>
                     )}
                 </Box>
-                {!isSmallerThan700 && (
+                {!isSmallerThan1095 && (
                     <Box flex="1" ml={5}>
                         <SlideFade in={true} offsetY="20px">
                             <GoogleMaps />
