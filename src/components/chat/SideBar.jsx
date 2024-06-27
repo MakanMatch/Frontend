@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Text, Avatar, VStack } from "@chakra-ui/react";
+import { Box, Flex, Text, Avatar, VStack, useMediaQuery } from "@chakra-ui/react";
 
 const users = [
   { name: "James Davis", lastMessage: "Can we discuss this later?", avatar: "https://randomuser.me/api/portraits/men/4.jpg" },
@@ -9,8 +9,14 @@ const users = [
 ];
 
 function Sidebar() {
+  const [isLargerThan100px] = useMediaQuery("(min-width: 100px)");
+
+  if (!isLargerThan100px) {
+    return null;
+  }
+
   return (
-    <Box bg="white" w="20%" h="100vh" p={4} borderRight="1px" borderColor="gray.200">
+    <Box bg="white" w="20%" minW="100px" h="100vh" p={4} borderRight="1px" borderColor="gray.200">
       <Text fontSize="2xl" mb={6} textAlign={"left"}>Messages</Text>
       <VStack spacing={4} align="stretch" alignContent={"left"}>
         {users.map((user, index) => (

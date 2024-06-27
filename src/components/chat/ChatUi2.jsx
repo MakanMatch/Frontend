@@ -73,6 +73,7 @@ function ChatUi2() {
   const sendMessage = () => {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
+        id: Math.random().toString(36).substr(2, 9),
         sender: "James", // Replace with dynamic sender information
         message: messageInput,
         timestamp: `${new Date().getHours()}:${new Date()
