@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react'
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
 import { Button, Box, Input, Flex, HStack, Text, Container, Image, Textarea, Spacer, useToast, Heading, Center, useClipboard, Tooltip } from '@chakra-ui/react';
-import server from '../../networking'
+import server from '../../networking';
 import { ArrowBackIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
+import { useNavigate } from 'react-router-dom';
 
 function Reviews() {
     const toast = useToast();
+    const navigate = useNavigate();
     const [reviews, setReviews] = useState([]);
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
@@ -32,8 +34,13 @@ function Reviews() {
         return 'red';
     };
 
+
     const handleGoBack = () => {
-        window.history.back();
+        if (window.history.length > 1) {
+            navigate(-1);
+        } else {
+            navigate('/');
+        }
     }
 
     const colorScheme = getColorScheme(hostHygieneGrade);
