@@ -88,6 +88,7 @@ function ExpandedListing() {
             toastConfig.icon = icon
         }
 
+        toast.closeAll()
         toast(toastConfig)
     }
     const processData = (data) => {
@@ -303,7 +304,7 @@ function ExpandedListing() {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-            <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} />
+            <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} showToast={showToast} refreshPage={fetchListingDetails} />
         </>
     )
 }
