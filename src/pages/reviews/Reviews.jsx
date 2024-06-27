@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 function Reviews() {
     const toast = useToast();
     const navigate = useNavigate();
-    const [reviews, setReviews] = useState([]);
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostContactNum, setHostContactNum] = useState(0);
@@ -45,31 +44,6 @@ function Reviews() {
 
     const colorScheme = getColorScheme(hostHygieneGrade);
 
-    const fetchReviews = async () => {
-        try {
-            const response = await server.get(`/cdn/getReviews?hostID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}&order=${"mostRecent"}`); //hardcoded hostID and order
-            if (!response.data) {
-                ShowToast(
-                    "No reviews found",
-                    "Be the first to leave a review!",
-                    "info",
-                    2500
-                );
-            } else {
-                setReviews(response.data);
-            }
-        } catch (error) {
-            toast.closeAll();
-            ShowToast(
-                "Error fetching reviews",
-                "Please try again later.",
-                "error",
-                2500
-            );
-            console.error("Error fetching reviews:", error);
-        }
-    }
-
     const fetchHostInfo = async () => {
         try {
             const response = await server.get(`/cdn/accountInfo?userID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}`);
@@ -99,7 +73,6 @@ function Reviews() {
     };
 
     useEffect(() => {
-        fetchReviews();
         fetchHostInfo();
     }, []);
 
