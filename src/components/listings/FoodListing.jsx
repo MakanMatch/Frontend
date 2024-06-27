@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton } from "@chakra-ui/react";
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, Skeleton, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useMediaQuery } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import server from "../../networking";
@@ -21,6 +21,7 @@ const FoodListing = ({
     const [favourite, setFavourite] = useState(false);
     const [loading, setLoading] = useState(true);
     const [favouriteLoaded, setFavouriteLoaded] = useState(false);
+    const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
     const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
 
     useEffect(() => {
@@ -153,9 +154,23 @@ const FoodListing = ({
                 </CardBody>
                 <Divider />
                 <Skeleton isLoaded={favouriteLoaded && !loading}>
+                    {isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
-                        <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-between"}>
-                            <Button variant="MMPrimary">View more</Button>
+                        <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
+                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
+                            <Button onClick={toggleFavourite}>
+                                <Text fontSize={"15px"}>{favourite ? "🩷 Un-favourite" : "🤍 Favourite"}</Text>
+                            </Button>
+                            <Button onClick={onOpenAlert}>
+                                <Text fontSize={"15px"}><DeleteIcon color="red" mb={1}/> Remove</Text>
+                            </Button>
+                        </ButtonGroup>
+                    </CardFooter>
+                    )}
+                    {!isSmallerThan710 && (
+                        <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
+                        <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
+                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
                             <Button onClick={toggleFavourite}>
                                 {favourite ? "🩷" : "🤍"}
                             </Button>
@@ -164,6 +179,7 @@ const FoodListing = ({
                             </Button>
                         </ButtonGroup>
                     </CardFooter>
+                    )}
                 </Skeleton>
             </Card>
             <AlertDialog

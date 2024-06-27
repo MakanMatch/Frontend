@@ -5,7 +5,7 @@ import server from "../../networking";
 import FoodListing from "../../components/listings/FoodListing";
 import GoogleMaps from "../../components/listings/GoogleMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
-import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, } from "@chakra-ui/react";
+import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery } from "@chakra-ui/react";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
@@ -14,6 +14,8 @@ const FoodListingsPage = () => {
     const [guestUserID, setGuestUserID] = useState("");
     const [guestName, setGuestName] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [isSmallerThan700] = useMediaQuery("(max-width: 700px)");
+    const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const toast = useToast();
 
     function ShowToast(title, description, status, duration) {
@@ -148,6 +150,11 @@ const FoodListingsPage = () => {
                     Add Listing
                 </Button>
             </Box>
+            {isSmallerThan700 && (
+                <Box mb={4}>
+                    <GoogleMaps maxHeight="250px"/>
+                </Box>
+            )}
             <Flex display="flex" flexWrap="wrap">
                 <Box
                     maxH="520px"
@@ -224,11 +231,13 @@ const FoodListingsPage = () => {
                         </Box>
                     )}
                 </Box>
-                <Box flex="1" ml={5}>
-                    <SlideFade in={true} offsetY="20px">
-                        <GoogleMaps />
-                    </SlideFade>
-                </Box>
+                {!isSmallerThan700 && (
+                    <Box flex="1" ml={5}>
+                        <SlideFade in={true} offsetY="20px">
+                            <GoogleMaps />
+                        </SlideFade>
+                    </Box>
+                )}
             </Flex>
             <AddListingModal
                 isOpen={isOpen}
