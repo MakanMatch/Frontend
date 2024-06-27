@@ -147,7 +147,7 @@ const FoodListingsPage = () => {
             </Text>
             <Box display="flex" justifyContent="center" mb={4}>
                 <Button onClick={onOpen} variant="MMPrimary">
-                    Add Listing
+                    Host a meal
                 </Button>
             </Box>
             {isSmallerThan1095 && (
