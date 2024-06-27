@@ -105,12 +105,14 @@ function Reviews() {
                                 </Tooltip>
                             </HStack>
                         </Flex>
-                        <Spacer display={{ base: 'none', md: 'block' }} />
-                        <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
-                            {hostHygieneGrade}
-                        </Button>
-                        <Spacer display={{ base: 'none', md: 'block' }} />
-                        <SubmitReviews />
+                        <Flex gap={3}>
+                            <Spacer display={{ base: 'none', md: 'block' }} />
+                            <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
+                                {hostHygieneGrade}
+                            </Button>
+                            <Spacer display={{ base: 'none', md: 'block' }} />
+                            <SubmitReviews />
+                        </Flex>
                     </Flex>
                 </Box>
                 <Spacer display={{ base: 'none', md: 'block' }} />
