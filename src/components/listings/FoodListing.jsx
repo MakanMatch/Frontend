@@ -46,7 +46,7 @@ const FoodListing = ({
                         ShowToast("Failed to fetch information", "Please try again later", "error", 3000);
                     }, 5000);
                 }
-            }, 1000);
+            }, 500);
 
             return () => {
                 clearInterval(interval);
