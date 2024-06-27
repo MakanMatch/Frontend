@@ -79,14 +79,21 @@ function Reviews() {
     }, []);
 
     return (
-        <Box p={4}>
+        <Box p={4} position="relative" width="100%">
+            <Button
+                onClick={handleGoBack}
+                position='absolute'
+                top={{ md:12, base: 12}}
+                left={{ md: 4, base: 0}}
+                zIndex={10}
+            >
+                <ArrowBackIcon />
+            </Button>
             <Flex direction={{ base: 'column', md: 'row' }} wrap='wrap' align='center' justify='center' >
+                <Spacer display={{ base: 'none', md: 'block' }}  minWidth="50px" maxWidth="50px"/>
                 <Box>
                     <Flex direction={{ base: 'column', md: 'row' }} align="center" mb={4} gap={3}>
-                        <Button onClick={handleGoBack}>
-                            <ArrowBackIcon />
-                        </Button>
-                        <Spacer display={{ base: 'none',md: 'block' }} />
+                        <Spacer display={{ base: 'none', md: 'block' }} />
                         <Image
                             borderRadius='full'
                             boxSize='100px'
