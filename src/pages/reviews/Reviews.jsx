@@ -48,7 +48,16 @@ function Reviews() {
     const fetchReviews = async () => {
         try {
             const response = await server.get(`/cdn/getReviews?hostID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}&order=${"mostRecent"}`); //hardcoded hostID and order
-            setReviews(response.data);
+            if (!response.data) {
+                ShowToast(
+                    "No reviews found",
+                    "Be the first to leave a review!",
+                    "info",
+                    2500
+                );
+            } else {
+                setReviews(response.data);
+            }
         } catch (error) {
             toast.closeAll();
             ShowToast(
@@ -64,10 +73,19 @@ function Reviews() {
     const fetchHostInfo = async () => {
         try {
             const response = await server.get(`/cdn/accountInfo?userID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}`);
-            setHostName(response.data.username);
-            setHostAddress(response.data.address);
-            setHostContactNum(response.data.contactNum);
-            setHostHygieneGrade(response.data.hygieneGrade);
+            if (!response.data) {
+                ShowToast(
+                    "No host information found",
+                    "Please try again later.",
+                    "info",
+                    2500
+                );
+            } else {
+                setHostName(response.data.username);
+                setHostAddress(response.data.address);
+                setHostContactNum(response.data.contactNum);
+                setHostHygieneGrade(response.data.hygieneGrade);
+            }
         } catch (error) {
             toast.closeAll();
             ShowToast(
