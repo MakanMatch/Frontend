@@ -233,8 +233,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 isCentered
             >
                 <ModalOverlay
-                    bg="blackAlpha.300"
-                    backdropFilter="blur(3px) hue-rotate(90deg)"
+                    backdropFilter="brightness(1)"
                 />
                 <ModalContent overflow={"hidden"} maxH={"90vh"}>
                     <ModalHeader>Host your next meal!</ModalHeader>
@@ -443,10 +442,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 motionPreset="slideInBottom"
                 closeOnOverlayClick={false}
             >
-                <AlertDialogOverlay
-                    bg="blackAlpha.300"
-                    backdropFilter="blur(6px) hue-rotate(90deg)"
-                >
+                <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader fontSize="lg" fontWeight="bold">
                             Discard changes
