@@ -27,6 +27,8 @@ function SortReviews() {
                     const guestInfoResponse = await server.get(`/cdn/accountInfo?userID=${review.guestID}`);
                     if (guestInfoResponse.data) {
                         review.guestInfo = guestInfoResponse.data;
+                    } else {
+                        review.guestInfo = null;
                     }
                     return review;
                 }));
