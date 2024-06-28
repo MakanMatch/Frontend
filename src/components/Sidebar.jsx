@@ -57,7 +57,7 @@ function Sidebar({ isOpen, onClose }) {
                         <Text ml={2}>My Account</Text>
                     </Button>
 
-                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => window.location.href="#"}>
+                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => window.location.href="/chat"}>
                         <ChatIcon ml={1}/>
                         <Text ml={3}>Chats</Text>
                     </Button>
