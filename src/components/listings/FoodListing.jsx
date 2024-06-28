@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useMediaQuery, Skeleton } from "@chakra-ui/react";
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useMediaQuery } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon, DeleteIcon } from '@chakra-ui/icons';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import server from "../../networking";
 
 const FoodListing = ({
@@ -21,7 +21,6 @@ const FoodListing = ({
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(isFavourite);
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
-    const [loading, setLoading] = useState(true);
     const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
         
     const handlePrevImage = () => {
@@ -45,17 +44,18 @@ const FoodListing = ({
             userID: userID,
             listingID: listingID
         }
-        const toggle = await server.put("/listings/toggleFavouriteListing", favouriteData);
-        if (toggle.status === 200) {
-            if (toggle.data.favourite === true) {
+        await server.put("/listings/toggleFavouriteListing", favouriteData)
+        .then((response) => {
+            if (response.data.favourite === true) {
                 setFavourite(true);
             } else {
                 setFavourite(false);
             }
-        } else {
+        })
+        .catch(() => {
             toast.closeAll();
             ShowToast("Error", "Failed to add/remove listing from favourites", "error", 3000);
-        }
+        });
     };
 
     const handleDeleteListing = async () => {
@@ -68,12 +68,7 @@ const FoodListing = ({
             toast.closeAll();
             ShowToast("Error", "Failed to remove listing", "error", 3000);
         }
-    };
-
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 1000);
-        return () => clearTimeout(timer);
-    }, []);    
+    };  
     return (
         <>
             <style>
@@ -100,7 +95,7 @@ const FoodListing = ({
                         <SlideFade in={true} offsetY="20px">
                             <Image
                                 key={images[imageIndex]}
-                                src={images[imageIndex]}
+                                src={images[imageIndex] || "/placeholderImage.png"}
                                 onError={(e) => {
                                     e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
                                     e.target.src = "/placeholderImage.png"; // Path to your placeholder image
@@ -124,38 +119,35 @@ const FoodListing = ({
                     </Stack>
                 </CardBody>
                 <Divider />
-                <Skeleton isLoaded={!loading}>
-                    {isSmallerThan710 && (
+                {isSmallerThan710 && (
+                <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
+                    <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
+                        <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
+                        <Button onClick={toggleFavourite}>
+                            <Text fontSize={"15px"}>{favourite ? "🩷 Un-favourite" : "🤍 Favourite"}</Text>
+                        </Button>
+                        <Button onClick={onOpenAlert}>
+                            <Text fontSize={"15px"}><DeleteIcon color="red" mb={1}/> Remove</Text>
+                        </Button>
+                    </ButtonGroup>
+                </CardFooter>
+                )}
+                {!isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
-                        <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
-                            <Button onClick={toggleFavourite}>
-                                <Text fontSize={"15px"}>{favourite ? "🩷 Un-favourite" : "🤍 Favourite"}</Text>
-                            </Button>
-                            <Button onClick={onOpenAlert}>
-                                <Text fontSize={"15px"}><DeleteIcon color="red" mb={1}/> Remove</Text>
-                            </Button>
-                        </ButtonGroup>
-                    </CardFooter>
-                    )}
-                    {!isSmallerThan710 && (
-                        <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
-                        <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
-                            <Button onClick={toggleFavourite}>
-                                {favourite ? "🩷" : "🤍"}
-                            </Button>
-                            <Button onClick={onOpenAlert}>
-                                <DeleteIcon color="red" />
-                            </Button>
-                        </ButtonGroup>
-                    </CardFooter>
-                    )}
-                </Skeleton>
+                    <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
+                        <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
+                        <Button onClick={toggleFavourite}>
+                            {favourite ? "🩷" : "🤍"}
+                        </Button>
+                        <Button onClick={onOpenAlert}>
+                            <DeleteIcon color="red" />
+                        </Button>
+                    </ButtonGroup>
+                </CardFooter>
+                )}
             </Card>
             <AlertDialog
                 isOpen={isOpenAlert}
-                leastDestructiveRef={undefined}
                 onClose={onCloseAlert}
             >
                 <AlertDialogOverlay>
