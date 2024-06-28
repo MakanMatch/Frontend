@@ -67,8 +67,6 @@ function SubmitReviews() {
         setIsSubmitting(true);
         const currentDate = new Date().toISOString();
         const formData = new FormData();
-        formData.append('sender', 'Susie Jones');
-        formData.append('receiver', 'Jamie Oliver');
         formData.append('foodRating', foodRating);
         formData.append('hygieneRating', hygieneRating);
         formData.append('comments', comments);
@@ -93,6 +91,7 @@ function SubmitReviews() {
                         setImages([]);
                         setReviewData(null);
                         onClose();
+                        window.location.reload();
                     } else {
                         toast({
                             title: 'Error',
