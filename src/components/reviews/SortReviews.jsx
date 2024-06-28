@@ -13,16 +13,9 @@ function SortReviews() {
 
     const fetchReviews = async (hostID, sortOrder) => {
         try {
-            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`); //hardcoded hostID and order
-            if (!response.data) {
-                toast({
-                    title: "No reviews found",
-                    description: res.data,
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
-            } else {
+            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`); //hardcoded hostID
+            if (response.status == 200 && response.data) {
+                setReviews(response.data);
                 const reviewsWithGuestInfo = await Promise.all(response.data.map(async (review) => {
                     const guestInfoResponse = await server.get(`/cdn/accountInfo?userID=${review.guestID}`);
                     if (guestInfoResponse.data) {
@@ -33,6 +26,14 @@ function SortReviews() {
                     return review;
                 }));
                 setReviews(reviewsWithGuestInfo);
+            } else if (response.data && response.data.startsWith("ERROR")) {
+                toast({
+                    title: "No reviews found",
+                    description: "Please try again later.",
+                    status: 'info',
+                    duration: 2500,
+                    isClosable: false,
+                });
             }
         } catch (error) {
             toast({
