@@ -73,7 +73,7 @@ function SubmitReviews() {
         formData.append('hygieneRating', hygieneRating);
         formData.append('comments', comments);
         images.forEach((file) => {
-            formData.append('file', file);
+            formData.append('images', file);
         });
         formData.append('dateCreated', currentDate);
 
@@ -89,7 +89,6 @@ function SubmitReviews() {
                         });
                         console.log('Review submitted successfully!');
                         setIsSubmitting(false);
-
                         setComments('');
                         setImages([]);
                         setReviewData(null);

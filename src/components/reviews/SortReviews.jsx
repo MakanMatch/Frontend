@@ -5,23 +5,35 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { BiLike } from 'react-icons/bi';
 import { FaUtensils, FaSoap } from "react-icons/fa";
 import server from '../../networking'
+import CreateReview from './CreateReview';
 
 function SortReviews() {
     const toast = useToast();
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
 
+    function getImageLink(listingID, imageName) {
+        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForReview?reviewID=${listingID}&imageName=${imageName}`;
+    }
+
     const fetchReviews = async (hostID, sortOrder) => {
         try {
-            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`); //hardcoded hostID
-            if (response.status == 200 && response.data) {
-                setReviews(response.data);
-                const reviewsWithGuestInfo = await Promise.all(response.data.map(async (review) => {
-                    const guestInfoResponse = await server.get(`/cdn/accountInfo?userID=${review.guestID}`);
-                    if (guestInfoResponse.data) {
-                        review.guestInfo = guestInfoResponse.data;
-                    } else {
+            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`);
+            if (response.status === 200 && response.data) {
+                const reviews = response.data;
+                setReviews(reviews);
+                const reviewsWithGuestInfo = await Promise.all(reviews.map(async (review) => {
+                    try {
+                        const guestInfoResponse = await server.get(`/cdn/accountInfo?userID=${review.guestID}`);
+                        if (guestInfoResponse.status === 200 && guestInfoResponse.data) {
+                            review.guestInfo = guestInfoResponse.data;
+                        } else {
+                            review.guestInfo = null;
+                            console.error(`No guest info found for guestID ${review.guestID}`);
+                        }
+                    } catch (error) {
                         review.guestInfo = null;
+                        console.error(`Error fetching guest info for guestID ${review.guestID}:`, error);
                     }
                     return review;
                 }));
@@ -78,64 +90,20 @@ function SortReviews() {
             </TabList>
             <TabPanels>
                 <TabPanel>
-                    {reviews.map(review => (
-                        <Card maxW='md' variant="elevated" key={review.reviewID}>
-                            <CardHeader>
-                                <Flex spacing='4'>
-                                    <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
-                                        {review.guestInfo ? (
-                                            <Avatar name={review.guestInfo.username} src='https://bit.ly/sage-adebayo' />
-                                        ) : (
-                                            <Avatar src='https://bit.ly/sage-adebayo' />
-                                        )}
-                                        <Box>
-                                            <Heading textAlign="left" size='sm'>{review.guestInfo ? review.guestInfo.username : "Guest"}</Heading>
-                                            <Flex gap={3}>
-                                                <Flex gap={3}>
-                                                    <Box pt="4px">
-                                                        <FaUtensils />
-                                                    </Box>
-                                                    <Text>{review.foodRating}</Text>
-                                                </Flex>
-                                                <Flex gap={3}>
-                                                    <Box pt="2px">
-                                                        <FaSoap />
-                                                    </Box>
-                                                    <Text>{review.hygieneRating}</Text>
-                                                </Flex>
-                                            </Flex>
-                                        </Box>
-                                    </Flex>
-                                    <Text>{new Date(review.dateCreated).toLocaleDateString()}</Text>
-                                </Flex>
-                            </CardHeader>
-                            <CardBody>
-                                <Text textAlign="left">
-                                    {review.comments}
-                                </Text>
-                            </CardBody>
-                            {/* {review.image && (
-                                <Image
-                                    objectFit='cover'
-                                    src={review.image}
-                                    alt='Review Image'
-                                />
-                            )} */}
-                            <CardFooter
-                                justify='space-between'
-                                flexWrap='wrap'
-                                sx={{
-                                    '& > button': {
-                                        minW: '136px',
-                                    },
-                                }}
-                            >
-                                <Button flex='1' variant='ghost' leftIcon={<BiLike />}>
-                                    Like
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    ))}
+                    {reviews.length > 0 ?
+                        reviews.map((review) => (
+                            <CreateReview 
+                            key={review.reviewID} 
+                            username={review.guestInfo ? review.guestInfo.username : null}
+                            foodRating = {review.foodRating}
+                            hygieneRating = {review.hygieneRating}
+                            comments = {review.comments}
+                            dateCreated = {review.dateCreated}
+                            images = {review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                            likeCount = {review.likeCount}
+                             />
+                        )) : 
+                        <Text>No reviews found</Text>}
                 </TabPanel>
                 <TabPanel>
                     <p>Highest Rating Reviews</p>
