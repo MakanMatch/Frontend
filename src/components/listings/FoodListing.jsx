@@ -117,6 +117,9 @@ const FoodListing = ({
                         <Text color="blue.600" fontSize="2xl">
                             ${portionPrice}/pax
                         </Text>
+                        <Link to={'/reviews'}>
+                            <Text textDecoration={"underline"} color={"blue"}>See reviews</Text>
+                        </Link>
                     </Stack>
                 </CardBody>
                 <Divider />

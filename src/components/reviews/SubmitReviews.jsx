@@ -94,6 +94,7 @@ function SubmitReviews() {
                         setImages([]);
                         setReviewData(null);
                         onClose();
+                        location.reload();
                     } else {
                         toast({
                             title: 'Error',
