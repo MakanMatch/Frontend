@@ -1,17 +1,31 @@
 import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, Flex, Image, Text, Icon, Box } from '@chakra-ui/react'
 import { CalendarIcon, ChatIcon } from '@chakra-ui/icons'
 import { BsQuestionCircle } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/Logo.png'
 import React from 'react'
 
 
 function Sidebar({ isOpen, onClose }) {
+    const navigate = useNavigate();
     const DrawerHover = {
         _hover: {
           bg: "#E4EBF8"
         },
         borderRadius: "20px",
     };
+
+    const handleMyAccountClick = () => {
+        const token = localStorage.getItem('jwt');
+        if (token) {
+            navigate('/myAccount');
+        } else {
+            console.log("Sign in first.")
+            navigate('/login');
+        }
+        onClose()
+    };
+
     return (
         <Drawer
             isOpen={isOpen}
@@ -38,7 +52,7 @@ function Sidebar({ isOpen, onClose }) {
                         <Text ml={3}>Upcoming Reservations</Text>
                     </Button>
 
-                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => window.location.href="#"}>
+                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={handleMyAccountClick}>
                     <Icon viewBox="0 0 24 24" boxSize={6}><path fill="#515F7C" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></Icon>
                         <Text ml={2}>My Account</Text>
                     </Button>

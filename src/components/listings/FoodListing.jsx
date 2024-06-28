@@ -4,6 +4,7 @@ import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Imag
 import { ChevronLeftIcon, ChevronRightIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useState } from "react";
 import server from "../../networking";
+import { Link } from "react-router-dom";
 
 const FoodListing = ({
     listingID,
@@ -88,8 +89,8 @@ const FoodListing = ({
                     <Box position="relative">
                         {images.length > 1 && (
                             <Box position={"absolute"} top="50%" transform="translateY(-50%)" width={"100%"}>
-                                <ChevronLeftIcon boxSize={8} ml={-1} mt={-4} onClick={handlePrevImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} left="-5" zIndex={1}/>
-                                <ChevronRightIcon boxSize={8} mr={-1} mt={-4} onClick={handleNextImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} right="-5" zIndex={1}/>
+                                <ChevronLeftIcon boxSize={8} ml={-1} mt={-4} onClick={handlePrevImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} left="-5" zIndex={1} />
+                                <ChevronRightIcon boxSize={8} mr={-1} mt={-4} onClick={handleNextImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} right="-5" zIndex={1} />
                             </Box>
                         )}
                         <SlideFade in={true} offsetY="20px">

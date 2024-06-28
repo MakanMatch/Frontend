@@ -1,16 +1,21 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
 import server from '../../networking';
 import axios from 'axios'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
 
 function ExpandedListing() {
     // const Universal = useSelector(state => state.universal)
     const toast = useToast()
+    const navigate = useNavigate()
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
+    const [searchParams, setSearchParams] = useSearchParams()
+    const [listingID, setListingID] = useState(searchParams.get("id"))
     const [pricePerPortion, setPricePerPortion] = useState('0.00')
     const [listingPublished, setListingPublished] = useState(false)
     const [listingData, setListingData] = useState({
@@ -30,13 +35,19 @@ function ExpandedListing() {
     const [changesMade, setChangesMade] = useState(false)
     const [loading, setLoading] = useState(true)
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen: deleteImageDialogOpen, onOpen: openDeleteImageDialog, onClose: closeDeleteImageDialog } = useDisclosure()
+    const [imageToBeDeleted, setImageToBeDeleted] = useState(null)
+    const [isUploading, setIsUploading] = useState(false)
     const [file, setFile] = useState(null);
 
     const handleClose = () => {
         onClose()
         setFile(null)
     }
-
+    const handleDeleteImageDialogClosure = () => {
+        closeDeleteImageDialog()
+        setImageToBeDeleted(null)
+    }
     const handleFileSubmission = (e) => {
         if (e.target.files.length > 0) {
             setFile(e.target.files[0])
@@ -49,6 +60,10 @@ function ExpandedListing() {
         } else {
             setChangesMade(false)
         }
+    }
+    const handleDeleteImage = (imageName) => {
+        openDeleteImageDialog()
+        setImageToBeDeleted(imageName)
     }
     const togglePublished = (newValue) => {
         setListingPublished(newValue)
@@ -74,6 +89,7 @@ function ExpandedListing() {
             toastConfig.icon = icon
         }
 
+        toast.closeAll()
         toast(toastConfig)
     }
     const processData = (data) => {
@@ -87,11 +103,15 @@ function ExpandedListing() {
     }
 
     useEffect(() => {
+        if (!listingID) {
+            navigate("/")
+            return
+        }
         fetchListingDetails()
     }, [])
 
     const fetchListingDetails = () => {
-        server.get("/listingDetails")
+        server.get(`/cdn/getListing?id=${listingID}`)
             .then(response => {
                 if (response.status == 200) {
                     const processedData = processData(response.data)
@@ -100,23 +120,34 @@ function ExpandedListing() {
                     setListingPublished(processedData.published)
                     setLoading(false)
                     return
+                } else if (response.status == 404) {
+                    console.log("Listing not found, re-directing to home.")
+                    navigate("/")
+                    return
                 } else {
                     showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
+                    console.log("EXPANDEDLISTING: Failed to retrieve listing details, redirecting to home. Response below.")
                     console.log(response.data)
+                    navigate("/")
                     return
                 }
             })
             .catch(err => {
                 showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
+                console.log("EXPANDEDLISTING: Failed to retrieve listing details, redirecting to home. Response below.")
                 console.log(err)
+                navigate("/")
                 return
             })
     }
 
     const uploadImage = (e) => {
         e.preventDefault();
+        setIsUploading(true)
+
         if (file == null) {
             showToast("Error", "No file selected", 2500, true, "error")
+            setIsUploading(false)
             return
         }
 
@@ -133,18 +164,21 @@ function ExpandedListing() {
             .then(res => {
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Success", "Image uploaded successfully", 2500, true, "success")
+                    setIsUploading(false)
                     handleClose()
                     fetchListingDetails()
                     return
                 } else {
                     showToast("Error", "Failed to upload image", 5000, true, "error")
                     console.log(res.data)
+                    setIsUploading(false)
                     return
                 }
             })
             .catch(err => {
                 showToast("Error", "Failed to upload image", 5000, true, "error")
                 console.log(err)
+                setIsUploading(false)
                 return
             })
     }
@@ -214,11 +248,18 @@ function ExpandedListing() {
                     <VStack alignItems={"flex-start"}>
                         <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
                             {listingData.images.map((imgName, index) => {
-                                return (
-                                    <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
-                                )
+                                if (imgName) {
+                                    return (
+                                        <Box key={index} position={"relative"} height={"100%"} minW={"fit-content"}>
+                                            <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
+                                            <Tooltip hasArrow label={"Delete image"} placement={"top"}>
+                                                <CloseButton size={"md"} position={"absolute"} top={"0"} right={"0"} m={"2"} bgColor={"red"} color={"white"} onClick={() => { handleDeleteImage(imgName) }} />
+                                            </Tooltip>
+                                        </Box>
+                                    )
+                                }
                             })}
-                            <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={onOpen}>
+                            <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={onOpen} rounded={"10px"}>
                                 <SmallAddIcon boxSize={"10"} />
                             </Center>
                         </HStack>
@@ -265,11 +306,12 @@ function ExpandedListing() {
                     <ModalFooter>
                         <HStack spacing={"20px"}>
                             <Button onClick={handleClose}>Close</Button>
-                            <Button colorScheme={"blue"} onClick={uploadImage}>Upload</Button>
+                            <Button variant={isUploading ? "": "MMPrimary"} isLoading={isUploading} loadingText="Uploading..." onClick={uploadImage}>Upload</Button>
                         </HStack>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
+            <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} showToast={showToast} refreshPage={fetchListingDetails} />
         </>
     )
 }

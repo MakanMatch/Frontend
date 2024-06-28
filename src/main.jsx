@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client'
 import './index.css'
+import { useState, useEffect } from 'react';
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import { ChakraProvider } from '@chakra-ui/react'
@@ -7,6 +8,7 @@ import universalReducer from './slices/UniversalState.js'
 import MainTheme from './themes/MainTheme.js'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './Layout.jsx'
+import UserContext from './context/UserContext.js'
 import Version from './pages/Version.jsx'
 import Home from './pages/Home.jsx'
 import ExpandedListing from './pages/orders/ExpandedListing.jsx'
@@ -17,16 +19,19 @@ import EmailVerification from './pages/identity/EmailVerification';
 import AccountRecovery from './pages/identity/AccountRecovery';
 import Reviews from './pages/reviews/Reviews.jsx'
 import NotFound from './pages/404.jsx'
+import Chat from './pages/chat/Chat.jsx'
+import Chat2 from './pages/chat/Chat2.jsx'
+import MyAccount from './pages/identity/MyAccount.jsx'
 
 const store = configureStore({
     reducer: {
-        universal: universalReducer,
+        universal: universalReducer
     }
 })
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
-        <ChakraProvider theme={MainTheme} toastOptions={{ defaultOptions: { position: 'bottom-right' }}}>
+        <ChakraProvider theme={MainTheme} toastOptions={{ defaultOptions: { position: 'bottom-right' } }}>
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Layout />}>
@@ -37,11 +42,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"/login"} element={<Login />} />
                         <Route path={"/emailVerification"} element={<EmailVerification />} />
                         <Route path={"/accountRecovery"} element={<AccountRecovery />} />
+                        <Route path={"/myAccount"} element={<MyAccount />} />
                         <Route path='reviews' element={<Reviews />} />
+                        <Route path='chat' element={<Chat />} />
+                        <Route path="chat2" element={<Chat2 />}></Route>
                         <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
         </ChakraProvider>
     </Provider>
+
 )
