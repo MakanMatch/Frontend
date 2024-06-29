@@ -109,13 +109,61 @@ function SortReviews() {
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                    <p>Highest Rating Reviews</p>
+                <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                        {reviews.length > 0 ?
+                            reviews.map((review) => (
+                                <CreateReview
+                                    key={review.reviewID}
+                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    foodRating={review.foodRating}
+                                    hygieneRating={review.hygieneRating}
+                                    comments={review.comments}
+                                    dateCreated={review.dateCreated}
+                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    like={review.likeCount}
+                                    reviewID={review.reviewID}
+                                />
+                            )) :
+                            null}
+                    </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                    <p>Lowest Rating Reviews</p>
+                <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                        {reviews.length > 0 ?
+                            reviews.map((review) => (
+                                <CreateReview
+                                    key={review.reviewID}
+                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    foodRating={review.foodRating}
+                                    hygieneRating={review.hygieneRating}
+                                    comments={review.comments}
+                                    dateCreated={review.dateCreated}
+                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    like={review.likeCount}
+                                    reviewID={review.reviewID}
+                                />
+                            )) :
+                            null}
+                    </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                    <p>Images Reviews</p>
+                <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                        {reviews.length > 0 ?
+                            reviews.map((review) => (
+                                <CreateReview
+                                    key={review.reviewID}
+                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    foodRating={review.foodRating}
+                                    hygieneRating={review.hygieneRating}
+                                    comments={review.comments}
+                                    dateCreated={review.dateCreated}
+                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    like={review.likeCount}
+                                    reviewID={review.reviewID}
+                                />
+                            )) :
+                            null}
+                    </SimpleGrid>
                 </TabPanel>
             </TabPanels>
         </Tabs>
