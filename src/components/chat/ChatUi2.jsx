@@ -169,7 +169,7 @@ function ChatUi2() {
           mt={-4}
         >
           <Image
-            src="https://randomuser.me/api/portraits/men/4.jpg"
+            src="https://bit.ly/dan-abramov"
             alt="UserA"
             borderRadius="full"
             w={{ base: "20%", md: "10%" }}
