@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import {
-    Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, SlideFade, CardHeader, Flex,
+    Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
     Avatar, useToast, Divider
 } from "@chakra-ui/react";
 import { useDisclosure } from '@chakra-ui/react'
@@ -94,14 +94,17 @@ const CreateReview = ({
         }
         if (numImages === 2) {
             return (
-                <Flex>
+                <Flex direction={{ base: 'column', md: 'row' }} 
+                wrap="wrap" 
+                gap={2} 
+            >
                     <Image
                         onClick={() => handleImageClick(0)}
                         key={images[0]}
                         src={images[0]}
                         alt="Review image"
                         borderRadius="lg"
-                        minWidth={"50%"}
+                        minWidth={{ base: '100%', md: '50%' }}
                         minHeight={"108px"}
                         maxHeight={"200"}
                         objectFit="cover"
@@ -113,7 +116,7 @@ const CreateReview = ({
                         src={images[1]}
                         alt="Review image"
                         borderRadius="lg"
-                        minWidth={"50%"}
+                        minWidth={{ base: '100%', md: '50%' }}
                         minHeight={"108px"}
                         maxHeight={"200"}
                         objectFit="cover"
@@ -124,20 +127,23 @@ const CreateReview = ({
         }
         if (numImages === 3) {
             return (
-                <Flex>
+                <Flex direction={{ base: 'column', md: 'row' }} 
+                wrap="wrap" 
+                gap={2} 
+            >
                     <Image
                         onClick={() => handleImageClick(0)}
                         key={images[0]}
                         src={images[0]}
                         alt="Review image"
                         borderRadius="lg"
-                        minWidth={"50%"}
+                        minWidth={{ base: '100%', md: '50%' }}
                         minHeight={"108px"}
                         maxHeight={"200"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
-                    <Flex direction="column" ml={2} flex="1">
+                    <Flex direction={{base:"row", md:"column"}} ml={2} flex="1" wrap="wrap">
                         <Image
                             onClick={() => handleImageClick(1)}
                             key={images[1]}
@@ -145,7 +151,7 @@ const CreateReview = ({
                             alt="Review image"
                             borderRadius="lg"
                             minWidth={"100%"}
-                            minHeight={"50%"}
+                            minHeight={{ base: '50%', md: '50%' }}
                             maxHeight={"100px"}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
@@ -157,7 +163,7 @@ const CreateReview = ({
                             alt="Review image"
                             borderRadius="lg"
                             minWidth={"100%"}
-                            minHeight={"50%"}
+                            minHeight={{ base: '50%', md: '50%' }}
                             maxHeight={"100px"}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
@@ -176,7 +182,7 @@ const CreateReview = ({
                             src={image}
                             alt={`Review image ${index + 1}`}
                             borderRadius="lg"
-                            minWidth={"calc(50% - 8px)"}
+                            minWidth={"calc(50% - 6px)"}
                             minHeight={"108px"}
                             maxHeight={"100px"}
                             objectFit="cover"
@@ -195,7 +201,7 @@ const CreateReview = ({
                         src={image}
                         alt={`Review image ${index + 1}`}
                         borderRadius="lg"
-                        minWidth={"calc(25% - 8px)"}
+                        minWidth={"calc(50% - 6px)"}
                         minHeight={"108px"}
                         maxHeight={"100px"}
                         objectFit="cover"
@@ -206,7 +212,7 @@ const CreateReview = ({
                     <Box
                         onClick={onOpen}
                         borderRadius="lg"
-                        minWidth={"calc(25% - 8px)"}
+                        minWidth={{ base: '100%' }}
                         minHeight={"108px"}
                         bg="gray.200"
                         display="flex"
@@ -216,6 +222,7 @@ const CreateReview = ({
                         fontSize="lg"
                         fontWeight="bold"
                         _hover={{ cursor: "pointer" }}
+                        textAlign="center"
                     >
                         +{images.length - 4}
                     </Box>
@@ -228,8 +235,11 @@ const CreateReview = ({
         <TabPanel>
             <Card maxW='lg' variant="elevated" key={reviewID} p={4} boxShadow="md">
                 <CardHeader>
-                    <Flex alignItems="center" justifyContent="space-between">
-                        <Flex alignItems='center'>
+                    <Flex direction={{ base: 'column', md: 'row' }} 
+                    alignItems={{ base: 'flex-start', md: 'center' }} 
+                    justifyContent="space-between" 
+                    wrap="wrap">
+                        <Flex alignItems='center' mb={{ base: 2, md: 0 }}>
                             {username ? (
                                 <Avatar name={username} src='https://bit.ly/sage-adebayo' />
                             ) : (
@@ -237,14 +247,14 @@ const CreateReview = ({
                             )}
                             <Box ml={4}>
                                 <Heading textAlign="left" size='sm'>{username ? username : "Guest"}</Heading>
-                                <Flex gap={3}>
-                                    <Flex gap={3}>
-                                        <Box pt="4px">
+                                <Flex gap={3} mt={1}>
+                                    <Flex alignItems="center" gap={3}>
+                                        <Box pt="2px">
                                             <FaUtensils />
                                         </Box>
                                         <Text>{foodRating}</Text>
                                     </Flex>
-                                    <Flex gap={3}>
+                                    <Flex align Items="center" gap={3}>
                                         <Box pt="2px">
                                             <FaSoap />
                                         </Box>
@@ -253,11 +263,15 @@ const CreateReview = ({
                                 </Flex>
                             </Box>
                         </Flex>
-                        <Text fontSize="sm" color="gray.500">{new Date(dateCreated).toLocaleDateString()}</Text>
+                        <Box textAlign={{ base: 'center', md: 'right' }}
+                        width={{ base: '100%', md: 'auto'}}
+                        mt={{ base:2, md:0}}>
+                            <Text fontSize="sm" color="gray.500">{new Date(dateCreated).toLocaleDateString()}</Text>
+                        </Box>
                     </Flex>
                 </CardHeader>
                 <CardBody>
-                    <Text textAlign="left">{comments}</Text>
+                    <Text textAlign="left" mb={4}>{comments}</Text>
                     {renderImages()}
                 </CardBody>
                 <CardFooter>
@@ -268,7 +282,7 @@ const CreateReview = ({
                 <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
                     <ModalOverlay />
                     <ModalContent maxWidth="90vw" maxHeight="80vh" overflow="auto">
-                        <ModalHeader>Images</ModalHeader>
+                        <ModalHeader>Review Images</ModalHeader>
                         <ModalCloseButton mt={2} />
                         <ModalBody display="flex" justifyContent="center" alignItems="center" p={0}>
                             <Flex direction="column" alignItems="center">
@@ -280,12 +294,13 @@ const CreateReview = ({
                                             alt={`Review image ${index + 1}`}
                                             maxWidth="100%"
                                             maxHeight="80vh"
-                                            mb={2}
+                                            mt={10}
+                                            mb={10}
                                             objectFit="cover"
                                             onClick={() => handleImageClick(index)}
                                             _hover={{ cursor: "pointer" }}
                                         />
-                                        {index < images.length - 1 && <Divider />}
+                                        {index < images.length - 1 && <Divider/>}
                                     </React.Fragment>
                                 ))}
                             </Flex>
