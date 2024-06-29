@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, SlideFade, CardHeader, Flex,
     Avatar, useToast, Divider
 } from "@chakra-ui/react";
 import { useDisclosure } from '@chakra-ui/react'
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { FaUtensils, FaSoap } from "react-icons/fa";
 import server from '../../networking';
 import Like from './Like';
@@ -34,20 +33,16 @@ const CreateReview = ({
     const [imageIndex, setImageIndex] = useState(0);
     const [liked, setLiked] = useState(false);
     const [currentLikeCount, setCurrentLikeCount] = useState(like);
+    const [modalImageIndex, setModalImageIndex] = useState(null);
 
-    const handlePrevImage = () => {
-        if (imageIndex === 0) {
-            setImageIndex(images.length - 1);
-        } else {
-            setImageIndex(imageIndex - 1);
-        }
-    }
-    const handleNextImage = () => {
-        if (imageIndex === images.length - 1) {
-            setImageIndex(0);
-        } else {
-            setImageIndex(imageIndex + 1);
-        }
+    const imageRefs = useRef([]);
+
+    const handleImageClick = (index) => {
+        setModalImageIndex(index);
+        onOpen();
+        setTimeout(() => {
+            imageRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 0);
     }
 
     const toggleLike = async () => {
@@ -84,7 +79,7 @@ const CreateReview = ({
         if (numImages === 1) {
             return (
                 <Image
-                    onClick={onOpen}
+                    onClick={() => handleImageClick(0)}
                     key={images[0]}
                     src={images[0]}
                     alt="Review image"
@@ -101,7 +96,7 @@ const CreateReview = ({
             return (
                 <Flex>
                     <Image
-                        onClick={onOpen}
+                        onClick={() => handleImageClick(0)}
                         key={images[0]}
                         src={images[0]}
                         alt="Review image"
@@ -113,7 +108,7 @@ const CreateReview = ({
                         _hover={{ cursor: "pointer" }}
                     />
                     <Image
-                        onClick={onOpen}
+                        onClick={() => handleImageClick(1)}
                         key={images[1]}
                         src={images[1]}
                         alt="Review image"
@@ -131,7 +126,7 @@ const CreateReview = ({
             return (
                 <Flex>
                     <Image
-                        onClick={onOpen}
+                        onClick={() => handleImageClick(0)}
                         key={images[0]}
                         src={images[0]}
                         alt="Review image"
@@ -144,7 +139,7 @@ const CreateReview = ({
                     />
                     <Flex direction="column" ml={2} flex="1">
                         <Image
-                            onClick={onOpen}
+                            onClick={() => handleImageClick(1)}
                             key={images[1]}
                             src={images[1]}
                             alt="Review image"
@@ -156,7 +151,7 @@ const CreateReview = ({
                             _hover={{ cursor: "pointer" }}
                         />
                         <Image
-                            onClick={onOpen}
+                            onClick={() => handleImageClick(2)}
                             key={images[2]}
                             src={images[2]}
                             alt="Review image"
@@ -176,7 +171,7 @@ const CreateReview = ({
                 <Flex wrap="wrap" gap={2}>
                     {images.map((image, index) => (
                         <Image
-                            onClick={onOpen}
+                            onClick={() => handleImageClick(index)}
                             key={index}
                             src={image}
                             alt={`Review image ${index + 1}`}
@@ -195,7 +190,7 @@ const CreateReview = ({
             <Flex wrap="wrap" gap={2}>
                 {images.slice(0, 4).map((image, index) => (
                     <Image
-                        onClick={onOpen}
+                        onClick={() => handleImageClick(index)}
                         key={index}
                         src={image}
                         alt={`Review image ${index + 1}`}
@@ -276,17 +271,19 @@ const CreateReview = ({
                         <ModalHeader>Images</ModalHeader>
                         <ModalCloseButton mt={2} />
                         <ModalBody display="flex" justifyContent="center" alignItems="center" p={0}>
-                        <Flex direction="column" alignItems="center">
+                            <Flex direction="column" alignItems="center">
                                 {images.map((image, index) => (
                                     <React.Fragment key={index}>
                                         <Image
+                                            ref={el => (imageRefs.current[index] = el)}
                                             src={image}
                                             alt={`Review image ${index + 1}`}
                                             maxWidth="100%"
                                             maxHeight="80vh"
                                             mb={2}
-                                            objectFit="contain"
-                                            p={4}
+                                            objectFit="cover"
+                                            onClick={() => handleImageClick(index)}
+                                            _hover={{ cursor: "pointer" }}
                                         />
                                         {index < images.length - 1 && <Divider />}
                                     </React.Fragment>
