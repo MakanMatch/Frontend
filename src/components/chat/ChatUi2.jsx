@@ -59,17 +59,23 @@ function ChatUi2() {
       }
 
       console.log("Received message:", receivedMessage);
-      if (receivedMessage.action === "edit") {
+
+      if (receivedMessage.type === "chat_history") {
+        for (let i = 0; i < receivedMessage.messages.length; i++) {
+          setMessages((prevMessages) => [...prevMessages, receivedMessage.messages[i]]);
+          console.log("Received message:", receivedMessage.messages[i].from);
+        }
+      } else if (receivedMessage.action === "edit") {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
-            msg.id === receivedMessage.id
+            msg.messageID === receivedMessage.id
               ? { ...msg, message: receivedMessage.message, edited: true }
               : msg
           )
         );
       } else if (receivedMessage.action === "delete") {
         setMessages((prevMessages) =>
-          prevMessages.filter((msg) => msg.id !== receivedMessage.id)
+          prevMessages.filter((msg) => msg.messageID !== receivedMessage.id)
         );
       } else if (receivedMessage.action === "reload") {
         window.location.reload();
@@ -85,18 +91,26 @@ function ChatUi2() {
     ws.current.onclose = () => {
       console.log("Disconnected from WebSocket server");
     };
+
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
   }, []);
 
   const sendMessage = () => {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
-        id: Math.random().toString(36).substr(2, 9),
+        messageid: Math.random().toString(36).substr(2, 9),
         sender: "James",
+        receiver: "Jamie",
         message: messageInput,
         timestamp: `${new Date().getHours()}:${new Date()
           .getMinutes()
           .toString()
           .padStart(2, "0")}`,
+        datetime: new Date().toISOString(),
       };
 
       ws.current.send(JSON.stringify(newMessage));
@@ -181,7 +195,7 @@ function ChatUi2() {
           />
           <Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
             <Text fontSize={20} mt={2} textAlign={"left"}>
-              Chat with Jamie Oliver (Host) Rating: 2 ⭐
+            Chat with Jamie Oliver (Host) Rating: 2 ⭐
             </Text>
             <Spacer h={3} />
             <Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
@@ -202,7 +216,7 @@ function ChatUi2() {
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
             {messages.map((msg) => (
               <ChatBubble
-                key={msg.id}
+                key={msg.messageID}
                 message={msg.message}
                 timestamp={msg.timestamp}
                 isSender={msg.sender === "James"}
@@ -211,8 +225,8 @@ function ChatUi2() {
                     ? "https://randomuser.me/api/portraits/men/4.jpg"
                     : "https://bit.ly/dan-abramov"
                 }
-                onEdit={() => handleEditPrompt(msg.id, msg.message)}
-                onDelete={() => handleDeletePrompt(msg.id)}
+                onEdit={() => handleEditPrompt(msg.messageID, msg.message)}
+                onDelete={() => handleDeletePrompt(msg.messageID)}
                 edited={msg.edited}
               />
             ))}
@@ -251,7 +265,7 @@ function ChatUi2() {
       </Center>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog isOpen={deleteDialogOpen}>
+      <AlertDialog isOpen={deleteDialogOpen} onClose={closeDeleteDialog}>
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
