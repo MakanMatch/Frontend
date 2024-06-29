@@ -13,6 +13,9 @@ function SortReviews() {
     const [reviews, setReviews] = useState([])
 
     function getImageLink(listingID, imageName) {
+        if (!listingID || !imageName) {
+            return null;
+        }
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForReview?reviewID=${listingID}&imageName=${imageName}`;
     }
 

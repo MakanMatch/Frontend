@@ -183,7 +183,7 @@ const CreateReview = ({
                             src={image}
                             alt={`Review image ${index + 1}`}
                             borderRadius="lg"
-                            minWidth={{ base: '100%', md:"calc(50% - 6px)" }}
+                            minWidth={{ base: '100%', md: "calc(50% - 6px)" }}
                             minHeight={"108px"}
                             maxHeight={"100px"}
                             objectFit="cover"
@@ -202,7 +202,7 @@ const CreateReview = ({
                         src={image}
                         alt={`Review image ${index + 1}`}
                         borderRadius="lg"
-                        minWidth={{ base: '100%', md:"calc(50% - 6px)" }}
+                        minWidth={{ base: '100%', md: "calc(50% - 6px)" }}
                         minHeight={"108px"}
                         maxHeight={"100px"}
                         objectFit="cover"
@@ -305,10 +305,12 @@ const CreateReview = ({
                         </Box>
                     </Flex>
                 </CardHeader>
-                <CardBody>
-                    <Text textAlign="left" mb={4}>{comments}</Text>
-                    {renderImages()}
-                </CardBody>
+                {comments && images && images.filter(image => image !== null).length > 0 && (
+                    <CardBody>
+                        <Text textAlign="left" mb={4}>{comments}</Text>
+                        {renderImages()}
+                    </CardBody>
+                )}
                 <CardFooter>
                     <Button flex='1' variant='ghost' leftIcon={liked ? <Liked /> : <Like />} onClick={toggleLike}>
                         <Text>{currentLikeCount}</Text>
