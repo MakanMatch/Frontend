@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Input, Flex, Text, Container, Image, Textarea, Spacer, Icon, Heading, Avatar, useToast } from '@chakra-ui/react';
+import { Button, Box, Input, Flex, Text, Container, Image, Textarea, Spacer, Icon, Heading, Avatar, useToast, SimpleGrid } from '@chakra-ui/react';
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { BiLike } from 'react-icons/bi';
@@ -90,21 +90,23 @@ function SortReviews() {
             </TabList>
             <TabPanels>
                 <TabPanel>
-                    {reviews.length > 0 ?
-                        reviews.map((review) => (
-                            <CreateReview 
-                            key={review.reviewID} 
-                            username={review.guestInfo ? review.guestInfo.username : null}
-                            foodRating = {review.foodRating}
-                            hygieneRating = {review.hygieneRating}
-                            comments = {review.comments}
-                            dateCreated = {review.dateCreated}
-                            images = {review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                            like = {review.likeCount}
-                            reviewID = {review.reviewID}
-                             />
-                        )) : 
-                        <Text>No reviews found</Text>}
+                    <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                        {reviews.length > 0 ?
+                            reviews.map((review) => (
+                                <CreateReview
+                                    key={review.reviewID}
+                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    foodRating={review.foodRating}
+                                    hygieneRating={review.hygieneRating}
+                                    comments={review.comments}
+                                    dateCreated={review.dateCreated}
+                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    like={review.likeCount}
+                                    reviewID={review.reviewID}
+                                />
+                            )) :
+                            null}
+                    </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
                     <p>Highest Rating Reviews</p>
