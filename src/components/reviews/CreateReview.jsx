@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, SlideFade, CardHeader, Flex,
-    Avatar, useToast
+    Avatar, useToast, Divider
 } from "@chakra-ui/react";
 import { useDisclosure } from '@chakra-ui/react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
@@ -79,9 +79,159 @@ const CreateReview = ({
         }
     }
 
+    const renderImages = () => {
+        const numImages = images.length;
+        if (numImages === 1) {
+            return (
+                <Image
+                    onClick={onOpen}
+                    key={images[0]}
+                    src={images[0]}
+                    alt="Review image"
+                    borderRadius="lg"
+                    minWidth={"100%"}
+                    minHeight={"108px"}
+                    maxHeight={"200"}
+                    objectFit="cover"
+                    _hover={{ cursor: "pointer" }}
+                />
+            );
+        }
+        if (numImages === 2) {
+            return (
+                <Flex>
+                    <Image
+                        onClick={onOpen}
+                        key={images[0]}
+                        src={images[0]}
+                        alt="Review image"
+                        borderRadius="lg"
+                        minWidth={"50%"}
+                        minHeight={"108px"}
+                        maxHeight={"200"}
+                        objectFit="cover"
+                        _hover={{ cursor: "pointer" }}
+                    />
+                    <Image
+                        onClick={onOpen}
+                        key={images[1]}
+                        src={images[1]}
+                        alt="Review image"
+                        borderRadius="lg"
+                        minWidth={"50%"}
+                        minHeight={"108px"}
+                        maxHeight={"200"}
+                        objectFit="cover"
+                        _hover={{ cursor: "pointer" }}
+                    />
+                </Flex>
+            );
+        }
+        if (numImages === 3) {
+            return (
+                <Flex>
+                    <Image
+                        onClick={onOpen}
+                        key={images[0]}
+                        src={images[0]}
+                        alt="Review image"
+                        borderRadius="lg"
+                        minWidth={"50%"}
+                        minHeight={"108px"}
+                        maxHeight={"200"}
+                        objectFit="cover"
+                        _hover={{ cursor: "pointer" }}
+                    />
+                    <Flex direction="column" ml={2} flex="1">
+                        <Image
+                            onClick={onOpen}
+                            key={images[1]}
+                            src={images[1]}
+                            alt="Review image"
+                            borderRadius="lg"
+                            minWidth={"100%"}
+                            minHeight={"50%"}
+                            maxHeight={"100px"}
+                            objectFit="cover"
+                            _hover={{ cursor: "pointer" }}
+                        />
+                        <Image
+                            onClick={onOpen}
+                            key={images[2]}
+                            src={images[2]}
+                            alt="Review image"
+                            borderRadius="lg"
+                            minWidth={"100%"}
+                            minHeight={"50%"}
+                            maxHeight={"100px"}
+                            objectFit="cover"
+                            _hover={{ cursor: "pointer" }}
+                        />
+                    </Flex>
+                </Flex>
+            );
+        }
+        if (numImages === 4) {
+            return (
+                <Flex wrap="wrap" gap={2}>
+                    {images.map((image, index) => (
+                        <Image
+                            onClick={onOpen}
+                            key={index}
+                            src={image}
+                            alt={`Review image ${index + 1}`}
+                            borderRadius="lg"
+                            minWidth={"calc(50% - 8px)"}
+                            minHeight={"108px"}
+                            maxHeight={"100px"}
+                            objectFit="cover"
+                            _hover={{ cursor: "pointer" }}
+                        />
+                    ))}
+                </Flex>
+            );
+        }
+        return (
+            <Flex wrap="wrap" gap={2}>
+                {images.slice(0, 4).map((image, index) => (
+                    <Image
+                        onClick={onOpen}
+                        key={index}
+                        src={image}
+                        alt={`Review image ${index + 1}`}
+                        borderRadius="lg"
+                        minWidth={"calc(25% - 8px)"}
+                        minHeight={"108px"}
+                        maxHeight={"100px"}
+                        objectFit="cover"
+                        _hover={{ cursor: "pointer" }}
+                    />
+                ))}
+                {images.length > 4 && (
+                    <Box
+                        onClick={onOpen}
+                        borderRadius="lg"
+                        minWidth={"calc(25% - 8px)"}
+                        minHeight={"108px"}
+                        bg="gray.200"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        color="gray.700"
+                        fontSize="lg"
+                        fontWeight="bold"
+                        _hover={{ cursor: "pointer" }}
+                    >
+                        +{images.length - 4}
+                    </Box>
+                )}
+            </Flex>
+        );
+    }
+
     return (
         <TabPanel>
-            <Card maxW='md' variant="elevated" key={reviewID} p={4} boxShadow="md">
+            <Card maxW='lg' variant="elevated" key={reviewID} p={4} boxShadow="md">
                 <CardHeader>
                     <Flex alignItems="center" justifyContent="space-between">
                         <Flex alignItems='center'>
@@ -113,31 +263,7 @@ const CreateReview = ({
                 </CardHeader>
                 <CardBody>
                     <Text textAlign="left">{comments}</Text>
-                    {images.length > 0 && (
-                        <Box position="relative" mt={4}>
-                            {images.length > 1 && (
-                                <Box position={"absolute"} top="50%" transform="translateY(-50%)" width={"100%"}>
-                                    <ChevronLeftIcon boxSize={8} ml={-1} mt={-4} onClick={handlePrevImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} left="-5" zIndex={1} />
-                                    <ChevronRightIcon boxSize={8} mr={-1} mt={-4} onClick={handleNextImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} right="-5" zIndex={1} />
-                                </Box>
-                            )}
-                            <SlideFade in={true} offsetY="20px">
-                                <Image
-                                    onClick={onOpen}
-                                    key={images[imageIndex]}
-                                    src={images[imageIndex]}
-                                    alt="Review image"
-                                    borderRadius="lg"
-                                    minWidth={"100%"}
-                                    minHeight={"108px"}
-                                    maxHeight={"200"}
-                                    objectFit="cover"
-                                    _hover={{ cursor: "pointer" }}
-                                />
-                            </SlideFade>
-                        </Box>
-
-                    )}
+                    {renderImages()}
                 </CardBody>
                 <CardFooter>
                     <Button flex='1' variant='ghost' leftIcon={liked ? <Liked /> : <Like />} onClick={toggleLike}>
@@ -150,7 +276,22 @@ const CreateReview = ({
                         <ModalHeader>Images</ModalHeader>
                         <ModalCloseButton mt={2} />
                         <ModalBody display="flex" justifyContent="center" alignItems="center" p={0}>
-                            <Image src={images[imageIndex]} alt="Review image" maxWidth="100%" maxHeight="100%" />
+                        <Flex direction="column" alignItems="center">
+                                {images.map((image, index) => (
+                                    <React.Fragment key={index}>
+                                        <Image
+                                            src={image}
+                                            alt={`Review image ${index + 1}`}
+                                            maxWidth="100%"
+                                            maxHeight="80vh"
+                                            mb={2}
+                                            objectFit="contain"
+                                            p={4}
+                                        />
+                                        {index < images.length - 1 && <Divider />}
+                                    </React.Fragment>
+                                ))}
+                            </Flex>
                         </ModalBody>
                         <ModalFooter>
                             <Button colorScheme='red' borderRadius='10px' onClick={onClose}>
