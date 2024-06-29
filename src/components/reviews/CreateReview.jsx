@@ -1,21 +1,28 @@
 import React, { useState } from 'react'
-import { Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, SlideFade, CardHeader, Flex, Avatar} from "@chakra-ui/react";
+import { Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, SlideFade, CardHeader, Flex, 
+    Avatar, useToast} from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { BiLike } from 'react-icons/bi';
+import { BiLike} from 'react-icons/bi';
 import { FaUtensils, FaSoap } from "react-icons/fa";
+import server from '../../networking';
+import Like from './Like';
+import Liked from './Liked';
 
 const CreateReview = ({
-    key,
     username,
     foodRating,
     hygieneRating,
     dateCreated,
     comments,
     images,
-    likeCount,
+    like,
+    reviewID,
 }) => {
-
+    const toast = useToast();
     const [imageIndex, setImageIndex] = useState(0);
+    const [liked, setLiked] = useState(false);
+    const [currentLikeCount, setCurrentLikeCount] = useState(like);
+
     const handlePrevImage = () => {
         if (imageIndex === 0) {
             setImageIndex(images.length - 1);
@@ -31,9 +38,38 @@ const CreateReview = ({
         }
     }
 
+    const toggleLike = async () => {
+        try {
+            const newLikeCount = liked ? currentLikeCount - 1 : currentLikeCount + 1;
+
+            const response = await server.put(`/reviews/reviews?id=${reviewID}&likeCount=${newLikeCount}`);
+            if (response.status === 200) {
+                setLiked(!liked);
+                setCurrentLikeCount(!liked ? currentLikeCount + 1 : currentLikeCount - 1);
+            } else {
+                toast({
+                    title: "An error occurred",
+                    description: response.data,
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            
+            }
+        } catch (error) {
+            toast({
+                title: "An error occurred",
+                description: error.message,
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            });
+        }
+    }
+
     return (
         <TabPanel>
-            <Card maxW='md' variant="elevated" key={key}>
+            <Card maxW='md' variant="elevated" key={reviewID}>
                 <CardHeader>
                     <Flex spacing='4'>
                         <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
@@ -101,8 +137,8 @@ const CreateReview = ({
                         },
                     }}
                 >
-                    <Button flex='1' variant='ghost' leftIcon={<BiLike />}>
-                        Like {likeCount}
+                    <Button flex='1' variant='ghost' leftIcon={liked ? <Liked /> : <Like />} onClick={toggleLike}>
+                        <Text>{currentLikeCount}</Text>
                     </Button>
                 </CardFooter>
             </Card>

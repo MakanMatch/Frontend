@@ -100,7 +100,8 @@ function SortReviews() {
                             comments = {review.comments}
                             dateCreated = {review.dateCreated}
                             images = {review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                            likeCount = {review.likeCount}
+                            like = {review.likeCount}
+                            reviewID = {review.reviewID}
                              />
                         )) : 
                         <Text>No reviews found</Text>}
