@@ -33,7 +33,6 @@ function Reviews() {
         return 'red';
     };
 
-
     const handleGoBack = () => {
         if (window.history.length > 1) {
             navigate(-1);
