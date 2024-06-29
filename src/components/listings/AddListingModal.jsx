@@ -98,6 +98,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 setTimeout(() => {
                     onClose();
                     setDefaultState();
+                    setIsSubmitting(false);
                     toast.closeAll();
                     ShowToast(
                         "Listing published successfully!",
@@ -116,7 +117,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                     "error",
                     2500
                 );
-                console.error("Request timed out:", error);
                 return;
             } else {
                 ShowToast(
@@ -125,7 +125,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                     "error",
                     2500
                 );
-                console.error("Error submitting listing:", error);
                 return;
             }
         }
@@ -171,6 +170,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const handleAlertConfirm = () => {
         onAlertClose();
         onClose();
+        setDefaultState();
     };
 
     useEffect(() => {
@@ -233,8 +233,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 isCentered
             >
                 <ModalOverlay
-                    bg="blackAlpha.300"
-                    backdropFilter="blur(3px) hue-rotate(90deg)"
+                    backdropFilter="brightness(1)"
                 />
                 <ModalContent overflow={"hidden"} maxH={"90vh"}>
                     <ModalHeader>Host your next meal!</ModalHeader>
@@ -443,10 +442,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 motionPreset="slideInBottom"
                 closeOnOverlayClick={false}
             >
-                <AlertDialogOverlay
-                    bg="blackAlpha.300"
-                    backdropFilter="blur(6px) hue-rotate(90deg)"
-                >
+                <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader fontSize="lg" fontWeight="bold">
                             Discard changes
