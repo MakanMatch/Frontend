@@ -4,7 +4,7 @@ import {
     Avatar, useToast, Divider
 } from "@chakra-ui/react";
 import { useDisclosure } from '@chakra-ui/react'
-import { FaUtensils, FaSoap } from "react-icons/fa";
+import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
 import server from '../../networking';
 import Like from './Like';
 import Liked from './Liked';
@@ -17,6 +17,7 @@ import {
     ModalBody,
     ModalCloseButton,
 } from '@chakra-ui/react'
+import StarRatings from 'react-star-ratings';
 
 const CreateReview = ({
     username,
@@ -94,10 +95,10 @@ const CreateReview = ({
         }
         if (numImages === 2) {
             return (
-                <Flex direction={{ base: 'column', md: 'row' }} 
-                wrap="wrap" 
-                gap={2} 
-            >
+                <Flex direction={{ base: 'column', md: 'row' }}
+                    wrap="wrap"
+                    gap={2}
+                >
                     <Image
                         onClick={() => handleImageClick(0)}
                         key={images[0]}
@@ -127,10 +128,10 @@ const CreateReview = ({
         }
         if (numImages === 3) {
             return (
-                <Flex direction={{ base: 'column', md: 'row' }} 
-                wrap="wrap" 
-                gap={2} 
-            >
+                <Flex direction={{ base: 'column', md: 'row' }}
+                    wrap="wrap"
+                    gap={2}
+                >
                     <Image
                         onClick={() => handleImageClick(0)}
                         key={images[0]}
@@ -143,7 +144,7 @@ const CreateReview = ({
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
-                    <Flex direction={{base:"row", md:"column"}} ml={2} flex="1" wrap="wrap">
+                    <Flex direction={{ base: "row", md: "column" }} ml={2} flex="1" wrap="wrap">
                         <Image
                             onClick={() => handleImageClick(1)}
                             key={images[1]}
@@ -235,10 +236,10 @@ const CreateReview = ({
         <TabPanel>
             <Card maxW='lg' variant="elevated" key={reviewID} p={4} boxShadow="md">
                 <CardHeader>
-                    <Flex direction={{ base: 'column', md: 'row' }} 
-                    alignItems={{ base: 'flex-start', md: 'center' }} 
-                    justifyContent="space-between" 
-                    wrap="wrap">
+                    <Flex direction={{ base: 'column', md: 'row' }}
+                        alignItems={{ base: 'flex-start', md: 'center' }}
+                        justifyContent="space-between"
+                        wrap="wrap">
                         <Flex alignItems='center' mb={{ base: 2, md: 0 }}>
                             {username ? (
                                 <Avatar name={username} src='https://bit.ly/sage-adebayo' />
@@ -247,25 +248,59 @@ const CreateReview = ({
                             )}
                             <Box ml={4}>
                                 <Heading textAlign="left" size='sm'>{username ? username : "Guest"}</Heading>
-                                <Flex gap={3} mt={1}>
-                                    <Flex alignItems="center" gap={3}>
-                                        <Box pt="2px">
+                                <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 2, md: 5 }} mt={1}>
+                                    <Flex alignItems="center" gap={2}>
+                                        <Box pt="5px">
                                             <FaUtensils />
                                         </Box>
-                                        <Text>{foodRating}</Text>
+                                        {/* Show StarRatings on medium and larger screens */}
+                                        <Box display={{ base: 'none', md: 'block' }}>
+                                            <StarRatings
+                                                rating={foodRating}
+                                                starRatedColor="gold"
+                                                numberOfStars={5}
+                                                name='foodRating'
+                                                starDimension="15px"
+                                                starSpacing="1px"
+                                                starFull={<FaStar />}
+                                                starEmpty={<FaRegStar />}
+                                            />
+                                        </Box>
+                                        {/* Show numeric rating and star icon on smaller screens */}
+                                        <Box display={{ base: 'flex', md: 'none' }} alignItems="center" gap={1}>
+                                            <Text fontSize="sm">{foodRating}</Text>
+                                            <FaStar color="gold" />
+                                        </Box>
                                     </Flex>
-                                    <Flex align Items="center" gap={3}>
-                                        <Box pt="2px">
+                                    <Flex align Items="center" gap={2}>
+                                        <Box pt="5px">
                                             <FaSoap />
                                         </Box>
-                                        <Text>{hygieneRating}</Text>
+                                        {/* Show StarRatings on medium and larger screens */}
+                                        <Box display={{ base: 'none', md: 'block' }}>
+                                            <StarRatings
+                                                rating={hygieneRating}
+                                                starRatedColor="gold"
+                                                numberOfStars={5}
+                                                name='hygieneRating'
+                                                starDimension="15px"
+                                                starSpacing="1px"
+                                                starFull={<FaStar />}
+                                                starEmpty={<FaRegStar />}
+                                            />
+                                        </Box>
+                                        {/* Show numeric rating and star icon on smaller screens */}
+                                        <Box display={{ base: 'flex', md: 'none' }} alignItems="center" gap={1}>
+                                            <Text fontSize="sm">{hygieneRating}</Text>
+                                            <FaStar color="gold" />
+                                        </Box>
                                     </Flex>
                                 </Flex>
                             </Box>
                         </Flex>
                         <Box textAlign={{ base: 'center', md: 'right' }}
-                        width={{ base: '100%', md: 'auto'}}
-                        mt={{ base:2, md:0}}>
+                            width={{ base: '100%', md: 'auto' }}
+                            mt={{ base: 8, md: 6 }}>
                             <Text fontSize="sm" color="gray.500">{new Date(dateCreated).toLocaleDateString()}</Text>
                         </Box>
                     </Flex>
@@ -300,7 +335,7 @@ const CreateReview = ({
                                             onClick={() => handleImageClick(index)}
                                             _hover={{ cursor: "pointer" }}
                                         />
-                                        {index < images.length - 1 && <Divider/>}
+                                        {index < images.length - 1 && <Divider />}
                                     </React.Fragment>
                                 ))}
                             </Flex>
