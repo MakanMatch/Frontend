@@ -272,7 +272,7 @@ const CreateReview = ({
                                             <FaStar color="gold" />
                                         </Box>
                                     </Flex>
-                                    <Flex align Items="center" gap={2}>
+                                    <Flex alignItems="center" gap={2}>
                                         <Box pt="5px">
                                             <FaSoap />
                                         </Box>
