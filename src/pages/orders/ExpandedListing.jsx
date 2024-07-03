@@ -282,6 +282,7 @@ function ExpandedListing() {
                                     return (
                                         <Box key={index} position={"relative"} height={"100%"} minW={"fit-content"}>
                                             <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
+                                            
                                             <Tooltip hasArrow label={"Delete image"} placement={"top"}>
                                                 <CloseButton size={"md"} position={"absolute"} top={"0"} right={"0"} m={"2"} bgColor={"red"} color={"white"} onClick={() => { handleDeleteImage(imgName) }} />
                                             </Tooltip>

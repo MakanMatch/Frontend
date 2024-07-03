@@ -1,4 +1,4 @@
-import { HStack, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, VStack } from '@chakra-ui/react'
+import { Button, HStack, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, VStack } from '@chakra-ui/react'
 import React from 'react'
 
 function UploadNewImageModal({ handleClose, isOpen, handleFileSubmission, isUploading, uploadImage }) {
