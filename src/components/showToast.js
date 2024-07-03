@@ -1,5 +1,3 @@
-import { ViewIcon } from "@chakra-ui/icons"
-
 /**
  * Usage: showToast(title, description, duration, isClosable, status, icon)
  * @param {import("@chakra-ui/react").CreateToastFnReturn} toast

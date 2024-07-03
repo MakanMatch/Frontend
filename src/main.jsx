@@ -17,6 +17,7 @@ import EmailVerification from './pages/identity/EmailVerification';
 import AccountRecovery from './pages/identity/AccountRecovery';
 import Reviews from './pages/reviews/Reviews.jsx'
 import NotFound from './pages/404.jsx'
+import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
 
 const store = configureStore({
     reducer: {
@@ -33,6 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route index element={<FoodListingsPage />} />
                         <Route path={'version'} element={<Version />} />
                         <Route path={"expandedListing"} element={<ExpandedListingHost />} />
+                        <Route path={"expandedListingGuest"} element={<ExpandedListingGuest />} />
                         <Route path={"/createAccount"} element={<CreateAccount />} />
                         <Route path={"/login"} element={<Login />} />
                         <Route path={"/emailVerification"} element={<EmailVerification />} />

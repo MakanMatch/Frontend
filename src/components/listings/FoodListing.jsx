@@ -79,7 +79,7 @@ const FoodListing = ({
                 <Divider />
                 <CardFooter justifyContent="center">
                     <ButtonGroup spacing="2">
-                        <Link to={`/expandedListing?id=${id}`}>
+                        <Link to={`/expandedListingGuest?id=${id}`}>
                             <Button variant="MMPrimary">View more</Button>
                         </Link>
                         <Button onClick={onToggleFavourite}>

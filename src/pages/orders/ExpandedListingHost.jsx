@@ -132,7 +132,7 @@ function ExpandedListingHost() {
                     return
                 } else {
                     showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
-                    console.log("EXPANDEDLISTING: Failed to retrieve listing details, redirecting to home. Response below.")
+                    console.log("EXPANDEDLISTINGHOST: Failed to retrieve listing details, redirecting to home. Response below.")
                     console.log(response.data)
                     navigate("/")
                     return
@@ -140,7 +140,7 @@ function ExpandedListingHost() {
             })
             .catch(err => {
                 showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
-                console.log("EXPANDEDLISTING: Failed to retrieve listing details, redirecting to home. Response below.")
+                console.log("EXPANDEDLISTINGHOST: Failed to retrieve listing details, redirecting to home. Response below.")
                 console.log(err)
                 navigate("/")
                 return
