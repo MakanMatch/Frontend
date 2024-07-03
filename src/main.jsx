@@ -9,7 +9,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './Layout.jsx'
 import Version from './pages/Version.jsx'
 import Home from './pages/Home.jsx'
-import ExpandedListing from './pages/orders/ExpandedListing.jsx'
+import ExpandedListingHost from './pages/orders/ExpandedListingHost.jsx'
 import FoodListingsPage from './pages/Listings/FoodListingsPage'
 import CreateAccount from './pages/identity/CreateAccount'
 import Login from './pages/identity/Login'
@@ -32,7 +32,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path='/' element={<Layout />}>
                         <Route index element={<FoodListingsPage />} />
                         <Route path={'version'} element={<Version />} />
-                        <Route path={"expandedListing"} element={<ExpandedListing />} />
+                        <Route path={"expandedListing"} element={<ExpandedListingHost />} />
                         <Route path={"/createAccount"} element={<CreateAccount />} />
                         <Route path={"/login"} element={<Login />} />
                         <Route path={"/emailVerification"} element={<EmailVerification />} />

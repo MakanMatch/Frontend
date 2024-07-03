@@ -10,7 +10,7 @@ import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
 import UploadNewImageModal from '../../components/orders/UploadNewImageModal'
 import HostListingImage from '../../components/orders/HostListingImage'
 
-function ExpandedListing() {
+function ExpandedListingHost() {
     // const Universal = useSelector(state => state.universal)
     const toast = useToast()
     const navigate = useNavigate()
@@ -326,4 +326,4 @@ function ExpandedListing() {
     )
 }
 
-export default ExpandedListing
+export default ExpandedListingHost
