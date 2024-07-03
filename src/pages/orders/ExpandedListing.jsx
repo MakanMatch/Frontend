@@ -1,5 +1,5 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip, Badge, ScaleFade } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip, Badge, ScaleFade, Stack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
@@ -32,6 +32,7 @@ function ExpandedListing() {
         published: null
     })
     const [longDescription, setLongDescription] = useState(listingData.longDescription)
+    const [shortDescription, setShortDescription] = useState(listingData.shortDescription)
     const [guestSlots, setGuestSlots] = useState(1)
     const [changesMade, setChangesMade] = useState(false)
     const [loading, setLoading] = useState(true)
@@ -54,9 +55,8 @@ function ExpandedListing() {
             setFile(e.target.files[0])
         }
     }
-    const handleDescriptionChange = (e) => {
-        setLongDescription(e.target.value);
-    }
+    const handleShortDescriptionChange = (e) => { setShortDescription(e.target.value); }
+    const handleLongDescriptionChange = (e) => { setLongDescription(e.target.value); }
     const handleDeleteImage = (imageName) => {
         openDeleteImageDialog()
         setImageToBeDeleted(imageName)
@@ -68,7 +68,6 @@ function ExpandedListing() {
 
     const handleSettingsChange = (newValue, setting) => {
         if (setting == "guestSlots") {
-            console.log("updating guest slots...")
             setGuestSlots(newValue)
         } else if (setting == "pricePerPortion") {
             setPricePerPortion(newValue)
@@ -76,7 +75,8 @@ function ExpandedListing() {
     }
 
     const checkForChanges = () => {
-        if (longDescription != listingData.longDescription ||
+        if (shortDescription != listingData.shortDescription ||
+            longDescription != listingData.longDescription ||
             guestSlots != listingData.totalSlots ||
             pricePerPortion != listingData.portionPrice
         ) {
@@ -126,7 +126,7 @@ function ExpandedListing() {
         fetchListingDetails()
     }, [])
 
-    useEffect(checkForChanges, [longDescription, guestSlots, pricePerPortion])
+    useEffect(checkForChanges, [shortDescription, longDescription, guestSlots, pricePerPortion])
 
     const fetchListingDetails = () => {
         server.get(`/cdn/getListing?id=${listingID}`)
@@ -134,6 +134,7 @@ function ExpandedListing() {
                 if (response.status == 200) {
                     const processedData = processData(response.data)
                     setListingData(processedData)
+                    setShortDescription(processedData.shortDescription || "")
                     setLongDescription(processedData.longDescription || "")
                     setListingPublished(processedData.published || false)
                     setGuestSlots(processedData.totalSlots || 1)
@@ -206,6 +207,7 @@ function ExpandedListing() {
     const handleSaveChanges = (value, fromPublishToggle) => {
         const data = {
             listingID: listingData.listingID,
+            shortDescription: shortDescription,
             longDescription: longDescription,
             totalSlots: guestSlots,
             portionPrice: pricePerPortion
@@ -295,11 +297,14 @@ function ExpandedListing() {
                 <GridItem colSpan={2}>
                     <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
                         <VStack alignItems={"flex-start"} width={"100%"}>
-                            <Text fontWeight={"bold"} mb={"10px"}>Description</Text>
-                            <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleDescriptionChange} />
+                            <Text fontWeight={"bold"} mb={"10px"}>Short Description (shown on Home page)</Text>
+                            <Input placeholder='Briefly describe your dish' value={shortDescription} onChange={handleShortDescriptionChange} />
+
+                            <Text fontWeight={"bold"} mb={"10px"} mt={5}>Description</Text>
+                            <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleLongDescriptionChange} />
                         </VStack>
 
-                        <Spacer />
+                        {/* <Spacer /> */}
 
                         <VStack alignItems={"flex-start"} width={"100%"}>
                             <Heading size={"md"}>Listing Statistics</Heading>
