@@ -9,10 +9,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
 import UploadNewImageModal from '../../components/orders/UploadNewImageModal'
 import HostListingImage from '../../components/orders/HostListingImage'
+import configureShowToast from '../../components/showToast'
 
 function ExpandedListingHost() {
     // const Universal = useSelector(state => state.universal)
     const toast = useToast()
+    const showToast = configureShowToast(toast)
     const navigate = useNavigate()
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
@@ -91,25 +93,6 @@ function ExpandedListingHost() {
     }
 
     const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
-    const showToast = (title, description, duration = 5000, isClosable = true, status = 'info', icon = null) => {
-        if (!["success", "warning", "error", "info"].includes(status)) {
-            status = "info"
-        }
-
-        const toastConfig = {
-            title: title,
-            description: description,
-            duration: duration,
-            isClosable: isClosable,
-            status: status
-        }
-        if (icon != null) {
-            toastConfig.icon = icon
-        }
-
-        toast.closeAll()
-        toast(toastConfig)
-    }
     const processData = (data) => {
         let datetime = new Date(data.datetime)
         let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
