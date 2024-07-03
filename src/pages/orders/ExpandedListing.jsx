@@ -8,6 +8,7 @@ import axios from 'axios'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
 import UploadNewImageModal from '../../components/orders/UploadNewImageModal'
+import HostListingImage from '../../components/orders/HostListingImage'
 
 function ExpandedListing() {
     // const Universal = useSelector(state => state.universal)
@@ -280,13 +281,7 @@ function ExpandedListing() {
                             {listingData.images.map((imgName, index) => {
                                 if (imgName) {
                                     return (
-                                        <Box key={index} position={"relative"} height={"100%"} minW={"fit-content"}>
-                                            <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
-                                            
-                                            <Tooltip hasArrow label={"Delete image"} placement={"top"}>
-                                                <CloseButton size={"md"} position={"absolute"} top={"0"} right={"0"} m={"2"} bgColor={"red"} color={"white"} onClick={() => { handleDeleteImage(imgName) }} />
-                                            </Tooltip>
-                                        </Box>
+                                        <HostListingImage key={index} index={index} listingImages={listingData.images} imgURL={imgBackendURL(imgName)} imgName={imgName} handleDeleteImage={handleDeleteImage} />
                                     )
                                 }
                             })}
