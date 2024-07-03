@@ -32,6 +32,7 @@ function ExpandedListing() {
         published: null
     })
     const [longDescription, setLongDescription] = useState(listingData.longDescription)
+    const [guestSlots, setGuestSlots] = useState(1)
     const [changesMade, setChangesMade] = useState(false)
     const [loading, setLoading] = useState(true)
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -55,11 +56,6 @@ function ExpandedListing() {
     }
     const handleDescriptionChange = (e) => {
         setLongDescription(e.target.value);
-        if (e.target.value != listingData.longDescription) {
-            setChangesMade(true)
-        } else {
-            setChangesMade(false)
-        }
     }
     const handleDeleteImage = (imageName) => {
         openDeleteImageDialog()
@@ -67,11 +63,31 @@ function ExpandedListing() {
     }
     const togglePublished = (newValue) => {
         setListingPublished(newValue)
-        console.log("Updating to: " + newValue)
         handleSaveChanges(newValue, true)
     }
 
-    const showComingSoon = () => { showToast("Coming soon", "This feature is not complete yet.", 3000) }
+    const handleSettingsChange = (newValue, setting) => {
+        if (setting == "guestSlots") {
+            console.log("updating guest slots...")
+            setGuestSlots(newValue)
+        } else if (setting == "pricePerPortion") {
+            setPricePerPortion(newValue)
+        }
+    }
+
+    const checkForChanges = () => {
+        if (longDescription != listingData.longDescription ||
+            guestSlots != listingData.totalSlots ||
+            pricePerPortion != listingData.portionPrice
+        ) {
+            console.log("changes detected")
+            setChangesMade(true)
+        } else {
+            console.log("no changes detected")
+            setChangesMade(false)
+        }
+    }
+
     const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
     const showToast = (title, description, duration = 5000, isClosable = true, status = 'info', icon = null) => {
         if (!["success", "warning", "error", "info"].includes(status)) {
@@ -110,14 +126,18 @@ function ExpandedListing() {
         fetchListingDetails()
     }, [])
 
+    useEffect(checkForChanges, [longDescription, guestSlots, pricePerPortion])
+
     const fetchListingDetails = () => {
         server.get(`/cdn/getListing?id=${listingID}`)
             .then(response => {
                 if (response.status == 200) {
                     const processedData = processData(response.data)
                     setListingData(processedData)
-                    setLongDescription(processedData.longDescription)
-                    setListingPublished(processedData.published)
+                    setLongDescription(processedData.longDescription || "")
+                    setListingPublished(processedData.published || false)
+                    setGuestSlots(processedData.totalSlots || 1)
+                    setPricePerPortion(processedData.portionPrice || 0.00)
                     setLoading(false)
                     return
                 } else if (response.status == 404) {
@@ -186,7 +206,9 @@ function ExpandedListing() {
     const handleSaveChanges = (value, fromPublishToggle) => {
         const data = {
             listingID: listingData.listingID,
-            longDescription: longDescription
+            longDescription: longDescription,
+            totalSlots: guestSlots,
+            portionPrice: pricePerPortion
         }
         if (fromPublishToggle) {
             data.published = value
@@ -288,7 +310,7 @@ function ExpandedListing() {
                 </GridItem>
 
                 <GridItem colSpan={1}>
-                    <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} setPricePerPortion={setPricePerPortion} />
+                    <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
                 </GridItem>
             </Grid>
             <Modal onClose={handleClose} isOpen={isOpen} isCentered>
