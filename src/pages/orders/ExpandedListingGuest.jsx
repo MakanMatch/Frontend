@@ -1,8 +1,9 @@
-import { Heading, Spinner, useToast } from '@chakra-ui/react'
+import { Box, Grid, GridItem, HStack, Heading, Image, Spinner, Stack, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import server from '../../networking'
 import configureShowToast from '../../components/showToast'
+import placeholderImage from '../../assets/placeholderImage.svg'
 
 function ExpandedListingGuest() {
     const navigate = useNavigate()
@@ -33,6 +34,7 @@ function ExpandedListingGuest() {
     })
 
     const [listingID, setListingID] = useState(searchParams.get("id"))
+    const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
 
     useEffect(() => {
         if (!listingID) {
@@ -86,7 +88,42 @@ function ExpandedListingGuest() {
     }
 
     return (
-        <Heading>{listingData.title}</Heading>
+        <Grid
+            h={"100vh"}
+            templateColumns={'repeat(3, 1fr)'}
+            gap={4}
+            p={"10px"}
+        >
+            {/* Images array */}
+            <GridItem colSpan={3}>
+                <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
+                    {listingData.images.map((imgName, index) => {
+                        if (imgName) {
+                            return (
+                                <Box key={index} position={"relative"} height={"100%"} minW={"fit-content"}>
+                                    <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} fallbackSrc={placeholderImage} />
+                                </Box>
+                            )
+                        }
+                    })}
+                </HStack>
+            </GridItem>
+
+            {/* Listing title, approx address, share and favourite icons */}
+            <GridItem colSpan={3}>
+
+            </GridItem>
+
+            {/* Listing description, host information, host ratings */}
+            <GridItem colSpan={2}>
+
+            </GridItem>
+
+            {/* Reservation card */}
+            <GridItem colSpan={1}>
+
+            </GridItem>
+        </Grid>
     )
 }
 
