@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem, HStack, Heading, Image, Spinner, Stack, useToast } from '@chakra-ui/react'
+import { Box, Divider, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Spinner, Stack, StackDivider, Text, VStack, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import server from '../../networking'
@@ -89,34 +89,63 @@ function ExpandedListingGuest() {
 
     return (
         <Grid
-            h={"100vh"}
+            h={"100%"}
             templateColumns={'repeat(3, 1fr)'}
             gap={4}
-            p={"10px"}
+            mt={{ base: "10px", md: "20px", lg: "30px" }}
         >
             {/* Images array */}
             <GridItem colSpan={3}>
-                <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
-                    {listingData.images.map((imgName, index) => {
-                        if (imgName) {
-                            return (
-                                <Box key={index} position={"relative"} height={"100%"} minW={"fit-content"}>
-                                    <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} fallbackSrc={placeholderImage} />
-                                </Box>
-                            )
-                        }
-                    })}
-                </HStack>
+                <VStack alignItems={"flex-start"} height={'250px'}>
+                    <HStack spacing={"10px"} overflowX={"auto"} height={{ base: "150px", md: "200px", lg: "250px" }}>
+                        {listingData.images.map((imgName, index) => {
+                            if (imgName) {
+                                return (
+                                    <Box key={index} position={"relative"} height={"100%"} minW={"fit-content"}>
+                                        <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} fallbackSrc={placeholderImage} />
+                                    </Box>
+                                )
+                            }
+                        })}
+                    </HStack>
+                </VStack>
             </GridItem>
 
             {/* Listing title, approx address, share and favourite icons */}
             <GridItem colSpan={3}>
-
+                <VStack alignItems={"flex-start"} spacing={2}>
+                    <Text>{listingData.datetime}</Text>
+                    <VStack spacing={0} alignItems={'flex-start'}>
+                        <Heading>{listingData.title}</Heading>
+                        <Heading size={"sm"}>{listingData.approxAddress}</Heading>
+                    </VStack>
+                </VStack>
             </GridItem>
 
             {/* Listing description, host information, host ratings */}
             <GridItem colSpan={2}>
+                <Flex direction={'row'} spacing={4} width={'100%'} justifyContent={'space-between'}>
+                    <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0}>
+                        <Text fontWeight={'bold'} fontSize={'1.5em'}>{hostData.foodRating}</Text>
+                        <Text>Food Rating</Text>
+                    </VStack>
 
+                    <Divider borderColor={'black'} orientation="vertical" />
+
+                    <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0} ml={"5%"}>
+                        <Text fontWeight={'bold'} fontSize={'1.5em'}>108</Text>
+                        <Text>Guests Served</Text>
+                    </VStack>
+
+                    <Divider orientation="vertical" />
+
+                    <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0} ml={"5%"}>
+                        <Text fontWeight={'bold'} fontSize={'1.5em'}>73</Text>
+                        <Text>Reviews</Text>
+                    </VStack>
+
+                    <Spacer />
+                </Flex>
             </GridItem>
 
             {/* Reservation card */}
