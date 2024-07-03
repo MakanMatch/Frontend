@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Spinner, Stack, StackDivider, Text, VStack, useToast } from '@chakra-ui/react'
+import { Avatar, Box, Center, Divider, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Spinner, Stack, StackDivider, Text, VStack, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import server from '../../networking'
@@ -24,7 +24,8 @@ function ExpandedListingGuest() {
         address: null,
         totalSlots: null,
         datetime: null,
-        published: null
+        published: null,
+        hostID: null
     })
     const [hostData, setHostData] = useState({
         userID: null,
@@ -44,7 +45,15 @@ function ExpandedListingGuest() {
         fetchListingDetails()
     }, [])
 
-    const processData = (data) => {
+    useEffect(() => {
+        if (!listingData.hostID) {
+            return
+        } else {
+            fetchHostData()
+        }
+    }, [listingData])
+
+    const processListingData = (data) => {
         let datetime = new Date(data.datetime)
         let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
         data.datetime = formattedString
@@ -54,13 +63,17 @@ function ExpandedListingGuest() {
         return data
     }
 
+    const processHostData = (data) => {
+        const { userID, username, foodRating, hygieneGrade } = data
+        return { userID, username, foodRating, hygieneGrade }
+    }
+
     const fetchListingDetails = () => {
         server.get(`/cdn/getListing?id=${listingID}`)
             .then(response => {
                 if (response.status == 200) {
-                    const processedData = processData(response.data)
+                    const processedData = processListingData(response.data)
                     setListingData(processedData)
-                    setLoading(false)
                     return
                 } else if (response.status == 404) {
                     console.log("Listing not found, re-directing to home.")
@@ -80,6 +93,30 @@ function ExpandedListingGuest() {
                 console.log(err)
                 navigate("/")
                 return
+            })
+    }
+
+    const fetchHostData = () => {
+        server.get(`/cdn/accountInfo?userID=${listingData.hostID}`)
+            .then(response => {
+                if (response.status == 200) {
+                    const processedData = processHostData(response.data)
+                    setHostData(processedData)
+                    setLoading(false)
+                } else if (response.status == 404) {
+                    console.log("EXPANDEDLISTINGGUEST: Host not found, re-directing to home. Server response: " + response.data)
+                    navigate("/")
+                    showToast("Someting went wrong", "That listing doesn't seem to have a host. Try again later.", 5000, true, 'error')
+                } else {
+                    console.log("EXPANDEDLISTINGGUEST: Failed to retrieve host details, redirecting to home. Server response: " + response.data)
+                    navigate("/")
+                    showToast("Something went wrong", "Couldn't retrieve required information. Try again later.", 5000, true, "error")
+                }
+            })
+            .catch(err => {
+                console.log("EXPANDEDLISTINGGUEST: Failed to retrieve host details, redirecting to home. Error: " + err)
+                navigate("/")
+                showToast("Something went wrong", "Couldn't retrieve required information. Try again later.", 5000, true, "error")
             })
     }
 
@@ -124,7 +161,7 @@ function ExpandedListingGuest() {
 
             {/* Listing description, host information, host ratings */}
             <GridItem colSpan={2}>
-                <Flex direction={'row'} spacing={4} width={'100%'} justifyContent={'space-between'}>
+                <Flex direction={'row'} width={'100%'} justifyContent={'space-between'}>
                     <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0}>
                         <Text fontWeight={'bold'} fontSize={'1.5em'}>{hostData.foodRating}</Text>
                         <Text>Food Rating</Text>
@@ -146,6 +183,31 @@ function ExpandedListingGuest() {
 
                     <Spacer />
                 </Flex>
+
+                <Flex direction={'row'} width={'100%'} justifyContent={'space-between'} mt={'5%'}>
+                    <HStack>
+                        <Avatar size={'md'} name={hostData.username} />
+                        <VStack height={'100%'} p={'10px'} alignItems={'flex-start'} spacing={0}>
+                            <Text fontWeight={'bold'}>Hosted by {hostData.username}</Text>
+                            <Text color={'gray.500'}>2 years hosting</Text>
+                        </VStack>
+                    </HStack>
+
+                    <Spacer />
+
+                    <Center bg={'green'} w={'fit-content'} p={'20px'} rounded={'10px'}>
+                        <Text color={'white'}>{hostData.hygieneGrade}</Text>
+                    </Center>
+
+                    <Spacer />
+                </Flex>
+
+                <Divider mt={'5%'} />
+
+                <VStack textAlign={'left'} alignItems={'flex-start'} spacing={2} mt={'20px'}>
+                    <Heading size={'md'}>Description</Heading>
+                    <Text>{listingData.longDescription}</Text>
+                </VStack>
             </GridItem>
 
             {/* Reservation card */}
