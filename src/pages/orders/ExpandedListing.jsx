@@ -7,6 +7,7 @@ import server from '../../networking';
 import axios from 'axios'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
+import UploadNewImageModal from '../../components/orders/UploadNewImageModal'
 
 function ExpandedListing() {
     // const Universal = useSelector(state => state.universal)
@@ -323,26 +324,7 @@ function ExpandedListing() {
                     <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
                 </GridItem>
             </Grid>
-            <Modal onClose={handleClose} isOpen={isOpen} isCentered>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Upload New Image</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <VStack textAlign={"left"} spacing={"25px"} p={"10px"}>
-                            <Text width={"100%"}>Upload a new image for your dish!</Text>
-                            <Text>Please be reminded that images must not contain explicit content; the images you upload should be real-life pictures of your dish only.</Text>
-                            <Input type={"file"} p={"10px"} h={"20%"} accept='image/*' onChange={handleFileSubmission} />
-                        </VStack>
-                    </ModalBody>
-                    <ModalFooter>
-                        <HStack spacing={"20px"}>
-                            <Button onClick={handleClose}>Close</Button>
-                            <Button variant={isUploading ? "" : "MMPrimary"} isLoading={isUploading} loadingText="Uploading..." onClick={uploadImage}>Upload</Button>
-                        </HStack>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+            <UploadNewImageModal isOpen={isOpen} handleClose={handleClose} handleFileSubmission={handleFileSubmission} isUploading={isUploading} uploadImage={uploadImage} />
             <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} showToast={showToast} refreshPage={fetchListingDetails} />
         </>
     )
