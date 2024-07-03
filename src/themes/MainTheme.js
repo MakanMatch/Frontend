@@ -1,7 +1,7 @@
 import { Drawer, extendTheme } from "@chakra-ui/react";
 
 const colors = {
-    primaryButton: "#6f06f5"
+    primaryColour: "#6f06f5"
 }
 
 const MainTheme = extendTheme({
@@ -16,7 +16,7 @@ const MainTheme = extendTheme({
             },
             variants: {
                 MMPrimary: {
-                    bg: 'primaryButton',
+                    bg: 'primaryColour',
                     borderRadius: '10px',
                     color: 'white',
                     fontWeight: 'bold',

@@ -1,5 +1,5 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip, Badge, ScaleFade } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
@@ -253,7 +253,12 @@ function ExpandedListing() {
                 <GridItem colSpan={2}>
                     <VStack alignItems={"flex-start"}>
                         <Text>{listingData.datetime}</Text>
-                        <Heading>{listingData.title}</Heading>
+                        <HStack spacing={5} alignItems={'center'}>
+                            <Heading>{listingData.title}</Heading>
+                            <ScaleFade initialScale={0.5} in={!listingPublished}>
+                                <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>HIDDEN</Badge>
+                            </ScaleFade>
+                        </HStack>
                     </VStack>
                 </GridItem>
                 <GridItem colSpan={1} alignContent={"flex-end"}>
@@ -328,7 +333,7 @@ function ExpandedListing() {
                     <ModalFooter>
                         <HStack spacing={"20px"}>
                             <Button onClick={handleClose}>Close</Button>
-                            <Button variant={isUploading ? "": "MMPrimary"} isLoading={isUploading} loadingText="Uploading..." onClick={uploadImage}>Upload</Button>
+                            <Button variant={isUploading ? "" : "MMPrimary"} isLoading={isUploading} loadingText="Uploading..." onClick={uploadImage}>Upload</Button>
                         </HStack>
                     </ModalFooter>
                 </ModalContent>
