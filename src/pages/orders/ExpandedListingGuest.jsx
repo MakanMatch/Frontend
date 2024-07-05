@@ -1,9 +1,10 @@
-import { Avatar, Box, Center, Divider, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Spinner, Stack, StackDivider, Text, VStack, useToast } from '@chakra-ui/react'
+import { Avatar, Box, Center, Divider, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Spinner, Stack, StackDivider, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import server from '../../networking'
 import configureShowToast from '../../components/showToast'
 import placeholderImage from '../../assets/placeholderImage.svg'
+import ReserveCard from '../../components/orders/ReserveCard'
 
 function ExpandedListingGuest() {
     const navigate = useNavigate()
@@ -12,6 +13,7 @@ function ExpandedListingGuest() {
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
     const [searchParams, setSearchParams] = useSearchParams()
+    const [isLargerThan700] = useMediaQuery('(min-width: 700px)')
     const [loading, setLoading] = useState(true)
     const [listingData, setListingData] = useState({
         listingID: null,
@@ -69,7 +71,7 @@ function ExpandedListingGuest() {
     }
 
     const fetchListingDetails = () => {
-        server.get(`/cdn/getListing?id=${listingID}`)
+        server.get(`/cdn/getListing?id=${listingID}&includeReservations=true`)
             .then(response => {
                 if (response.status == 200) {
                     const processedData = processListingData(response.data)
@@ -160,7 +162,7 @@ function ExpandedListingGuest() {
             </GridItem>
 
             {/* Listing description, host information, host ratings */}
-            <GridItem colSpan={2}>
+            <GridItem colSpan={isLargerThan700 ? 2 : 3}>
                 <Flex direction={'row'} width={'100%'} justifyContent={'space-between'}>
                     <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0}>
                         <Text fontWeight={'bold'} fontSize={'1.5em'}>{hostData.foodRating}</Text>
@@ -174,7 +176,7 @@ function ExpandedListingGuest() {
                         <Text>Guests Served</Text>
                     </VStack>
 
-                    <Divider orientation="vertical" />
+                    <Divider borderColor={'black'} orientation="vertical" />
 
                     <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0} ml={"5%"}>
                         <Text fontWeight={'bold'} fontSize={'1.5em'}>73</Text>
@@ -202,7 +204,7 @@ function ExpandedListingGuest() {
                     <Spacer />
                 </Flex>
 
-                <Divider mt={'5%'} />
+                <Divider mt={'3%'} />
 
                 <VStack textAlign={'left'} alignItems={'flex-start'} spacing={2} mt={'20px'}>
                     <Heading size={'md'}>Description</Heading>
@@ -211,8 +213,11 @@ function ExpandedListingGuest() {
             </GridItem>
 
             {/* Reservation card */}
-            <GridItem colSpan={1}>
-
+            <GridItem colSpan={isLargerThan700 ? 1 : 3}>
+                {!isLargerThan700 && (
+                    <Divider my={'10%'} />
+                )}
+                <ReserveCard hostData={hostData} listingData={listingData} />
             </GridItem>
         </Grid>
     )
