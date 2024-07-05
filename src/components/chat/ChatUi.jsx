@@ -132,10 +132,7 @@ function ChatUi() {
         action: "edit",
         sender: "Jamie",
         message: newMessage,
-        timestamp: `${new Date().getHours()}:${new Date()
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`,
+        datetime: new Date().toISOString(),
       };
       ws.current.send(JSON.stringify(editedMessage));
     }
