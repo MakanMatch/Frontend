@@ -1,40 +1,41 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
+import { Loader } from "@googlemaps/js-api-loader";
 
 const GoogleMaps = ({ lat, long }) => {
     const mapRef = useRef(null);
 
     useEffect(() => {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GMAPS_API_KEY}`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-
-        script.onload = () => {
-            const LatLong = { lat: lat, lng: long};
-
-            const map = new window.google.maps.Map(mapRef.current, {
-                center: LatLong,
-                zoom: 17,
+        const initializeMap = async () => {
+            const loader = new Loader({
+                apiKey: import.meta.env.VITE_GMAPS_API_KEY,
+                version: "weekly",
+                libraries: ["places"],
             });
-
-            new window.google.maps.Marker({
-                position: LatLong,
-                map: map,
-                title: 'Hello Singapore!',
+            await loader.load().then(async () => {
+                const { Map } = await loader.importLibrary("maps");
+                const LatLong = { lat: lat, lng: long };
+                const map = new Map(mapRef.current, {
+                    center: LatLong,
+                    zoom: 17,
+                });
+                new window.google.maps.Marker({
+                    position: LatLong,
+                    map: map,
+                    title: "Hello Singapore!",
+                });
             });
         };
 
-        return () => {
-            document.head.removeChild(script);
-        };
+        initializeMap().catch((e) => {
+            console.error("Error loading Google Maps", e);
+        });
     }, [lat, long]);
 
     return (
         <div
             ref={mapRef}
-            style={{ height: '80vh', width: '100%', borderRadius: '10px'}}
+            style={{ height: "80vh", width: "100%", borderRadius: "10px" }}
         />
     );
 };
