@@ -23,6 +23,7 @@ import Chat from './pages/chat/Chat.jsx'
 import Chat2 from './pages/chat/Chat2.jsx'
 import MyAccount from './pages/identity/MyAccount.jsx'
 import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
+import GoogleMapsPage from './pages/Listings/GoogleMapsPage'
 
 const store = configureStore({
     reducer: {
@@ -48,6 +49,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={'reviews'} element={<Reviews />} />
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"chat2"} element={<Chat2 />}></Route>
+                        <Route path={"targetListing"} element={<GoogleMapsPage/>} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>

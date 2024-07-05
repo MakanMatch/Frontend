@@ -1,8 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // FoodListingsPage.jsx
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import server from "../../networking";
 import FoodListing from "../../components/listings/FoodListing";
+import GMapsEmbed from "../../components/listings/GMapsEmbed";
 import GoogleMaps from "../../components/listings/GoogleMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
@@ -19,6 +21,7 @@ const FoodListingsPage = () => {
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const [loading, setLoading] = useState(true); 
     const toast = useToast();
+    const navigate = useNavigate();
 
     function ShowToast(title, description, status, duration) {
         toast({
@@ -33,6 +36,10 @@ const FoodListingsPage = () => {
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
     }
+
+    const redirectToMap = (lat, lng) => {
+        navigate(`/targetListing?latitude=${lat}&longitude=${lng}`);
+    }; 
 
     const fetchListings = async () => {
         try {
@@ -84,7 +91,7 @@ const FoodListingsPage = () => {
             </Box>
             {isSmallerThan1095 && (
                 <Box mb={4}>
-                    <GoogleMaps maxHeight="250px"/>
+                    <GMapsEmbed maxHeight="250px"/>
                 </Box>
             )}
             <Skeleton isLoaded={!loading}>
@@ -166,12 +173,13 @@ const FoodListingsPage = () => {
                     {!isSmallerThan1095 && (
                         <Box flex="1" ml={5}>
                             <SlideFade in={true} offsetY="20px">
-                                <GoogleMaps />
+                                <GMapsEmbed />
                             </SlideFade>
                         </Box>
                     )}
                 </Flex>
             </Skeleton>
+            <Button onClick={() => redirectToMap(1.3800, 103.8489)} variant="MMPrimary" mt={5}>Go to Nanyang Polytechnic</Button>
             <AddListingModal
                 isOpen={isOpen}
                 onClose={onClose}
