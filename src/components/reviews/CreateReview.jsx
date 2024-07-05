@@ -328,7 +328,7 @@ const CreateReview = ({
                         <ModalBody display="flex" justifyContent="center" alignItems="center" p={0}>
                             <Flex direction="column" alignItems="center">
                                 {images.map((image, index) => (
-                                    <React.Fragment key={index}>
+                                    <Box key={index}>
                                         <Image
                                             ref={el => (imageRefs.current[index] = el)}
                                             src={image}
@@ -342,7 +342,7 @@ const CreateReview = ({
                                             _hover={{ cursor: "pointer" }}
                                         />
                                         {index < images.length - 1 && <Divider />}
-                                    </React.Fragment>
+                                    </Box>
                                 ))}
                             </Flex>
                         </ModalBody>
