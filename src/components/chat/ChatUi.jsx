@@ -77,7 +77,11 @@ function ChatUi() {
         );
       } else if (receivedMessage.action === "reload") {
         window.location.reload();
-      } else {
+      } else if(receivedMessage.action === "error") {
+        alert(receivedMessage.message);
+        window.location.reload();
+      } 
+      else {
         setMessages((prevMessages) => [...prevMessages, receivedMessage]);
       }
     };
