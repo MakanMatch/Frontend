@@ -12,18 +12,16 @@ const GoogleMaps = ({ lat, long }) => {
                 version: "weekly",
                 libraries: ["places"],
             });
-            await loader.load().then(async () => {
-                const { Map } = await loader.importLibrary("maps");
-                const LatLong = { lat: lat, lng: long };
-                const map = new Map(mapRef.current, {
-                    center: LatLong,
-                    zoom: 17,
-                });
-                new window.google.maps.Marker({
-                    position: LatLong,
-                    map: map,
-                    title: "Hello Singapore!",
-                });
+            const { Map } = await loader.importLibrary("maps");
+            const LatLong = { lat: lat, lng: long };
+            const map = new Map(mapRef.current, {
+                center: LatLong,
+                zoom: 17,
+            });
+            new window.google.maps.Marker({
+                position: LatLong,
+                map: map,
+                title: "Host's location",
             });
         };
 
