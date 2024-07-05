@@ -37,7 +37,9 @@ function Login() {
                     // Set the JWT token in localStorage
                     localStorage.setItem('jwt', res.data.accessToken);
                     dispatch(changeAuthToken(res.data.accessToken));
-                    dispatch(setUser(res.data.user));
+                    const authStateData = { userID: res.data.user.userID, username: res.data.user.username, userType: res.data.user.userType }
+                    console.log(authStateData)
+                    dispatch(setUser(authStateData));
                     navigate("/");
                 } else {
                     console.log("An error has occurred logging in to the account.")
