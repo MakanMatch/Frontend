@@ -2,7 +2,7 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Button, Card, CardBody, CardFooter, CardHeader, HStack, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Text, VStack } from '@chakra-ui/react'
 import React from 'react'
 
-function ReservationSettingsCard({ listingPublished, togglePublished, pricePerPortion, setPricePerPortion}) {
+function ReservationSettingsCard({ listingPublished, togglePublished, pricePerPortion, guestSlots, handleSettingsChange }) {
     const formatAsCurrency = (val) => `$` + val
     const parseCurrencyValue = (val) => val.replace(/^\$/, '')
 
@@ -14,19 +14,7 @@ function ReservationSettingsCard({ listingPublished, togglePublished, pricePerPo
                     <HStack width={"100%"}>
                         <Text>Max. Guests</Text>
                         <Spacer />
-                        <NumberInput defaultValue={1} min={1} max={10}>
-                            <NumberInputField />
-                            <NumberInputStepper>
-                                <NumberIncrementStepper />
-                                <NumberDecrementStepper />
-                            </NumberInputStepper>
-                        </NumberInput>
-                    </HStack>
-
-                    <HStack width={"100%"}>
-                        <Text>Portions</Text>
-                        <Spacer />
-                        <NumberInput defaultValue={1} min={1} max={10}>
+                        <NumberInput defaultValue={1} min={1} max={10} value={guestSlots} onChange={(value) => handleSettingsChange(value, "guestSlots")}>
                             <NumberInputField />
                             <NumberInputStepper>
                                 <NumberIncrementStepper />
@@ -38,7 +26,7 @@ function ReservationSettingsCard({ listingPublished, togglePublished, pricePerPo
                     <HStack width={"100%"}>
                         <Text>Price Per Portion</Text>
                         <Spacer />
-                        <NumberInput defaultValue={'$1.50'} onChange={(valueString) => setPricePerPortion(parseCurrencyValue(valueString))} value={formatAsCurrency(pricePerPortion)}>
+                        <NumberInput defaultValue={'$1.50'} onChange={(valueString) => handleSettingsChange(parseCurrencyValue(valueString), "pricePerPortion")} value={formatAsCurrency(pricePerPortion)}>
                             <NumberInputField />
                         </NumberInput>
                     </HStack>
