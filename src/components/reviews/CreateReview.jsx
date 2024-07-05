@@ -98,6 +98,8 @@ const CreateReview = ({
                 <Flex direction={{ base: 'column', md: 'row' }}
                     wrap="wrap"
                     gap={2}
+                    justifyContent='center'
+                    alignItems={{ base: 'center', md: 'flex-start' }}
                 >
                     <Image
                         onClick={() => handleImageClick(0)}
@@ -138,13 +140,13 @@ const CreateReview = ({
                         src={images[0]}
                         alt="Review image"
                         borderRadius="lg"
-                        minWidth={{ base: '100%', md: '50%' }}
+                        maxWidth={{ base: '100%', md: '60%' }}
                         minHeight={"108px"}
                         maxHeight={"200"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
-                    <Flex direction={{ base: "row", md: "column" }} ml={2} flex="1" wrap="wrap">
+                    <Flex direction="row" ml={{ base: 0, md: 2 }} flex="1" wrap="wrap" justifyContent="space-between" gap={2}>
                         <Image
                             onClick={() => handleImageClick(1)}
                             key={images[1]}
