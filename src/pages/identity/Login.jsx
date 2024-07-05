@@ -38,7 +38,6 @@ function Login() {
                     localStorage.setItem('jwt', res.data.accessToken);
                     dispatch(changeAuthToken(res.data.accessToken));
                     const authStateData = { userID: res.data.user.userID, username: res.data.user.username, userType: res.data.user.userType }
-                    console.log(authStateData)
                     dispatch(setUser(authStateData));
                     navigate("/");
                 } else {

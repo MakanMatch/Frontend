@@ -3,14 +3,15 @@ import { Avatar, Box, Button, Center, Container, Flex, GenericAvatarIcon, HStack
 import React from 'react'
 import Sidebar from './Sidebar'
 import { Link, useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux';
 
 function Navbar() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const navigate = useNavigate();
+    const authToken = useSelector((state) => state.auth.authToken);
 
     const handleAvatarClick = () => {
-        const token = localStorage.getItem('jwt');
-        if (token) {
+        if (authToken) {
             navigate('/myAccount');
         } else {
             console.log("Sign in first.")

@@ -2,12 +2,15 @@ import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHea
 import { CalendarIcon, ChatIcon } from '@chakra-ui/icons'
 import { BsQuestionCircle } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Logo from '../assets/Logo.png'
 import React from 'react'
 
 
 function Sidebar({ isOpen, onClose }) {
     const navigate = useNavigate();
+    const authToken = useSelector((state) => state.auth.authToken);
+
     const DrawerHover = {
         _hover: {
           bg: "#E4EBF8"
@@ -16,8 +19,7 @@ function Sidebar({ isOpen, onClose }) {
     };
 
     const handleMyAccountClick = () => {
-        const token = localStorage.getItem('jwt');
-        if (token) {
+        if (authToken) {
             navigate('/myAccount');
         } else {
             console.log("Sign in first.")
