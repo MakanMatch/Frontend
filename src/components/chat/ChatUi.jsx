@@ -61,10 +61,8 @@ function ChatUi() {
       console.log("Received message:", receivedMessage);
 
       if (receivedMessage.type === "chat_history") {
-        for (let i = 0; i < receivedMessage.messages.length; i++) {
-          setMessages((prevMessages) => [...prevMessages, receivedMessage.messages[i]]);
-          console.log("Received message:", receivedMessage.messages[i].from);
-        }
+        console.log(receivedMessage.messages)
+        setMessages(receivedMessage.messages)
       } else if (receivedMessage.action === "edit") {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
@@ -102,21 +100,16 @@ function ChatUi() {
   const sendMessage = () => {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
-        messageid: Math.random().toString(36).substr(2, 9),
         sender: "Jamie",
         receiver: "James",
         message: messageInput,
-        timestamp: `${new Date().getHours()}:${new Date()
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`,
         datetime: new Date().toISOString(),
       };
 
       ws.current.send(JSON.stringify(newMessage));
       console.log("Sent message:", newMessage);
 
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    //   setMessages((prevMessages) => [...prevMessages, newMessage]);
       setMessageInput("");
     }
   };
@@ -218,7 +211,7 @@ function ChatUi() {
               <ChatBubble
                 key={msg.messageID}
                 message={msg.message}
-                timestamp={msg.timestamp}
+                timestamp={new Date(msg.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 isSender={msg.sender === "Jamie"}
                 photoUrl={
                   msg.sender === "Jamie"
@@ -292,3 +285,4 @@ function ChatUi() {
 }
 
 export default ChatUi;
+

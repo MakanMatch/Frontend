@@ -61,10 +61,8 @@ function ChatUi2() {
       console.log("Received message:", receivedMessage);
 
       if (receivedMessage.type === "chat_history") {
-        for (let i = 0; i < receivedMessage.messages.length; i++) {
-          setMessages((prevMessages) => [...prevMessages, receivedMessage.messages[i]]);
-          console.log("Received message:", receivedMessage.messages[i].from);
-        }
+        console.log(receivedMessage.messages);
+        setMessages(receivedMessage.messages);
       } else if (receivedMessage.action === "edit") {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
@@ -102,7 +100,6 @@ function ChatUi2() {
   const sendMessage = () => {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
-        messageid: Math.random().toString(36).substr(2, 9),
         sender: "James",
         receiver: "Jamie",
         message: messageInput,
@@ -116,7 +113,7 @@ function ChatUi2() {
       ws.current.send(JSON.stringify(newMessage));
       console.log("Sent message:", newMessage);
 
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      // setMessages((prevMessages) => [...prevMessages, newMessage]);
       setMessageInput("");
     }
   };
@@ -195,7 +192,7 @@ function ChatUi2() {
           />
           <Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
             <Text fontSize={20} mt={2} textAlign={"left"}>
-            Chat with Jamie Oliver (Host) Rating: 2 ⭐
+              Chat with Jamie Oliver (Host) Rating: 2 ⭐
             </Text>
             <Spacer h={3} />
             <Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
@@ -218,7 +215,7 @@ function ChatUi2() {
               <ChatBubble
                 key={msg.messageID}
                 message={msg.message}
-                timestamp={msg.timestamp}
+                timestamp={new Date(msg.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 isSender={msg.sender === "James"}
                 photoUrl={
                   msg.sender === "James"
