@@ -13,12 +13,14 @@ const GoogleMaps = ({ lat, long }) => {
                 libraries: ["places"],
             });
             const { Map } = await loader.importLibrary("maps");
+            const { AdvancedMarkerElement } = await window.google.maps.importLibrary("marker");
             const LatLong = { lat: lat, lng: long };
             const map = new Map(mapRef.current, {
                 center: LatLong,
                 zoom: 17,
+                mapId: "DEMO_MAP_ID",
             });
-            new window.google.maps.Marker({
+            new AdvancedMarkerElement({
                 position: LatLong,
                 map: map,
                 title: "Host's location",
