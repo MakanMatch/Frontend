@@ -25,6 +25,7 @@ import ChatHistory from "../../components/chat/ChatHistory";
 function ChatUi() {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
+  const [messageToEdit, setMessageToEdit] = useState(null);
   const [messageToDelete, setMessageToDelete] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
@@ -135,6 +136,13 @@ function ChatUi() {
         datetime: new Date().toISOString(),
       };
       ws.current.send(JSON.stringify(editedMessage));
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.messageID === messageId
+            ? { ...msg, message: newMessage, edited: true }
+            : msg
+        )
+      );
     }
   };
 
