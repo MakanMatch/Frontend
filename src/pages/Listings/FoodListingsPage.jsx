@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import server from "../../networking";
 import FoodListing from "../../components/listings/FoodListing";
 import GMapsEmbed from "../../components/listings/GMapsEmbed";
-import GoogleMaps from "../../components/listings/GoogleMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
 
