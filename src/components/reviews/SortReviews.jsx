@@ -13,6 +13,7 @@ function SortReviews() {
     const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
+    const guestID = "47f4497b-1331-4b8a-97a4-095a79a1fd48"; //hardcoded guestID, should be dynamic, retrieve from URL
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {
@@ -96,6 +97,7 @@ function SortReviews() {
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
                                     like={review.likeCount}
                                     reviewID={review.reviewID}
+                                    guestID={guestID}
                                 />
                             )) :
                             null}
@@ -115,6 +117,7 @@ function SortReviews() {
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
                                     like={review.likeCount}
                                     reviewID={review.reviewID}
+                                    guestID={guestID}
                                 />
                             )) :
                             null}
@@ -134,6 +137,7 @@ function SortReviews() {
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
                                     like={review.likeCount}
                                     reviewID={review.reviewID}
+                                    guestID={guestID}
                                 />
                             )) :
                             null}
@@ -153,6 +157,7 @@ function SortReviews() {
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
                                     like={review.likeCount}
                                     reviewID={review.reviewID}
+                                    guestID={guestID}
                                 />
                             )) :
                             null}

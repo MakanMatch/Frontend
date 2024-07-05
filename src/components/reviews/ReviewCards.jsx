@@ -29,6 +29,7 @@ const CreateReview = ({
     images,
     like,
     reviewID,
+    guestID
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast)
@@ -51,7 +52,7 @@ const CreateReview = ({
         try {
             const newLikeCount = liked ? currentLikeCount - 1 : currentLikeCount + 1;
 
-            const response = await server.put(`/manageReviews?id=${reviewID}&likeCount=${newLikeCount}`);
+            const response = await server.post(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
             if (response.status === 200) {
                 setLiked(!liked);
                 setCurrentLikeCount(!liked ? currentLikeCount + 1 : currentLikeCount - 1);
