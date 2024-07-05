@@ -5,6 +5,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import { ChakraProvider } from '@chakra-ui/react'
 import universalReducer from './slices/UniversalState.js'
+import authReducer from './slices/AuthState.js'
 import MainTheme from './themes/MainTheme.js'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './Layout.jsx'
@@ -26,7 +27,8 @@ import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
 
 const store = configureStore({
     reducer: {
-        universal: universalReducer
+        universal: universalReducer,
+        auth: authReducer
     }
 })
 
