@@ -4,7 +4,7 @@ import SortReviews from '../../components/reviews/SortReviews';
 import { Button, Box, Input, Flex, HStack, Text, Container, Image, Textarea, Spacer, useToast, Heading, Center, useClipboard, Tooltip } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
 
 function Reviews() {
@@ -16,6 +16,11 @@ function Reviews() {
     const [hostContactNum, setHostContactNum] = useState(0);
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
     const { onCopy, hasCopied } = useClipboard(hostContactNum)
+    const [searchParams] = useSearchParams();
+    let hostID = searchParams.get('hostID'); // change to const afterwards
+    if (!hostID) {
+        hostID = "272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4";
+    }
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -37,7 +42,7 @@ function Reviews() {
 
     const fetchHostInfo = async () => {
         try {
-            const response = await server.get(`/cdn/accountInfo?userID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}`);
+            const response = await server.get(`/cdn/accountInfo?userID=${hostID}`);
             if (!response.data) {
                 showToast("No host information found", "Please try again later.", 3000, true, "info")
             } else {
