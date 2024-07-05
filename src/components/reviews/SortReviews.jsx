@@ -5,7 +5,7 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { BiLike } from 'react-icons/bi';
 import { FaUtensils, FaSoap } from "react-icons/fa";
 import server from '../../networking'
-import CreateReview from './CreateReview';
+import CreateReview from './ReviewCards';
 import configureShowToast from '../../components/showToast';
 
 function SortReviews() {

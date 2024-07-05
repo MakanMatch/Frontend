@@ -18,7 +18,7 @@ import {
     ModalCloseButton,
 } from '@chakra-ui/react'
 import StarRatings from 'react-star-ratings';
-import configureShowToast from '../../components/showToast';
+import configureShowToast from '../showToast';
 
 const CreateReview = ({
     username,
