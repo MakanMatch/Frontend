@@ -305,7 +305,8 @@ const CreateReview = ({
                         </Box>
                     </Flex>
                 </CardHeader>
-                {comments && images && images.filter(image => image !== null).length > 0 && (
+                {comments && (<Text textAlign="left" mb={4}>{comments}</Text>)}
+                {images && images.filter(image => image !== null).length > 0 && (
                     <CardBody>
                         <Text textAlign="left" mb={4}>{comments}</Text>
                         {renderImages()}
