@@ -18,6 +18,7 @@ import {
     ModalCloseButton,
 } from '@chakra-ui/react'
 import StarRatings from 'react-star-ratings';
+import configureShowToast from '../../components/showToast';
 
 const CreateReview = ({
     username,
@@ -30,8 +31,8 @@ const CreateReview = ({
     reviewID,
 }) => {
     const toast = useToast();
+    const showToast = configureShowToast(toast)
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [imageIndex, setImageIndex] = useState(0);
     const [liked, setLiked] = useState(false);
     const [currentLikeCount, setCurrentLikeCount] = useState(like);
     const [modalImageIndex, setModalImageIndex] = useState(null);
@@ -55,23 +56,10 @@ const CreateReview = ({
                 setLiked(!liked);
                 setCurrentLikeCount(!liked ? currentLikeCount + 1 : currentLikeCount - 1);
             } else {
-                toast({
-                    title: "An error occurred",
-                    description: response.data,
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
-
+                showToast("Like / Unlike review failed", "Please try again later.", 3000, true, "error")
             }
         } catch (error) {
-            toast({
-                title: "An error occurred",
-                description: error.message,
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
+            showToast("An error occured", "Please try again later.", 3000, true, "error")
         }
     }
 

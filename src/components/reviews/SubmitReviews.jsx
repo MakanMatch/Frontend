@@ -19,9 +19,11 @@ import {
     FormErrorMessage,
     FormHelperText,
 } from '@chakra-ui/react'
+import configureShowToast from '../../components/showToast';
 
 function SubmitReviews() {
     const toast = useToast();
+    const showToast = configureShowToast(toast);
     const [foodRating, setFoodRating] = useState(0);
     const [hygieneRating, setHygieneRating] = useState(0);
     const [comments, setComments] = useState('');
@@ -85,6 +87,7 @@ function SubmitReviews() {
                             duration: 3000,
                             isClosable: true,
                         });
+                        showToast("Review submitted successfully", "", 3000, true, "success")
                         console.log('Review submitted successfully!');
                         setIsSubmitting(false);
                         setComments('');
@@ -93,24 +96,13 @@ function SubmitReviews() {
                         onClose();
                         window.location.reload();
                     } else {
-                        toast({
-                            title: 'Error',
-                            description: res.data,
-                            status: 'error',
-                            duration: 3000,
-                            isClosable: true,
-                        });
+                        showToast("Failed to submit review", "Please try again later", 3000, true, "error");
                     }
                 })
         } catch (error) {
             console.error('Failed to submit review:', error);
             setIsSubmitting(false);
-            toast({
-                title: 'Failed to submit review.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
+            showToast("Failed to submit review", "Please try again later", 3000, true, "error");
         }
     };
 

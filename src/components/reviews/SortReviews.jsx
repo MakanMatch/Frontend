@@ -6,9 +6,11 @@ import { BiLike } from 'react-icons/bi';
 import { FaUtensils, FaSoap } from "react-icons/fa";
 import server from '../../networking'
 import CreateReview from './CreateReview';
+import configureShowToast from '../../components/showToast';
 
 function SortReviews() {
     const toast = useToast();
+    const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
 
@@ -42,22 +44,10 @@ function SortReviews() {
                 }));
                 setReviews(reviewsWithGuestInfo);
             } else if (response.data && response.data.startsWith("ERROR")) {
-                toast({
-                    title: "No reviews found",
-                    description: "Please try again later.",
-                    status: 'info',
-                    duration: 2500,
-                    isClosable: false,
-                });
+                showToast("No reviews found", "Please try again later", 3000, true, "info");
             }
         } catch (error) {
-            toast({
-                title: "An error occurred",
-                description: error.message,
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
+            showToast("An error occurred", "Please try again later", 3000, true, "error");
         }
     }
 

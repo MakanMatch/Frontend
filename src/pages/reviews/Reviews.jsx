@@ -5,25 +5,17 @@ import { Button, Box, Input, Flex, HStack, Text, Container, Image, Textarea, Spa
 import server from '../../networking';
 import { ArrowBackIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
+import configureShowToast from '../../components/showToast';
 
 function Reviews() {
     const toast = useToast();
+    const showToast = configureShowToast(toast);
     const navigate = useNavigate();
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostContactNum, setHostContactNum] = useState(0);
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
     const { onCopy, hasCopied } = useClipboard(hostContactNum)
-
-    function ShowToast(title, description, status, duration) {
-        toast({
-            title: title,
-            description: description,
-            status: status,
-            duration: duration,
-            isClosable: false,
-        });
-    }
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -47,12 +39,7 @@ function Reviews() {
         try {
             const response = await server.get(`/cdn/accountInfo?userID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}`);
             if (!response.data) {
-                ShowToast(
-                    "No host information found",
-                    "Please try again later.",
-                    "info",
-                    2500
-                );
+                showToast("No host information found", "Please try again later.", 3000, true, "info")
             } else {
                 setHostName(response.data.username);
                 setHostAddress(response.data.address);
@@ -61,12 +48,7 @@ function Reviews() {
             }
         } catch (error) {
             toast.closeAll();
-            ShowToast(
-                "Error fetching host information",
-                "Please try again later.",
-                "error",
-                2500
-            );
+            showToast("Error fetching host information", "Please try again later", 3000, true, "error");
             console.error("Error fetching host info:", error);
         }
     };
