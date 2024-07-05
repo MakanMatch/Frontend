@@ -1,5 +1,5 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip, Badge, ScaleFade, Stack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
@@ -7,10 +7,14 @@ import server from '../../networking';
 import axios from 'axios'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
+import UploadNewImageModal from '../../components/orders/UploadNewImageModal'
+import HostListingImage from '../../components/orders/HostListingImage'
+import configureShowToast from '../../components/showToast'
 
-function ExpandedListing() {
+function ExpandedListingHost() {
     // const Universal = useSelector(state => state.universal)
     const toast = useToast()
+    const showToast = configureShowToast(toast)
     const navigate = useNavigate()
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
@@ -32,6 +36,8 @@ function ExpandedListing() {
         published: null
     })
     const [longDescription, setLongDescription] = useState(listingData.longDescription)
+    const [shortDescription, setShortDescription] = useState(listingData.shortDescription)
+    const [guestSlots, setGuestSlots] = useState(1)
     const [changesMade, setChangesMade] = useState(false)
     const [loading, setLoading] = useState(true)
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -53,45 +59,40 @@ function ExpandedListing() {
             setFile(e.target.files[0])
         }
     }
-    const handleDescriptionChange = (e) => {
-        setLongDescription(e.target.value);
-        if (e.target.value != listingData.longDescription) {
-            setChangesMade(true)
-        } else {
-            setChangesMade(false)
-        }
-    }
+    const handleShortDescriptionChange = (e) => { setShortDescription(e.target.value); }
+    const handleLongDescriptionChange = (e) => { setLongDescription(e.target.value); }
     const handleDeleteImage = (imageName) => {
         openDeleteImageDialog()
         setImageToBeDeleted(imageName)
     }
     const togglePublished = (newValue) => {
         setListingPublished(newValue)
-        console.log("Updating to: " + newValue)
         handleSaveChanges(newValue, true)
     }
 
-    const showComingSoon = () => { showToast("Coming soon", "This feature is not complete yet.", 3000) }
-    const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
-    const showToast = (title, description, duration = 5000, isClosable = true, status = 'info', icon = null) => {
-        if (!["success", "warning", "error", "info"].includes(status)) {
-            status = "info"
+    const handleSettingsChange = (newValue, setting) => {
+        if (setting == "guestSlots") {
+            setGuestSlots(newValue)
+        } else if (setting == "pricePerPortion") {
+            setPricePerPortion(newValue)
         }
-
-        const toastConfig = {
-            title: title,
-            description: description,
-            duration: duration,
-            isClosable: isClosable,
-            status: status
-        }
-        if (icon != null) {
-            toastConfig.icon = icon
-        }
-
-        toast.closeAll()
-        toast(toastConfig)
     }
+
+    const checkForChanges = () => {
+        if (shortDescription != listingData.shortDescription ||
+            longDescription != listingData.longDescription ||
+            guestSlots != listingData.totalSlots ||
+            pricePerPortion != listingData.portionPrice
+        ) {
+            console.log("changes detected")
+            setChangesMade(true)
+        } else {
+            console.log("no changes detected")
+            setChangesMade(false)
+        }
+    }
+
+    const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
     const processData = (data) => {
         let datetime = new Date(data.datetime)
         let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
@@ -110,14 +111,19 @@ function ExpandedListing() {
         fetchListingDetails()
     }, [])
 
+    useEffect(checkForChanges, [shortDescription, longDescription, guestSlots, pricePerPortion])
+
     const fetchListingDetails = () => {
         server.get(`/cdn/getListing?id=${listingID}`)
             .then(response => {
                 if (response.status == 200) {
                     const processedData = processData(response.data)
                     setListingData(processedData)
-                    setLongDescription(processedData.longDescription)
-                    setListingPublished(processedData.published)
+                    setShortDescription(processedData.shortDescription || "")
+                    setLongDescription(processedData.longDescription || "")
+                    setListingPublished(processedData.published || false)
+                    setGuestSlots(processedData.totalSlots || 1)
+                    setPricePerPortion(processedData.portionPrice || 0.00)
                     setLoading(false)
                     return
                 } else if (response.status == 404) {
@@ -126,7 +132,7 @@ function ExpandedListing() {
                     return
                 } else {
                     showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
-                    console.log("EXPANDEDLISTING: Failed to retrieve listing details, redirecting to home. Response below.")
+                    console.log("EXPANDEDLISTINGHOST: Failed to retrieve listing details, redirecting to home. Response below.")
                     console.log(response.data)
                     navigate("/")
                     return
@@ -134,7 +140,7 @@ function ExpandedListing() {
             })
             .catch(err => {
                 showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
-                console.log("EXPANDEDLISTING: Failed to retrieve listing details, redirecting to home. Response below.")
+                console.log("EXPANDEDLISTINGHOST: Failed to retrieve listing details, redirecting to home. Response below.")
                 console.log(err)
                 navigate("/")
                 return
@@ -186,7 +192,10 @@ function ExpandedListing() {
     const handleSaveChanges = (value, fromPublishToggle) => {
         const data = {
             listingID: listingData.listingID,
-            longDescription: longDescription
+            shortDescription: shortDescription,
+            longDescription: longDescription,
+            totalSlots: guestSlots,
+            portionPrice: pricePerPortion
         }
         if (fromPublishToggle) {
             data.published = value
@@ -231,7 +240,12 @@ function ExpandedListing() {
                 <GridItem colSpan={2}>
                     <VStack alignItems={"flex-start"}>
                         <Text>{listingData.datetime}</Text>
-                        <Heading>{listingData.title}</Heading>
+                        <HStack spacing={5} alignItems={'center'}>
+                            <Heading>{listingData.title}</Heading>
+                            <ScaleFade initialScale={0.5} in={!listingPublished}>
+                                <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>HIDDEN</Badge>
+                            </ScaleFade>
+                        </HStack>
                     </VStack>
                 </GridItem>
                 <GridItem colSpan={1} alignContent={"flex-end"}>
@@ -250,12 +264,7 @@ function ExpandedListing() {
                             {listingData.images.map((imgName, index) => {
                                 if (imgName) {
                                     return (
-                                        <Box key={index} position={"relative"} height={"100%"} minW={"fit-content"}>
-                                            <Image key={index} maxH={"100%"} objectFit={"cover"} display={"block"} rounded={"10px"} src={imgBackendURL(imgName)} />
-                                            <Tooltip hasArrow label={"Delete image"} placement={"top"}>
-                                                <CloseButton size={"md"} position={"absolute"} top={"0"} right={"0"} m={"2"} bgColor={"red"} color={"white"} onClick={() => { handleDeleteImage(imgName) }} />
-                                            </Tooltip>
-                                        </Box>
+                                        <HostListingImage key={index} index={index} listingImages={listingData.images} imgURL={imgBackendURL(imgName)} imgName={imgName} handleDeleteImage={handleDeleteImage} />
                                     )
                                 }
                             })}
@@ -268,11 +277,14 @@ function ExpandedListing() {
                 <GridItem colSpan={2}>
                     <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
                         <VStack alignItems={"flex-start"} width={"100%"}>
-                            <Text fontWeight={"bold"} mb={"10px"}>Description</Text>
-                            <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleDescriptionChange} />
+                            <Text fontWeight={"bold"} mb={"10px"}>Short Description (shown on Home page)</Text>
+                            <Input placeholder='Briefly describe your dish' value={shortDescription} onChange={handleShortDescriptionChange} />
+
+                            <Text fontWeight={"bold"} mb={"10px"} mt={5}>Description</Text>
+                            <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleLongDescriptionChange} />
                         </VStack>
 
-                        <Spacer />
+                        {/* <Spacer /> */}
 
                         <VStack alignItems={"flex-start"} width={"100%"}>
                             <Heading size={"md"}>Listing Statistics</Heading>
@@ -288,32 +300,13 @@ function ExpandedListing() {
                 </GridItem>
 
                 <GridItem colSpan={1}>
-                    <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} setPricePerPortion={setPricePerPortion} />
+                    <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
                 </GridItem>
             </Grid>
-            <Modal onClose={handleClose} isOpen={isOpen} isCentered>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Upload New Image</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <VStack textAlign={"left"} spacing={"25px"} p={"10px"}>
-                            <Text width={"100%"}>Upload a new image for your dish!</Text>
-                            <Text>Please be reminded that images must not contain explicit content; the images you upload should be real-life pictures of your dish only.</Text>
-                            <Input type={"file"} p={"10px"} h={"20%"} accept='image/*' onChange={handleFileSubmission} />
-                        </VStack>
-                    </ModalBody>
-                    <ModalFooter>
-                        <HStack spacing={"20px"}>
-                            <Button onClick={handleClose}>Close</Button>
-                            <Button variant={isUploading ? "": "MMPrimary"} isLoading={isUploading} loadingText="Uploading..." onClick={uploadImage}>Upload</Button>
-                        </HStack>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+            <UploadNewImageModal isOpen={isOpen} handleClose={handleClose} handleFileSubmission={handleFileSubmission} isUploading={isUploading} uploadImage={uploadImage} />
             <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} showToast={showToast} refreshPage={fetchListingDetails} />
         </>
     )
 }
 
-export default ExpandedListing
+export default ExpandedListingHost

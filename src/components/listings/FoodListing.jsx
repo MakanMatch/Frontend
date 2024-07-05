@@ -126,7 +126,7 @@ const FoodListing = ({
                 {isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link to={`/expandedListing?id=${listingID}`}>
+                            <Link to={`/expandedListingGuest?id=${listingID}`}>
                                 <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
                             </Link>
                             <Button onClick={toggleFavourite}>
@@ -141,7 +141,7 @@ const FoodListing = ({
                 {!isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link to={`/expandedListing?id=${listingID}`}>
+                            <Link to={`/expandedListingGuest?id=${listingID}`}>
                                 <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
                             </Link>
                             <Button onClick={toggleFavourite}>
