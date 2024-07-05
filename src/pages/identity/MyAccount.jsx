@@ -36,8 +36,8 @@ const MyAccount = () => {
   }
 
   if (error) {
-    console.log("Error");
-    return <div>{error}</div>;
+    console.log(error);
+    return <Spinner />;
   }
 
   const calculateAccountAge = () => {
