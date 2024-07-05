@@ -78,7 +78,7 @@ function SubmitReviews() {
         formData.append('dateCreated', currentDate);
 
         try {
-            await server.post('/reviews', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
+            await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
                 .then((res) => {
                     if (res.data && res.data.startsWith("SUCCESS")) {
                         toast({

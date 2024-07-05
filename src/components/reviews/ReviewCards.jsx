@@ -51,7 +51,7 @@ const CreateReview = ({
         try {
             const newLikeCount = liked ? currentLikeCount - 1 : currentLikeCount + 1;
 
-            const response = await server.put(`/reviews/reviews?id=${reviewID}&likeCount=${newLikeCount}`);
+            const response = await server.put(`/manageReviews?id=${reviewID}&likeCount=${newLikeCount}`);
             if (response.status === 200) {
                 setLiked(!liked);
                 setCurrentLikeCount(!liked ? currentLikeCount + 1 : currentLikeCount - 1);
