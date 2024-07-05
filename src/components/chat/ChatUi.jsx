@@ -25,10 +25,10 @@ import ChatHistory from "../../components/chat/ChatHistory";
 function ChatUi() {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
-  const [messageToEdit, setMessageToEdit] = useState(null);
   const [messageToDelete, setMessageToDelete] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
+  const [replyTo, setReplyTo] = useState(null); // New state for tracking the message being replied to
 
   const ws = useRef(null);
 
@@ -109,13 +109,14 @@ function ChatUi() {
         receiver: "James",
         message: messageInput,
         datetime: new Date().toISOString(),
+        replyTo: replyTo ? replyTo.message : null // Include the replied-to message
       };
 
       ws.current.send(JSON.stringify(newMessage));
       console.log("Sent message:", newMessage);
 
-    //   setMessages((prevMessages) => [...prevMessages, newMessage]);
       setMessageInput("");
+      setReplyTo(null); // Clear the reply state after sending
     }
   };
 
@@ -165,6 +166,10 @@ function ChatUi() {
 
   const closeDeleteDialog = () => {
     setDeleteDialogOpen(false);
+  };
+
+  const handleReply = (message) => {
+    setReplyTo(message); // Set the message being replied to
   };
 
   return (
@@ -229,11 +234,20 @@ function ChatUi() {
                 }
                 onEdit={() => handleEditPrompt(msg.messageID, msg.message)}
                 onDelete={() => handleDeletePrompt(msg.messageID)}
+                onReply={() => handleReply(msg)} // Pass the handleReply function
+                repliedMessage={msg.replyTo} // Pass the replied-to message
                 edited={msg.edited}
               />
             ))}
           </VStack>
           <Flex mt={4} align="center">
+            {replyTo && ( // Display the message being replied to
+              <Box bg="gray.200" p={2} borderRadius="md" mb={2}>
+                <Text fontSize="sm" fontStyle="italic">
+                  Replying to: {replyTo.message}
+                </Text>
+              </Box>
+            )}
             <IconButton
               aria-label="Add emoji"
               icon={<FiSmile boxSize={8} />}
