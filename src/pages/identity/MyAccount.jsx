@@ -2,9 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
-  Box, Heading, Text, Flex, Avatar, Button, Spacer, Spinner 
+  Box,
+  Heading,
+  Text,
+  Flex,
+  Avatar,
+  Button,
+  Spacer,
+  Spinner,
 } from "@chakra-ui/react";
 import { logout, fetchUser } from "../../slices/AuthState";
+import GuestSidebar from "../../components/identity/GuestSideNav";
+import HostSidebar from "../../components/identity/HostSideNav";
 
 const MyAccount = () => {
   const navigate = useNavigate();
@@ -50,13 +59,8 @@ const MyAccount = () => {
 
   return (
     <Flex height="100vh">
-      {/* Left side box */}
-      <Box width="25%" bg="gray.100" p={4} borderRadius={15}>
-        <Text>Left Sidebar</Text>
-        <Button colorScheme="purple" mb={4} onClick={handleLogout}>
-          Logout
-        </Button>
-      </Box>
+      {/* Conditionally render the sidebar based on user type */}
+      {user.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
 
       {/* Right side content */}
       <Box width="75%" ml={10} position="relative">
