@@ -67,13 +67,11 @@ function SubmitReviews() {
         setIsSubmitting(true);
         const currentDate = new Date().toISOString();
         const formData = new FormData();
-        formData.append('sender', 'Susie Jones');
-        formData.append('receiver', 'Jamie Oliver');
         formData.append('foodRating', foodRating);
         formData.append('hygieneRating', hygieneRating);
         formData.append('comments', comments);
         images.forEach((file) => {
-            formData.append('file', file);
+            formData.append('images', file);
         });
         formData.append('dateCreated', currentDate);
 
@@ -89,12 +87,11 @@ function SubmitReviews() {
                         });
                         console.log('Review submitted successfully!');
                         setIsSubmitting(false);
-
                         setComments('');
                         setImages([]);
                         setReviewData(null);
                         onClose();
-                        location.reload();
+                        window.location.reload();
                     } else {
                         toast({
                             title: 'Error',
