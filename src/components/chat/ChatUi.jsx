@@ -109,12 +109,13 @@ function ChatUi() {
         receiver: "James",
         message: messageInput,
         datetime: new Date().toISOString(),
-        replyTo: replyTo ? replyTo.message : null // Include the replied-to message
+        replyTo: replyTo ? replyTo.message : null, // Include the replied-to message
+        replyToID: replyTo ? replyTo.messageID : null // Include the replied-to message ID
       };
-
+  
       ws.current.send(JSON.stringify(newMessage));
       console.log("Sent message:", newMessage);
-
+  
       setMessageInput("");
       setReplyTo(null); // Clear the reply state after sending
     }
