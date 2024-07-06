@@ -2,9 +2,9 @@
 /* eslint-disable react/prop-types */
 import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useMediaQuery } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon, DeleteIcon } from '@chakra-ui/icons';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import server from "../../networking";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const FoodListing = ({
     listingID,
@@ -17,12 +17,16 @@ const FoodListing = ({
     ShowToast,
     images,
     fetchListings,
+    address
 }) => {
     const toast = useToast();
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(isFavourite);
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null);
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
     const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
+    const navigate = useNavigate();
 
     const handlePrevImage = () => {
         if (imageIndex === 0) {
@@ -70,6 +74,35 @@ const FoodListing = ({
             ShowToast("Error", "Failed to remove listing", "error", 3000);
         }
     };
+
+    const generateCoordinates = async (address) => {
+        const encodedAddress = encodeURIComponent(String(address));
+        const apiKey = import.meta.env.VITE_GMAPS_API_KEY;
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address="${encodedAddress}"&key=${apiKey}`;
+        try {
+            const response = await server.get(url);
+            const location = response.data.results[0].geometry.location;
+            return {
+                latitude: location.lat,
+                longitude: location.lng
+            };
+        } catch (error) {
+            ShowToast("An error occured", "Failed to generate maps coordinates", "error", 3000);
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        const fetchCoordinates = async () => {
+            const coordinates = await generateCoordinates(address);
+            if (coordinates) {
+                setLatitude(coordinates.latitude);
+                setLongitude(coordinates.longitude);
+            }
+        };
+    
+        fetchCoordinates();
+    }, [address]);
     return (
         <>
             <style>
@@ -126,9 +159,7 @@ const FoodListing = ({
                 {isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link to={`/expandedListingGuest?id=${listingID}`}>
-                                <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
-                            </Link>
+                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"} onClick={() => navigate(`/targetListing?latitude=${latitude}&longitude=${longitude}`)}>View</Button>
                             <Button onClick={toggleFavourite}>
                                 <Text fontSize={"15px"}>{favourite ? "🩷 Un-favourite" : "🤍 Favourite"}</Text>
                             </Button>
@@ -141,9 +172,7 @@ const FoodListing = ({
                 {!isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link to={`/expandedListingGuest?id=${listingID}`}>
-                                <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
-                            </Link>
+                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"} onClick={() => navigate(`/targetListing?latitude=${latitude}&longitude=${longitude}`)}>View</Button>
                             <Button onClick={toggleFavourite}>
                                 {favourite ? "🩷" : "🤍"}
                             </Button>

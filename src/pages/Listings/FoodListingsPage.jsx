@@ -146,6 +146,7 @@ const FoodListingsPage = () => {
                                                     getImageLink(listing.listingID, imageName)
                                                 )}
                                                 fetchListings={fetchListings}
+                                                address={listing.address}
                                             />
                                         </Box>
                                     </SlideFade>
