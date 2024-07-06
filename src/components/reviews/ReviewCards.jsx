@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
     Avatar, useToast, Divider
@@ -27,19 +27,23 @@ const CreateReview = ({
     dateCreated,
     comments,
     images,
-    like,
+    likeCount,
     reviewID,
-    guestID
+    guestID,
+    isLiked
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast)
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [liked, setLiked] = useState(false);
-    const [currentLikeCount, setCurrentLikeCount] = useState(like);
+    const [liked, setLiked] = useState(isLiked);
+    const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
     const [modalImageIndex, setModalImageIndex] = useState(null);
-
     const imageRefs = useRef([]);
 
+    useEffect(() => {
+        setLiked(isLiked);
+    }, [isLiked]);
+    
     const handleImageClick = (index) => {
         setModalImageIndex(index);
         onOpen();
@@ -50,14 +54,21 @@ const CreateReview = ({
 
     const toggleLike = async () => {
         try {
-            const newLikeCount = liked ? currentLikeCount - 1 : currentLikeCount + 1;
-
-            const response = await server.post(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
-            if (response.status === 200) {
-                setLiked(!liked);
-                setCurrentLikeCount(!liked ? currentLikeCount + 1 : currentLikeCount - 1);
+            const postLikeResponse = await server.post(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
+            if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
+                showToast("An error occured", "Please try again later.", 3000, true, "error")
+            }
+            const fetchLikeStatus = await server.get(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
+            if (fetchLikeStatus.status === 400 || fetchLikeStatus.status === 500) {
+                showToast("An error occured", "Please try again later.", 3000, true, "error")
             } else {
-                showToast("Like / Unlike review failed", "Please try again later.", 3000, true, "error")
+                if (fetchLikeStatus.data) {
+                    setLiked(true);
+                    setCurrentLikeCount(currentLikeCount + 1);
+                } else {
+                    setLiked(false);
+                    setCurrentLikeCount(currentLikeCount - 1);
+                }
             }
         } catch (error) {
             showToast("An error occured", "Please try again later.", 3000, true, "error")
@@ -305,7 +316,14 @@ const CreateReview = ({
                     </CardBody>
                 )}
                 <CardFooter>
-                    <Button flex='1' variant='ghost' leftIcon={liked ? <Liked /> : <Like />} onClick={toggleLike}>
+                    <Button flex='1' variant='ghost'
+                    backgroundColor={liked ? 'blue.100' : 'gray.100'} 
+                    leftIcon={liked ? <Liked /> : <Like />} 
+                    _hover={{ 
+                        backgroundColor: liked ? 'blue.300' : 'gray.200', 
+                        color: liked ? 'white' : 'gray.800' 
+                    }}
+                    onClick={toggleLike}>
                         <Text>{currentLikeCount}</Text>
                     </Button>
                 </CardFooter>

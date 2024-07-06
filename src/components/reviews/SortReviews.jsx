@@ -13,6 +13,7 @@ function SortReviews() {
     const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
+    const [likedReviews, setLikedReviews] = useState([])
     const guestID = "47f4497b-1331-4b8a-97a4-095a79a1fd48"; //hardcoded guestID, should be dynamic, retrieve from URL
 
     function getImageLink(listingID, imageName) {
@@ -24,10 +25,23 @@ function SortReviews() {
 
     const fetchReviews = async (hostID, sortOrder) => {
         try {
+
+            // Get liked reviews
+            const likedResponse = await server.get(`/likeReview/userLikedReviews?guestID=${guestID}`);
+            if (likedResponse.status === 200 && Array.isArray(likedResponse.data)) {
+                setLikedReviews(likedResponse.data);
+            } else {
+                setLikedReviews([]);
+            }
+
+            // Get reviews
             const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`);
-            if (response.status === 200 && response.data) {
+            if (response.status === 200 && Array.isArray(response.data)) {
                 const reviews = response.data;
-                setReviews(reviews);
+                if (reviews.length == 0) {
+                    showToast("No reviews found", "", 3000, false, "info");
+                    return;
+                }
                 const reviewsWithGuestInfo = await Promise.all(reviews.map(async (review) => {
                     try {
                         const guestInfoResponse = await server.get(`/cdn/accountInfo?userID=${review.guestID}`);
@@ -41,14 +55,15 @@ function SortReviews() {
                         review.guestInfo = null;
                         console.error(`Error fetching guest info for guestID ${review.guestID}:`, error);
                     }
+
+                    // Check if review is liked
+                    review.isLiked = likedReviews.some((likedReview) => likedReview.reviewID === review.reviewID);
                     return review;
                 }));
                 setReviews(reviewsWithGuestInfo);
-            } else if (response.data && response.data.startsWith("ERROR")) {
-                showToast("No reviews found", "Please try again later", 3000, true, "info");
             }
         } catch (error) {
-            showToast("An error occurred", "Please try again later", 3000, true, "error");
+            showToast("An error occurred",` Please try again later: ${error}`, 3000, true, "error");
         }
     }
 
@@ -85,7 +100,7 @@ function SortReviews() {
             <TabPanels>
                 <TabPanel>
                     <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
-                        {reviews.length > 0 ?
+                        {Array.isArray(reviews) && reviews.length > 0 ?
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
@@ -95,9 +110,10 @@ function SortReviews() {
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                                    like={review.likeCount}
+                                    likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     guestID={guestID}
+                                    isLiked={review.isLiked}
                                 />
                             )) :
                             null}
@@ -105,7 +121,7 @@ function SortReviews() {
                 </TabPanel>
                 <TabPanel>
                 <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
-                        {reviews.length > 0 ?
+                        {Array.isArray(reviews) && reviews.length > 0 ?
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
@@ -115,9 +131,10 @@ function SortReviews() {
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                                    like={review.likeCount}
+                                    likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     guestID={guestID}
+                                    isLiked={review.isLiked}
                                 />
                             )) :
                             null}
@@ -125,7 +142,7 @@ function SortReviews() {
                 </TabPanel>
                 <TabPanel>
                 <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
-                        {reviews.length > 0 ?
+                        {Array.isArray(reviews) && reviews.length > 0 ?
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
@@ -135,9 +152,10 @@ function SortReviews() {
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                                    like={review.likeCount}
+                                    likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     guestID={guestID}
+                                    isLiked={review.isLiked}
                                 />
                             )) :
                             null}
@@ -145,7 +163,7 @@ function SortReviews() {
                 </TabPanel>
                 <TabPanel>
                 <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
-                        {reviews.length > 0 ?
+                        {Array.isArray(reviews) && reviews.length > 0 ?
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
@@ -155,9 +173,10 @@ function SortReviews() {
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                                    like={review.likeCount}
+                                    likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     guestID={guestID}
+                                    isLiked={review.isLiked}
                                 />
                             )) :
                             null}
