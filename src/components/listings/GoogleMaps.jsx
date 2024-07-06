@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useEffect, useRef } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useToast } from "@chakra-ui/react";
-import { configureShowToast} from "../../components/showToast";
+import configureShowToast from "../../components/showToast";
 
 const GoogleMaps = ({ lat, long }) => {
     const mapRef = useRef(null);
@@ -27,6 +28,8 @@ const GoogleMaps = ({ lat, long }) => {
                 center: LatLong,
                 zoom: 17,
                 mapId: "DEMO_MAP_ID",
+                mapTypeControl: false,
+                streetViewControl: false,
             });
             new AdvancedMarkerElement({
                 position: LatLong,
@@ -43,7 +46,7 @@ const GoogleMaps = ({ lat, long }) => {
     return (
         <div
             ref={mapRef}
-            style={{ height: "80vh", width: "100%", borderRadius: "10px" }}
+            style={{ height: "83vh", width: "100%", borderRadius: "10px" }}
         />
     );
 };
