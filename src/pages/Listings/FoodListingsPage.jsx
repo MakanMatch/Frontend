@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // FoodListingsPage.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import server from "../../networking";
 import FoodListing from "../../components/listings/FoodListing";
 import GMapsEmbed from "../../components/listings/GMapsEmbed";
@@ -20,7 +19,6 @@ const FoodListingsPage = () => {
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const [loading, setLoading] = useState(true); 
     const toast = useToast();
-    const navigate = useNavigate();
 
     function ShowToast(title, description, status, duration) {
         toast({
@@ -35,10 +33,6 @@ const FoodListingsPage = () => {
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
     }
-
-    const redirectToMap = (lat, lng) => {
-        navigate(`/targetListing?latitude=${lat}&longitude=${lng}`);
-    }; 
 
     const fetchListings = async () => {
         try {
@@ -179,7 +173,6 @@ const FoodListingsPage = () => {
                     )}
                 </Flex>
             </Skeleton>
-            <Button onClick={() => redirectToMap(1.3800, 103.8489)} variant="MMPrimary" mt={5}>Go to Nanyang Polytechnic</Button>
             <AddListingModal
                 isOpen={isOpen}
                 onClose={onClose}
