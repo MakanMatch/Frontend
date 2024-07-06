@@ -1,10 +1,73 @@
-import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Link, Progress, Stack, Text } from "@chakra-ui/react";
-import { InfoOutlineIcon, ArrowBackIcon } from "@chakra-ui/icons";
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/prop-types */
+import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast } from "@chakra-ui/react";
+import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import server from "../../networking";
+import configureShowToast from "../../components/showToast";
 
-function DetailedListingCard() {
+function DetailedListingCard({ listingID, userID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
+    const [imageIndex, setImageIndex] = useState(0);
+    const [favourite, setFavourite] = useState(false);
+    const toast = useToast();
+    const showToast = configureShowToast(toast);
     const navigate = useNavigate();
+
+    const handlePrevImage = () => {
+        if (imageIndex === 0) {
+            setImageIndex(images.length - 1);
+        } else {
+            setImageIndex(imageIndex - 1);
+        }
+    }
+
+    const handleNextImage = () => {
+        if (imageIndex === images.length - 1) {
+            setImageIndex(0);
+        } else {
+            setImageIndex(imageIndex + 1);
+        }
+    }
+
+    const toggleFavourite = async () => {
+        const favouriteData = {
+            userID: userID,
+            listingID: listingID
+        }
+        await server.put("/listings/toggleFavouriteListing", favouriteData)
+        .then((response) => {
+            if (response.data.favourite === true) {
+                setFavourite(true);
+            } else {
+                setFavourite(false);
+            }
+        })
+        .catch(() => {
+            toast.closeAll();
+            showToast("Error", "Failed to add/remove listing from favourites", "error", 3000);
+        });
+    };
+
+    const fetchFavouriteState = async () => {
+        const data = { userID: userID };
+        const response = await server.get("/cdn/fetchGuestDetails", data);
+        const guestFavCuisine = response.data.guestFavCuisine;
+        if (guestFavCuisine.includes(listingID)) {
+            setFavourite(true);
+        } else {
+            setFavourite(false);
+        }
+    }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchFavouriteState();
+        }
+        fetchData();
+    }, []);
+    
     return (
         <>
             <style>
@@ -22,11 +85,19 @@ function DetailedListingCard() {
             <Card maxW="md" maxH="78vh" borderRadius={6} overflow="hidden">
                 <CardBody>
                     <Box position="relative" width="fit-content">
+                        {images.length > 1 && (
+                            <Box position={"absolute"} top="50%" transform="translateY(-50%)" width={"100%"}>
+                                <ChevronLeftIcon boxSize={8} ml={-1} mt={-4} onClick={handlePrevImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} left="-5" zIndex={1} />
+                                <ChevronRightIcon boxSize={8} mr={-1} mt={-4} onClick={handleNextImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} right="-5" zIndex={1} />
+                            </Box>
+                        )}
                         <Image
-                            src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+                            key={images[imageIndex]}
+                            src={images[imageIndex]}
                             alt="Green double couch with wooden legs"
                             borderRadius="5px"
-                            minWidth="100%"
+                            minWidth="310px"
+                            maxWidth="310px"
                             minHeight="175px"
                             maxHeight="175px"
                             objectFit="cover"
@@ -58,8 +129,10 @@ function DetailedListingCard() {
                             mt={2}
                             mb={2}
                         >
-                            <Heading size="md" mt={-2}>Living room Sofa</Heading>
-                            <Text mt={-2}>🤍</Text>
+                            <Heading size="md" mt={-2}>{title}</Heading>
+                            <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"}>
+                                {favourite ? "🩷" : "🤍"}
+                            </Text>
                         </Box>
                         <Box className="ratingBox">
                             <Box display="flex" alignItems="center">
@@ -117,25 +190,25 @@ function DetailedListingCard() {
                                 />
                             </Box>
                         </Box>
-                        <Link mt={2} mb={-4} textAlign="left" color="blue" fontSize={"13px"}>View all reviews</Link>
+                        <Text mt={2} mb={-4} textAlign="left" color="blue" fontSize={"13px"} textDecoration={"underline"} cursor={"pointer"} onClick={() => navigate("/reviews")}>View all reviews</Text>
                     </Stack>
                 </CardBody>
                 <Divider />
                 <Box ml={4} mt={2} textAlign="left" fontSize={"15px"}>
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1}>Chilli Crab for Dinner</Text>
+                        <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1}>{shortDescription}</Text>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1} mt={1}><FaMapMarkerAlt fill="#515F7C" /></Text><Text ml={1}>Pasir Ris Ave 1</Text>
+                        <Text mr={1} mt={1}><FaMapMarkerAlt fill="#515F7C" /></Text><Text ml={1}>{approxAddress}</Text>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mt={1.5} mr={1}><FaWallet fill="#515F7C" /></Text><Text flex={1} ml={1} mt={0.5}>$3.50 per pax</Text>
+                        <Text mt={1.5} mr={1}><FaWallet fill="#515F7C" /></Text><Text flex={1} ml={1} mt={0.5}>${portionPrice}</Text>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1} mt={0.5}><FaUser fill="#515F7C" /></Text><Text ml={1}>2 slots left</Text>
+                        <Text mr={1} mt={0.5}><FaUser fill="#515F7C" /></Text><Text ml={1}>{totalSlots} slots left</Text>
                     </Box>
                 </Box>
                 <CardFooter display="flex" justifyContent="center">

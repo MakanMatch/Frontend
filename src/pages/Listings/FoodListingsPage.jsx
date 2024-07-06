@@ -13,7 +13,6 @@ const FoodListingsPage = () => {
     const [hostRating, setHostRating] = useState(0);
     const [guestUserID, setGuestUserID] = useState("");
     const [guestUsername, setGuestUsername] = useState("");
-    const [guestFavCuisine, setGuestFavCuisine] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
@@ -59,7 +58,6 @@ const FoodListingsPage = () => {
         const response = await server.get("/cdn/fetchGuestDetails");
         setGuestUserID(response.data.guestUserID);
         setGuestUsername(response.data.guestUsername);
-        setGuestFavCuisine(response.data.guestFavCuisine);
     }
 
     useEffect(() => {
@@ -134,13 +132,15 @@ const FoodListingsPage = () => {
                                                 hostName={hostName}
                                                 hostFoodRating={hostRating}
                                                 userID={guestUserID}
-                                                isFavourite={guestFavCuisine.split("|").includes(listing.listingID)}
                                                 ShowToast={ShowToast}
                                                 images={listing.images.map((imageName) =>
                                                     getImageLink(listing.listingID, imageName)
                                                 )}
                                                 fetchListings={fetchListings}
                                                 address={listing.address}
+                                                shortDescription={listing.shortDescription}
+                                                approxAddress={listing.approxAddress}
+                                                totalSlots={listing.totalSlots}
                                             />
                                         </Box>
                                     </SlideFade>
