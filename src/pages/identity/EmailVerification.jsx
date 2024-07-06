@@ -20,7 +20,7 @@ function EmailVerification() {
     }, [cooldown]);
 
     const sendEmailVerification = () => {
-        server.post('/identity/emailVerification/sendVerificationEmail', { email })
+        server.post('/identity/emailVerification/send', { email })
             .then((res) => {
                 if (res.data && res.data.startsWith("SUCCESS")) {
                     setCooldown(30);
