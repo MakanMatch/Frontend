@@ -72,7 +72,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
         <>
             <style>
                 {`
-                    .ratingBox {
+                    .disable-select * {
                         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
                         -webkit-touch-callout: none;
                         -webkit-user-select: none;
@@ -80,9 +80,16 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                         -ms-user-select: none;
                         user-select: none;
                     }
+
+                    .enable-select {
+                        -webkit-user-select: text;
+                        -moz-user-select: text;
+                        -ms-user-select: text;
+                        user-select: text;
+                    }
                 `}
             </style>
-            <Card maxW="md" maxH="78vh" borderRadius={6} overflow="hidden">
+            <Card maxW="md" maxH="78vh" borderRadius={6} overflow="hidden" className="disable-select">
                 <CardBody>
                     <Box position="relative" width="fit-content">
                         {images.length > 1 && (
@@ -94,7 +101,10 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                         <Image
                             key={images[imageIndex]}
                             src={images[imageIndex]}
-                            alt="Green double couch with wooden legs"
+                            onError={(e) => {
+                                e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
+                                e.target.src = "/placeholderImage.png";
+                            }}
                             borderRadius="5px"
                             minWidth="310px"
                             maxWidth="310px"
@@ -102,6 +112,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                             maxHeight="175px"
                             objectFit="cover"
                             style={{ pointerEvents: "none" }}
+                            className="image"
                         />
                         <Text
                             borderRadius="50%"
@@ -129,14 +140,14 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                             mt={2}
                             mb={2}
                         >
-                            <Heading size="md" mt={-2}>{title}</Heading>
-                            <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"}>
+                            <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
+                            <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
                                 {favourite ? "🩷" : "🤍"}
                             </Text>
                         </Box>
                         <Box className="ratingBox">
                             <Box display="flex" alignItems="center">
-                                <Text fontSize={"10px"} mr={1} ml={0.5}>1⭐️</Text>
+                                <Text fontSize={"10px"} mr={1} ml={0.5} mt={-2}>1⭐️</Text>
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
@@ -147,7 +158,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                                 />
                             </Box>
                             <Box display="flex" alignItems="center">
-                                <Text fontSize={"10px"} mr={1}>2⭐️</Text>
+                                <Text fontSize={"10px"} mr={1} mt={-2}>2⭐️</Text>
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
@@ -158,7 +169,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                                 />
                             </Box>
                             <Box display="flex" alignItems="center">
-                                <Text fontSize={"10px"} mr={1}>3⭐️</Text>
+                                <Text fontSize={"10px"} mr={1} mt={-2}>3⭐️</Text>
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
@@ -169,7 +180,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                                 />
                             </Box>
                             <Box display="flex" alignItems="center">
-                                <Text fontSize={"10px"} mr={1}>4⭐️</Text>
+                                <Text fontSize={"10px"} mr={1} mt={-2}>4⭐️</Text>
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
@@ -180,7 +191,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                                 />
                             </Box>
                             <Box display="flex" alignItems="center">
-                                <Text fontSize={"10px"} mr={1}>5⭐️</Text>
+                                <Text fontSize={"10px"} mr={1} mt={-1}>5⭐️</Text>
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
@@ -196,24 +207,24 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                 <Divider />
                 <Box ml={4} mt={2} textAlign="left" fontSize={"15px"}>
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1}>{shortDescription}</Text>
+                        <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1} className="enable-select">{shortDescription}</Text>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1} mt={1}><FaMapMarkerAlt fill="#515F7C" /></Text><Text ml={1}>{approxAddress}</Text>
+                        <Text mr={1} mt={1}><FaMapMarkerAlt fill="#515F7C" /></Text><Text ml={1} className="enable-select">{approxAddress}</Text>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mt={1.5} mr={1}><FaWallet fill="#515F7C" /></Text><Text flex={1} ml={1} mt={0.5}>${portionPrice}</Text>
+                        <Text mt={1.5} mr={1}><FaWallet fill="#515F7C" /></Text><Text flex={1} ml={1} mt={0.5} className="enable-select">${portionPrice}</Text>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1} mt={0.5}><FaUser fill="#515F7C" /></Text><Text ml={1}>{totalSlots} slots left</Text>
+                        <Text mr={1} mt={0.5}><FaUser fill="#515F7C" /></Text><Text ml={1} className="enable-select">{totalSlots} slots left</Text>
                     </Box>
                 </Box>
                 <CardFooter display="flex" justifyContent="center">
                     <ButtonGroup spacing="2">
-                        <Button variant="MMPrimary" colorScheme="blue">
+                        <Button variant="MMPrimary" colorScheme="blue" onClick={() => navigate(`/expandedListingGuest?id=${listingID}`)}>
                             Proceed
                         </Button>
                     </ButtonGroup>

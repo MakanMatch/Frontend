@@ -88,11 +88,8 @@ const FoodListing = ({
                         <SlideFade in={true} offsetY="20px">
                             <Image
                                 key={images[0]}
-                                src={images[0] || "/placeholderImage.png"}
-                                onError={(e) => {
-                                    e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
-                                    e.target.src = "/placeholderImage.png"; // Path to your placeholder image
-                                }}
+                                src={images[0]}
+                                fallbackSrc="/placeholderImage.png"
                                 borderRadius="lg"
                                 minWidth={"100%"}
                                 minHeight={"108px"}
