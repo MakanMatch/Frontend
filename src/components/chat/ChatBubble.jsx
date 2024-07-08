@@ -1,6 +1,17 @@
 import React from "react";
-import { Box, Text, Flex, Image, IconButton, Tooltip } from "@chakra-ui/react";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import {
+  Box,
+  Text,
+  Flex,
+  Image,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { FiEdit, FiTrash2, FiMoreVertical } from "react-icons/fi";
 import { FaReply } from "react-icons/fa";
 
 function ChatBubble({
@@ -14,6 +25,9 @@ function ChatBubble({
   repliedMessage,
   edited,
 }) {
+  const menuItemColor = useColorModeValue("teal.500", "teal.200");
+  const menuItemHoverBg = useColorModeValue("teal.100", "teal.600");
+
   return (
     <Box
       position="relative"
@@ -32,14 +46,58 @@ function ChatBubble({
             marginTop="-40px"
           />
         )}
-        <Box position="relative">
+        <Box position="relative" width="100%">
           <Box
             bg={isSender ? "blue.500" : "gray.200"}
             color={isSender ? "white" : "black"}
             borderRadius="lg"
             p={3}
+            pb={4} // Adding bottom padding
+            pt={6} // Adding top padding to accommodate the menu button
             position="relative"
           >
+            <Box position="absolute" top={1} right={1}>
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  icon={<FiMoreVertical />}
+                  size="sm"
+                  variant="ghost"
+                />
+                <MenuList>
+                  {!isSender && (
+                    <MenuItem
+                      icon={<FaReply />}
+                      onClick={onReply}
+                      _hover={{ bg: menuItemHoverBg, color: menuItemColor }}
+                      color={menuItemColor}
+                    >
+                      Reply
+                    </MenuItem>
+                  )}
+                  {isSender && (
+                    <>
+                      <MenuItem
+                        icon={<FiEdit />}
+                        onClick={onEdit}
+                        _hover={{ bg: menuItemHoverBg, color: menuItemColor }}
+                        color={menuItemColor}
+                      >
+                        Edit
+                      </MenuItem>
+                      <MenuItem
+                        icon={<FiTrash2 />}
+                        onClick={onDelete}
+                        _hover={{ bg: menuItemHoverBg, color: menuItemColor }}
+                        color={menuItemColor}
+                      >
+                        Delete
+                      </MenuItem>
+                    </>
+                  )}
+                </MenuList>
+              </Menu>
+            </Box>
             {repliedMessage && (
               <Box
                 bg={isSender ? "blue.300" : "gray.100"}
@@ -74,42 +132,6 @@ function ChatBubble({
               >
                 {timestamp}
               </Text>
-            )}
-            {!isSender && (
-              <Flex mt={2} justifyContent="flex-end">
-                <Tooltip label="Reply" hasArrow>
-                  <IconButton
-                    icon={<FaReply />}
-                    size="sm"
-                    onClick={onReply}
-                    variant="ghost"
-                    colorScheme="teal"
-                  />
-                </Tooltip>
-              </Flex>
-            )}
-            {isSender && (
-              <Flex mt={2} justifyContent="flex-end">
-                <Tooltip label="Edit" hasArrow>
-                  <IconButton
-                    icon={<FiEdit />}
-                    size="sm"
-                    onClick={onEdit}
-                    mr={2}
-                    variant="ghost"
-                    colorScheme="gray"
-                  />
-                </Tooltip>
-                <Tooltip label="Delete" hasArrow>
-                  <IconButton
-                    icon={<FiTrash2 />}
-                    size="sm"
-                    onClick={onDelete}
-                    variant="ghost"
-                    colorScheme="red"
-                  />
-                </Tooltip>
-              </Flex>
             )}
           </Box>
         </Box>
