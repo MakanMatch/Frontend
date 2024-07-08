@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Text,
-  Flex,
-  Image,
-  IconButton,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, Text, Flex, Image, IconButton, Tooltip } from "@chakra-ui/react";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaReply } from "react-icons/fa";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
@@ -20,6 +13,7 @@ function ChatBubble({
   onDelete,
   onReply,
   repliedMessage,
+  edited,
 }) {
   return (
     <Box
@@ -78,7 +72,19 @@ function ChatBubble({
                 </Text>
               </Box>
             )}
-            <Text>{message}</Text>
+            <Text>
+              {message}
+              {edited && (
+                <Text
+                  as="span"
+                  color={isSender ? "gray.300" : "gray.500"}
+                  marginLeft={2}
+                >
+                  (edited)
+                </Text>
+              )}
+            </Text>
+
             {timestamp && (
               <Text
                 fontSize="xs"
