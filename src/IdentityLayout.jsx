@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import Home from './pages/Home'
-import Navbar from './components/Navbar'
 import { Outlet } from 'react-router-dom'
+import Navbar from './components/Navbar.jsx'
 import server from './networking.js'
 import { useDispatch } from 'react-redux';
 import { fetchUser } from './slices/AuthState';
 
-function App() {
+function IdentityRoot() {
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -17,11 +17,13 @@ function App() {
     }, [dispatch]);
 
     return (
-        <div className='defaultLayout'>
-            <Navbar />
-            <Outlet />
+        <div className='identityLayout'>
+            <div className='contentWrapper'>
+                <Navbar />
+                <Outlet />
+            </div>
         </div>
     )
 }
 
-export default App
+export default IdentityRoot

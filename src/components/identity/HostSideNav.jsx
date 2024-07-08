@@ -11,7 +11,7 @@ const HostSidebar = () => {
     const handleLogout = () => {
         dispatch(logout());
         localStorage.clear();
-        navigate("/login");
+        navigate("/identity/login");
     };
 
     return (

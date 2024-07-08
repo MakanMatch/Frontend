@@ -21,7 +21,7 @@ function VerifyToken() {
                 .then((res) => {
                     if (res.data.startsWith('SUCCESS')) {
                         showToast('Email Verified', 'Please log in to continue', 3000, true, 'success');
-                        navigate('/login');
+                        navigate('/identity/login');
                     } else if (res.data.startsWith('UERROR')) {
                         setMessage("Invalid link, please try again.");
                     } else if (res.data.startsWith('ERROR')) {

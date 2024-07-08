@@ -79,7 +79,7 @@ function AccountRecovery() {
                         duration: 3000,
                         isClosable: true,
                     });
-                    navigate('/login');
+                    navigate('/identity/login');
                 }
             })
             .catch((err) => {
@@ -136,7 +136,7 @@ function AccountRecovery() {
                         Recover your account
                     </Heading>
                     <Box w="400px" display="flex" justifyContent="start">
-                        <Button onClick={() => navigate('/login')} mb={4} colorScheme='purple'>
+                        <Button onClick={() => navigate('/identity/login')} mb={4} colorScheme='purple'>
                             Back
                         </Button>
                     </Box>

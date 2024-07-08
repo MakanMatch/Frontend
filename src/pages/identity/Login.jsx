@@ -89,7 +89,7 @@ function Login() {
             <Box
                 w="50%"
                 h="100%"
-                bg="rgba(255, 255, 255, 0.8)"
+                bg="rgba(255, 255, 255, 0.85)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -164,7 +164,7 @@ function Login() {
                         </Button>
                     </Box>
                     <Text textAlign='center' fontSize='12px' mb={5}>
-                        Don't have an account? <Link href='./createAccount' color='teal.500'><Text as='u'>Sign Up</Text></Link>
+                        Don't have an account? <Link href='/identity/createAccount' color='teal.500'><Text as='u'>Sign Up</Text></Link>
                     </Text>
                 </VStack>
             </Box>

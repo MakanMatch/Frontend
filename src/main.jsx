@@ -25,6 +25,7 @@ import Chat2 from './pages/chat/Chat2.jsx'
 import MyAccount from './pages/identity/MyAccount.jsx'
 import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
 import VerifyToken from './pages/identity/VerifyToken.jsx';
+import IdentityRoot from './IdentityLayout.jsx';
 
 const store = configureStore({
     reducer: {
@@ -43,9 +44,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={'version'} element={<Version />} />
                         <Route path={"expandedListing"} element={<ExpandedListingHost />} />
                         <Route path={"expandedListingGuest"} element={<ExpandedListingGuest />} />
-                        <Route path={"/createAccount"} element={<CreateAccount />} />
-                        <Route path={"login"} element={<Login />} />
-                        <Route path={"emailVerification"} element={<EmailVerification />} />
                         <Route path={"verifyToken"} element={<VerifyToken />} />
                         <Route path={"accountRecovery"} element={<AccountRecovery />} />
                         <Route path={"myAccount"} element={<MyAccount />} />
@@ -53,6 +51,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"chat2"} element={<Chat2 />}></Route>
                         <Route path='*' element={<NotFound />} />
+                    </Route>
+                    <Route path='/identity' element={<IdentityRoot />}>
+                        <Route path={"createAccount"} element={<CreateAccount />} />
+                        <Route path={"login"} element={<Login />} />
+                        <Route path={"emailVerification"} element={<EmailVerification />} />
                     </Route>
                 </Routes>
             </BrowserRouter>

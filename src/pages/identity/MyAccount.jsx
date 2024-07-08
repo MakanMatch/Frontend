@@ -26,7 +26,7 @@ const MyAccount = () => {
   const handleLogout = () => {
     dispatch(logout());
     localStorage.clear();
-    navigate("/login");
+    navigate("/identity/login");
   };
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const MyAccount = () => {
 
   useEffect(() => {
     if (loaded && !user) {
-      navigate("/login");
+      navigate("/identity/login");
     }
   }, [loaded, user, navigate]);
 

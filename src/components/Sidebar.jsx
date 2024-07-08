@@ -23,7 +23,7 @@ function Sidebar({ isOpen, onClose }) {
             navigate('/myAccount');
         } else {
             console.log("Sign in first.")
-            navigate('/login');
+            navigate('/identity/login');
         }
         onClose()
     };
