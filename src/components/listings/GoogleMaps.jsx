@@ -27,7 +27,7 @@ const GoogleMaps = ({ lat, long }) => {
             const map = new Map(mapRef.current, {
                 center: LatLong,
                 zoom: 17,
-                mapId: "DEMO_MAP_ID",
+                mapId: import.meta.env.VITE_GMAPS_MAPID,
                 mapTypeControl: false,
                 streetViewControl: false,
             });

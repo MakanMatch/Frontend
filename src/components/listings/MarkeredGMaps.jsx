@@ -41,7 +41,7 @@ const MarkeredGMaps = ({ addresses, listings, userID, isSmallerThan1095, getImag
           new Map(mapRef.current, {
             center: { lat: 1.3521, lng: 103.8198 },
             zoom: 11,
-            mapId: "DEMO_MAP_ID",
+            mapId: import.meta.env.VITE_GMAPS_MAPID,
             mapTypeControl: false,
             streetViewControl: false,
           });
@@ -49,7 +49,7 @@ const MarkeredGMaps = ({ addresses, listings, userID, isSmallerThan1095, getImag
           const map = new Map(mapRef.current, {
             center: { lat: 1.3621, lng: 103.8198 },
             zoom: 11,
-            mapId: "DEMO_MAP_ID",
+            mapId: import.meta.env.VITE_GMAPS_MAPID,
             mapTypeControl: false,
             streetViewControl: false,
           });
