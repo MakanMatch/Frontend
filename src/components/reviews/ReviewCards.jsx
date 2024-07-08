@@ -38,6 +38,8 @@ const CreateReview = ({
     const [liked, setLiked] = useState(isLiked);
     const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
     const [modalImageIndex, setModalImageIndex] = useState(null);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [profileImage, setProfileImage] = useState('');
     const imageRefs = useRef([]);
 
     useEffect(() => {
@@ -56,7 +58,12 @@ const CreateReview = ({
         };
         fetchLikeStatus();
     }, [reviewID, guestID, showToast]);
-    
+
+    const handleProfileClick = (image) => {
+        setProfileImage(image);
+        setIsProfileOpen(true);
+    }
+
     const handleImageClick = (index) => {
         setModalImageIndex(index);
         onOpen();
@@ -168,7 +175,7 @@ const CreateReview = ({
                             borderRadius="lg"
                             minWidth={"100%"}
                             minHeight={{ base: '50%', md: '50%' }}
-                            maxHeight={{ base:"200px", md: "100px"}}
+                            maxHeight={{ base: "200px", md: "100px" }}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -180,7 +187,7 @@ const CreateReview = ({
                             borderRadius="lg"
                             minWidth={"100%"}
                             minHeight={{ base: '50%', md: '50%' }}
-                            maxHeight={{ base:"200px", md: "100px"}}
+                            maxHeight={{ base: "200px", md: "100px" }}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -257,7 +264,9 @@ const CreateReview = ({
                         wrap="wrap">
                         <Flex alignItems='center' mb={{ base: 2, md: 0 }}>
                             {username ? (
-                                <Avatar name={username} src='https://bit.ly/sage-adebayo' />
+                                <Avatar name={username} src='https://bit.ly/sage-adebayo'
+                                    onClick={() => handleProfileClick('https://bit.ly/sage-adebayo')}
+                                    _hover={{ cursor: "pointer" }} />
                             ) : (
                                 <Avatar src='https://bit.ly/sage-adebayo' />
                             )}
@@ -321,7 +330,7 @@ const CreateReview = ({
                     </Flex>
                 </CardHeader>
                 <CardBody>
-                {comments && (<Text textAlign="left" mb={4}>{comments}</Text>)}
+                    {comments && (<Text textAlign="left" mb={4}>{comments}</Text>)}
                 </CardBody>
                 {images && images.filter(image => image !== null).length > 0 && (
                     <CardBody>
@@ -330,16 +339,27 @@ const CreateReview = ({
                 )}
                 <CardFooter>
                     <Button flex='1' variant='ghost'
-                    backgroundColor={liked ? 'blue.100' : 'gray.100'} 
-                    leftIcon={liked ? <Liked /> : <Like />} 
-                    _hover={{ 
-                        backgroundColor: liked ? 'blue.300' : 'gray.200', 
-                        color: liked ? 'white' : 'gray.800' 
-                    }}
-                    onClick={toggleLike}>
+                        backgroundColor={liked ? 'blue.100' : 'gray.100'}
+                        leftIcon={liked ? <Liked /> : <Like />}
+                        _hover={{
+                            backgroundColor: liked ? 'blue.300' : 'gray.200',
+                            color: liked ? 'white' : 'gray.800'
+                        }}
+                        onClick={toggleLike}>
                         <Text>{currentLikeCount}</Text>
                     </Button>
                 </CardFooter>
+                <Modal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} size="lg" isCentered>
+                <ModalOverlay />
+                <ModalContent maxW="max-content" background="transparent" boxShadow="none">
+                        <Image
+                            boxSize='500px'
+                            borderRadius='full'
+                            src='https://bit.ly/sage-adebayo'
+                            alt='Dan Abramov'
+                        />
+                </ModalContent>
+                </Modal>
                 <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
                     <ModalOverlay />
                     <ModalContent maxWidth="90vw" maxHeight="80vh" overflow="auto">
