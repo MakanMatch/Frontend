@@ -86,12 +86,6 @@ const SubmitReviews = ({
             await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
                 .then((res) => {
                     if (res.data && res.data.startsWith("SUCCESS")) {
-                        toast({
-                            title: 'Review submitted successfully.',
-                            status: 'success',
-                            duration: 3000,
-                            isClosable: true,
-                        });
                         showToast("Review submitted successfully", "", 3000, true, "success")
                         console.log('Review submitted successfully!');
                         setIsSubmitting(false);
