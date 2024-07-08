@@ -6,6 +6,16 @@ import server from '../../networking';
 import { ArrowBackIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
+import { useDisclosure } from '@chakra-ui/react';
+import {
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+} from '@chakra-ui/react'
 
 function Reviews() {
     const toast = useToast();
@@ -17,6 +27,7 @@ function Reviews() {
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
     const { onCopy, hasCopied } = useClipboard(hostContactNum)
     const [searchParams] = useSearchParams();
+    const { isOpen, onOpen, onClose } = useDisclosure();
     let hostID = searchParams.get('hostID'); // change to const afterwards
     if (!hostID) {
         hostID = "272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4";
@@ -83,6 +94,8 @@ function Reviews() {
                             boxSize='100px'
                             src='https://bit.ly/dan-abramov'
                             alt='Dan Abramov'
+                            onClick={onOpen}
+                            cursor="pointer"
                         />
                         <Spacer display={{ base: 'none', md: 'block' }} />
                         <Flex direction="column" align={{ base: 'center', md: 'left' }} ml={{ base: 0, md: 4 }} textAlign={{ base: 'center', md: 'left' }}>
@@ -120,6 +133,17 @@ function Reviews() {
             </Flex>
             <Heading mt={5} size="lg"><Text>Reviews</Text></Heading>
             <SortReviews />
+            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                <ModalOverlay />
+                <ModalContent maxW="max-content" background="transparent" boxShadow="none">
+                        <Image
+                            boxSize='500px'
+                            borderRadius='full'
+                            src='https://bit.ly/dan-abramov'
+                            alt='Dan Abramov'
+                        />
+                </ModalContent>
+            </Modal>
         </Box>
     )
 }
