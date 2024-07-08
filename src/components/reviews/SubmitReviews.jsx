@@ -16,12 +16,15 @@ import {
 import {
     FormControl,
     FormLabel,
-    FormErrorMessage,
     FormHelperText,
 } from '@chakra-ui/react'
 import configureShowToast from '../../components/showToast';
 
-function SubmitReviews() {
+const SubmitReviews = ({
+    hostName,
+    guestID,
+    hostID
+}) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const [foodRating, setFoodRating] = useState(0);
@@ -76,6 +79,8 @@ function SubmitReviews() {
             formData.append('images', file);
         });
         formData.append('dateCreated', currentDate);
+        formData.append('guestID', guestID);
+        formData.append('hostID', hostID);
 
         try {
             await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
@@ -130,7 +135,7 @@ function SubmitReviews() {
                                 alt='Dan Abramov'
                             />
                             <Text fontSize={{ base: '2xl', md: '3xl' }} textAlign='center' mt={{ base: 2, md: 0 }} ml={{ base: 0, md: 4 }}>
-                                Jamie Oliver
+                                {hostName}
                             </Text>
                         </Flex>
                         <FormControl>

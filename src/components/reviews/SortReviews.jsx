@@ -8,13 +8,15 @@ import server from '../../networking'
 import CreateReview from './ReviewCards';
 import configureShowToast from '../../components/showToast';
 
-function SortReviews() {
+const SortReviews = ({
+    hostID,
+    guestID
+}) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
     const [likedReviews, setLikedReviews] = useState([])
-    const guestID = "47f4497b-1331-4b8a-97a4-095a79a1fd48"; //hardcoded guestID, should be dynamic, retrieve from URL
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {
@@ -86,7 +88,7 @@ function SortReviews() {
                 sortOrder = "mostRecent"
                 break;
         }
-        fetchReviews("272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4", sortOrder); //hardcoded hostID, should be dynamic, retrieve from URL
+        fetchReviews(hostID, sortOrder);
     }, [activeTab]);
 
     return (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Input, Flex, HStack, Text, Container, Image, Textarea, Spacer, useToast, Heading, Center, useClipboard, Tooltip } from '@chakra-ui/react';
+import { Button, Box, Flex, HStack, Text, Image, Spacer, useToast, Heading, useClipboard, Tooltip } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -11,10 +11,6 @@ import {
     Modal,
     ModalOverlay,
     ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
 } from '@chakra-ui/react'
 
 function Reviews() {
@@ -28,10 +24,8 @@ function Reviews() {
     const { onCopy, hasCopied } = useClipboard(hostContactNum)
     const [searchParams] = useSearchParams();
     const { isOpen, onOpen, onClose } = useDisclosure();
-    let hostID = searchParams.get('hostID'); // change to const afterwards
-    if (!hostID) {
-        hostID = "272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4";
-    }
+    const hostID = searchParams.get('hostID');
+    const guestID = searchParams.get('guestID');     
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -69,8 +63,26 @@ function Reviews() {
         }
     };
 
+    const fetchGuestInfo = async () => {
+        try {
+            const response = await server.get(`/cdn/accountInfo?userID=${guestID}`);
+            if (!response.data) {
+                showToast("No guest information found", "Please try again later.", 3000, true, "info")
+            }
+        } catch (error) {
+            toast.closeAll();
+            showToast("Error fetching guest information", "Directing you back to homepage", 3000, true, "error");
+            console.error("Error fetching guest info:", error);
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 3000);
+        }
+    
+    }
+
     useEffect(() => {
         fetchHostInfo();
+        fetchGuestInfo();
     }, []);
 
     return (
@@ -118,7 +130,11 @@ function Reviews() {
                             </Button>
                             </Tooltip>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            <SubmitReviews />
+                            <SubmitReviews 
+                                hostName={hostName}
+                                guestID={guestID}
+                                hostID={hostID}
+                            />
                         </Flex>
                     </Flex>
                 </Box>
@@ -135,7 +151,10 @@ function Reviews() {
                 </Box>
             </Flex>
             <Heading mt={5} size="lg"><Text>Reviews</Text></Heading>
-            <SortReviews />
+            <SortReviews 
+                hostID={hostID}
+                guestID={guestID}
+            />
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
                 <ModalContent maxW="max-content" background="transparent" boxShadow="none">
