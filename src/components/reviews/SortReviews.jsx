@@ -24,7 +24,6 @@ const SortReviews = ({
 
     const fetchReviews = async (hostID, sortOrder) => {
         try {
-
             // Get liked reviews
             const likedResponse = await server.get(`/likeReview/userLiked?guestID=${guestID}`);
             if (likedResponse.status === 200 && Array.isArray(likedResponse.data)) {
@@ -60,6 +59,11 @@ const SortReviews = ({
                     return review;
                 }));
                 setReviews(reviewsWithGuestInfo);
+            } else if (response.status === 200 && !Array.isArray(response.data)) {
+                setReviews([]);
+                showToast("No reviews found", "", 3000, false, "info");
+            } else {
+                showToast("An error occurred", "Please try again later", 3000, true, "error");
             }
         } catch (error) {
             showToast("An error occurred", "Please try again later", 3000, true, "error");
@@ -99,7 +103,7 @@ const SortReviews = ({
             <TabPanels>
                 <TabPanel>
                     <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
-                        {Array.isArray(reviews) && reviews.length > 0 ?
+                        {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
@@ -120,7 +124,7 @@ const SortReviews = ({
                 </TabPanel>
                 <TabPanel>
                 <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
-                        {Array.isArray(reviews) && reviews.length > 0 ?
+                        {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
@@ -141,7 +145,7 @@ const SortReviews = ({
                 </TabPanel>
                 <TabPanel>
                 <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
-                        {Array.isArray(reviews) && reviews.length > 0 ?
+                        {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
@@ -162,7 +166,7 @@ const SortReviews = ({
                 </TabPanel>
                 <TabPanel>
                 <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
-                        {Array.isArray(reviews) && reviews.length > 0 ?
+                        {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}

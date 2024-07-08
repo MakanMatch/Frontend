@@ -65,8 +65,11 @@ function Reviews() {
     const fetchGuestInfo = async () => {
         try {
             const response = await server.get(`/cdn/accountInfo?userID=${guestID}`);
-            if (!response.data) {
-                showToast("No guest information found", "Please try again later.", 3000, true, "info")
+            if (!response.data && response.status !== 200) {
+                showToast("No guest information found", "Directing you back to homepage", 3000, true, "info");
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 3000);
             }
         } catch (error) {
             toast.closeAll();

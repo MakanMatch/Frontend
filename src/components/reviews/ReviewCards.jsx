@@ -63,7 +63,6 @@ const CreateReview = ({
     }
 
     const handleImageClick = (index) => {
-        setModalImageIndex(index);
         onOpen();
         setTimeout(() => {
             imageRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
