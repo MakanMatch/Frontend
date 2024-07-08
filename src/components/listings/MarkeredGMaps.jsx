@@ -6,7 +6,7 @@ import { useToast } from "@chakra-ui/react";
 import configureShowToast from "../../components/showToast";
 import server from "../../networking";
 
-const MarkeredGMaps = ({ addresses }) => {
+const MarkeredGMaps = ({ addresses, isSmallerThan1095 }) => {
   const mapRef = useRef(null);
   const toast = useToast();
   const showToast = configureShowToast(toast);
@@ -49,16 +49,11 @@ const MarkeredGMaps = ({ addresses }) => {
         } else {
           console.log(validCoordinates.length + " valid coordinates found");
           const map = new Map(mapRef.current, {
-            center: { lat: 1.3521, lng: 103.8198 },
+            center: { lat: 1.3621, lng: 103.8198 },
             zoom: 11,
             mapId: "DEMO_MAP_ID",
             mapTypeControl: false,
             streetViewControl: false,
-          });
-          const demoCoordinates = { lat: 1.4284751, lng: 103.8359705 };
-          new AdvancedMarkerElement({
-            position: demoCoordinates,
-            map: map,
           });
           validCoordinates.forEach(({ lat, lng }) => {
             new AdvancedMarkerElement({
@@ -79,14 +74,13 @@ const MarkeredGMaps = ({ addresses }) => {
           console.error("Error fetching address coordinates:", error);
         });
     }
-  }, [addresses]);
+}, [addresses]);
 
-  return (
-    <div
-      ref={mapRef}
-      style={{ height: "83vh", width: "100%", borderRadius: "10px" }}
-    />
-  );
+    return (
+        <div
+        ref={mapRef}
+        style={{ height: isSmallerThan1095 ? "45vh" : "83vh", width: "100%", borderRadius: "10px"}}/>
+    );
 };
 
 export default MarkeredGMaps;
