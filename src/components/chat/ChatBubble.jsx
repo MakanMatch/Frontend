@@ -115,6 +115,7 @@ function ChatBubble({
               {edited && (
                 <Text
                   as="span"
+                  fontSize="xs" // Making the text smaller
                   color={isSender ? "gray.300" : "gray.500"}
                   marginLeft={2}
                 >
