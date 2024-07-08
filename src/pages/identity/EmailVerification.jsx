@@ -2,15 +2,36 @@ import React, { useState, useEffect } from 'react';
 import {
     Box, Heading, Text, VStack, Image, Button, useToast
 } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import server from '../../networking';
+import showToast from '../../components/showToast';
 
 function EmailVerification() {
-    const location = useLocation();
-    const email = new URLSearchParams(location.search).get('email');
+    const [searchParams] = useSearchParams();
     const [cooldown, setCooldown] = useState(0);
     const toast = useToast();
 
+    const email = searchParams.get('email');
+
+    useEffect(() => {
+        server.post('/identity/emailVerification/send', { email })
+        .then((res) => {
+            if (!res.data || res.data.startsWith("ERROR") || res.data.startsWith("UERROR")) {
+                showToast('Error', res.data, 3000, true, 'error')
+            }
+        })
+        .catch((err) => {
+            console.log(err)
+            toast({
+                title: 'Error',
+                description: err.response?.data || 'Failed to send verification email.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            });
+        });
+    }, [])
+    
     useEffect(() => {
         let timer;
         if (cooldown > 0) {

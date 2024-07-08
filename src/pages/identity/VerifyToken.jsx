@@ -1,35 +1,43 @@
-import React, { useEffect } from 'react';
-import { Box, Heading, Text, VStack } from '@chakra-ui/react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Box, Heading, Text, useToast, VStack } from '@chakra-ui/react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import server from '../../networking';
+import configureShowToast from '../../components/showToast';
 
 function VerifyToken() {
-    const location = useLocation();
+    const toast = useToast()
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const [message, setMessage] = useState('');
+    const showToast = configureShowToast(toast);
 
-    // Get token from searchParams
+    // Get token and userID from searchParams
     const token = searchParams.get('token');
-    const userID = searchParams.get('userID')
+    const userID = searchParams.get('userID');
 
     useEffect(() => {
-        if (token) {
+        if (token && userID) {
             server.post('/identity/emailVerification/verify', { userID, token })
                 .then((res) => {
                     if (res.data.startsWith('SUCCESS')) {
-                        navigate('/'); // Navigate to myAccount on successful verification
+                        showToast('Email Verified', 'Please log in to continue', 3000, true, 'success');
+                        navigate('/login');
+                    } else if (res.data.startsWith('UERROR')) {
+                        setMessage("Invalid link, please try again.");
+                    } else if (res.data.startsWith('ERROR')) {
+                        setMessage("Something went wrong, please try again.");
                     } else {
-                        // Handle error case, e.g., token expired or invalid
-                        console.error('Verification failed:', res.data);
-                        // Optionally show a message to the user
+                        console.error('Unexpected response:', res.data);
                     }
                 })
                 .catch((err) => {
                     console.error('Error verifying token:', err);
-                    // Handle error, show error message to user
+                    setMessage("Something went wrong, please try again!.");
                 });
+        } else {
+            setMessage("Invalid link, please try again.");
         }
-    }, [token, navigate]);
+    }, [token, userID, navigate]);
 
     return (
         <Box
@@ -43,7 +51,7 @@ function VerifyToken() {
                 <Heading as="h1" size="xl" mb={4} textAlign="center">
                     Verifying Email...
                 </Heading>
-                <Text>Please wait while we verify your email...</Text>
+                <Text>{message || "Please wait while we verify your email..."}</Text>
             </VStack>
         </Box>
     );
