@@ -62,13 +62,12 @@ function ChatUi() {
       console.log("Received message:", receivedMessage);
 
       if (receivedMessage.type === "chat_history") {
-        console.log(receivedMessage.messages)
         setMessages(receivedMessage.messages)
       } else if (receivedMessage.action === "edit") {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.messageID === receivedMessage.id
-              ? { ...msg, message: receivedMessage.message, edited: true }
+              ? { ...msg, message: receivedMessage.message}
               : msg
           )
         );
@@ -109,8 +108,8 @@ function ChatUi() {
         receiver: "James",
         message: messageInput,
         datetime: new Date().toISOString(),
-        replyTo: replyTo ? replyTo.message : null, // Include the replied-to message
-        replyToID: replyTo ? replyTo.messageID : null // Include the replied-to message ID
+        replyTo: replyTo ? replyTo.message : null,
+        replyToID: replyTo ? replyTo.messageID : null 
       };
   
       ws.current.send(JSON.stringify(newMessage));
@@ -170,7 +169,10 @@ function ChatUi() {
   };
 
   const handleReply = (message) => {
-    setReplyTo(message); // Set the message being replied to
+    console.log("Replying to:", message);
+    console.log("Replying to:", message.messageID);
+    console.log("Replying to:", message.message);
+    setReplyTo(message);
   };
 
   return (
@@ -223,6 +225,7 @@ function ChatUi() {
         >
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
             {messages.map((msg) => (
+              console.log("here", msg),
               <ChatBubble
                 key={msg.messageID}
                 message={msg.message}
@@ -236,7 +239,7 @@ function ChatUi() {
                 onEdit={() => handleEditPrompt(msg.messageID, msg.message)}
                 onDelete={() => handleDeletePrompt(msg.messageID)}
                 onReply={() => handleReply(msg)} // Pass the handleReply function
-                repliedMessage={msg.replyTo} // Pass the replied-to message
+                repliedMessage={msg.repliedMessage} 
                 edited={msg.edited}
               />
             ))}
@@ -264,39 +267,52 @@ function ChatUi() {
               mr={2}
             />
             <Input
-              placeholder="Type a message"
-              bg="white"
-              color="black"
-              borderColor="gray.300"
-              _placeholder={{ color: "gray.500" }}
+              placeholder="Type a message..."
               flex="1"
-              height="48px"
-              fontSize="lg"
-              padding={4}
+              mr={2}
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyDown={handleKeyDown}
             />
+            <Button colorScheme="teal" onClick={sendMessage}>
+              Send
+            </Button>
           </Flex>
         </Box>
       </Center>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog isOpen={deleteDialogOpen} onClose={closeDeleteDialog}>
+      {isSmallerThan950px && (
+        <Box>
+          <VStack mt={10}>
+            <IconButton
+              aria-label="Add emoji"
+              icon={<FiSmile boxSize={8} />}
+              variant="ghost"
+              colorScheme="gray"
+            />
+            <IconButton
+              aria-label="Add photo"
+              icon={<FiCamera boxSize={8} />}
+              variant="ghost"
+              colorScheme="gray"
+            />
+          </VStack>
+        </Box>
+      )}
+      <AlertDialog
+        isOpen={deleteDialogOpen}
+        leastDestructiveRef={undefined}
+        onClose={closeDeleteDialog}
+      >
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Delete Message
             </AlertDialogHeader>
-
             <AlertDialogBody>
               Are you sure you want to delete this message?
             </AlertDialogBody>
-
             <AlertDialogFooter>
-              <Button variant="ghost" onClick={closeDeleteDialog}>
-                Cancel
-              </Button>
+              <Button onClick={closeDeleteDialog}>Cancel</Button>
               <Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
                 Delete
               </Button>
@@ -309,4 +325,3 @@ function ChatUi() {
 }
 
 export default ChatUi;
-

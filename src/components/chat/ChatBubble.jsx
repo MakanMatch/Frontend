@@ -22,6 +22,7 @@ function ChatBubble({
   repliedMessage,
 }) {
   return (
+    console.log(repliedMessage),
     <Box position="relative" marginY={2} maxW="70%" alignSelf={isSender ? 'flex-end' : 'flex-start'}>
       <Flex alignItems="center">
         {!isSender && (
