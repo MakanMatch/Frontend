@@ -17,6 +17,13 @@ import {
   AlertDialogOverlay,
   Button,
   useMediaQuery,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import { FiSmile, FiCamera, FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
@@ -29,6 +36,8 @@ function ChatUi() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
   const [replyTo, setReplyTo] = useState(null);
+  const [editMessageId, setEditMessageId] = useState(null);
+  const [editMessageContent, setEditMessageContent] = useState("");
   const chatBottomRef = useRef(null); // Reference to the bottom of chat container
 
   const ws = useRef(null);
@@ -128,24 +137,34 @@ function ChatUi() {
     }
   };
 
-  const handleEditPrompt = (messageId, currentMessage) => {
-    const newMessage = prompt("Edit your message:", currentMessage);
-    if (newMessage && newMessage.trim() !== "") {
+  const openEditModal = (messageId, currentMessage) => {
+    setEditMessageId(messageId);
+    setEditMessageContent(currentMessage);
+  };
+
+  const closeEditModal = () => {
+    setEditMessageId(null);
+    setEditMessageContent("");
+  };
+
+  const handleEditMessage = () => {
+    if (editMessageId && editMessageContent.trim() !== "") {
       const editedMessage = {
-        id: messageId,
+        id: editMessageId,
         action: "edit",
         sender: "Jamie",
-        message: newMessage,
+        message: editMessageContent,
         datetime: new Date().toISOString(),
       };
       ws.current.send(JSON.stringify(editedMessage));
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
-          msg.messageID === messageId
-            ? { ...msg, message: newMessage, edited: true }
+          msg.messageID === editMessageId
+            ? { ...msg, message: editMessageContent, edited: true }
             : msg
         )
       );
+      closeEditModal();
     }
   };
 
@@ -172,8 +191,6 @@ function ChatUi() {
 
   const handleReply = (message) => {
     console.log("Replying to:", message);
-    console.log("Replying to:", message.messageID);
-    console.log("Replying to:", message.message);
     setReplyTo(message);
   };
 
@@ -272,9 +289,9 @@ function ChatUi() {
                       ? "https://bit.ly/dan-abramov"
                       : "https://randomuser.me/api/portraits/men/4.jpg"
                   }
-                  onEdit={() => handleEditPrompt(msg.messageID, msg.message)}
+                  onEdit={() => openEditModal(msg.messageID, msg.message)}
                   onDelete={() => handleDeletePrompt(msg.messageID)}
-                  onReply={() => handleReply(msg)} // Pass the handleReply function
+                  onReply={() => handleReply(msg)}
                   repliedMessage={msg.repliedMessage}
                   edited={msg.edited}
                 />
@@ -282,7 +299,7 @@ function ChatUi() {
             ))}
             <div ref={chatBottomRef} /> {/* Ref to scroll to */}
           </VStack>
-          {replyTo && ( // Display the message being replied to
+          {replyTo && (
             <Flex
               bg="gray.200"
               p={2}
@@ -334,6 +351,29 @@ function ChatUi() {
         </Box>
       </Center>
 
+      {/* Edit Message Modal */}
+      <Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Message</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              value={editMessageContent}
+              onChange={(e) => setEditMessageContent(e.target.value)}
+              placeholder="Edit your message..."
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
+              Save
+            </Button>
+            <Button onClick={closeEditModal}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Message AlertDialog */}
       <AlertDialog
         isOpen={deleteDialogOpen}
         leastDestructiveRef={undefined}
