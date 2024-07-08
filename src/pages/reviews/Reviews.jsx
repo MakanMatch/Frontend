@@ -96,6 +96,7 @@ function Reviews() {
                             alt='Dan Abramov'
                             onClick={onOpen}
                             cursor="pointer"
+                            ml={{ base: 0, md: 4 }}
                         />
                         <Spacer display={{ base: 'none', md: 'block' }} />
                         <Flex direction="column" align={{ base: 'center', md: 'left' }} ml={{ base: 0, md: 4 }} textAlign={{ base: 'center', md: 'left' }}>
