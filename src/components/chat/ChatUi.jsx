@@ -69,7 +69,6 @@ function ChatUi() {
         }
       }
 
-      console.log("Received message:", receivedMessage);
 
       if (receivedMessage.type === "chat_history") {
         setMessages(receivedMessage.messages);
@@ -124,7 +123,6 @@ function ChatUi() {
       };
 
       ws.current.send(JSON.stringify(newMessage));
-      console.log("Sent message:", newMessage);
 
       setMessageInput("");
       setReplyTo(null); // Clear the reply state after sending
@@ -190,7 +188,6 @@ function ChatUi() {
   };
 
   const handleReply = (message) => {
-    console.log("Replying to:", message);
     setReplyTo(message);
   };
 
