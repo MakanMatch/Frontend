@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // FoodListingsPage.jsx
 import { useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
 import server from "../../networking";
 import FoodListing from "../../components/listings/FoodListing";
-import GMapsEmbed from "../../components/listings/GMapsEmbed";
+import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
 
@@ -13,6 +14,7 @@ const FoodListingsPage = () => {
     const [hostRating, setHostRating] = useState(0);
     const [guestUserID, setGuestUserID] = useState("");
     const [guestUsername, setGuestUsername] = useState("");
+    const [addresses, setAddresses] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
@@ -61,6 +63,10 @@ const FoodListingsPage = () => {
     }
 
     useEffect(() => {
+        setAddresses(listings.map((listing) => listing.address));
+    }, [listings]);
+
+    useEffect(() => {
         const fetchData = async () => {
             await fetchHostDetails();
             await fetchGuestDetails();
@@ -82,13 +88,13 @@ const FoodListingsPage = () => {
             </Box>
             {isSmallerThan1095 && (
                 <Box mb={4}>
-                    <GMapsEmbed maxHeight="250px"/>
+                    <MarkeredGMaps addresses={addresses} maxHeight="520px"/> {/* Pass in a list of addresses as prop */}
                 </Box>
             )}
             <Skeleton isLoaded={!loading}>
                 <Flex display="flex" flexWrap="wrap">
                     <Box
-                        maxH="520px"
+                        maxH="600px"
                         overflowY="auto"
                         boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
                         borderRadius={"22px 8px 8px 22px"}
@@ -151,7 +157,7 @@ const FoodListingsPage = () => {
                                 display="flex"
                                 justifyContent="center"
                                 alignItems="center"
-                                height="65vh"
+                                height="70vh"
                             >
                                 <Text
                                     textAlign="center"
@@ -167,7 +173,7 @@ const FoodListingsPage = () => {
                     {!isSmallerThan1095 && (
                         <Box flex="1" ml={5}>
                             <SlideFade in={true} offsetY="20px">
-                                <GMapsEmbed />
+                                <MarkeredGMaps addresses={addresses} maxHeight="520px"/> {/* Pass in a list of addresses as prop */}
                             </SlideFade>
                         </Box>
                     )}
