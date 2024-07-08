@@ -5,6 +5,7 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import server from "../../networking";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const FoodListing = ({
     listingID,
@@ -46,7 +47,7 @@ const FoodListing = ({
         const apiKey = import.meta.env.VITE_GMAPS_API_KEY;
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address="${encodedAddress}"&key=${apiKey}`;
         try {
-            const response = await server.get(url);
+            const response = await axios.get(url);
             const location = response.data.results[0].geometry.location;
             return {
                 latitude: location.lat,
