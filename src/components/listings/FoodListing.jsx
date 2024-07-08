@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useMediaQuery } from "@chakra-ui/react";
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useMediaQuery, Skeleton } from "@chakra-ui/react";
 import { DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import server from "../../networking";
@@ -24,6 +24,7 @@ const FoodListing = ({
     const toast = useToast();
     const [latitude, setLatitude] = useState(null);
     const [longitude, setLongitude] = useState(null);
+    const [imageLoaded, setImageLoaded] = useState(false);
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
     const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
     const navigate = useNavigate();
@@ -86,17 +87,23 @@ const FoodListing = ({
                 <CardBody>
                     <Box position="relative">
                         <SlideFade in={true} offsetY="20px">
-                            <Image
-                                key={images[0]}
-                                src={images[0]}
-                                fallbackSrc="/placeholderImage.png"
-                                borderRadius="lg"
-                                minWidth={"100%"}
-                                minHeight={"108px"}
-                                maxHeight={"108px"}
-                                objectFit="cover"
-                                style={{ pointerEvents: "none" }}
-                            />
+                            <Skeleton isLoaded={imageLoaded} height="108px" width="100%" borderRadius="lg" fadeDuration={1}>
+                                <Image
+                                    key={images[0]}
+                                    src={images[0]}
+                                    onLoad={() => setImageLoaded(true)}
+                                    onError={(e) => {
+                                        e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
+                                        e.target.src = "/placeholderImage.png";
+                                    }}
+                                    borderRadius="lg"
+                                    minWidth={"100%"}
+                                    minHeight={"108px"}
+                                    maxHeight={"108px"}
+                                    objectFit="cover"
+                                    style={{ pointerEvents: "none" }}
+                                />
+                            </Skeleton>
                         </SlideFade>
                     </Box>
                     <Stack mt="6" spacing="3">
