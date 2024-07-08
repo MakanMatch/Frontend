@@ -18,7 +18,7 @@ import {
   Button,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { FiSmile, FiCamera } from "react-icons/fi";
+import { FiSmile, FiCamera, FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatHistory from "../../components/chat/ChatHistory";
 
@@ -28,7 +28,7 @@ function ChatUi() {
   const [messageToDelete, setMessageToDelete] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
-  const [replyTo, setReplyTo] = useState(null); // New state for tracking the message being replied to
+  const [replyTo, setReplyTo] = useState(null);
 
   const ws = useRef(null);
 
@@ -175,6 +175,10 @@ function ChatUi() {
     setReplyTo(message);
   };
 
+  const cancelReply = () => {
+    setReplyTo(null);
+  };
+
   return (
     <Flex>
       <ChatHistory />
@@ -244,14 +248,22 @@ function ChatUi() {
               />
             ))}
           </VStack>
+          {replyTo && ( // Display the message being replied to
+            <Flex bg="gray.200" p={2} borderRadius="md" mb={2} align="center" justify="space-between">
+              <Text fontSize="sm" fontStyle="italic">
+                Replying to: {replyTo.message}
+              </Text>
+              <IconButton
+                aria-label="Cancel reply"
+                icon={<FiX />}
+                variant="ghost"
+                colorScheme="red"
+                size="sm"
+                onClick={cancelReply}
+              />
+            </Flex>
+          )}
           <Flex mt={4} align="center">
-            {replyTo && ( // Display the message being replied to
-              <Box bg="gray.200" p={2} borderRadius="md" mb={2}>
-                <Text fontSize="sm" fontStyle="italic">
-                  Replying to: {replyTo.message}
-                </Text>
-              </Box>
-            )}
             <IconButton
               aria-label="Add emoji"
               icon={<FiSmile boxSize={8} />}
