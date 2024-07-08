@@ -99,8 +99,8 @@ const CreateReview = ({
                     alt="Review image"
                     borderRadius="lg"
                     minWidth={"100%"}
-                    minHeight={"108px"}
-                    maxHeight={"200"}
+                    minHeight={"200px"}
+                    maxHeight={"400px"}
                     objectFit="cover"
                     _hover={{ cursor: "pointer" }}
                 />
@@ -168,7 +168,7 @@ const CreateReview = ({
                             borderRadius="lg"
                             minWidth={"100%"}
                             minHeight={{ base: '50%', md: '50%' }}
-                            maxHeight={"100px"}
+                            maxHeight={{ base:"200px", md: "100px"}}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -180,7 +180,7 @@ const CreateReview = ({
                             borderRadius="lg"
                             minWidth={"100%"}
                             minHeight={{ base: '50%', md: '50%' }}
-                            maxHeight={"100px"}
+                            maxHeight={{ base:"200px", md: "100px"}}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -190,7 +190,7 @@ const CreateReview = ({
         }
         if (numImages === 4) {
             return (
-                <Flex wrap="wrap" gap={2}>
+                <Flex wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
                     {images.map((image, index) => (
                         <Image
                             onClick={() => handleImageClick(index)}
@@ -200,7 +200,7 @@ const CreateReview = ({
                             borderRadius="lg"
                             minWidth={{ base: '100%', md: "calc(50% - 6px)" }}
                             minHeight={"108px"}
-                            maxHeight={"100px"}
+                            maxHeight={"120px"}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -209,7 +209,7 @@ const CreateReview = ({
             );
         }
         return (
-            <Flex wrap="wrap" gap={2}>
+            <Flex wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
                 {images.slice(0, 4).map((image, index) => (
                     <Image
                         onClick={() => handleImageClick(index)}
@@ -219,7 +219,7 @@ const CreateReview = ({
                         borderRadius="lg"
                         minWidth={{ base: '100%', md: "calc(50% - 6px)" }}
                         minHeight={"108px"}
-                        maxHeight={"100px"}
+                        maxHeight={"120px"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
