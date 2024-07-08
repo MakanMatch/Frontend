@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Input, Flex, Text, Container, Image, Textarea, Spacer, Icon, Heading, Avatar, useToast, SimpleGrid } from '@chakra-ui/react';
-import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react';
+import { Text, useToast, SimpleGrid } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import { BiLike } from 'react-icons/bi';
-import { FaUtensils, FaSoap } from "react-icons/fa";
 import server from '../../networking'
 import CreateReview from './ReviewCards';
 import configureShowToast from '../../components/showToast';
@@ -65,7 +62,7 @@ const SortReviews = ({
                 setReviews(reviewsWithGuestInfo);
             }
         } catch (error) {
-            showToast("An error occurred",` Please try again later: ${error}`, 3000, true, "error");
+            showToast("An error occurred", "Please try again later", 3000, true, "error");
         }
     }
 

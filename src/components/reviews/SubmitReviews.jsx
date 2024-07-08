@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import StarRating from './StarRatings';
 import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';

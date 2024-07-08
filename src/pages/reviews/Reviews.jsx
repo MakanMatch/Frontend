@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Flex, HStack, Text, Image, Spacer, useToast, Heading, useClipboard, Tooltip } from '@chakra-ui/react';
+import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip } from '@chakra-ui/react';
 import server from '../../networking';
-import { ArrowBackIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
+import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
 import { useDisclosure } from '@chakra-ui/react';
@@ -21,7 +21,6 @@ function Reviews() {
     const [hostAddress, setHostAddress] = useState("");
     const [hostContactNum, setHostContactNum] = useState(0);
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
-    const { onCopy, hasCopied } = useClipboard(hostContactNum)
     const [searchParams] = useSearchParams();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const hostID = searchParams.get('hostID');

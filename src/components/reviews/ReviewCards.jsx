@@ -37,9 +37,7 @@ const CreateReview = ({
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [liked, setLiked] = useState(isLiked);
     const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
-    const [modalImageIndex, setModalImageIndex] = useState(null);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
-    const [profileImage, setProfileImage] = useState('');
     const imageRefs = useRef([]);
 
     useEffect(() => {
@@ -50,14 +48,14 @@ const CreateReview = ({
                 if (response.status === 400 || response.status === 500) {
                     showToast("An error occurred", "Please try again later.", 3000, true, "error");
                 } else {
-                    setLiked(response.data);
+                    setLiked(response.data.liked);
                 }
             } catch (error) {
                 showToast("An error occurred", "Please try again later.", 3000, true, "error");
             }
         };
         fetchLikeStatus();
-    }, [reviewID, guestID, showToast]);
+    }, [reviewID, guestID]);
 
     const handleProfileClick = (image) => {
         setProfileImage(image);
@@ -88,7 +86,7 @@ const CreateReview = ({
                 if (fetchLikeStatus.status === 400 || fetchLikeStatus.status === 500) {
                     showToast("An error occurred", "Please try again later.", 3000, true, "error");
                 } else {
-                    if (fetchLikeStatus.data) {
+                    if (fetchLikeStatus.data.liked) {
                         setLiked(true);
                         setCurrentLikeCount(currentLikeCount + 1);
                     } else {
