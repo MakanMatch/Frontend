@@ -29,6 +29,7 @@ function ChatUi() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
   const [replyTo, setReplyTo] = useState(null);
+  const chatBottomRef = useRef(null); // Reference to the bottom of chat container
 
   const ws = useRef(null);
 
@@ -97,6 +98,10 @@ function ChatUi() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = () => {
     if (ws.current && messageInput.trim() !== "") {
@@ -176,6 +181,12 @@ function ChatUi() {
     setReplyTo(null);
   };
 
+  const scrollToBottom = () => {
+    if (chatBottomRef.current) {
+      chatBottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <Flex>
       <ChatHistory />
@@ -246,6 +257,7 @@ function ChatUi() {
                 edited={msg.edited}
               />
             ))}
+            <div ref={chatBottomRef} /> {/* Ref to scroll to */}
           </VStack>
           {replyTo && ( // Display the message being replied to
             <Flex bg="gray.200" p={2} borderRadius="md" mb={2} align="center" justify="space-between">
