@@ -62,12 +62,12 @@ function ChatUi() {
       console.log("Received message:", receivedMessage);
 
       if (receivedMessage.type === "chat_history") {
-        setMessages(receivedMessage.messages)
+        setMessages(receivedMessage.messages);
       } else if (receivedMessage.action === "edit") {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.messageID === receivedMessage.id
-              ? { ...msg, message: receivedMessage.message}
+              ? { ...msg, message: receivedMessage.message }
               : msg
           )
         );
@@ -75,13 +75,10 @@ function ChatUi() {
         setMessages((prevMessages) =>
           prevMessages.filter((msg) => msg.messageID !== receivedMessage.id)
         );
-      } else if (receivedMessage.action === "reload") {
-        window.location.reload();
-      } else if(receivedMessage.action === "error") {
+      } else if (receivedMessage.action === "error") {
         alert(receivedMessage.message);
         window.location.reload();
-      } 
-      else {
+      } else {
         setMessages((prevMessages) => [...prevMessages, receivedMessage]);
       }
     };
@@ -109,12 +106,12 @@ function ChatUi() {
         message: messageInput,
         datetime: new Date().toISOString(),
         replyTo: replyTo ? replyTo.message : null,
-        replyToID: replyTo ? replyTo.messageID : null 
+        replyToID: replyTo ? replyTo.messageID : null,
       };
-  
+
       ws.current.send(JSON.stringify(newMessage));
       console.log("Sent message:", newMessage);
-  
+
       setMessageInput("");
       setReplyTo(null); // Clear the reply state after sending
     }
@@ -229,11 +226,13 @@ function ChatUi() {
         >
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
             {messages.map((msg) => (
-              console.log("here", msg),
               <ChatBubble
                 key={msg.messageID}
                 message={msg.message}
-                timestamp={new Date(msg.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                timestamp={new Date(msg.datetime).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
                 isSender={msg.sender === "Jamie"}
                 photoUrl={
                   msg.sender === "Jamie"
@@ -243,7 +242,7 @@ function ChatUi() {
                 onEdit={() => handleEditPrompt(msg.messageID, msg.message)}
                 onDelete={() => handleDeletePrompt(msg.messageID)}
                 onReply={() => handleReply(msg)} // Pass the handleReply function
-                repliedMessage={msg.repliedMessage} 
+                repliedMessage={msg.repliedMessage}
                 edited={msg.edited}
               />
             ))}
@@ -292,24 +291,6 @@ function ChatUi() {
           </Flex>
         </Box>
       </Center>
-      {isSmallerThan950px && (
-        <Box>
-          <VStack mt={10}>
-            <IconButton
-              aria-label="Add emoji"
-              icon={<FiSmile boxSize={8} />}
-              variant="ghost"
-              colorScheme="gray"
-            />
-            <IconButton
-              aria-label="Add photo"
-              icon={<FiCamera boxSize={8} />}
-              variant="ghost"
-              colorScheme="gray"
-            />
-          </VStack>
-        </Box>
-      )}
       <AlertDialog
         isOpen={deleteDialogOpen}
         leastDestructiveRef={undefined}
