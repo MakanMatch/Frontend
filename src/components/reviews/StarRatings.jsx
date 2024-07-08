@@ -3,13 +3,13 @@ import { HStack, IconButton } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 
 const StarRating = ({ maxStars = 5, size = '20px', color = 'yellow.400', onChange }) => {
-    const [rating, setRating] = useState(0);
+    const [rating, setRating] = useState(0); // set to 1 to let minimunm rating be 1
     const [hoverRating, setHoverRating] = useState(0);
 
     const handleMouseEnter = (index) => setHoverRating(index);
     const handleMouseLeave = () => setHoverRating(0);
     const handleClick = (index) => {
-        const newRating = (rating === index) ? 0 : index;
+        const newRating = (rating === index) ? 0 : index; // set to 1 to let minimunm rating be 1
         setRating(newRating);
         if (onChange) onChange(newRating);
     };
