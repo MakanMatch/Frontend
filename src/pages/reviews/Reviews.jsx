@@ -112,9 +112,11 @@ function Reviews() {
                         </Flex>
                         <Flex gap={3}>
                             <Spacer display={{ base: 'none', md: 'block' }} />
+                            <Tooltip label={`Hygiene grade for ${hostName}`} aria-label="Hygiene grade tooltip">
                             <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
                                 {hostHygieneGrade}
                             </Button>
+                            </Tooltip>
                             <Spacer display={{ base: 'none', md: 'block' }} />
                             <SubmitReviews />
                         </Flex>
