@@ -25,6 +25,7 @@ function ExpandedListingGuest() {
         approxAddress: null,
         address: null,
         totalSlots: null,
+        slotsTaken: null,
         datetime: null,
         published: null,
         hostID: null
@@ -62,6 +63,13 @@ function ExpandedListingGuest() {
 
         data.images = data.images.split("|")
 
+        var slotsTaken = 0;
+        if (data.guests) {
+            data.guests.forEach(guest => { slotsTaken++; })
+        }
+
+        data.slotsTaken = slotsTaken;
+
         return data
     }
 
@@ -75,6 +83,7 @@ function ExpandedListingGuest() {
             .then(response => {
                 if (response.status == 200) {
                     const processedData = processListingData(response.data)
+                    if (processedData.published == false) { console.log("Attempt to access unpublished listing blocked; redirecting..."); navigate("/"); return; }
                     setListingData(processedData)
                     return
                 } else if (response.status == 404) {

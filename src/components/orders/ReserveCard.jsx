@@ -3,10 +3,11 @@ import React, { useState } from 'react'
 
 function ReserveCard({ hostData, listingData }) {
     const [portionSize, setPortionSize] = useState(1)
+    const noSlotsRemaining = listingData.slotsTaken == listingData.totalSlots
 
     return (
         <Card variant={'elevated'} maxW={'100%'}>
-            <CardHeader fontFamily={"Sora"} fontWeight={"bold"} fontSize={'large'}>2 Slots Remain (3/5)</CardHeader>
+            <CardHeader fontFamily={"Sora"} fontWeight={"bold"} fontSize={'large'} color={noSlotsRemaining ? "red": "black"}>{listingData.totalSlots - listingData.slotsTaken} Slots Remain ({listingData.slotsTaken}/{listingData.totalSlots})</CardHeader>
             <CardBody textAlign={'left'}>
                 <Text>Payment to be made 6 hours prior to meal.</Text>
                 <br />
@@ -30,7 +31,7 @@ function ReserveCard({ hostData, listingData }) {
                         <Text fontSize={'smaller'} fontFamily={'Sora'} color={'gray.500'}>${listingData.portionPrice}/portion</Text>
                     </VStack>
                     <Spacer />
-                    <Button variant={'MMPrimary'} w={'50%'} ml={'20px'}>Reserve</Button>
+                    <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} isDisabled={noSlotsRemaining}>Reserve</Button>
                 </HStack>
             </CardFooter>
         </Card>
