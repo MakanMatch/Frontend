@@ -23,11 +23,11 @@ function CreateAccount() {
     const validationSchema = Yup.object().shape({
         username: Yup.string().required('Username is required'),
         email: Yup.string()
-        .matches(
-            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-            'Invalid email address'
-        )
-        .required('Email is required'),
+            .matches(
+                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                'Invalid email address'
+            )
+            .required('Email is required'),
         password: Yup.string()
             .min(6, 'Password must be at least 6 characters')
             .required('Password is required'),
@@ -64,7 +64,7 @@ function CreateAccount() {
                         duration: 3000,
                         isClosable: true,
                     });
-                    navigate('/emailVerification');
+                    navigate(`/emailVerification?email=${submitValues.email}`);
                 } else {
                     toast({
                         title: 'Account creation failed.',
@@ -94,21 +94,21 @@ function CreateAccount() {
 
                 actions.setSubmitting(false);
             });
-        };
+    };
 
-        const formik = useFormik({
-            initialValues: {
-                username: '',
-                email: '',
-                password: '',
-                confirmPassword: '',
-                contactNum: '',
-                address: '',
-                isHostAccount: false
-            },
-            validationSchema,
-            onSubmit: handleSubmit,
-        });
+    const formik = useFormik({
+        initialValues: {
+            username: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            contactNum: '',
+            address: '',
+            isHostAccount: false
+        },
+        validationSchema,
+        onSubmit: handleSubmit,
+    });
 
         return (
             <Box

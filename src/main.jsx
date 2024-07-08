@@ -24,6 +24,7 @@ import Chat from './pages/chat/Chat.jsx'
 import Chat2 from './pages/chat/Chat2.jsx'
 import MyAccount from './pages/identity/MyAccount.jsx'
 import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
+import VerifyToken from './pages/identity/VerifyToken.jsx';
 
 const store = configureStore({
     reducer: {
@@ -45,6 +46,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"/createAccount"} element={<CreateAccount />} />
                         <Route path={"login"} element={<Login />} />
                         <Route path={"emailVerification"} element={<EmailVerification />} />
+                        <Route path={"verifyToken"} element={<VerifyToken />} />
                         <Route path={"accountRecovery"} element={<AccountRecovery />} />
                         <Route path={"myAccount"} element={<MyAccount />} />
                         <Route path={'reviews'} element={<Reviews />} />
