@@ -88,7 +88,7 @@ const FoodListingsPage = () => {
             </Box>
             {isSmallerThan1095 && (
                 <Box mb={4}>
-                    <MarkeredGMaps addresses={addresses} isSmallerThan1095={true}/>
+                    <MarkeredGMaps addresses={addresses} listings={listings} userID={guestUserID} isSmallerThan1095={true} getImageLink={getImageLink}/>
                 </Box>
             )}
             <Skeleton isLoaded={!loading}>
@@ -173,7 +173,7 @@ const FoodListingsPage = () => {
                     {!isSmallerThan1095 && (
                         <Box flex="1" ml={5}>
                             <SlideFade in={true} offsetY="20px">
-                                <MarkeredGMaps addresses={addresses} isSmallerThan1095={false}/>
+                                <MarkeredGMaps addresses={addresses} listings={listings} userID={guestUserID} isSmallerThan1095={false} getImageLink={getImageLink}/>
                             </SlideFade>
                         </Box>
                     )}

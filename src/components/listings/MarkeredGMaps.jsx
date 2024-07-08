@@ -1,20 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useToast } from "@chakra-ui/react";
 import configureShowToast from "../../components/showToast";
 import server from "../../networking";
 
-const MarkeredGMaps = ({ addresses, isSmallerThan1095 }) => {
+const MarkeredGMaps = ({ addresses, listings, userID, isSmallerThan1095, getImageLink }) => {
   const mapRef = useRef(null);
   const toast = useToast();
   const showToast = configureShowToast(toast);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (addresses.length > 0) {
-      console.log("Received the following addresses: ", addresses);
-
       const fetchCoordinates = async (address) => {
         const encodedAddress = encodeURIComponent(String(address));
         const apiKey = import.meta.env.VITE_GMAPS_API_KEY;
@@ -38,7 +38,6 @@ const MarkeredGMaps = ({ addresses, isSmallerThan1095 }) => {
         const { AdvancedMarkerElement } = await window.google.maps.importLibrary("marker");
 
         if (validCoordinates.length === 0) {
-          console.log("No valid coordinates found");
           new Map(mapRef.current, {
             center: { lat: 1.3521, lng: 103.8198 },
             zoom: 11,
@@ -47,7 +46,6 @@ const MarkeredGMaps = ({ addresses, isSmallerThan1095 }) => {
             streetViewControl: false,
           });
         } else {
-          console.log(validCoordinates.length + " valid coordinates found");
           const map = new Map(mapRef.current, {
             center: { lat: 1.3621, lng: 103.8198 },
             zoom: 11,
@@ -55,11 +53,18 @@ const MarkeredGMaps = ({ addresses, isSmallerThan1095 }) => {
             mapTypeControl: false,
             streetViewControl: false,
           });
-          validCoordinates.forEach(({ lat, lng }) => {
-            new AdvancedMarkerElement({
+          validCoordinates.forEach(({ lat, lng }, index) => {
+            const images = listings[index].images.map((imageName) =>
+                getImageLink(listings[index].listingID, imageName)
+            )
+            const marker = new AdvancedMarkerElement({
               position: { lat, lng },
               map: map,
-            });
+            })
+            marker.addListener("click", () => {
+                const listing = listings[index];
+                navigate(`/targetListing?latitude=${lat}&longitude=${lng}&listingID=${listing.listingID}&userID=${userID}&images=${encodeURIComponent(JSON.stringify(images))}&title=${listing.title}&shortDescription=${listing.shortDescription}&approxAddress=${listing.approxAddress}&portionPrice=${listing.portionPrice}&totalSlots=${listing.totalSlots}`)
+              });
           });
         }
       };
@@ -67,7 +72,6 @@ const MarkeredGMaps = ({ addresses, isSmallerThan1095 }) => {
       Promise.all(addresses.map(fetchCoordinates))
         .then((coordinatesList) => {
           const validCoordinates = coordinatesList.filter(({ lat, lng }) => lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180);
-          console.log("Consolidated valid coordinates:", validCoordinates);
           initializeMap(validCoordinates);
         })
         .catch((error) => {
