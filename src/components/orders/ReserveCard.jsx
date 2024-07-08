@@ -15,7 +15,7 @@ function ReserveCard({ hostData, listingData }) {
                 <HStack mt={'15px'}>
                     <Text>Portion:</Text>
                     <Spacer />
-                    <NumberInput defaultValue={1} min={1} max={listingData.totalSlots} value={portionSize} onChange={(v) => setPortionSize(v)}>
+                    <NumberInput isDisabled={noSlotsRemaining} defaultValue={1} min={1} max={listingData.totalSlots - listingData.slotsTaken} value={portionSize} onChange={(v) => setPortionSize(v)}>
                         <NumberInputField />
                         <NumberInputStepper>
                             <NumberIncrementStepper />
@@ -31,7 +31,7 @@ function ReserveCard({ hostData, listingData }) {
                         <Text fontSize={'smaller'} fontFamily={'Sora'} color={'gray.500'}>${listingData.portionPrice}/portion</Text>
                     </VStack>
                     <Spacer />
-                    <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} isDisabled={noSlotsRemaining}>Reserve</Button>
+                    <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} isDisabled={noSlotsRemaining || portionSize <= 0}>Reserve</Button>
                 </HStack>
             </CardFooter>
         </Card>
