@@ -29,7 +29,7 @@ const SortReviews = ({
         try {
 
             // Get liked reviews
-            const likedResponse = await server.get(`/likeReview/userLikedReviews?guestID=${guestID}`);
+            const likedResponse = await server.get(`/likeReview/userLiked?guestID=${guestID}`);
             if (likedResponse.status === 200 && Array.isArray(likedResponse.data)) {
                 setLikedReviews(likedResponse.data);
             } else {

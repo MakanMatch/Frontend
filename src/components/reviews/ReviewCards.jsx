@@ -74,7 +74,13 @@ const CreateReview = ({
 
     const toggleLike = async () => {
         try {
-            const postLikeResponse = await server.post(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
+            const reviewInfo = {
+                reviewID: reviewID,
+                guestID: guestID
+            }
+            const postLikeResponse = await server.post('/likeReview', reviewInfo, {headers: {
+                'Content-Type': 'application/json',
+            }});
             if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
                 showToast("An error occurred", "Please try again later.", 3000, true, "error");
             } else {
