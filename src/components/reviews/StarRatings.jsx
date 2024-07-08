@@ -9,8 +9,9 @@ const StarRating = ({ maxStars = 5, size = '20px', color = 'yellow.400', onChang
     const handleMouseEnter = (index) => setHoverRating(index);
     const handleMouseLeave = () => setHoverRating(0);
     const handleClick = (index) => {
-        setRating(index);
-        if (onChange) onChange(index);
+        const newRating = (rating === index) ? 0 : index;
+        setRating(newRating);
+        if (onChange) onChange(newRating);
     };
 
     return (
