@@ -113,14 +113,6 @@ function Reviews() {
                         <Spacer display={{ base: 'none', md: 'block' }} />
                         <Flex direction="column" align={{ base: 'center', md: 'left' }} ml={{ base: 0, md: 4 }} textAlign={{ base: 'center', md: 'left' }}>
                             <Text fontSize={{ base: '2xl', md: '4xl' }}>{hostName}</Text>
-                            <HStack spacing={2}>
-                                <PhoneIcon />
-                                <Tooltip label={hasCopied ? "Copied!" : "Click to copy"} closeOnClick={false}>
-                                    <Text fontSize={{ base: 'sm', md: 'md' }} cursor="pointer" onClick={onCopy}>
-                                        {hostContactNum}
-                                    </Text>
-                                </Tooltip>
-                            </HStack>
                         </Flex>
                         <Flex gap={3}>
                             <Spacer display={{ base: 'none', md: 'block' }} />
