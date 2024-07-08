@@ -2,7 +2,6 @@ import React from "react";
 import { Box, Text, Flex, Image, IconButton, Tooltip } from "@chakra-ui/react";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaReply } from "react-icons/fa";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 function ChatBubble({
   message,
@@ -34,25 +33,6 @@ function ChatBubble({
           />
         )}
         <Box position="relative">
-          {isSender ? (
-            <ChevronLeftIcon
-              color="blue.500"
-              boxSize={8}
-              position="absolute"
-              top="25%"
-              transform="translateY(-50%)"
-              right="-20px"
-            />
-          ) : (
-            <ChevronRightIcon
-              color="black.200"
-              boxSize={8}
-              position="absolute"
-              top="25%"
-              transform="translateY(-50%)"
-              left="-20px"
-            />
-          )}
           <Box
             bg={isSender ? "blue.500" : "gray.200"}
             color={isSender ? "white" : "black"}
