@@ -41,8 +41,21 @@ const CreateReview = ({
     const imageRefs = useRef([]);
 
     useEffect(() => {
-        setLiked(isLiked);
-    }, [isLiked]);
+        // Fetch the like status when component mounts or guestID changes
+        const fetchLikeStatus = async () => {
+            try {
+                const response = await server.get(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
+                if (response.status === 400 || response.status === 500) {
+                    showToast("An error occurred", "Please try again later.", 3000, true, "error");
+                } else {
+                    setLiked(response.data);
+                }
+            } catch (error) {
+                showToast("An error occurred", "Please try again later.", 3000, true, "error");
+            }
+        };
+        fetchLikeStatus();
+    }, [reviewID, guestID, showToast]);
     
     const handleImageClick = (index) => {
         setModalImageIndex(index);
@@ -56,25 +69,25 @@ const CreateReview = ({
         try {
             const postLikeResponse = await server.post(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
             if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
-                showToast("An error occured", "Please try again later.", 3000, true, "error")
-            }
-            const fetchLikeStatus = await server.get(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
-            if (fetchLikeStatus.status === 400 || fetchLikeStatus.status === 500) {
-                showToast("An error occured", "Please try again later.", 3000, true, "error")
+                showToast("An error occurred", "Please try again later.", 3000, true, "error");
             } else {
-                if (fetchLikeStatus.data) {
-                    setLiked(true);
-                    setCurrentLikeCount(currentLikeCount + 1);
+                const fetchLikeStatus = await server.get(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
+                if (fetchLikeStatus.status === 400 || fetchLikeStatus.status === 500) {
+                    showToast("An error occurred", "Please try again later.", 3000, true, "error");
                 } else {
-                    setLiked(false);
-                    setCurrentLikeCount(currentLikeCount - 1);
+                    if (fetchLikeStatus.data) {
+                        setLiked(true);
+                        setCurrentLikeCount(currentLikeCount + 1);
+                    } else {
+                        setLiked(false);
+                        setCurrentLikeCount(currentLikeCount - 1);
+                    }
                 }
             }
         } catch (error) {
-            showToast("An error occured", "Please try again later.", 3000, true, "error")
+            showToast("An error occurred", "Please try again later.", 3000, true, "error");
         }
     }
-
     const renderImages = () => {
         const numImages = images.length;
         if (numImages === 1) {
