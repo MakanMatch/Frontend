@@ -187,6 +187,18 @@ function ChatUi() {
     }
   };
 
+  const formatDate = (date) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
+
+  const shouldDisplayDate = (currentMessage, previousMessage) => {
+    if (!previousMessage) return true;
+    const currentDate = new Date(currentMessage.datetime).toDateString();
+    const previousDate = new Date(previousMessage.datetime).toDateString();
+    return currentDate !== previousDate;
+  };
+
   return (
     <Flex>
       <ChatHistory />
@@ -236,31 +248,49 @@ function ChatUi() {
           boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
         >
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
-            {messages.map((msg) => (
-              <ChatBubble
-                key={msg.messageID}
-                message={msg.message}
-                timestamp={new Date(msg.datetime).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-                isSender={msg.sender === "Jamie"}
-                photoUrl={
-                  msg.sender === "Jamie"
-                    ? "https://bit.ly/dan-abramov"
-                    : "https://randomuser.me/api/portraits/men/4.jpg"
-                }
-                onEdit={() => handleEditPrompt(msg.messageID, msg.message)}
-                onDelete={() => handleDeletePrompt(msg.messageID)}
-                onReply={() => handleReply(msg)} // Pass the handleReply function
-                repliedMessage={msg.repliedMessage}
-                edited={msg.edited}
-              />
+            {messages.map((msg, index) => (
+              <React.Fragment key={msg.messageID}>
+                {shouldDisplayDate(msg, messages[index - 1]) && (
+                  <Text
+                    fontSize="sm"
+                    color="gray.500"
+                    textAlign="center"
+                    mb={2}
+                  >
+                    {formatDate(msg.datetime)}
+                  </Text>
+                )}
+                <ChatBubble
+                  message={msg.message}
+                  timestamp={new Date(msg.datetime).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                  isSender={msg.sender === "Jamie"}
+                  photoUrl={
+                    msg.sender === "Jamie"
+                      ? "https://bit.ly/dan-abramov"
+                      : "https://randomuser.me/api/portraits/men/4.jpg"
+                  }
+                  onEdit={() => handleEditPrompt(msg.messageID, msg.message)}
+                  onDelete={() => handleDeletePrompt(msg.messageID)}
+                  onReply={() => handleReply(msg)} // Pass the handleReply function
+                  repliedMessage={msg.repliedMessage}
+                  edited={msg.edited}
+                />
+              </React.Fragment>
             ))}
             <div ref={chatBottomRef} /> {/* Ref to scroll to */}
           </VStack>
           {replyTo && ( // Display the message being replied to
-            <Flex bg="gray.200" p={2} borderRadius="md" mb={2} align="center" justify="space-between">
+            <Flex
+              bg="gray.200"
+              p={2}
+              borderRadius="md"
+              mb={2}
+              align="center"
+              justify="space-between"
+            >
               <Text fontSize="sm" fontStyle="italic">
                 Replying to: {replyTo.message}
               </Text>
@@ -303,6 +333,7 @@ function ChatUi() {
           </Flex>
         </Box>
       </Center>
+
       <AlertDialog
         isOpen={deleteDialogOpen}
         leastDestructiveRef={undefined}
@@ -314,7 +345,8 @@ function ChatUi() {
               Delete Message
             </AlertDialogHeader>
             <AlertDialogBody>
-              Are you sure you want to delete this message?
+              Are you sure you want to delete this message? You can't undo this
+              action afterwards.
             </AlertDialogBody>
             <AlertDialogFooter>
               <Button onClick={closeDeleteDialog}>Cancel</Button>
