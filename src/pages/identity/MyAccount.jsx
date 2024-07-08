@@ -14,11 +14,13 @@ import {
 import { logout, fetchUser } from "../../slices/AuthState";
 import GuestSidebar from "../../components/identity/GuestSideNav";
 import HostSidebar from "../../components/identity/HostSideNav";
+import server from '../../networking';
 
 const MyAccount = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
+  const [accountInfo, setAccountInfo] = useState(null);
   const { user, loaded, error } = useSelector((state) => state.auth);
 
   const handleLogout = () => {
@@ -39,6 +41,27 @@ const MyAccount = () => {
     }
   }, [loaded, user, navigate]);
 
+  useEffect(() => {
+    const fetchAccountInfo = async () => {
+      try {
+        const userID = JSON.parse(atob(localStorage.getItem("jwt").split(".")[1])).userID;
+        const response = await server.get(`/cdn/accountInfo?userID=${userID}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        });
+        setAccountInfo(response.data);
+      } catch (err) {
+        console.log("Error fetching account info:", err);
+      }
+    };
+
+    if (user && user.userID) {
+      fetchAccountInfo();
+    }
+  }, [user]);
+
   if (!loaded) {
     console.log("Not loaded");
     return <Spinner />;
@@ -49,8 +72,12 @@ const MyAccount = () => {
     return <Spinner />;
   }
 
+  if (!accountInfo) {
+    return <Spinner />;
+  }
+
   const calculateAccountAge = () => {
-    const createdAt = new Date(user.createdAt);
+    const createdAt = new Date(accountInfo.createdAt);
     const currentDate = new Date();
     const diffInMilliseconds = currentDate - createdAt;
     const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
@@ -60,14 +87,14 @@ const MyAccount = () => {
   return (
     <Flex height="100vh">
       {/* Conditionally render the sidebar based on user type */}
-      {user.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
+      {accountInfo.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
 
       {/* Right side content */}
       <Box width="75%" ml={10} position="relative">
         {/* Profile banner */}
         <Box bg="blue.500" height="25%" position="relative" borderRadius={15}>
           <Flex align="center" justify="flex-end" height="100%" pr={10}>
-            <Heading color="white">Guest</Heading>
+            <Heading color="white">{accountInfo.userType}</Heading>
           </Flex>
           {/* Circle avatar */}
           <Box
@@ -82,7 +109,7 @@ const MyAccount = () => {
           >
             <Avatar
               size="3xl"
-              name="User Name"
+              name={accountInfo.username}
               src="https://via.placeholder.com/150"
               position="relative"
               bg="white"
@@ -123,10 +150,10 @@ const MyAccount = () => {
             <Heading size="md" mb={4}>
               Basic Information
             </Heading>
-            <Text>Username: {user.username}</Text>
-            <Text>Email: {user.email}</Text>
-            <Text>Contact: {user.contactNum}</Text>
-            <Text>Address: {user.address}</Text>
+            <Text>Username: {accountInfo.username}</Text>
+            <Text>Email: {accountInfo.email}</Text>
+            <Text>Contact: {accountInfo.contactNum}</Text>
+            <Text>Address: {accountInfo.address}</Text>
             <Button
               colorScheme="purple"
               mb={4}
@@ -140,8 +167,8 @@ const MyAccount = () => {
             <Heading size="md" mb={4}>
               Additional Information
             </Heading>
-            <Text>Favorite Cuisine: {user.favCuisine}</Text>
-            <Text>Meals Matched: {user.mealsMatched}</Text>
+            <Text>Favorite Cuisine: {accountInfo.favCuisine}</Text>
+            <Text>Meals Matched: {accountInfo.mealsMatched}</Text>
             <Text>Account Age: {calculateAccountAge()} days</Text>
             <Spacer />
             <Button
