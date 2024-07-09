@@ -5,7 +5,6 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import server from "../../networking";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 const FoodListingCard = ({
     listingID,
@@ -17,10 +16,11 @@ const FoodListingCard = ({
     ShowToast,
     images,
     fetchListings,
-    address,
     shortDescription,
+    address,
     approxAddress,
-    totalSlots
+    totalSlots,
+    generateCoordinates
 }) => {
     const toast = useToast();
     const [latitude, setLatitude] = useState(null);
@@ -39,23 +39,6 @@ const FoodListingCard = ({
         } else {
             toast.closeAll();
             ShowToast("Error", "Failed to remove listing", "error", 3000);
-        }
-    };
-
-    const generateCoordinates = async (address) => {
-        const encodedAddress = encodeURIComponent(String(address));
-        const apiKey = import.meta.env.VITE_GMAPS_API_KEY;
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address="${encodedAddress}"&key=${apiKey}`;
-        try {
-            const response = await axios.get(url);
-            const location = response.data.results[0].geometry.location;
-            return {
-                latitude: location.lat,
-                longitude: location.lng
-            };
-        } catch (error) {
-            ShowToast("An error occured", "Failed to generate maps coordinates", "error", 3000);
-            return null;
         }
     };
 

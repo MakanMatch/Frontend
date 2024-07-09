@@ -5,6 +5,7 @@ import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
+import axios from "axios";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
@@ -32,6 +33,24 @@ const FoodListingsPage = () => {
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
     }
+
+    const generateCoordinates = async (address) => {
+        const encodedAddress = encodeURIComponent(String(address));
+        const apiKey = import.meta.env.VITE_GMAPS_API_KEY;
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address="${encodedAddress}"&key=${apiKey}`;
+        try {
+            const response = await axios.get(url);
+            const location = response.data.results[0].geometry.location;
+            return {
+                latitude: location.lat,
+                longitude: location.lng
+            };
+        } catch (error) {
+            ShowToast("An error occured", "Failed to generate maps coordinates", "error", 3000);
+            console.error(error);
+            return null;
+        }
+    };
 
     const fetchListings = async () => {
         try {
@@ -141,10 +160,11 @@ const FoodListingsPage = () => {
                                                     getImageLink(listing.listingID, imageName)
                                                 )}
                                                 fetchListings={fetchListings}
-                                                address={listing.address}
                                                 shortDescription={listing.shortDescription}
+                                                address={listing.address}
                                                 approxAddress={listing.approxAddress}
                                                 totalSlots={listing.totalSlots}
+                                                generateCoordinates={generateCoordinates}
                                             />
                                         </Box>
                                     </SlideFade>
