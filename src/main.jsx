@@ -45,7 +45,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"expandedListing"} element={<ExpandedListingHost />} />
                         <Route path={"expandedListingGuest"} element={<ExpandedListingGuest />} />
                         <Route path={"verifyToken"} element={<VerifyToken />} />
-                        <Route path={"accountRecovery"} element={<AccountRecovery />} />
                         <Route path={"myAccount"} element={<MyAccount />} />
                         <Route path={'reviews'} element={<Reviews />} />
                         <Route path={'chat'} element={<Chat />} />
@@ -56,6 +55,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"createAccount"} element={<CreateAccount />} />
                         <Route path={"login"} element={<Login />} />
                         <Route path={"emailVerification"} element={<EmailVerification />} />
+                        <Route path={"accountRecovery"} element={<AccountRecovery />} />
                     </Route>
                 </Routes>
             </BrowserRouter>

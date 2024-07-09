@@ -125,14 +125,15 @@ function AccountRecovery() {
             <Box
                 w="50%"
                 h="100%"
-                bg="rgba(255, 255, 255, 0.8)"
+                bg="rgba(255, 255, 255, 0.85)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
                 p={8}
+                borderRadius={15}
             >
                 <VStack spacing={4} w="full">
-                    <Heading as="h1" size="xl" mb={5} textAlign="center">
+                    <Heading as="h1" size="xl" mb={5} mt={10} textAlign="center">
                         Recover your account
                     </Heading>
                     <Box w="400px" display="flex" justifyContent="start">
@@ -156,12 +157,12 @@ function AccountRecovery() {
                         <FormErrorMessage fontSize='12px'>{formik.errors.usernameOrEmail}</FormErrorMessage>
                     </FormControl>
                     <Box w="400px" display="flex" justifyContent="start">
-                        <Button onClick={sendResetKey} colorScheme='purple' isDisabled={cooldown > 0}>
+                        <Button onClick={sendResetKey} colorScheme='purple' isDisabled={cooldown > 0} mb={4}>
                             {cooldown > 0 ? `Resend in ${cooldown}s` : 'Send password reset key'}
                         </Button>
                     </Box>
                     {showResetFields && (
-                        <Box as="form" onSubmit={formik.handleSubmit} mt={4} w="400px">
+                        <Box as="form" onSubmit={formik.handleSubmit} w="400px">
                             <FormControl isInvalid={formik.errors.resetKey && formik.touched.resetKey} mb={4}>
                                 <FormLabel>Enter reset key</FormLabel>
                                 <Input
@@ -232,7 +233,7 @@ function AccountRecovery() {
                                 <FormErrorMessage fontSize='12px'>{formik.errors.confirmNewPassword}</FormErrorMessage>
                             </FormControl>
                             <Box w="full" display="flex" justifyContent="start">
-                                <Button type="submit" colorScheme='purple'>
+                                <Button type="submit" colorScheme='purple' mb={4} mt={4}>
                                     Reset Password
                                 </Button>
                             </Box>

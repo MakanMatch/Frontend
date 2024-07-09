@@ -123,7 +123,7 @@ function CreateAccount() {
                     borderRadius={15}
                 >
                     <VStack spacing={4} w="full">
-                        <Heading as="h1" size="xl" mb={4} mt={'40px'} textAlign="center">
+                        <Heading as="h1" size="xl" mb={4} mt={10} textAlign="center">
                             Create an account
                         </Heading>
                         <Box as="form" onSubmit={formik.handleSubmit}>
@@ -220,6 +220,7 @@ function CreateAccount() {
                                         setIsHostAccount(!isHostAccount);
                                         formik.setFieldValue('isHostAccount', !isHostAccount);
                                     }}
+                                    borderColor={'gray'}
                                 >
                                     I want to be a host
                                 </Checkbox>
