@@ -110,7 +110,7 @@ const FoodListingsPage = () => {
             </Box>
             {isSmallerThan1095 && coordinatesList.length > 0 && (
                 <Box mb={4}>
-                    <MarkeredGMaps coordinatesList={coordinatesList} listings={listings} userID={guestUserID} isSmallerThan1095={true} getImageLink={getImageLink}/>
+                    <MarkeredGMaps coordinatesList={coordinatesList} listings={listings} isSmallerThan1095={true}/>
                 </Box>
             )}
             <Skeleton isLoaded={!loading}>
@@ -196,7 +196,7 @@ const FoodListingsPage = () => {
                     {!isSmallerThan1095 && coordinatesList.length > 0 && (
                         <Box flex="1" ml={5}>
                             <SlideFade in={true} offsetY="20px">
-                                <MarkeredGMaps addresses={addresses} listings={listings} userID={guestUserID} isSmallerThan1095={false} getImageLink={getImageLink}/>
+                                <MarkeredGMaps coordinatesList={coordinatesList} listings={listings}     isSmallerThan1095={false}/>
                             </SlideFade>
                         </Box>
                     )}

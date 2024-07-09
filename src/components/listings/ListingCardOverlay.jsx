@@ -17,14 +17,14 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
 
     const handlePrevImage = () => {
         if (imageIndex === 0) {
-            setImageIndex(images.length - 1);
+            setImageIndex(images.split(",").length - 1);
         } else {
             setImageIndex(imageIndex - 1);
         }
     }
 
     const handleNextImage = () => {
-        if (imageIndex === images.length - 1) {
+        if (imageIndex === images.split(",").length - 1) {
             setImageIndex(0);
         } else {
             setImageIndex(imageIndex + 1);
@@ -89,15 +89,15 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
             <Card maxW="md" maxH="78vh" borderRadius={6} overflow="hidden" className="disable-select">
                 <CardBody>
                     <Box position="relative" width="fit-content">
-                        {images.length > 1 && (
+                        {images.split(",").length > 1 && (
                             <Box position={"absolute"} top="50%" transform="translateY(-50%)" width={"100%"}>
                                 <ChevronLeftIcon boxSize={8} ml={-1} mt={-4} onClick={handlePrevImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} left="-5" zIndex={1} />
                                 <ChevronRightIcon boxSize={8} mr={-1} mt={-4} onClick={handleNextImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} right="-5" zIndex={1} />
                             </Box>
                         )}
                         <Image
-                            key={images[imageIndex]}
-                            src={images[imageIndex]}
+                            key={images.split(",")[imageIndex]}
+                            src={images.split(",")[imageIndex]}
                             onError={(e) => {
                                 e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
                                 e.target.src = "/placeholderImage.png";

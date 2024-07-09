@@ -22,8 +22,6 @@ const FoodListingCard = ({
     coordinates,
 }) => {
     const toast = useToast();
-    const [latitude, setLatitude] = useState(null);
-    const [longitude, setLongitude] = useState(null);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
     const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
@@ -42,9 +40,22 @@ const FoodListingCard = ({
     };
 
     useEffect(() => {
+        const setLocalStorage = async () => {
+            localStorage.setItem("userID", userID);
+            localStorage.setItem(`images-${listingID}`, images);
+            localStorage.setItem(`title-${listingID}`, title);
+            localStorage.setItem(`shortDescription-${listingID}`, shortDescription);
+            localStorage.setItem(`approxAddress-${listingID}`, approxAddress);
+            localStorage.setItem(`portionPrice-${listingID}`, portionPrice);
+            localStorage.setItem(`totalSlots-${listingID}`, totalSlots);
+        }
+        setLocalStorage();
+    }, []);
+
+    useEffect(() => {
         if (coordinates) {
-            setLatitude(coordinates.latitude);
-            setLongitude(coordinates.longitude);
+            localStorage.setItem(`latitude-${listingID}`, coordinates.lat);
+            localStorage.setItem(`longitude-${listingID}`, coordinates.lng);
         }
     }, [coordinates]);
     return (
@@ -97,7 +108,7 @@ const FoodListingCard = ({
                 {isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"} onClick={() => navigate(`/targetListing?latitude=${latitude}&longitude=${longitude}&listingID=${listingID}&userID=${userID}&images=${encodeURIComponent(JSON.stringify(images))}&title=${title}&shortDescription=${shortDescription}&approxAddress=${approxAddress}&portionPrice=${portionPrice}&totalSlots=${totalSlots}`)}>View</Button>
+                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"} onClick={() => navigate(`/targetListing?listingID=${listingID}`)}>View</Button>
                             <Button onClick={onOpenAlert}>
                                 <Text fontSize={"15px"}><DeleteIcon color="red" mb={1} /> Remove</Text>
                             </Button>
@@ -107,7 +118,7 @@ const FoodListingCard = ({
                 {!isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"} onClick={() => navigate(`/targetListing?latitude=${latitude}&longitude=${longitude}&listingID=${listingID}&userID=${userID}&images=${encodeURIComponent(JSON.stringify(images))}&title=${title}&shortDescription=${shortDescription}&approxAddress=${approxAddress}&portionPrice=${portionPrice}&totalSlots=${totalSlots}`)}>View</Button>
+                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"} onClick={() => navigate(`/targetListing?listingID=${listingID}`)}>View</Button>
                             <Button onClick={onOpenAlert}>
                                 <DeleteIcon color="red" />
                             </Button>

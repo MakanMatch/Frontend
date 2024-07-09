@@ -9,9 +9,7 @@ import configureShowToast from "../../components/showToast";
 const MarkeredGMaps = ({
     coordinatesList,
     listings,
-    userID,
-    isSmallerThan1095,
-    getImageLink,
+    isSmallerThan1095
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -41,28 +39,13 @@ const MarkeredGMaps = ({
                     return map;
                 } else {
                     validCoordinates.forEach(({ lat, lng }, index) => {
-                        const images = listings[index].images.map((imageName) =>
-                            getImageLink(listings[index].listingID, imageName)
-                        );
                         const marker = new AdvancedMarkerElement({
                             position: { lat, lng },
                             map: map,
                         });
                         marker.addListener("click", () => {
                             const listing = listings[index];
-                            navigate(
-                                `/targetListing?latitude=${lat}&longitude=${lng}&listingID=${
-                                    listing.listingID
-                                }&userID=${userID}&images=${encodeURIComponent(
-                                    JSON.stringify(images)
-                                )}&title=${listing.title}&shortDescription=${
-                                    listing.shortDescription
-                                }&approxAddress=${
-                                    listing.approxAddress
-                                }&portionPrice=${
-                                    listing.portionPrice
-                                }&totalSlots=${listing.totalSlots}`
-                            );
+                            navigate(`/targetListing?listingID=${listing.listingID}`);
                         });
                     });
                 }
@@ -76,6 +59,7 @@ const MarkeredGMaps = ({
             InitializeMap(validCoordinates);
         } catch (error) {
             showToast("An error occured", "Failed to render Google Maps", 3000, false, "error");
+            console.error(error);
         }
     }, [coordinatesList]);
 

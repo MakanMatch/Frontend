@@ -6,17 +6,18 @@ import { Box } from "@chakra-ui/react";
 
 const GoogleMapsPage = () => {
     const [searchParams] = useSearchParams();
-    const latitude = Number(searchParams.get("latitude"));
-    const longitude = Number(searchParams.get("longitude"));
     const listingID = searchParams.get("listingID");
-    const userID = searchParams.get("userID");
-    const imagesString = searchParams.get("images");
-    const images = imagesString ? JSON.parse(decodeURIComponent(imagesString)) : [];
-    const title = searchParams.get("title");
-    const shortDescription = searchParams.get("shortDescription");
-    const approxAddress = searchParams.get("approxAddress");
-    const portionPrice = searchParams.get("portionPrice");
-    const totalSlots = searchParams.get("totalSlots");
+
+    const latitude = Number(localStorage.getItem(`latitude-${listingID}`));
+    const longitude = Number(localStorage.getItem(`longitude-${listingID}`));
+    const userID = localStorage.getItem("userID");
+    const images = localStorage.getItem(`images-${listingID}`);
+    console.log("Images from GoogleMapsPage: ", images)
+    const title = localStorage.getItem(`title-${listingID}`);
+    const shortDescription = localStorage.getItem(`shortDescription-${listingID}`);
+    const approxAddress = localStorage.getItem(`approxAddress-${listingID}`);
+    const portionPrice = localStorage.getItem(`portionPrice-${listingID}`);
+    const totalSlots = localStorage.getItem(`totalSlots-${listingID}`);
     return (
         <>
             <Box position="relative" height="100%">
