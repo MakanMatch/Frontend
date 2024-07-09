@@ -93,6 +93,7 @@ function Login() {
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
+                borderRadius={15}
             >
                 <VStack spacing={4} w="full">
                     <Heading as="h1" size="xl" mb={4} mt={20} textAlign="center">

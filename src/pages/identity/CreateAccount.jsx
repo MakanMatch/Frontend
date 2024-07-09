@@ -120,9 +120,10 @@ function CreateAccount() {
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
+                    borderRadius={15}
                 >
                     <VStack spacing={4} w="full">
-                        <Heading as="h1" size="2xl" mb={4} mt={'40px'} textAlign="center">
+                        <Heading as="h1" size="xl" mb={4} mt={'40px'} textAlign="center">
                             Create an account
                         </Heading>
                         <Box as="form" onSubmit={formik.handleSubmit}>
