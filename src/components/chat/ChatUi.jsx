@@ -34,7 +34,6 @@ function ChatUi() {
   const [messageInput, setMessageInput] = useState("");
   const [messageToDelete, setMessageToDelete] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
   const [replyTo, setReplyTo] = useState(null);
   const [editMessageId, setEditMessageId] = useState(null);
   const [editMessageContent, setEditMessageContent] = useState("");
@@ -263,6 +262,7 @@ function ChatUi() {
         >
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
             {messages.map((msg, index) => (
+              console.log(msg),
               <React.Fragment key={msg.messageID}>
                 {shouldDisplayDate(msg, messages[index - 1]) && (
                   <Text
@@ -289,7 +289,7 @@ function ChatUi() {
                   onEdit={() => openEditModal(msg.messageID, msg.message)}
                   onDelete={() => handleDeletePrompt(msg.messageID)}
                   onReply={() => handleReply(msg)}
-                  repliedMessage={msg.repliedMessage}
+                  repliedMessage={msg.replyTo}
                   edited={msg.edited}
                 />
               </React.Fragment>
