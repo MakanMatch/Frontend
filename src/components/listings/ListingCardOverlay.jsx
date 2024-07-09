@@ -86,7 +86,17 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
                     }
                 `}
             </style>
-            <Card maxW="md" maxH="78vh" borderRadius={6} overflow="hidden" className="disable-select">
+            <Card 
+            maxW="350px" 
+            height="80vh"
+            borderRadius={6} 
+            overflow="scroll" 
+            className="disable-select"
+            css={{
+                '&::-webkit-scrollbar': {
+                    display: 'none',
+                },  
+            }}>
                 <CardBody>
                     <Box position="relative" width="fit-content">
                         {images.split(",").length > 1 && (
@@ -105,8 +115,8 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
                             borderRadius="5px"
                             minWidth="310px"
                             maxWidth="310px"
-                            minHeight="175px"
-                            maxHeight="175px"
+                            minHeight="150px"
+                            maxHeight="150px"
                             objectFit="cover"
                             style={{ pointerEvents: "none" }}
                             className="image"
@@ -204,7 +214,7 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
                 <Divider mt={1} />
                 <Box ml={4} mt={2} textAlign="left" fontSize={"15px"}>
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1} className="enable-select">{shortDescription}</Text>
+                        <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1} className="enable-select" maxW={"80%"} overflow="hidden">{shortDescription}</Text>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>
