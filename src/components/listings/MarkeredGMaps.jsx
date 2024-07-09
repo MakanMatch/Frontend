@@ -76,7 +76,6 @@ const MarkeredGMaps = ({
             InitializeMap(validCoordinates);
         } catch (error) {
             showToast("An error occured", "Failed to render Google Maps", 3000, false, "error");
-            console.error(error);
         }
     }, [coordinatesList]);
 

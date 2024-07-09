@@ -45,7 +45,6 @@ const FoodListingsPage = () => {
             return { lat: location.lat, lng: location.lng };
         } catch (error) {
             ShowToast("An error occured", "Failed to generate maps coordinates", "error", 3000);
-            console.error(error);
             return null;
         }
     };
