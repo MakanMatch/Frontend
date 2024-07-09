@@ -57,7 +57,6 @@ const MarkeredGMaps = ({
                 });
 
                 if (addresses.length === 0 || validCoordinates.length === 0) {
-                    console.log("No valid coordinates found");
                     return map;
                 } else {
                     validCoordinates.forEach(({ lat, lng }, index) => {
@@ -97,8 +96,8 @@ const MarkeredGMaps = ({
             );
             InitializeMap(validCoordinates);
         })
-        .catch((error) => {
-            console.error("Error fetching address coordinates:", error);
+        .catch(() => {
+            showToast("An error occured", "Failed to render Google Maps", 3000, false, "error");
         });
     }, [addresses]);
 
