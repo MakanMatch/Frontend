@@ -62,10 +62,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
     }
 
     useEffect(() => {
-        const fetchData = async () => {
-            await fetchFavouriteState();
-        }
-        fetchData();
+        fetchFavouriteState();
     }, []);
     
     return (
