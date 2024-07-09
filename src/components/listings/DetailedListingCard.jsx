@@ -135,7 +135,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                             justifyContent="space-between"
                             flexDirection="row"
                             mt={2}
-                            mb={2}
+                            mb={5}
                         >
                             <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
                             <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
@@ -143,7 +143,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                             </Text>
                         </Box>
                         <Box className="ratingBox">
-                            <Box display="flex" alignItems="center">
+                            <Box display="flex" alignItems="center" mb={1}>
                                 <Text fontSize={"10px"} mr={1} ml={0.5} mt={-2}>1⭐️</Text>
                                 <Progress
                                     colorScheme="green"
@@ -154,7 +154,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                                     flex={1}
                                 />
                             </Box>
-                            <Box display="flex" alignItems="center">
+                            <Box display="flex" alignItems="center" mb={1}>
                                 <Text fontSize={"10px"} mr={1} mt={-2}>2⭐️</Text>
                                 <Progress
                                     colorScheme="green"
@@ -165,7 +165,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                                     flex={1}
                                 />
                             </Box>
-                            <Box display="flex" alignItems="center">
+                            <Box display="flex" alignItems="center" mb={1}>
                                 <Text fontSize={"10px"} mr={1} mt={-2}>3⭐️</Text>
                                 <Progress
                                     colorScheme="green"
@@ -176,7 +176,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                                     flex={1}
                                 />
                             </Box>
-                            <Box display="flex" alignItems="center">
+                            <Box display="flex" alignItems="center" mb={1}>
                                 <Text fontSize={"10px"} mr={1} mt={-2}>4⭐️</Text>
                                 <Progress
                                     colorScheme="green"
@@ -187,7 +187,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                                     flex={1}
                                 />
                             </Box>
-                            <Box display="flex" alignItems="center">
+                            <Box display="flex" alignItems="center" mb={1}>
                                 <Text fontSize={"10px"} mr={1} mt={-1}>5⭐️</Text>
                                 <Progress
                                     colorScheme="green"
@@ -201,7 +201,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                         <Text mt={2} mb={-4} textAlign="left" color="blue" fontSize={"13px"} textDecoration={"underline"} cursor={"pointer"} onClick={() => navigate("/reviews")}>View all reviews</Text>
                     </Stack>
                 </CardBody>
-                <Divider />
+                <Divider mt={1} />
                 <Box ml={4} mt={2} textAlign="left" fontSize={"15px"}>
                     <Box display="flex" justifyContent={"left"} mb={1}>
                         <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1} className="enable-select">{shortDescription}</Text>
@@ -221,7 +221,7 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
                 </Box>
                 <CardFooter display="flex" justifyContent="center">
                     <ButtonGroup spacing="2">
-                        <Button variant="MMPrimary" colorScheme="blue" onClick={() => navigate(`/expandedListingGuest?id=${listingID}`)}>
+                        <Button variant="MMPrimary" colorScheme="blue" onClick={() => navigate(`/expandedListingGuest?id=${listingID}`)} mt={-4}>
                             Proceed
                         </Button>
                     </ButtonGroup>
