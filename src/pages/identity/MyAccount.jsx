@@ -17,7 +17,7 @@ const MyAccount = () => {
 
     const handleLogout = () => {
         dispatch(logout());
-        localStorage.clear();
+        localStorage.removeItem('jwt');
         navigate("/identity/login");
     };
 
