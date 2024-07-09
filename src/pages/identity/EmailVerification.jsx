@@ -16,8 +16,8 @@ function EmailVerification() {
     useEffect(() => {
         server.post('/identity/emailVerification/send', { email })
         .then((res) => {
-            if (!res.data || res.data.startsWith("ERROR") || res.data.startsWith("UERROR")) {
-                showToast('Error', res.data, 3000, true, 'error')
+            if (res.data || res.data.startsWith("SUCCESS")) {
+                showToast('Check your email', 'A verification link has been sent.', 3000, true, 'success')
             }
         })
         .catch((err) => {

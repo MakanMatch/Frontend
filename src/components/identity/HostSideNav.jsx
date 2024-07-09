@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../slices/AuthState';
 
-const GuestSidebar = () => {
+const HostSidebar = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -23,7 +23,7 @@ const GuestSidebar = () => {
     };
 
     const handleMyAccountClick = () => {
-        navigate("/")
+        navigate("/myAccount")
     }
 
 
@@ -53,4 +53,4 @@ const GuestSidebar = () => {
     );
 };
 
-export default GuestSidebar;
+export default HostSidebar;

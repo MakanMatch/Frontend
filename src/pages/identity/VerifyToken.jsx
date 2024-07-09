@@ -44,11 +44,9 @@ function VerifyToken() {
             bgPosition="center"
             display="flex"
             justifyContent="center"
-            alignItems="center"
-            h="100vh"
         >
             <VStack spacing={4}>
-                <Heading as="h1" size="xl" mb={4} textAlign="center">
+                <Heading as="h1" size="xl" mt={100} mb={4} textAlign="center">
                     Verifying Email...
                 </Heading>
                 <Text>{message || "Please wait while we verify your email..."}</Text>

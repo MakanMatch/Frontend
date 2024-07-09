@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-Box,
-Heading,
-Text,
-Flex,
-Avatar,
-Button,
-Spacer,
-Spinner,
+import { Box, Heading, Text, Flex, Avatar, Button, Spacer, Spinner
 } from "@chakra-ui/react";
 import { logout, fetchUser } from "../../slices/AuthState";
 import GuestSidebar from "../../components/identity/GuestSideNav";

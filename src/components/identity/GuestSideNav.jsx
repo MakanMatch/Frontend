@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Text, Icon, Card } from "@chakra-ui/react";
-import { RepeatClockIcon, ChatIcon } from '@chakra-ui/icons'
+import { RepeatClockIcon } from '@chakra-ui/icons'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../slices/AuthState';
@@ -23,7 +23,7 @@ const GuestSidebar = () => {
     };
 
     const handleMyAccountClick = () => {
-        navigate("/")
+        navigate("/myAccount")
     }
 
 
