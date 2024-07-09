@@ -17,10 +17,9 @@ const FoodListingCard = ({
     images,
     fetchListings,
     shortDescription,
-    address,
     approxAddress,
     totalSlots,
-    generateCoordinates
+    coordinates,
 }) => {
     const toast = useToast();
     const [latitude, setLatitude] = useState(null);
@@ -43,16 +42,11 @@ const FoodListingCard = ({
     };
 
     useEffect(() => {
-        const fetchCoordinates = async () => {
-            const coordinates = await generateCoordinates(address);
-            if (coordinates) {
-                setLatitude(coordinates.latitude);
-                setLongitude(coordinates.longitude);
-            }
-        };
-    
-        fetchCoordinates();
-    }, [address]);
+        if (coordinates) {
+            setLatitude(coordinates.latitude);
+            setLongitude(coordinates.longitude);
+        }
+    }, [coordinates]);
     return (
         <>
             <style>

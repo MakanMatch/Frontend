@@ -5,10 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useToast } from "@chakra-ui/react";
 import configureShowToast from "../../components/showToast";
-import axios from "axios";
 
 const MarkeredGMaps = ({
-    addresses,
+    coordinatesList,
     listings,
     userID,
     isSmallerThan1095,
@@ -20,24 +19,6 @@ const MarkeredGMaps = ({
     const mapRef = useRef(null);
 
     useEffect(() => {
-        const fetchCoordinates = async (address) => {
-            const encodedAddress = encodeURIComponent(String(address));
-            const apiKey = import.meta.env.VITE_GMAPS_API_KEY;
-            const url = `https://maps.googleapis.com/maps/api/geocode/json?address="${encodedAddress}"&key=${apiKey}`;
-            try {
-                const response = await axios.get(url);
-                return response.data.results[0].geometry.location;
-            } catch (error) {
-                showToast(
-                    "An error occured",
-                    "Failed to generate maps coordinates",
-                    "error",
-                    3000
-                );
-                return null;
-            }
-        };
-
         const InitializeMap = async (validCoordinates) => {
             const loader = new Loader({
                 apiKey: import.meta.env.VITE_GMAPS_API_KEY,
@@ -56,7 +37,7 @@ const MarkeredGMaps = ({
                     streetViewControl: false,
                 });
 
-                if (addresses.length === 0 || validCoordinates.length === 0) {
+                if (coordinatesList.length === 0 || validCoordinates.length === 0) {
                     return map;
                 } else {
                     validCoordinates.forEach(({ lat, lng }, index) => {
@@ -87,19 +68,17 @@ const MarkeredGMaps = ({
                 }
             } else return;
         };
-
-        Promise.all(addresses.map(fetchCoordinates))
-        .then((coordinatesList) => {
+        try {
             const validCoordinates = coordinatesList.filter(
                 ({ lat, lng }) =>
                     lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180
             );
             InitializeMap(validCoordinates);
-        })
-        .catch(() => {
+        } catch (error) {
             showToast("An error occured", "Failed to render Google Maps", 3000, false, "error");
-        });
-    }, [addresses]);
+            console.error(error);
+        }
+    }, [coordinatesList]);
 
     return (
         <div

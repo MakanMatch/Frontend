@@ -14,6 +14,7 @@ const FoodListingsPage = () => {
     const [guestUserID, setGuestUserID] = useState("");
     const [guestUsername, setGuestUsername] = useState("");
     const [addresses, setAddresses] = useState([]);
+    const [coordinatesList, setCoordinatesList] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
@@ -41,10 +42,7 @@ const FoodListingsPage = () => {
         try {
             const response = await axios.get(url);
             const location = response.data.results[0].geometry.location;
-            return {
-                latitude: location.lat,
-                longitude: location.lng
-            };
+            return { lat: location.lat, lng: location.lng };
         } catch (error) {
             ShowToast("An error occured", "Failed to generate maps coordinates", "error", 3000);
             console.error(error);
@@ -84,6 +82,14 @@ const FoodListingsPage = () => {
     }, [listings]);
 
     useEffect(() => {
+        const promiseCoordinates = async () => {
+            const response = await Promise.all(addresses.map((address) => generateCoordinates(address)));
+            setCoordinatesList(response);
+        };
+        promiseCoordinates();
+    }, [addresses]);
+
+    useEffect(() => {
         const fetchData = async () => {
             await fetchHostDetails();
             await fetchGuestDetails();
@@ -103,9 +109,9 @@ const FoodListingsPage = () => {
                     Host a meal
                 </Button>
             </Box>
-            {isSmallerThan1095 && (
+            {isSmallerThan1095 && coordinatesList.length > 0 && (
                 <Box mb={4}>
-                    <MarkeredGMaps addresses={addresses} listings={listings} userID={guestUserID} isSmallerThan1095={true} getImageLink={getImageLink}/>
+                    <MarkeredGMaps coordinatesList={coordinatesList} listings={listings} userID={guestUserID} isSmallerThan1095={true} getImageLink={getImageLink}/>
                 </Box>
             )}
             <Skeleton isLoaded={!loading}>
@@ -139,7 +145,7 @@ const FoodListingsPage = () => {
                                 spacing={4}
                                 templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
                             >
-                                {listings.map((listing) => (
+                                {listings.map((listing, index) => (
                                     <SlideFade
                                         in={true}
                                         offsetY="20px"
@@ -164,7 +170,7 @@ const FoodListingsPage = () => {
                                                 address={listing.address}
                                                 approxAddress={listing.approxAddress}
                                                 totalSlots={listing.totalSlots}
-                                                generateCoordinates={generateCoordinates}
+                                                coordinates={coordinatesList[index]}
                                             />
                                         </Box>
                                     </SlideFade>
@@ -188,7 +194,7 @@ const FoodListingsPage = () => {
                             </Box>
                         )}
                     </Box>
-                    {!isSmallerThan1095 && (
+                    {!isSmallerThan1095 && coordinatesList.length > 0 && (
                         <Box flex="1" ml={5}>
                             <SlideFade in={true} offsetY="20px">
                                 <MarkeredGMaps addresses={addresses} listings={listings} userID={guestUserID} isSmallerThan1095={false} getImageLink={getImageLink}/>
