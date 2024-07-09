@@ -11,6 +11,7 @@ import configureShowToast from "../../components/showToast";
 function ListingCardOverlay({ listingID, userID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
+    const [showFullDescription, setShowFullDescription] = useState(false);
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
@@ -64,6 +65,27 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
     useEffect(() => {
         fetchFavouriteState();
     }, []);
+
+    const renderDescription = () => {
+        if (shortDescription.length <= 43 || showFullDescription) {
+            return (
+                <>
+                    {shortDescription} {shortDescription.length > 43 && !showFullDescription && (
+                        <Text color="blue" fontSize="sm" cursor="pointer" onClick={() => setShowFullDescription(true)}>show more</Text>
+                    )}
+                    {showFullDescription && (
+                        <Text color="blue" fontSize="sm" cursor="pointer" onClick={() => setShowFullDescription(false)}>show less</Text>
+                    )}
+                </>
+            );
+        }
+
+        return (
+            <>
+                {shortDescription.slice(0, 43)}... <Text as="span" color="blue" fontSize="sm" cursor="pointer" onClick={() => setShowFullDescription(true)}>show more</Text>
+            </>
+        );
+    };
     
     return (
         <>
@@ -214,7 +236,7 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
                 <Divider mt={1} />
                 <Box ml={4} mt={2} textAlign="left" fontSize={"15px"}>
                     <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1} className="enable-select" maxW={"80%"} overflow="hidden">{shortDescription}</Text>
+                        <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1} className="enable-select" maxW={"80%"} overflow="hidden">{renderDescription()}</Text>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>
