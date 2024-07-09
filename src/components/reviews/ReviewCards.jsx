@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
-    Avatar, useToast, Divider
+    Avatar, useToast, Divider,
+    Center
 } from "@chakra-ui/react";
 import { useDisclosure } from '@chakra-ui/react'
 import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
@@ -340,8 +341,8 @@ const CreateReview = ({
                         {renderImages()}
                     </CardBody>
                 )}
-                <CardFooter>
-                    <Button variant='ghost'
+                <CardFooter justifyContent={{ base : 'center', md: 'flex-start'}} display="flex">
+                    <Button  variant='ghost'
                         backgroundColor={liked ? 'blue.100' : 'gray.100'}
                         leftIcon={liked ? <Liked /> : <Like />}
                         _hover={{
