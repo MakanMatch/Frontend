@@ -209,8 +209,8 @@ const CreateReview = ({
                             alt={`Review image ${index + 1}`}
                             borderRadius="lg"
                             minWidth={{ base: '100%', md: "calc(50% - 6px)" }}
-                            minHeight={"108px"}
-                            maxHeight={"120px"}
+                            minHeight={"100px"}
+                            maxHeight={"108px"}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
