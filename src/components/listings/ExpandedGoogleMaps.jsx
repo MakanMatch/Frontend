@@ -38,8 +38,8 @@ const ExpandedGoogleMaps = ({ lat, long }) => {
             });
         };
 
-        initializeMap().catch((e) => {
-            console.error("Error loading Google Maps", e);
+        initializeMap().catch(() => {
+            showToast("An error occured", "Failed to render Google Maps", 3000, false, "error");
         });
     }, [lat, long]);
 
