@@ -86,17 +86,17 @@ function EmailVerification() {
                 alignItems="center"
                 justifyContent="center"
                 p={8}
+                borderRadius={15}
             >
                 <VStack spacing={4} w="full">
-                    <Heading as="h1" size="xl" mb={4} textAlign="center">
+                    <Heading as="h1" size="xl" textAlign="center">
                         Verify your email
                     </Heading>
                     <Image
-                        src="/placeholderImage.png"
+                        src= '/src/assets/EmailVerificationImage.png'
                         alt="Email verification"
                         boxSize="300px"
                         objectFit="cover"
-                        mb={4}
                     />
                     <Text fontSize="lg" textAlign="center">
                         We've just sent a verification link to your email. Click the link provided to verify your email!

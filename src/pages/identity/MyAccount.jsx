@@ -14,7 +14,7 @@ import {
 import { logout, fetchUser } from "../../slices/AuthState";
 import GuestSidebar from "../../components/identity/GuestSideNav";
 import HostSidebar from "../../components/identity/HostSideNav";
-import server from '../../networking';
+import server from "../../networking";
 
 const MyAccount = () => {
   const navigate = useNavigate();
@@ -37,6 +37,7 @@ const MyAccount = () => {
 
   useEffect(() => {
     if (loaded && !user) {
+      // console.log(localStorage.getItem("jwt"));
       navigate("/identity/login");
     }
   }, [loaded, user, navigate]);
@@ -44,7 +45,7 @@ const MyAccount = () => {
   useEffect(() => {
     const fetchAccountInfo = async () => {
       try {
-        const userID = JSON.parse(atob(localStorage.getItem("jwt").split(".")[1])).userID;
+        const userID = user.userID;
         const response = await server.get(`/cdn/accountInfo?userID=${userID}`, {
           headers: {
             "Content-Type": "application/json",
@@ -84,6 +85,19 @@ const MyAccount = () => {
     return diffInDays;
   };
 
+  const bannerStyles = {
+    guest: {
+        backgroundImage: "url('/src/assets/GuestBanner.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        },
+    host: {
+        backgroundImage: "url('/src/assets/HostBanner.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+    },
+  };
+
   return (
     <Flex height="100vh">
       {/* Conditionally render the sidebar based on user type */}
@@ -92,9 +106,14 @@ const MyAccount = () => {
       {/* Right side content */}
       <Box width="75%" ml={10} position="relative">
         {/* Profile banner */}
-        <Box bg="blue.500" height="25%" position="relative" borderRadius={15}>
+        <Box 
+            height="25%" 
+            position="relative" 
+            borderRadius={15}
+            {...(accountInfo.userType === 'Guest' ? bannerStyles.guest : bannerStyles.host)}
+        >
           <Flex align="center" justify="flex-end" height="100%" pr={10}>
-            <Heading color="white">{accountInfo.userType}</Heading>
+            <Heading mr={5} size={'2xl'} color="Black">{accountInfo.userType}</Heading>
           </Flex>
           {/* Circle avatar */}
           <Box
@@ -140,7 +159,6 @@ const MyAccount = () => {
 
         {/* Account info part */}
         <Flex
-          bg="gray.200"
           p={4}
           mt={20}
           justifyContent="space-between"

@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 function Navbar() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const navigate = useNavigate();
-    const authToken = useSelector((state) => state.auth.authToken);
+    const { authToken } = useSelector((state) => state.auth);
 
     const handleAvatarClick = () => {
         if (authToken) {
