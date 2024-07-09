@@ -341,12 +341,12 @@ const CreateReview = ({
                     </CardBody>
                 )}
                 <CardFooter>
-                    <Button flex='1' variant='ghost'
+                    <Button variant='ghost'
                         backgroundColor={liked ? 'blue.100' : 'gray.100'}
                         leftIcon={liked ? <Liked /> : <Like />}
                         _hover={{
-                            backgroundColor: liked ? 'blue.300' : 'gray.200',
-                            color: liked ? 'white' : 'gray.800'
+                            backgroundColor: liked ? 'blue.200' : 'gray.200',
+                            color: liked ? 'black' : 'gray.800'
                         }}
                         onClick={toggleLike}>
                         <Text>{currentLikeCount}</Text>
