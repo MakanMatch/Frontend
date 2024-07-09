@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import server from "../../networking";
 import configureShowToast from "../../components/showToast";
 
-function DetailedListingCard({ listingID, userID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
+function ListingCardOverlay({ listingID, userID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const toast = useToast();
@@ -231,4 +231,4 @@ function DetailedListingCard({ listingID, userID, images, title, shortDescriptio
     );
 }
 
-export default DetailedListingCard;
+export default ListingCardOverlay;

@@ -7,7 +7,7 @@ import server from "../../networking";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const FoodListing = ({
+const FoodListingCard = ({
     listingID,
     title,
     portionPrice,
@@ -166,4 +166,4 @@ const FoodListing = ({
     );
 };
 
-export default FoodListing;
+export default FoodListingCard;

@@ -1,9 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-// FoodListingsPage.jsx
 import { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
 import server from "../../networking";
-import FoodListing from "../../components/listings/FoodListing";
+import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
@@ -131,7 +129,7 @@ const FoodListingsPage = () => {
                                         <Box 
                                             display={isBetween701And739 ? "flex" : "initial"}
                                             justifyContent={isBetween701And739 ? "center" : "initial"}>
-                                            <FoodListing
+                                            <FoodListingCard
                                                 listingID={listing.listingID}
                                                 title={listing.title}
                                                 portionPrice={listing.portionPrice}

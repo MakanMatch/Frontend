@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import GoogleMaps from "../../components/listings/GoogleMaps";
-import DetailedListingCard from "../../components/listings/DetailedListingCard";
+import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
+import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
 import { useSearchParams } from "react-router-dom";
 import { Box } from "@chakra-ui/react";
 
@@ -20,14 +20,14 @@ const GoogleMapsPage = () => {
     return (
         <>
             <Box position="relative" height="100%">
-                <GoogleMaps lat={latitude} long={longitude} />
+                <ExpandedGoogleMaps lat={latitude} long={longitude} />
                 <Box
                     position="absolute"
                     top="50%"
                     left="10px"
                     transform="translateY(-50%)"
                     zIndex="1">
-                    <DetailedListingCard listingID={listingID} userID={userID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} />
+                    <ListingCardOverlay listingID={listingID} userID={userID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} />
                 </Box>
             </Box>
         </>

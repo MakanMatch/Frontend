@@ -5,7 +5,7 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { useToast } from "@chakra-ui/react";
 import configureShowToast from "../../components/showToast";
 
-const GoogleMaps = ({ lat, long }) => {
+const ExpandedGoogleMaps = ({ lat, long }) => {
     const mapRef = useRef(null);
     const toast = useToast()
     const showToast = configureShowToast(toast)
@@ -51,4 +51,4 @@ const GoogleMaps = ({ lat, long }) => {
     );
 };
 
-export default GoogleMaps;
+export default ExpandedGoogleMaps;
