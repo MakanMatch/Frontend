@@ -4,7 +4,7 @@ import SortReviews from '../../components/reviews/SortReviews';
 import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
 import { useDisclosure } from '@chakra-ui/react';
 import {
@@ -19,12 +19,10 @@ function Reviews() {
     const navigate = useNavigate();
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
-    const [hostContactNum, setHostContactNum] = useState(0);
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
-    const [searchParams] = useSearchParams();
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const hostID = searchParams.get('hostID');
-    const guestID = searchParams.get('guestID');     
+    const { isOpen, onOpen, onClose } = useDisclosure();   
+    const location = useLocation();
+    const { userID, hostID } = location.state || {}; 
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -52,7 +50,6 @@ function Reviews() {
             } else {
                 setHostName(response.data.username);
                 setHostAddress(response.data.address);
-                setHostContactNum(response.data.contactNum);
                 setHostHygieneGrade(response.data.hygieneGrade);
             }
         } catch (error) {
@@ -64,7 +61,7 @@ function Reviews() {
 
     const fetchGuestInfo = async () => {
         try {
-            const response = await server.get(`/cdn/accountInfo?userID=${guestID}`);
+            const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
             if (!response.data && response.status !== 200) {
                 showToast("No guest information found", "Directing you back to homepage", 3000, true, "info");
                 setTimeout(() => {
@@ -75,9 +72,9 @@ function Reviews() {
             toast.closeAll();
             showToast("Error fetching guest information", "Directing you back to homepage", 3000, true, "error");
             console.error("Error fetching guest info:", error);
-            setTimeout(() => {
-                window.location.href = "/";
-            }, 3000);
+            // setTimeout(() => {
+            //     window.location.href = "/";
+            // }, 3000);
         }
     
     }
@@ -126,7 +123,7 @@ function Reviews() {
                             <Spacer display={{ base: 'none', md: 'block' }} />
                             <SubmitReviews 
                                 hostName={hostName}
-                                guestID={guestID}
+                                guestID={userID}
                                 hostID={hostID}
                             />
                         </Flex>
@@ -147,7 +144,7 @@ function Reviews() {
             <Heading mt={5} size="lg"><Text>Reviews</Text></Heading>
             <SortReviews 
                 hostID={hostID}
-                guestID={guestID}
+                guestID={userID}
             />
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />

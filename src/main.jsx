@@ -45,7 +45,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"emailVerification"} element={<EmailVerification />} />
                         <Route path={"accountRecovery"} element={<AccountRecovery />} />
                         <Route path={"myAccount"} element={<MyAccount />} />
-                        <Route path={'reviews'} element={<Reviews />} />
+                        <Route path={'reviews/:username'} element={<Reviews />} />
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"chat2"} element={<Chat2 />}></Route>
                         <Route path='*' element={<NotFound />} />
