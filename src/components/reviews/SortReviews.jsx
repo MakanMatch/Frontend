@@ -24,23 +24,14 @@ const SortReviews = ({
 
     const fetchReviews = async (hostID, sortOrder) => {
         try {
-            // Get liked reviews
-            const likedResponse = await server.get(`/likeReview/userLiked?guestID=${guestID}`);
-            if (likedResponse.status === 200 && Array.isArray(likedResponse.data)) {
-                setLikedReviews(likedResponse.data);
-            } else {
-                setLikedReviews([]);
-            }
-
             // Get reviews
-            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`);
+            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&guestID=${guestID}&order=${sortOrder}`);
             if (response.status === 200 && Array.isArray(response.data)) {
                 const reviews = response.data;
                 if (reviews.length == 0) {
                     showToast("No reviews found", "", 3000, false, "info");
                     return;
                 }
-                reviews.isLiked = likedReviews.some((likedReview) => likedReview.reviewID === reviews.reviewID);
                 setReviews(reviews);
             } else if (response.status === 200 && !Array.isArray(response.data)) {
                 setReviews([]);
