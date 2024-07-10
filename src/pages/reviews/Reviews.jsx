@@ -4,7 +4,7 @@ import SortReviews from '../../components/reviews/SortReviews';
 import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
 import { useDisclosure } from '@chakra-ui/react';
 import {
@@ -47,6 +47,7 @@ function Reviews() {
             const response = await server.get(`/cdn/accountInfo?userID=${hostID}`);
             if (!response.data) {
                 showToast("No host information found", "Please try again later.", 3000, true, "info")
+                return
             } else {
                 setHostName(response.data.username);
                 setHostAddress(response.data.address);
@@ -56,6 +57,7 @@ function Reviews() {
             toast.closeAll();
             showToast("Error fetching host information", "Please try again later", 3000, true, "error");
             console.error("Error fetching host info:", error);
+            return
         }
     };
 
@@ -67,6 +69,7 @@ function Reviews() {
                 setTimeout(() => {
                     window.location.href = "/";
                 }, 3000);
+                return
             }
         } catch (error) {
             toast.closeAll();
@@ -75,6 +78,7 @@ function Reviews() {
             setTimeout(() => {
                 window.location.href = "/";
             }, 3000);
+            return
         }
     
     }

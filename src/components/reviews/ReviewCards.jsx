@@ -63,6 +63,7 @@ const CreateReview = ({
             }});
             if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
                 showToast("An error occurred", "Please try again later.", 3000, true, "error");
+                return
             } else {
                 const { liked, likeCount } = postLikeResponse.data;
                 setLiked(liked);
@@ -70,6 +71,7 @@ const CreateReview = ({
             }
         } catch (error) {
             showToast("An error occurred", "Please try again later.", 3000, true, "error");
+            return
         }
     }
     const renderImages = () => {

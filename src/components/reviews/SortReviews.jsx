@@ -27,19 +27,17 @@ const SortReviews = ({
             const response = await server.get(`/cdn/getReviews?hostID=${hostID}&guestID=${guestID}&order=${sortOrder}`);
             if (response.status === 200 && Array.isArray(response.data)) {
                 const reviews = response.data;
-                if (reviews.length == 0) {
-                    showToast("No reviews found", "", 3000, false, "info");
-                    return;
-                }
                 setReviews(reviews);
-            } else if (response.status === 200 && !Array.isArray(response.data)) {
+            } else if (response.status === 200 && !Array.isArray(response.data) && response.data.length == 0) {
                 setReviews([]);
                 showToast("No reviews found", "", 3000, false, "info");
             } else {
                 showToast("An error occurred", "Please try again later", 3000, true, "error");
+                return
             }
         } catch (error) {
             showToast("An error occurred", "Please try again later", 3000, true, "error");
+            return
         }
     }
 
