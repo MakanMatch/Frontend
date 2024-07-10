@@ -13,6 +13,7 @@ const FoodListing = ({
     hostName,
     hostFoodRating,
     userID,
+    hostID,
     isFavourite,
     ShowToast,
     images,
@@ -117,7 +118,7 @@ const FoodListing = ({
                         <Text color="blue.600" fontSize="2xl">
                             ${portionPrice}/pax
                         </Text>
-                        <Link to={`/reviews/${hostName}`} state={{ userID: userID, hostID: "272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4" }}> {/* Pass the userID and harcoded hostID to the reviews page */}
+                        <Link to={`/reviews/${hostName}`} state={{ userID: userID, hostID: hostID }}> {/* This is a placeholder link with user and host ID fetched from FoodListingPage.jsx */}
                             <Text textDecoration={"underline"} color={"blue"}>See reviews</Text>
                         </Link>
                     </Stack>
