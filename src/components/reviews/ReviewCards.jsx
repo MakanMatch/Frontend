@@ -64,18 +64,9 @@ const CreateReview = ({
             if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
                 showToast("An error occurred", "Please try again later.", 3000, true, "error");
             } else {
-                const fetchLikeStatus = await server.get(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
-                if (fetchLikeStatus.status === 400 || fetchLikeStatus.status === 500) {
-                    showToast("An error occurred", "Please try again later.", 3000, true, "error");
-                } else {
-                    if (fetchLikeStatus.data.liked) {
-                        setLiked(true);
-                        setCurrentLikeCount(currentLikeCount + 1);
-                    } else {
-                        setLiked(false);
-                        setCurrentLikeCount(currentLikeCount - 1);
-                    }
-                }
+                const { liked, likeCount } = postLikeResponse.data;
+                setLiked(liked);
+                setCurrentLikeCount(likeCount);
             }
         } catch (error) {
             showToast("An error occurred", "Please try again later.", 3000, true, "error");
