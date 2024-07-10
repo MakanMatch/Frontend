@@ -40,25 +40,8 @@ const SortReviews = ({
                     showToast("No reviews found", "", 3000, false, "info");
                     return;
                 }
-                const reviewsWithGuestInfo = await Promise.all(reviews.map(async (review) => {
-                    try {
-                        const guestInfoResponse = await server.get(`/cdn/accountInfo?userID=${review.guestID}`);
-                        if (guestInfoResponse.status === 200 && guestInfoResponse.data) {
-                            review.guestInfo = guestInfoResponse.data;
-                        } else {
-                            review.guestInfo = null;
-                            console.error(`No guest info found for guestID ${review.guestID}`);
-                        }
-                    } catch (error) {
-                        review.guestInfo = null;
-                        console.error(`Error fetching guest info for guestID ${review.guestID}:`, error);
-                    }
-
-                    // Check if review is liked
-                    review.isLiked = likedReviews.some((likedReview) => likedReview.reviewID === review.reviewID);
-                    return review;
-                }));
-                setReviews(reviewsWithGuestInfo);
+                reviews.isLiked = likedReviews.some((likedReview) => likedReview.reviewID === reviews.reviewID);
+                setReviews(reviews);
             } else if (response.status === 200 && !Array.isArray(response.data)) {
                 setReviews([]);
                 showToast("No reviews found", "", 3000, false, "info");
@@ -107,7 +90,7 @@ const SortReviews = ({
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
-                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
@@ -128,7 +111,7 @@ const SortReviews = ({
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
-                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
@@ -149,7 +132,7 @@ const SortReviews = ({
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
-                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
@@ -170,7 +153,7 @@ const SortReviews = ({
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
-                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
