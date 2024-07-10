@@ -31,7 +31,6 @@ const SubmitReviews = ({
     const [hygieneRating, setHygieneRating] = useState(0);
     const [comments, setComments] = useState('');
     const [images, setImages] = useState([]);
-    const [reviewData, setReviewData] = useState(null);
     const [fileFormatError, setFileFormatError] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -91,7 +90,6 @@ const SubmitReviews = ({
                         setIsSubmitting(false);
                         setComments('');
                         setImages([]);
-                        setReviewData(null);
                         onClose();
                         window.location.reload();
                     } else {

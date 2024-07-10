@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
-    Avatar, useToast, Divider,
-    Center
+    Avatar, useToast, Divider
 } from "@chakra-ui/react";
 import { useDisclosure } from '@chakra-ui/react'
 import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
