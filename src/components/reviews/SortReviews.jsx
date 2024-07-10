@@ -13,7 +13,6 @@ const SortReviews = ({
     const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
-    const [likedReviews, setLikedReviews] = useState([])
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {

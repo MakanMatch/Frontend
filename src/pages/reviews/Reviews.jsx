@@ -72,9 +72,9 @@ function Reviews() {
             toast.closeAll();
             showToast("Error fetching guest information", "Directing you back to homepage", 3000, true, "error");
             console.error("Error fetching guest info:", error);
-            // setTimeout(() => {
-            //     window.location.href = "/";
-            // }, 3000);
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 3000);
         }
     
     }
