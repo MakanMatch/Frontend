@@ -40,23 +40,6 @@ const CreateReview = ({
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const imageRefs = useRef([]);
 
-    useEffect(() => {
-        // Fetch the like status when component mounts or guestID changes
-        const fetchLikeStatus = async () => {
-            try {
-                const response = await server.get(`/likeReview?reviewID=${reviewID}&guestID=${guestID}`);
-                if (response.status === 400 || response.status === 500) {
-                    showToast("An error occurred", "Please try again later.", 3000, true, "error");
-                } else {
-                    setLiked(response.data.liked);
-                }
-            } catch (error) {
-                showToast("An error occurred", "Please try again later.", 3000, true, "error");
-            }
-        };
-        fetchLikeStatus();
-    }, [reviewID, guestID]);
-
     const handleProfileClick = (image) => {
         setProfileImage(image);
         setIsProfileOpen(true);
