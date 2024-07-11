@@ -5,9 +5,11 @@ import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
+import configureShowToast from "../../components/showToast";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const toast = useToast();
+    const showToast = configureShowToast(toast);
     const today = new Date();
     today.setDate(today.getDate() + 1);
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -32,16 +34,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         onClose: onAlertClose,
     } = useDisclosure();
 
-    function ShowToast(title, description, status, duration) {
-        toast({
-            title: title,
-            description: description,
-            status: status,
-            duration: duration,
-            isClosable: false,
-        });
-    }
-
     function setDefaultState() {
         setIsSubmitting(false);
         setFileFormatError("");
@@ -61,7 +53,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             setDatetime(date);
         } else {
             toast.closeAll();
-            ShowToast(
+            showToast(
                 "Invalid Date/Time",
                 "Please select a date-time that's greater than today's date-time",
                 "error",
@@ -100,7 +92,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                     setDefaultState();
                     setIsSubmitting(false);
                     toast.closeAll();
-                    ShowToast(
+                    showToast(
                         "Listing published successfully!",
                         "We'll notify you when all slots have been filled.",
                         "success",
@@ -111,7 +103,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         } catch (error) {
             toast.closeAll();
             if (error.code === "ECONNABORTED") {
-                ShowToast(
+                showToast(
                     "Request timed out",
                     "Please try again later.",
                     "error",
@@ -119,7 +111,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 );
                 return;
             } else {
-                ShowToast(
+                showToast(
                     "Error submitting listing",
                     "Please try again later.",
                     "error",
@@ -183,7 +175,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             setModalError(true);
             setValidListing(false);
             if (images.length > 5) {
-                ShowToast(
+                showToast(
                     "That's too many images!",
                     "You can upload a maximum of 5 images",
                     "error",
@@ -200,7 +192,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         if (portionPrice > 10) {
             setPortionPrice(10);
             toast.closeAll();
-            ShowToast(
+            showToast(
                 "Woah, that's too expensive!",
                 "Fee cannot exceed $10",
                 "error",
@@ -213,7 +205,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         if (totalSlots > 5) {
             setTotalSlots(5);
             toast.closeAll();
-            ShowToast(
+            showToast(
                 "Too many Guests!",
                 "You can invite a maximum of 5 Guests",
                 "error",
