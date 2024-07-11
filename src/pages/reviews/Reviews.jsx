@@ -24,7 +24,7 @@ function Reviews() {
     const { isOpen, onOpen, onClose } = useDisclosure();   
     const location = useLocation();
     const [searchParams] = useSearchParams();
-    const { userID = '', hostID = '' } = {}
+    var { userID = '', hostID = '' } = {}
     if (location.state.userID && location.state.hostID) {
         userID = location.state.userID;
         hostID = location.state.hostID;
