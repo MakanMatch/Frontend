@@ -41,21 +41,21 @@ const FoodListingCard = ({
 
     useEffect(() => {
         const setLocalStorage = async () => {
-            localStorage.setItem("userID", userID);
-            localStorage.setItem(`images-${listingID}`, images);
-            localStorage.setItem(`title-${listingID}`, title);
-            localStorage.setItem(`shortDescription-${listingID}`, shortDescription);
-            localStorage.setItem(`approxAddress-${listingID}`, approxAddress);
-            localStorage.setItem(`portionPrice-${listingID}`, portionPrice);
-            localStorage.setItem(`totalSlots-${listingID}`, totalSlots);
+            localStorage.setItem("ListingExp-userID", userID);
+            localStorage.setItem(`ListingExp-images-${listingID}`, images);
+            localStorage.setItem(`ListingExp-title-${listingID}`, title);
+            localStorage.setItem(`ListingExp-shortDescription-${listingID}`, shortDescription);
+            localStorage.setItem(`ListingExp-approxAddress-${listingID}`, approxAddress);
+            localStorage.setItem(`ListingExp-portionPrice-${listingID}`, portionPrice);
+            localStorage.setItem(`ListingExp-totalSlots-${listingID}`, totalSlots);
         }
         setLocalStorage();
     }, []);
 
     useEffect(() => {
         if (coordinates) {
-            localStorage.setItem(`latitude-${listingID}`, coordinates.lat);
-            localStorage.setItem(`longitude-${listingID}`, coordinates.lng);
+            localStorage.setItem(`ListingExp-latitude-${listingID}`, coordinates.lat);
+            localStorage.setItem(`ListingExp-longitude-${listingID}`, coordinates.lng);
         }
     }, [coordinates]);
     return (

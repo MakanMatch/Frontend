@@ -8,16 +8,15 @@ const GoogleMapsPage = () => {
     const [searchParams] = useSearchParams();
     const listingID = searchParams.get("listingID");
 
-    const latitude = Number(localStorage.getItem(`latitude-${listingID}`));
-    const longitude = Number(localStorage.getItem(`longitude-${listingID}`));
-    const userID = localStorage.getItem("userID");
-    const images = localStorage.getItem(`images-${listingID}`);
-    console.log("Images from GoogleMapsPage: ", images)
-    const title = localStorage.getItem(`title-${listingID}`);
-    const shortDescription = localStorage.getItem(`shortDescription-${listingID}`);
-    const approxAddress = localStorage.getItem(`approxAddress-${listingID}`);
-    const portionPrice = localStorage.getItem(`portionPrice-${listingID}`);
-    const totalSlots = localStorage.getItem(`totalSlots-${listingID}`);
+    const latitude = Number(localStorage.getItem(`ListingExp-latitude-${listingID}`));
+    const longitude = Number(localStorage.getItem(`ListingExp-longitude-${listingID}`));
+    const userID = localStorage.getItem("ListingExp-userID");
+    const images = localStorage.getItem(`ListingExp-images-${listingID}`);
+    const title = localStorage.getItem(`ListingExp-title-${listingID}`);
+    const shortDescription = localStorage.getItem(`ListingExp-shortDescription-${listingID}`);
+    const approxAddress = localStorage.getItem(`ListingExp-approxAddress-${listingID}`);
+    const portionPrice = localStorage.getItem(`ListingExp-portionPrice-${listingID}`);
+    const totalSlots = localStorage.getItem(`ListingExp-totalSlots-${listingID}`);
     return (
         <>
             <Box position="relative" height="100%">
