@@ -77,11 +77,10 @@ function ChatUi2() {
         );
       } else if (receivedMessage.action === "reload") {
         window.location.reload();
-      } else if(receivedMessage.action === "error") {
+      } else if (receivedMessage.action === "error") {
         alert(receivedMessage.message);
         window.location.reload();
-      }  
-      else {
+      } else {
         setMessages((prevMessages) => [...prevMessages, receivedMessage]);
       }
     };
@@ -107,10 +106,6 @@ function ChatUi2() {
         sender: "James",
         receiver: "Jamie",
         message: messageInput,
-        timestamp: `${new Date().getHours()}:${new Date()
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`,
         datetime: new Date().toISOString(),
       };
 
@@ -136,12 +131,16 @@ function ChatUi2() {
         action: "edit",
         sender: "James",
         message: newMessage,
-        timestamp: `${new Date().getHours()}:${new Date()
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`,
+        datetime: new Date().toISOString(),
       };
       ws.current.send(JSON.stringify(editedMessage));
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.messageID === receivedMessage.id
+            ? { ...msg, message: receivedMessage.message, edited: true }
+            : msg
+        )
+      );
     }
   };
 
@@ -219,7 +218,10 @@ function ChatUi2() {
               <ChatBubble
                 key={msg.messageID}
                 message={msg.message}
-                timestamp={new Date(msg.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                timestamp={new Date(msg.datetime).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
                 isSender={msg.sender === "James"}
                 photoUrl={
                   msg.sender === "James"

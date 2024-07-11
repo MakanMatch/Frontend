@@ -4,14 +4,16 @@ import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
-import UserContext from '../../context/UserContext';
 import server from '../../networking';
+import { useDispatch, useSelector } from 'react-redux';
+import { changeAuthToken, setUser } from '../../slices/AuthState';
 
 function Login() {
     const navigate = useNavigate();
     const toast = useToast();
     const [showPassword, setShowPassword] = useState(false);
-    const { user, setUser } = useContext(UserContext);
+    const dispatch = useDispatch();
+    const authToken = useSelector((state) => state.auth.authToken);
 
     const handleShowPassword = () => setShowPassword(!showPassword);
 
@@ -34,7 +36,9 @@ function Login() {
                     });
                     // Set the JWT token in localStorage
                     localStorage.setItem('jwt', res.data.accessToken);
-                    setUser(res.data.user)
+                    dispatch(changeAuthToken(res.data.accessToken));
+                    const authStateData = { userID: res.data.user.userID, username: res.data.user.username, userType: res.data.user.userType }
+                    dispatch(setUser(authStateData));
                     navigate("/");
                 } else {
                     console.log("An error has occurred logging in to the account.")
@@ -77,7 +81,6 @@ function Login() {
         }),
         onSubmit: handleSubmit,
     });
-
     return (
         <Box
             bgPosition="center"

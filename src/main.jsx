@@ -5,6 +5,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import { ChakraProvider } from '@chakra-ui/react'
 import universalReducer from './slices/UniversalState.js'
+import authReducer from './slices/AuthState.js'
 import MainTheme from './themes/MainTheme.js'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './Layout.jsx'
@@ -23,10 +24,12 @@ import Chat from './pages/chat/Chat.jsx'
 import Chat2 from './pages/chat/Chat2.jsx'
 import MyAccount from './pages/identity/MyAccount.jsx'
 import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
+import GoogleMapsPage from './pages/Listings/GoogleMapsPage'
 
 const store = configureStore({
     reducer: {
-        universal: universalReducer
+        universal: universalReducer,
+        auth: authReducer
     }
 })
 
@@ -48,6 +51,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={'reviews'} element={<Reviews />} />
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"chat2"} element={<Chat2 />}></Route>
+                        <Route path={"targetListing"} element={<GoogleMapsPage/>} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>
