@@ -6,7 +6,9 @@ const instance = axios.create({
 
 instance.interceptors.request.use((config) => {
     config.headers["content-type"] = "application/json";
-    config.headers["Authorization"] = `Bearer ${localStorage.getItem('jwt')}`
+    if (localStorage.getItem('jwt')) {
+        config.headers["Authorization"] = `Bearer ${localStorage.getItem('jwt')}`
+    }
     config.headers["mmapikey"] = import.meta.env.VITE_BACKEND_API_KEY
 
     return config;

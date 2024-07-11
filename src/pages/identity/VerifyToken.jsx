@@ -41,18 +41,6 @@ function VerifyToken() {
     }, [token, userID, navigate]);
 
     return (
-        // <Box
-        //     bgPosition="center"
-        //     display="flex"
-        //     justifyContent="center"
-        // >
-        //     <VStack spacing={4}>
-        //         <Heading as="h1" size="xl" mt={100} mb={4} textAlign="center">
-        //             Verifying Email...
-        //         </Heading>
-        //         <Text>{message || "Please wait while we verify your email..."}</Text>
-        //     </VStack>
-        // </Box>
         <Box
             w="50%"
             h="500px"
