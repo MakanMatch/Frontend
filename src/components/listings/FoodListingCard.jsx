@@ -40,16 +40,13 @@ const FoodListingCard = ({
     };
 
     useEffect(() => {
-        const setLocalStorage = async () => {
-            localStorage.setItem("ListingExp-userID", userID);
-            localStorage.setItem(`ListingExp-images-${listingID}`, images);
-            localStorage.setItem(`ListingExp-title-${listingID}`, title);
-            localStorage.setItem(`ListingExp-shortDescription-${listingID}`, shortDescription);
-            localStorage.setItem(`ListingExp-approxAddress-${listingID}`, approxAddress);
-            localStorage.setItem(`ListingExp-portionPrice-${listingID}`, portionPrice);
-            localStorage.setItem(`ListingExp-totalSlots-${listingID}`, totalSlots);
-        }
-        setLocalStorage();
+        localStorage.setItem("ListingExp-userID", userID);
+        localStorage.setItem(`ListingExp-images-${listingID}`, images);
+        localStorage.setItem(`ListingExp-title-${listingID}`, title);
+        localStorage.setItem(`ListingExp-shortDescription-${listingID}`, shortDescription);
+        localStorage.setItem(`ListingExp-approxAddress-${listingID}`, approxAddress);
+        localStorage.setItem(`ListingExp-portionPrice-${listingID}`, portionPrice);
+        localStorage.setItem(`ListingExp-totalSlots-${listingID}`, totalSlots);
     }, []);
 
     useEffect(() => {
