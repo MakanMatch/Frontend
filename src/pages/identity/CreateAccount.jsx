@@ -64,7 +64,7 @@ function CreateAccount() {
                         duration: 3000,
                         isClosable: true,
                     });
-                    navigate(`/identity/emailVerification?email=${submitValues.email}`);
+                    navigate(`/auth/emailVerification?email=${submitValues.email}`);
                 } else {
                     toast({
                         title: 'Account creation failed.',
@@ -267,7 +267,7 @@ function CreateAccount() {
                             </Button>
                         </Box>
                         <Text textAlign='center' fontSize='12px' mb={5}>
-                            Already have an account? <Link href='/identity/login' color='teal.500'><Text as='u'>Sign In</Text></Link>
+                            Already have an account? <Link href='/auth/login' color='teal.500'><Text as='u'>Sign In</Text></Link>
                         </Text>
                     </VStack>
                 </Box>

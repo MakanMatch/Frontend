@@ -12,7 +12,7 @@ const HostSidebar = () => {
     const handleLogout = () => {
         dispatch(logout());
         localStorage.removeItem('jwt');
-        navigate("/identity/login");
+        navigate("/auth/login");
     };
 
     const DrawerHover = {
@@ -23,7 +23,7 @@ const HostSidebar = () => {
     };
 
     const handleMyAccountClick = () => {
-        navigate("/myAccount")
+        navigate("/identity/myAccount")
     }
 
 

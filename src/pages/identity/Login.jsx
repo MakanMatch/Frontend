@@ -165,7 +165,7 @@ function Login() {
                         </Button>
                     </Box>
                     <Text textAlign='center' fontSize='12px' mb={5}>
-                        Don't have an account? <Link href='/identity/createAccount' color='teal.500'><Text as='u'>Sign Up</Text></Link>
+                        Don't have an account? <Link href='/auth/createAccount' color='teal.500'><Text as='u'>Sign Up</Text></Link>
                     </Text>
                 </VStack>
             </Box>

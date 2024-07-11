@@ -18,7 +18,7 @@ const MyAccount = () => {
     const handleLogout = () => {
         dispatch(logout());
         localStorage.removeItem('jwt');
-        navigate("/identity/login");
+        navigate("/auth/login");
     };
 
     useEffect(() => {
@@ -30,7 +30,7 @@ const MyAccount = () => {
     useEffect(() => {
         if (loaded && !user) {
         // console.log(localStorage.getItem("jwt"));
-        navigate("/identity/login");
+        navigate("/auth/login");
         }
     }, [loaded, user, navigate]);
 
