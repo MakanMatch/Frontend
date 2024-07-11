@@ -113,6 +113,7 @@ function ChatUi() {
   const sendMessage = () => {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
+        action: "send",
         sender: "Jamie",
         receiver: "James",
         message: messageInput,
