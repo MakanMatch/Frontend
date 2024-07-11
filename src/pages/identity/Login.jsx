@@ -48,6 +48,7 @@ function Login() {
                     formik.setFieldError('password', 'Incorrect password.');
                 }
                 showToast('Login failed', 'Invalid username or password.', 3000, true, 'error')
+                console.log(err)
             });
 
         actions.setSubmitting(false);

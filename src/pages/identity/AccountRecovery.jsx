@@ -48,6 +48,7 @@ function AccountRecovery() {
                     formik.setFieldError('usernameOrEmail', "Username or email doesn't exist.");
                 }
                 showToast('Error', "Username or email doesn't exist.", 3000, true, 'error')
+                console.log(err)
             });
     };
 
@@ -65,6 +66,7 @@ function AccountRecovery() {
                     formik.setFieldError('resetKey', 'Invalid or expired reset key.')
                 }
                 showToast('Error', 'Invalid or expired reset key.', 3000, true, 'error')
+                console.log(err)
             });
 
         actions.setSubmitting(false);
