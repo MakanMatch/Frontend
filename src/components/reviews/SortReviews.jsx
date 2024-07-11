@@ -7,7 +7,8 @@ import configureShowToast from '../../components/showToast';
 
 const SortReviews = ({
     hostID,
-    guestID
+    guestID,
+    stateRefresh
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -42,7 +43,7 @@ const SortReviews = ({
         }
     }
 
-    useEffect(() => {
+    const fetchSortedData = () => {
         let sortOrder = ""
         switch (activeTab) {
             case 0:
@@ -62,7 +63,11 @@ const SortReviews = ({
                 break;
         }
         fetchReviews(hostID, sortOrder);
-    }, [activeTab]);
+    }
+
+    useEffect(() => {
+        fetchSortedData();
+    }, [activeTab, stateRefresh]);
 
     return (
         <Tabs mt={8} variant="soft-rounded" size='sm' minWidth="310px" onChange={(index) => setActiveTab(index)}>

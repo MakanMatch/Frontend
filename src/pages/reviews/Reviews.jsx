@@ -20,6 +20,7 @@ function Reviews() {
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
+    const [stateRefresh, refreshState] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();   
     const location = useLocation();
     const [searchParams] = useSearchParams();
@@ -98,7 +99,7 @@ function Reviews() {
     useEffect(() => {
         fetchHostInfo();
         fetchGuestInfo();
-    }, []);
+    }, [stateRefresh]);
 
     return (
         <Box p={2} position="relative" width="100%">
@@ -141,6 +142,8 @@ function Reviews() {
                                 hostName={hostName}
                                 guestID={userID}
                                 hostID={hostID}
+                                refreshState={refreshState}
+                                stateRefresh={stateRefresh}
                             />
                         </Flex>
                     </Flex>
@@ -161,6 +164,7 @@ function Reviews() {
             <SortReviews 
                 hostID={hostID}
                 guestID={userID}
+                stateRefresh={stateRefresh}
             />
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
