@@ -71,6 +71,7 @@ const CreateReview = ({
             }
         } catch (error) {
             showToast("An error occurred", "Please try again later.", 3000, true, "error");
+            console.log("Error liking review:", error);
             return
         }
     }

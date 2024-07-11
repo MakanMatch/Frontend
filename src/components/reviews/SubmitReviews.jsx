@@ -97,9 +97,9 @@ const SubmitReviews = ({
                     }
                 })
         } catch (error) {
-            console.error('Failed to submit review:', error);
             setIsSubmitting(false);
             showToast("Failed to submit review", "Please try again later", 3000, true, "error");
+            console.log('Failed to submit review:', error);
         }
     };
 

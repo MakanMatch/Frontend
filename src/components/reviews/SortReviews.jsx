@@ -37,6 +37,7 @@ const SortReviews = ({
             }
         } catch (error) {
             showToast("An error occurred", "Please try again later", 3000, true, "error");
+            console.log("Error fetching reviews:", error)
             return
         }
     }
