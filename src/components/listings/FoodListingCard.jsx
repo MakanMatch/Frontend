@@ -5,6 +5,7 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import server from "../../networking";
 import { useNavigate } from "react-router-dom";
+import configureShowToast from "../../components/showToast";
 
 const FoodListingCard = ({
     listingID,
@@ -13,7 +14,6 @@ const FoodListingCard = ({
     hostName,
     hostFoodRating,
     userID,
-    ShowToast,
     images,
     fetchListings,
     shortDescription,
@@ -22,6 +22,7 @@ const FoodListingCard = ({
     coordinates,
 }) => {
     const toast = useToast();
+    const showToast = configureShowToast(toast);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
     const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
@@ -31,11 +32,11 @@ const FoodListingCard = ({
         const deleteListing = await server.delete("/listings/deleteListing", { data: { listingID: listingID } });
         if (deleteListing.status === 200) {
             toast.closeAll();
-            ShowToast("Listing removed", "Your listing has been successfully removed!", "success", 3000);
+            showToast("Listing removed", "Your listing has been successfully removed!", "success", 3000);
             fetchListings();
         } else {
             toast.closeAll();
-            ShowToast("Error", "Failed to remove listing", "error", 3000);
+            showToast("Error", "Failed to remove listing", "error", 3000);
         }
     };
 

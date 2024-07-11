@@ -4,6 +4,7 @@ import server from "../../networking";
 import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
+import configureShowToast from "../../components/showToast";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
 import axios from "axios";
 
@@ -20,16 +21,7 @@ const FoodListingsPage = () => {
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const [loading, setLoading] = useState(true); 
     const toast = useToast();
-
-    function ShowToast(title, description, status, duration) {
-        toast({
-            title: title,
-            description: description,
-            status: status,
-            duration: duration,
-            isClosable: false,
-        });
-    }
+    const showToast = configureShowToast(toast);
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
@@ -44,7 +36,7 @@ const FoodListingsPage = () => {
             const location = response.data.results[0].geometry.location;
             return { lat: location.lat, lng: location.lng };
         } catch (error) {
-            ShowToast("An error occured", "Failed to generate maps coordinates", "error", 3000);
+            showToast("An error occured", "Failed to generate maps coordinates", "error", 3000);
             return null;
         }
     };
@@ -55,7 +47,7 @@ const FoodListingsPage = () => {
             setListings(response.data);
         } catch (error) {
             toast.closeAll();
-            ShowToast(
+            showToast(
                 "Error fetching food listings",
                 "Please try again later.",
                 "error",
@@ -160,7 +152,6 @@ const FoodListingsPage = () => {
                                                 hostName={hostName}
                                                 hostFoodRating={hostRating}
                                                 userID={guestUserID}
-                                                ShowToast={ShowToast}
                                                 images={listing.images.map((imageName) =>
                                                     getImageLink(listing.listingID, imageName)
                                                 )}
