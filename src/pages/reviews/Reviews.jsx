@@ -77,10 +77,10 @@ function Reviews() {
     const fetchGuestInfo = async () => {
         try {
             const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
-            if (!response.data && response.status !== 200) {
+            if (!response.data || response.status !== 200) {
                 showToast("No guest information found", "Directing you back to homepage", 3000, true, "info");
                 setTimeout(() => {
-                    window.location.href = "/";
+                    navigate("/")
                 }, 3000);
                 return
             }
@@ -89,7 +89,7 @@ function Reviews() {
             showToast("Error fetching guest information", "Directing you back to homepage", 3000, true, "error");
             console.error("Error fetching guest info:", error);
             setTimeout(() => {
-                window.location.href = "/";
+                navigate("/")
             }, 3000);
             return
         }
