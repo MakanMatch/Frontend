@@ -262,7 +262,6 @@ function ChatUi() {
         >
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
             {messages.map((msg, index) => (
-              console.log(msg),
               <React.Fragment key={msg.messageID}>
                 {shouldDisplayDate(msg, messages[index - 1]) && (
                   <Text
