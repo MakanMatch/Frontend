@@ -4,7 +4,7 @@ import SortReviews from '../../components/reviews/SortReviews';
 import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
 import { useDisclosure } from '@chakra-ui/react';
 import {
@@ -22,8 +22,20 @@ function Reviews() {
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
     const { isOpen, onOpen, onClose } = useDisclosure();   
     const location = useLocation();
-    const { userID, hostID } = location.state || {}; 
-
+    const [searchParams] = useSearchParams();
+    const { userID = '', hostID = '' } = {}
+    if (location.state.userID && location.state.hostID) {
+        userID = location.state.userID;
+        hostID = location.state.hostID;
+    } else if (searchParams.has('userID') && searchParams.has('hostID')) {
+        userID = searchParams.get('userID');
+        hostID = searchParams.get('hostID');
+    } else {
+        showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
+        navigate('/');
+    }
+    
+    
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
         if (hygieneGrade >= 4) return 'teal';

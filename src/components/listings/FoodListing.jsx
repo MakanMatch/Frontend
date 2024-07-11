@@ -118,7 +118,7 @@ const FoodListing = ({
                         <Text color="blue.600" fontSize="2xl">
                             ${portionPrice}/pax
                         </Text>
-                        <Link to={`/reviews/${hostName}`} state={{ userID: userID, hostID: hostID }}> {/* This is a placeholder link with user and host ID fetched from FoodListingPage.jsx */}
+                        <Link to={`/reviews/${hostName}/?hostID=${hostID}&userID${userID}`} state={{ userID: userID, hostID: hostID }}> {/* This is a placeholder link with user and host ID fetched from FoodListingPage.jsx */}
                             <Text textDecoration={"underline"} color={"blue"}>See reviews</Text>
                         </Link>
                     </Stack>
