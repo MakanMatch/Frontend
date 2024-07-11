@@ -7,6 +7,7 @@ import { logout, fetchUser } from "../../slices/AuthState";
 import GuestSidebar from "../../components/identity/GuestSideNav";
 import HostSidebar from "../../components/identity/HostSideNav";
 import server from "../../networking";
+import configureShowToast from '../../components/showToast';
 
 const MyAccount = () => {
     const navigate = useNavigate();
@@ -14,6 +15,8 @@ const MyAccount = () => {
     const [isHovered, setIsHovered] = useState(false);
     const [accountInfo, setAccountInfo] = useState(null);
     const { user, loaded, error } = useSelector((state) => state.auth);
+    const toast = useToast()
+    const showToast = configureShowToast(toast);
 
     const handleLogout = () => {
         dispatch(logout());

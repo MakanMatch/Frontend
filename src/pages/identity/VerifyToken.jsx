@@ -5,10 +5,10 @@ import server from '../../networking';
 import configureShowToast from '../../components/showToast';
 
 function VerifyToken() {
-    const toast = useToast()
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [message, setMessage] = useState('');
+    const toast = useToast()
     const showToast = configureShowToast(toast);
 
     // Get token and userID from searchParams

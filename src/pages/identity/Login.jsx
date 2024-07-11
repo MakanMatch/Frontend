@@ -7,10 +7,12 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import server from '../../networking';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeAuthToken, setUser } from '../../slices/AuthState';
+import configureShowToast from '../../components/showToast';
 
 function Login() {
     const navigate = useNavigate();
-    const toast = useToast();
+    const toast = useToast()
+    const showToast = configureShowToast(toast);
     const [showPassword, setShowPassword] = useState(false);
     const dispatch = useDispatch();
     const authToken = useSelector((state) => state.auth.authToken);
@@ -27,13 +29,7 @@ function Login() {
             .then((res) => {
                 if (res && res.data) {
                     console.log("Account logged in successfully.");
-                    toast({
-                        title: 'Login successful.',
-                        description: "Welcome back to MakanMatch!",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Login successful', 'Welcome back to MakanMatch!', 3000, true, 'success')
                     // Set the JWT token in localStorage
                     localStorage.setItem('jwt', res.data.accessToken);
                     dispatch(changeAuthToken(res.data.accessToken));
@@ -42,13 +38,7 @@ function Login() {
                     navigate("/");
                 } else {
                     console.log("An error has occurred logging in to the account.")
-                    toast({
-                        title: 'Login failed.',
-                        description: "Invalid username or password.",
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Login failed', 'Invalid username or password.', 3000, true, 'error')
                 }
             })
             .catch((err) => {
@@ -57,13 +47,7 @@ function Login() {
                     formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
                     formik.setFieldError('password', 'Incorrect password.');
                 }
-                toast({
-                    title: 'Login failed.',
-                    description: "Invalid username or password.",
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                showToast('Login failed', 'Invalid username or password.', 3000, true, 'error')
             });
 
         actions.setSubmitting(false);

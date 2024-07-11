@@ -4,12 +4,13 @@ import {
 } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import server from '../../networking';
-import showToast from '../../components/showToast';
+import configureShowToast from '../../components/showToast';
 
 function EmailVerification() {
     const [searchParams] = useSearchParams();
     const [cooldown, setCooldown] = useState(0);
-    const toast = useToast();
+    const toast = useToast()
+    const showToast = configureShowToast(toast);
 
     const email = searchParams.get('email');
 
@@ -22,13 +23,7 @@ function EmailVerification() {
         })
         .catch((err) => {
             console.log(err)
-            toast({
-                title: 'Error',
-                description: err.response?.data || 'Failed to send verification email.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
+            showToast('Error', err.response?.data || 'Failed to send verification email.', 3000, true, 'error')
         });
     }, [])
     
@@ -45,32 +40,14 @@ function EmailVerification() {
             .then((res) => {
                 if (res.data && res.data.startsWith("SUCCESS")) {
                     setCooldown(30);
-                    toast({
-                        title: 'Verification email sent.',
-                        description: "Check your email for the verification link.",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Verification email sent.', 'Check your email for the verification link.', 3000, true, 'success')
                 } else {
-                    toast({
-                        title: 'Error',
-                        description: res.data,
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Error.', res.data, 3000, true, 'error')
                 }
             })
             .catch((err) => {
                 console.log(err)
-                toast({
-                    title: 'Error',
-                    description: err.response?.data || 'Failed to send verification email.',
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                showToast('Error', err.response?.data || 'Failed to send verification email.', 3000, true, 'error')
             });
     };
 

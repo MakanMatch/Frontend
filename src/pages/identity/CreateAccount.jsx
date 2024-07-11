@@ -8,10 +8,12 @@ import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import server from '../../networking';
+import configureShowToast from '../../components/showToast';
 
 function CreateAccount() {
     const navigate = useNavigate();
-    const toast = useToast();
+    const toast = useToast()
+    const showToast = configureShowToast(toast);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isHostAccount, setIsHostAccount] = useState(false);
@@ -57,22 +59,10 @@ function CreateAccount() {
         })
             .then((res) => {
                 if (res && res.data && res.data === "SUCCESS: Account created. Please verify your email.") {
-                    toast({
-                        title: 'Account created.',
-                        description: "Please verify your email to continue.",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Account created', 'Please verify your email to continue', 3000, true, 'success')
                     navigate(`/auth/emailVerification?email=${submitValues.email}`);
                 } else {
-                    toast({
-                        title: 'Account creation failed.',
-                        description: "An error has occurred creating the account.",
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Account creation failed', 'An error has occured creating the account.', 3000, true, '')
                 }
             })
             .catch((err) => {
@@ -83,15 +73,7 @@ function CreateAccount() {
                 } else if (err.response.data === "UERROR: Contact number already exists.") {
                     actions.setFieldError('contactNum', 'Contact number already in use.');
                 }
-                toast({
-                    title: 'Account creation failed.',
-                    description: `${err.response.data}`.substring("UERROR: ".length),
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-
-                });
-
+                showToast('Account creation failed.', `${err.response.data}`.substring("UERROR: ".length), 3000, true, 'error')
                 actions.setSubmitting(false);
             });
     };

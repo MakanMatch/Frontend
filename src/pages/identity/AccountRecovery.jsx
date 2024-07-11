@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import server from '../../networking';
+import configureShowToast from '../../components/showToast';
 
 function AccountRecovery() {
     const [showResetFields, setShowResetFields] = useState(false);
@@ -15,7 +16,8 @@ function AccountRecovery() {
     const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
     const [isResetKeySent, setIsResetKeySent] = useState(false);
     const [cooldown, setCooldown] = useState(0);
-    const toast = useToast();
+    const toast = useToast()
+    const showToast = configureShowToast(toast);
     const navigate = useNavigate();
 
     const handleShowNewPassword = () => setShowNewPassword(!showNewPassword);
@@ -36,34 +38,16 @@ function AccountRecovery() {
                     setShowResetFields(true);
                     setIsResetKeySent(true);
                     setCooldown(30);
-                    toast({
-                        title: 'Reset key sent.',
-                        description: "Check your email for the reset key.",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Reset key sent', 'Check your email for the reset key.', 3000, true, 'success')
                 } else {
-                    toast({
-                        title: 'Error',
-                        description: res.data,
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Error', res.data, 3000, true, 'error')
                 }
             })
             .catch((err) => {
                 if (err.response.data === "UERROR: Username or email doesn't exist.") {
                     formik.setFieldError('usernameOrEmail', "Username or email doesn't exist.");
                 }
-                toast({
-                    title: 'Error',
-                    description: "Username or email doesn' exist.",
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                showToast('Error', "Username or email doesn't exist.", 3000, true, 'error')
             });
     };
 
@@ -72,13 +56,7 @@ function AccountRecovery() {
         server.post('/accountRecovery/resetPassword', { usernameOrEmail, ...values })
             .then((res) => {
                 if (res.data && res.data.startsWith("SUCCESS")) {
-                    toast({
-                        title: 'Password reset successfully.',
-                        description: "You can now log in with your new password.",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Password reset successfully.', 'You can now log in with your new password.', 3000, true, 'success')
                     navigate('/auth/login');
                 }
             })
@@ -86,13 +64,7 @@ function AccountRecovery() {
                 if (err.response.data === "UERROR: Invalid or expired reset key.") {
                     formik.setFieldError('resetKey', 'Invalid or expired reset key.')
                 }
-                toast({
-                    title: 'Error',
-                    description: "Invalid or expired reset key.",
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                showToast('Error', 'Invalid or expired reset key.', 3000, true, 'error')
             });
 
         actions.setSubmitting(false);
