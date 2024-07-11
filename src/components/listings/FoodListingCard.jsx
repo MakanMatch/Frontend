@@ -14,6 +14,7 @@ const FoodListingCard = ({
     hostName,
     hostFoodRating,
     userID,
+    hostID,
     images,
     fetchListings,
     shortDescription,
@@ -100,6 +101,9 @@ const FoodListingCard = ({
                         <Text color="blue.600" fontSize="2xl">
                             ${portionPrice}/pax
                         </Text>
+                        <Link to={`/reviews`} state={{ userID: userID, hostID: hostID }}> {/* To send a state consisting of userId and hostID to the review page.*/}
+                            <Text textDecoration={"underline"} color={"blue"}>See reviews</Text>
+                        </Link>
                     </Stack>
                 </CardBody>
                 <Divider />
