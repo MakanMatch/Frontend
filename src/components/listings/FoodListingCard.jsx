@@ -4,7 +4,7 @@ import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Imag
 import { DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import server from "../../networking";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import configureShowToast from "../../components/showToast";
 
 const FoodListingCard = ({
@@ -14,6 +14,7 @@ const FoodListingCard = ({
     hostName,
     hostFoodRating,
     userID,
+    hostID,
     images,
     fetchListings,
     shortDescription,
@@ -42,6 +43,7 @@ const FoodListingCard = ({
 
     useEffect(() => {
         localStorage.setItem("ListingExp-userID", userID);
+        localStorage.setItem("ListingExp-hostID", hostID);
         localStorage.setItem(`ListingExp-images-${listingID}`, images);
         localStorage.setItem(`ListingExp-title-${listingID}`, title);
         localStorage.setItem(`ListingExp-shortDescription-${listingID}`, shortDescription);
@@ -100,13 +102,18 @@ const FoodListingCard = ({
                         <Text color="blue.600" fontSize="2xl">
                             ${portionPrice}/pax
                         </Text>
+                        <Link to={`/reviews`} state={{ userID: userID, hostID: hostID }}> {/* To send a state consisting of userId and hostID to the review page.*/}
+                            <Text textDecoration={"underline"} color={"blue"}>See reviews</Text>
+                        </Link>
                     </Stack>
                 </CardBody>
                 <Divider />
                 {isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"} onClick={() => navigate(`/targetListing?listingID=${listingID}`)}>View</Button>
+                            <Link to={`/targetListing?listingID=${listingID}`}>
+                                <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
+                            </Link>
                             <Button onClick={onOpenAlert}>
                                 <Text fontSize={"15px"}><DeleteIcon color="red" mb={1} /> Remove</Text>
                             </Button>
@@ -116,7 +123,9 @@ const FoodListingCard = ({
                 {!isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"} onClick={() => navigate(`/targetListing?listingID=${listingID}`)}>View</Button>
+                            <Link to={`/targetListing?listingID=${listingID}`}>
+                                <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
+                            </Link>
                             <Button onClick={onOpenAlert}>
                                 <DeleteIcon color="red" />
                             </Button>

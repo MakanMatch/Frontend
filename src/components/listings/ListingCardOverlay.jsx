@@ -3,12 +3,12 @@
 import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast } from "@chakra-ui/react";
 import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import server from "../../networking";
 import configureShowToast from "../../components/showToast";
 
-function ListingCardOverlay({ listingID, userID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
+function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
@@ -38,17 +38,17 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
             listingID: listingID
         }
         await server.put("/listings/toggleFavouriteListing", favouriteData)
-        .then((response) => {
-            if (response.data.favourite === true) {
-                setFavourite(true);
-            } else {
-                setFavourite(false);
-            }
-        })
-        .catch(() => {
-            toast.closeAll();
-            showToast("Error", "Failed to add/remove listing from favourites", "error", 3000);
-        });
+            .then((response) => {
+                if (response.data.favourite === true) {
+                    setFavourite(true);
+                } else {
+                    setFavourite(false);
+                }
+            })
+            .catch(() => {
+                toast.closeAll();
+                showToast("Error", "Failed to add/remove listing from favourites", "error", 3000);
+            });
     };
 
     const fetchFavouriteState = async () => {
@@ -86,7 +86,7 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
             </>
         );
     };
-    
+
     return (
         <>
             <style>
@@ -108,17 +108,17 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
                     }
                 `}
             </style>
-            <Card 
-            maxW="350px" 
-            height="80vh"
-            borderRadius={6} 
-            overflow="scroll" 
-            className="disable-select"
-            css={{
-                '&::-webkit-scrollbar': {
-                    display: 'none',
-                },  
-            }}>
+            <Card
+                maxW="350px"
+                height="80vh"
+                borderRadius={6}
+                overflow="scroll"
+                className="disable-select"
+                css={{
+                    '&::-webkit-scrollbar': {
+                        display: 'none',
+                    },
+                }}>
                 <CardBody>
                     <Box position="relative" width="fit-content">
                         {images.split(",").length > 1 && (
@@ -230,7 +230,9 @@ function ListingCardOverlay({ listingID, userID, images, title, shortDescription
                                 />
                             </Box>
                         </Box>
-                        <Text mt={2} mb={-4} textAlign="left" color="blue" fontSize={"13px"} textDecoration={"underline"} cursor={"pointer"} onClick={() => navigate("/reviews")}>View all reviews</Text>
+                        <Link to={'/reviews'} state={{ userID, hostID }}>
+                            <Text mt={2} mb={-4} textAlign="left" color="blue" fontSize={"13px"} textDecoration={"underline"} cursor={"pointer"}>View Host Reviews</Text>
+                        </Link>
                     </Stack>
                 </CardBody>
                 <Divider mt={1} />

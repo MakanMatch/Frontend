@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Input, Flex, Text, Container, Image, Textarea, Spacer, Icon, Heading, Avatar, useToast, SimpleGrid } from '@chakra-ui/react';
-import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react';
+import { Text, useToast, SimpleGrid } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import { BiLike } from 'react-icons/bi';
-import { FaUtensils, FaSoap } from "react-icons/fa";
 import server from '../../networking'
-import CreateReview from './CreateReview';
+import CreateReview from './ReviewCards';
+import configureShowToast from '../../components/showToast';
 
-function SortReviews() {
+const SortReviews = ({
+    hostID,
+    guestID,
+    stateRefresh
+}) => {
     const toast = useToast();
+    const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
 
@@ -21,47 +24,26 @@ function SortReviews() {
 
     const fetchReviews = async (hostID, sortOrder) => {
         try {
-            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`);
-            if (response.status === 200 && response.data) {
+            // Get reviews
+            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&guestID=${guestID}&order=${sortOrder}`);
+            if (response.status === 200 && Array.isArray(response.data)) {
                 const reviews = response.data;
                 setReviews(reviews);
-                const reviewsWithGuestInfo = await Promise.all(reviews.map(async (review) => {
-                    try {
-                        const guestInfoResponse = await server.get(`/cdn/accountInfo?userID=${review.guestID}`);
-                        if (guestInfoResponse.status === 200 && guestInfoResponse.data) {
-                            review.guestInfo = guestInfoResponse.data;
-                        } else {
-                            review.guestInfo = null;
-                            console.error(`No guest info found for guestID ${review.guestID}`);
-                        }
-                    } catch (error) {
-                        review.guestInfo = null;
-                        console.error(`Error fetching guest info for guestID ${review.guestID}:`, error);
-                    }
-                    return review;
-                }));
-                setReviews(reviewsWithGuestInfo);
-            } else if (response.data && response.data.startsWith("ERROR")) {
-                toast({
-                    title: "No reviews found",
-                    description: "Please try again later.",
-                    status: 'info',
-                    duration: 2500,
-                    isClosable: false,
-                });
+            } else if (response.status === 200 && !Array.isArray(response.data) && response.data.length == 0) {
+                setReviews([]);
+                showToast("No reviews found", "", 3000, false, "info");
+            } else {
+                showToast("An error occurred", "Please try again later", 3000, true, "error");
+                return
             }
         } catch (error) {
-            toast({
-                title: "An error occurred",
-                description: error.message,
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
+            showToast("An error occurred", "Please try again later", 3000, true, "error");
+            console.log("Error fetching reviews:", error)
+            return
         }
     }
 
-    useEffect(() => {
+    const fetchSortedData = () => {
         let sortOrder = ""
         switch (activeTab) {
             case 0:
@@ -80,8 +62,12 @@ function SortReviews() {
                 sortOrder = "mostRecent"
                 break;
         }
-        fetchReviews("272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4", sortOrder); //hardcoded hostID, should be dynamic, retrieve from URL
-    }, [activeTab]);
+        fetchReviews(hostID, sortOrder);
+    }
+
+    useEffect(() => {
+        fetchSortedData();
+    }, [activeTab, stateRefresh]);
 
     return (
         <Tabs mt={8} variant="soft-rounded" size='sm' minWidth="310px" onChange={(index) => setActiveTab(index)}>
@@ -98,14 +84,16 @@ function SortReviews() {
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
-                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                                    like={review.likeCount}
+                                    likeCount={review.likeCount}
                                     reviewID={review.reviewID}
+                                    guestID={guestID}
+                                    isLiked={review.isLiked}
                                 />
                             )) :
                             null}
@@ -117,14 +105,16 @@ function SortReviews() {
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
-                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                                    like={review.likeCount}
+                                    likeCount={review.likeCount}
                                     reviewID={review.reviewID}
+                                    guestID={guestID}
+                                    isLiked={review.isLiked}
                                 />
                             )) :
                             null}
@@ -136,14 +126,16 @@ function SortReviews() {
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
-                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                                    like={review.likeCount}
+                                    likeCount={review.likeCount}
                                     reviewID={review.reviewID}
+                                    guestID={guestID}
+                                    isLiked={review.isLiked}
                                 />
                             )) :
                             null}
@@ -155,14 +147,16 @@ function SortReviews() {
                             reviews.map((review) => (
                                 <CreateReview
                                     key={review.reviewID}
-                                    username={review.guestInfo ? review.guestInfo.username : null}
+                                    username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
-                                    like={review.likeCount}
+                                    likeCount={review.likeCount}
                                     reviewID={review.reviewID}
+                                    guestID={guestID}
+                                    isLiked={review.isLiked}
                                 />
                             )) :
                             null}

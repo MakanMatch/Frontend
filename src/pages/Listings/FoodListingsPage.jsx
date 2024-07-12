@@ -10,6 +10,7 @@ import axios from "axios";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
+    const [hostUserID, setHostUserID] = useState("");
     const [hostName, setHostName] = useState("");
     const [hostRating, setHostRating] = useState(0);
     const [guestUserID, setGuestUserID] = useState("");
@@ -58,6 +59,7 @@ const FoodListingsPage = () => {
 
     const fetchHostDetails = async () => {
         const response = await server.get("/cdn/fetchHostdetails");
+        setHostUserID(response.data.hostUserID);
         setHostName(response.data.hostUsername);
         setHostRating(response.data.hostFoodRating);
     };
@@ -152,6 +154,7 @@ const FoodListingsPage = () => {
                                                 hostName={hostName}
                                                 hostFoodRating={hostRating}
                                                 userID={guestUserID}
+                                                hostID={hostUserID}
                                                 images={listing.images.map((imageName) =>
                                                     getImageLink(listing.listingID, imageName)
                                                 )}
