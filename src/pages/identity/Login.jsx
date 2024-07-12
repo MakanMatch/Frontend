@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Box, Heading, Input, Button, Text, VStack, useToast, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link, IconButton } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
@@ -7,10 +7,12 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import server from '../../networking';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeAuthToken, setUser } from '../../slices/AuthState';
+import configureShowToast from '../../components/showToast';
 
 function Login() {
     const navigate = useNavigate();
-    const toast = useToast();
+    const toast = useToast()
+    const showToast = configureShowToast(toast);
     const [showPassword, setShowPassword] = useState(false);
     const dispatch = useDispatch();
     const authToken = useSelector((state) => state.auth.authToken);
@@ -27,13 +29,7 @@ function Login() {
             .then((res) => {
                 if (res && res.data) {
                     console.log("Account logged in successfully.");
-                    toast({
-                        title: 'Login successful.',
-                        description: "Welcome back to MakanMatch!",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Login successful', 'Welcome back to MakanMatch!', 3000, true, 'success')
                     // Set the JWT token in localStorage
                     localStorage.setItem('jwt', res.data.accessToken);
                     dispatch(changeAuthToken(res.data.accessToken));
@@ -42,13 +38,7 @@ function Login() {
                     navigate("/");
                 } else {
                     console.log("An error has occurred logging in to the account.")
-                    toast({
-                        title: 'Login failed.',
-                        description: "Invalid username or password.",
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Login failed', 'Invalid username or password.', 3000, true, 'error')
                 }
             })
             .catch((err) => {
@@ -57,13 +47,8 @@ function Login() {
                     formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
                     formik.setFieldError('password', 'Incorrect password.');
                 }
-                toast({
-                    title: 'Login failed.',
-                    description: "Invalid username or password.",
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                showToast('Login failed', 'Invalid username or password.', 3000, true, 'error')
+                console.log(err)
             });
 
         actions.setSubmitting(false);
@@ -89,10 +74,11 @@ function Login() {
             <Box
                 w="50%"
                 h="100%"
-                bg="rgba(255, 255, 255, 0.8)"
+                bg="rgba(255, 255, 255, 0.85)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
+                borderRadius={15}
             >
                 <VStack spacing={4} w="full">
                     <Heading as="h1" size="xl" mb={4} mt={20} textAlign="center">
@@ -143,7 +129,7 @@ function Login() {
                         </FormControl>
                         <Box w="100%" display="flex" justifyContent="start">
                             <Link
-                                href='/accountRecovery'
+                                href='/identity/accountRecovery'
                                 fontSize='12px'
                                 color='teal.500'
                                 mb={5}
@@ -164,7 +150,7 @@ function Login() {
                         </Button>
                     </Box>
                     <Text textAlign='center' fontSize='12px' mb={5}>
-                        Don't have an account? <Link href='./createAccount' color='teal.500'><Text as='u'>Sign Up</Text></Link>
+                        Don't have an account? <Link href='/auth/createAccount' color='teal.500'><Text as='u'>Sign Up</Text></Link>
                     </Text>
                 </VStack>
             </Box>

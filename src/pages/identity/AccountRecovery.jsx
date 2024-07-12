@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Box, Heading, Input, Button, Text, VStack, FormControl, FormLabel, FormErrorMessage, useToast, InputGroup, InputRightElement, IconButton
+    Box, Heading, Input, Button, VStack, FormControl, FormLabel, FormErrorMessage, useToast, InputGroup, InputRightElement, IconButton
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import server from '../../networking';
+import configureShowToast from '../../components/showToast';
 
 function AccountRecovery() {
     const [showResetFields, setShowResetFields] = useState(false);
@@ -15,7 +16,8 @@ function AccountRecovery() {
     const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
     const [isResetKeySent, setIsResetKeySent] = useState(false);
     const [cooldown, setCooldown] = useState(0);
-    const toast = useToast();
+    const toast = useToast()
+    const showToast = configureShowToast(toast);
     const navigate = useNavigate();
 
     const handleShowNewPassword = () => setShowNewPassword(!showNewPassword);
@@ -36,34 +38,17 @@ function AccountRecovery() {
                     setShowResetFields(true);
                     setIsResetKeySent(true);
                     setCooldown(30);
-                    toast({
-                        title: 'Reset key sent.',
-                        description: "Check your email for the reset key.",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Reset key sent', 'Check your email for the reset key.', 3000, true, 'success')
                 } else {
-                    toast({
-                        title: 'Error',
-                        description: res.data,
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Error', res.data, 3000, true, 'error')
                 }
             })
             .catch((err) => {
                 if (err.response.data === "UERROR: Username or email doesn't exist.") {
                     formik.setFieldError('usernameOrEmail', "Username or email doesn't exist.");
                 }
-                toast({
-                    title: 'Error',
-                    description: "Username or email doesn' exist.",
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                showToast('Error', "Username or email doesn't exist.", 3000, true, 'error')
+                console.log(err)
             });
     };
 
@@ -72,27 +57,16 @@ function AccountRecovery() {
         server.post('/accountRecovery/resetPassword', { usernameOrEmail, ...values })
             .then((res) => {
                 if (res.data && res.data.startsWith("SUCCESS")) {
-                    toast({
-                        title: 'Password reset successfully.',
-                        description: "You can now log in with your new password.",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
-                    navigate('/login');
+                    showToast('Password reset successfully.', 'You can now log in with your new password.', 3000, true, 'success')
+                    navigate('/auth/login');
                 }
             })
             .catch((err) => {
                 if (err.response.data === "UERROR: Invalid or expired reset key.") {
                     formik.setFieldError('resetKey', 'Invalid or expired reset key.')
                 }
-                toast({
-                    title: 'Error',
-                    description: "Invalid or expired reset key.",
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                showToast('Error', 'Invalid or expired reset key.', 3000, true, 'error')
+                console.log(err)
             });
 
         actions.setSubmitting(false);
@@ -125,18 +99,19 @@ function AccountRecovery() {
             <Box
                 w="50%"
                 h="100%"
-                bg="rgba(255, 255, 255, 0.8)"
+                bg="rgba(255, 255, 255, 0.85)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
                 p={8}
+                borderRadius={15}
             >
                 <VStack spacing={4} w="full">
-                    <Heading as="h1" size="xl" mb={5} textAlign="center">
+                    <Heading as="h1" size="xl" mb={5} mt={10} textAlign="center">
                         Recover your account
                     </Heading>
                     <Box w="400px" display="flex" justifyContent="start">
-                        <Button onClick={() => navigate('/login')} mb={4} colorScheme='purple'>
+                        <Button onClick={() => navigate('/auth/login')} mb={4} colorScheme='purple'>
                             Back
                         </Button>
                     </Box>
@@ -156,12 +131,12 @@ function AccountRecovery() {
                         <FormErrorMessage fontSize='12px'>{formik.errors.usernameOrEmail}</FormErrorMessage>
                     </FormControl>
                     <Box w="400px" display="flex" justifyContent="start">
-                        <Button onClick={sendResetKey} colorScheme='purple' isDisabled={cooldown > 0}>
+                        <Button onClick={sendResetKey} colorScheme='purple' isDisabled={cooldown > 0} mb={4}>
                             {cooldown > 0 ? `Resend in ${cooldown}s` : 'Send password reset key'}
                         </Button>
                     </Box>
                     {showResetFields && (
-                        <Box as="form" onSubmit={formik.handleSubmit} mt={4} w="400px">
+                        <Box as="form" onSubmit={formik.handleSubmit} w="400px">
                             <FormControl isInvalid={formik.errors.resetKey && formik.touched.resetKey} mb={4}>
                                 <FormLabel>Enter reset key</FormLabel>
                                 <Input
@@ -232,7 +207,7 @@ function AccountRecovery() {
                                 <FormErrorMessage fontSize='12px'>{formik.errors.confirmNewPassword}</FormErrorMessage>
                             </FormControl>
                             <Box w="full" display="flex" justifyContent="start">
-                                <Button type="submit" colorScheme='purple'>
+                                <Button type="submit" colorScheme='purple' mb={4} mt={4}>
                                     Reset Password
                                 </Button>
                             </Box>

@@ -17,10 +17,10 @@ function App() {
     }, [dispatch]);
 
     return (
-        <>
+        <div className='defaultLayout'>
             <Navbar />
             <Outlet />
-        </>
+        </div>
     )
 }
 

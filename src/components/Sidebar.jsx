@@ -20,10 +20,10 @@ function Sidebar({ isOpen, onClose }) {
 
     const handleMyAccountClick = () => {
         if (authToken) {
-            navigate('/myAccount');
+            navigate('/identity/myAccount');
         } else {
             console.log("Sign in first.")
-            navigate('/login');
+            navigate('/auth/login');
         }
         onClose()
     };
