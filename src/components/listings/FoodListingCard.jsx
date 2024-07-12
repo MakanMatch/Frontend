@@ -4,7 +4,7 @@ import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Imag
 import { DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
 import server from "../../networking";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import configureShowToast from "../../components/showToast";
 
 const FoodListingCard = ({
@@ -27,7 +27,6 @@ const FoodListingCard = ({
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
     const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
-    const navigate = useNavigate();
 
     const handleDeleteListing = async () => {
         const deleteListing = await server.delete("/listings/deleteListing", { data: { listingID: listingID } });
