@@ -224,7 +224,8 @@ const CreateReview = ({
                         color="gray.700"
                         fontSize="lg"
                         fontWeight="bold"
-                        _hover={{ cursor: "pointer" }}
+                        transition="all 0.3s ease-in-out"
+                        _hover={{ cursor: "pointer", bg: "gray.300"}}
                         textAlign="center"
                     >
                         +{images.length - 4}
