@@ -47,7 +47,7 @@ const GuestSidebar = () => {
             </Button>
 
             <Box position="absolute" bottom={0} width="calc(100% - 2rem)" textAlign="center" p={4}>
-                <Button colorScheme="purple" width="50%" onClick={handleLogout} mx="auto">
+                <Button colorScheme='red' width="50%" onClick={handleLogout} mx="auto">
                     Logout
                 </Button>
             </Box>

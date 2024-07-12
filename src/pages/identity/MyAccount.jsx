@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Box, Heading, Text, Flex, Avatar, Button, Spacer, Spinner, useToast
+import { Box, Heading, Text, Flex, Avatar, Button, Spacer, Spinner, useToast, FormControl, FormLabel, Stack, 
+    Editable, EditableInput, EditablePreview
 } from "@chakra-ui/react";
 import { logout, fetchUser } from "../../slices/AuthState";
 import GuestSidebar from "../../components/identity/GuestSideNav";
@@ -12,11 +13,12 @@ import configureShowToast from '../../components/showToast';
 const MyAccount = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const toast = useToast()
+    const showToast = configureShowToast(toast);
     const [isHovered, setIsHovered] = useState(false);
     const [accountInfo, setAccountInfo] = useState(null);
     const { user, loaded, error } = useSelector((state) => state.auth);
-    const toast = useToast()
-    const showToast = configureShowToast(toast);
+    
 
     const handleLogout = () => {
         dispatch(logout());
@@ -89,7 +91,7 @@ const MyAccount = () => {
     };
 
     return (
-        <Flex height="100vh">
+        <Flex>
             {/* Conditionally render the sidebar based on user type */}
             {accountInfo.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
     
@@ -152,40 +154,96 @@ const MyAccount = () => {
                 </Box>
     
                 {/* Account info part */}
-                <Flex p={4} mt={20} justifyContent="space-between" width="100%">
-                    <Box flex="1">
-                        <Heading size="md" mb={4}>
-                            Basic Information
-                        </Heading>
-                        <Text>Username: {accountInfo.username}</Text>
-                        <Text>Email: {accountInfo.email}</Text>
-                        <Text>Contact: {accountInfo.contactNum}</Text>
-                        <Text>Address: {accountInfo.address}</Text>
+                <Stack direction={['column', 'row']} p={4} mt={20} justifyContent="space-between" width="100%" spacing={"20px"}>
+                    <Box p={2} width={"45%"}>
+
+                        <FormControl mb={2}>
+                            <FormLabel>Username</FormLabel>
+                            <Editable defaultValue={accountInfo.username} textAlign={'left'} borderColor={'black'} borderWidth={1} borderRadius={10}>
+                                <EditablePreview p={2}/>
+                                <EditableInput p={2}/>
+                            </Editable>
+                        </FormControl>
+
+                        <FormControl mb={2}>
+                            <FormLabel>Email</FormLabel>
+                            <Editable defaultValue={accountInfo.email} textAlign={'left'} borderColor={'black'} borderWidth={1} borderRadius={10}>
+                                <EditablePreview p={2}/>
+                                <EditableInput p={2}/>
+                            </Editable>
+                        </FormControl>
+
+                        <FormControl mb={2}>
+                            <FormLabel>Contact</FormLabel>
+                            <Editable defaultValue={accountInfo.contactNum} textAlign={'left'} borderColor={'black'} borderWidth={1} borderRadius={10}>
+                                <EditablePreview p={2}/>
+                                <EditableInput p={2}/>
+                            </Editable>
+                        </FormControl>
+
+                        <FormControl mb={2}>
+                            <FormLabel>Address</FormLabel>
+                            <Editable defaultValue={accountInfo.address} textAlign={'left'} borderColor={'black'} borderWidth={1} borderRadius={10}>
+                                <EditablePreview p={2}/>
+                                <EditableInput p={2}/>
+                            </Editable>
+                        </FormControl>
+
                         <Button
-                            colorScheme="purple"
+                            variant={"MMPrimary"}
                             mb={4}
                             onClick={() => console.log("Change password clicked")}
+                            position="absolute" 
+                            bottom={0}
+                            left={6}
                         >
                             Change Password
                         </Button>
                     </Box>
     
-                    <Box flex="1">
-                        <Heading size="md" mb={4}>
-                            Additional Information
-                        </Heading>
-                        <Text>Favorite Cuisine: {accountInfo.favCuisine}</Text>
-                        <Text>Meals Matched: {accountInfo.mealsMatched}</Text>
-                        <Text>Account Age: {calculateAccountAge()} days</Text>
-                        <Spacer />
-                        <Button
-                            colorScheme="red"
-                            onClick={() => console.log("Delete account clicked")}
-                        >
-                            Delete Account
-                        </Button>
+                    <Box p={2} width={"35%"}>
+                        
+                        <FormControl mb={2}>
+                            <FormLabel>Favorite Cuisine</FormLabel>
+                            <Text textAlign={'left'} pt={2} pb={2}>{accountInfo.favCuisine}</Text>
+                        </FormControl>
+
+                        <FormControl mb={2}>
+                            <FormLabel>Meals Matched</FormLabel>
+                            <Text textAlign={'left'} pt={2} pb={2}>{accountInfo.mealsMatched + " meals"}</Text>
+                        </FormControl>
+
+                        <FormControl mb={2}>
+                            <FormLabel>Meals Matched</FormLabel>
+                            <Text textAlign={'left'} pt={2} pb={2}>{calculateAccountAge() + " days"}</Text>
+                        </FormControl>
+
+                        
                     </Box>
-                </Flex>
+
+                    <Box p={2} width={"20%"}>
+                        <Flex justifyContent={"flex-end"} flexDirection={"column"}>
+                            <Button
+                                borderWidth={1}
+                                borderColor={'black'}
+                                onClick={() => console.log("Delete account clicked")}
+                                width="full"
+                            >
+                                Edit Profile
+                            </Button>
+
+                            <Button
+                                colorScheme="red"
+                                onClick={() => console.log("Delete account clicked")}
+                                position="absolute" 
+                                bottom={0}
+                                mb={4}
+                            >
+                                Delete Account
+                            </Button>
+                        </Flex>
+                    </Box>
+                </Stack>
             </Box>
         </Flex>
     );

@@ -243,7 +243,7 @@ function CreateAccount() {
                                 </>
                             )}
                             <Button
-                                colorScheme='purple'
+                                variant={"MMPrimary"}
                                 isLoading={formik.isSubmitting}
                                 type='submit'
                                 width='150px'
