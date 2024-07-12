@@ -58,9 +58,13 @@ function CreateAccount() {
             }
         })
             .then((res) => {
-                if (res && res.data && res.data === "SUCCESS: Account created. Please verify your email.") {
+                if (res && res.data && res.data.startsWith("SUCCESS")) {
                     showToast('Account created', 'Please verify your email to continue', 3000, true, 'success')
-                    navigate(`/auth/emailVerification?email=${submitValues.email}`);
+                    if (res.data.startsWith("SUCCESS RESENDVERIFICATION")) {
+                        navigate(`/auth/emailVerification?email=${submitValues.email}&resendOnLoad=true`);
+                    } else {
+                        navigate(`/auth/emailVerification?email=${submitValues.email}`);
+                    }
                 } else {
                     showToast('Account creation failed', 'An error has occured creating the account.', 3000, true, '')
                 }

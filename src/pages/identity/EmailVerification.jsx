@@ -13,18 +13,12 @@ function EmailVerification() {
     const showToast = configureShowToast(toast);
 
     const email = searchParams.get('email');
+    const resendOnLoad = searchParams.get('resendOnLoad');
 
     useEffect(() => {
-        server.post('/identity/emailVerification/send', { email })
-        .then((res) => {
-            if (res.data || res.data.startsWith("SUCCESS")) {
-                showToast('Check your email', 'A verification link has been sent.', 3000, true, 'success')
-            }
-        })
-        .catch((err) => {
-            console.log(err)
-            showToast('Error', err.response?.data || 'Failed to send verification email.', 3000, true, 'error')
-        });
+        if (resendOnLoad === 'true') {
+            sendEmailVerification()
+        }
     }, [])
     
     useEffect(() => {
@@ -79,7 +73,7 @@ function EmailVerification() {
                         We've just sent a verification link to your email. Click the link provided to verify your email!
                     </Text>
                     <Box>
-                        <Button onClick={sendEmailVerification} colorScheme='purple' isDisabled={cooldown > 0}>
+                        <Button onClick={sendEmailVerification} variant={'MMPrimary'} isDisabled={cooldown > 0}>
                             {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend Verification Email'}
                         </Button>
                     </Box>
