@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import server from '../networking';
 
 const initialState = {
-    authToken: null,
+    authToken: localStorage.getItem('jwt'),
     user: null,
     loaded: false,
     error: null,
