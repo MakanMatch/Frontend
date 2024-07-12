@@ -16,7 +16,6 @@ import {
 	AlertDialogContent,
 	AlertDialogOverlay,
 	Button,
-	useMediaQuery,
 	Modal,
 	ModalOverlay,
 	ModalContent,
@@ -30,6 +29,7 @@ import ChatBubble from "../../components/chat/ChatBubble";
 import ChatHistory from "../../components/chat/ChatHistory";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { fetchUser } from "../../slices/AuthState";
 
 function ChatUi() {
 	const navigate = useNavigate();
@@ -60,9 +60,11 @@ function ChatUi() {
 	useEffect(() => {
 		const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
 		ws.current = new WebSocket(wsUrl);
+		
 
 		ws.current.onopen = () => {
 			console.log("Connected to WebSocket server");
+			ws.current.send(JSON.stringify({action : "connect", userID: user.userID}))
 		};
 
 		ws.current.onmessage = async (event) => {
@@ -120,7 +122,7 @@ function ChatUi() {
 				ws.current.close();
 			}
 		};
-	}, []);
+	}, [loaded, user]);
 
 	useEffect(() => {
 		scrollToBottom();
@@ -130,8 +132,7 @@ function ChatUi() {
 		if (ws.current && messageInput.trim() !== "") {
 			const newMessage = {
 				action: "send",
-				sender: "Jamie",
-				receiver: "James",
+				sender: user.username,
 				message: messageInput,
 				datetime: new Date().toISOString(),
 				replyTo: replyTo ? replyTo.message : null,
@@ -166,7 +167,7 @@ function ChatUi() {
 			const editedMessage = {
 				id: editMessageId,
 				action: "edit",
-				sender: "Jamie",
+				sender: user.username,
 				message: editMessageContent,
 				datetime: new Date().toISOString(),
 			};
@@ -259,7 +260,7 @@ function ChatUi() {
 					/>
 					<Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
 						<Text fontSize={20} mt={2} textAlign={"left"}>
-							Chat with James Davies
+						Chat with {user ? user.username : 'Guest'}
 						</Text>
 						<Spacer h={3} />
 						<Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
@@ -296,9 +297,9 @@ function ChatUi() {
 										hour: "2-digit",
 										minute: "2-digit",
 									})}
-									isSender={msg.sender === "Jamie"}
+									isSender={msg.sender === user.username}
 									photoUrl={
-										msg.sender === "Jamie"
+										msg.sender === user.username
 											? "https://bit.ly/dan-abramov"
 											: "https://randomuser.me/api/portraits/men/4.jpg"
 									}
