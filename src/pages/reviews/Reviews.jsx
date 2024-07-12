@@ -1,30 +1,42 @@
 import React, { useState, useEffect } from 'react'
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Input, Flex, HStack, Text, Container, Image, Textarea, Spacer, useToast, Heading, Center, useClipboard, Tooltip } from '@chakra-ui/react';
+import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip } from '@chakra-ui/react';
 import server from '../../networking';
-import { ArrowBackIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { useNavigate } from 'react-router-dom';
+import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import configureShowToast from '../../components/showToast';
+import { useDisclosure } from '@chakra-ui/react';
+import {
+    Modal,
+    ModalOverlay,
+    ModalContent,
+} from '@chakra-ui/react'
 
 function Reviews() {
     const toast = useToast();
+    const showToast = configureShowToast(toast);
     const navigate = useNavigate();
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
-    const [hostContactNum, setHostContactNum] = useState(0);
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
-    const { onCopy, hasCopied } = useClipboard(hostContactNum)
-
-    function ShowToast(title, description, status, duration) {
-        toast({
-            title: title,
-            description: description,
-            status: status,
-            duration: duration,
-            isClosable: false,
-        });
+    const [stateRefresh, refreshState] = useState(false);
+    const { isOpen, onOpen, onClose } = useDisclosure();   
+    const location = useLocation();
+    const [searchParams] = useSearchParams();
+    var { userID = '', hostID = '' } = {}
+    if (location.state.userID && location.state.hostID) {
+        userID = location.state.userID;
+        hostID = location.state.hostID;
+    } else if (searchParams.has('userID') && searchParams.has('hostID')) {
+        userID = searchParams.get('userID');
+        hostID = searchParams.get('hostID');
+    } else {
+        showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
+        navigate('/');
     }
-
+    
+    
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
         if (hygieneGrade >= 4) return 'teal';
@@ -45,35 +57,49 @@ function Reviews() {
 
     const fetchHostInfo = async () => {
         try {
-            const response = await server.get(`/cdn/accountInfo?userID=${"272d3d17-fa63-49c4-b1ef-1a3b7fe63cf4"}`);
+            const response = await server.get(`/cdn/accountInfo?userID=${hostID}`);
             if (!response.data) {
-                ShowToast(
-                    "No host information found",
-                    "Please try again later.",
-                    "info",
-                    2500
-                );
+                showToast("No host information found", "Please try again later.", 3000, true, "info")
+                return
             } else {
                 setHostName(response.data.username);
                 setHostAddress(response.data.address);
-                setHostContactNum(response.data.contactNum);
                 setHostHygieneGrade(response.data.hygieneGrade);
             }
         } catch (error) {
             toast.closeAll();
-            ShowToast(
-                "Error fetching host information",
-                "Please try again later.",
-                "error",
-                2500
-            );
+            showToast("Error fetching host information", "Please try again later", 3000, true, "error");
             console.error("Error fetching host info:", error);
+            return
         }
     };
 
+    const fetchGuestInfo = async () => {
+        try {
+            const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
+            if (!response.data || response.status !== 200) {
+                showToast("No guest information found", "Directing you back to homepage", 3000, true, "info");
+                setTimeout(() => {
+                    navigate("/")
+                }, 3000);
+                return
+            }
+        } catch (error) {
+            toast.closeAll();
+            showToast("Error fetching guest information", "Directing you back to homepage", 3000, true, "error");
+            console.error("Error fetching guest info:", error);
+            setTimeout(() => {
+                navigate("/")
+            }, 3000);
+            return
+        }
+    
+    }
+
     useEffect(() => {
         fetchHostInfo();
-    }, []);
+        fetchGuestInfo();
+    }, [stateRefresh]);
 
     return (
         <Box p={2} position="relative" width="100%">
@@ -96,26 +122,29 @@ function Reviews() {
                             boxSize='100px'
                             src='https://bit.ly/dan-abramov'
                             alt='Dan Abramov'
+                            onClick={onOpen}
+                            cursor="pointer"
+                            ml={{ base: 0, md: 4 }}
                         />
                         <Spacer display={{ base: 'none', md: 'block' }} />
                         <Flex direction="column" align={{ base: 'center', md: 'left' }} ml={{ base: 0, md: 4 }} textAlign={{ base: 'center', md: 'left' }}>
                             <Text fontSize={{ base: '2xl', md: '4xl' }}>{hostName}</Text>
-                            <HStack spacing={2}>
-                                <PhoneIcon />
-                                <Tooltip label={hasCopied ? "Copied!" : "Click to copy"} closeOnClick={false}>
-                                    <Text fontSize={{ base: 'sm', md: 'md' }} cursor="pointer" onClick={onCopy}>
-                                        {hostContactNum}
-                                    </Text>
-                                </Tooltip>
-                            </HStack>
                         </Flex>
                         <Flex gap={3}>
                             <Spacer display={{ base: 'none', md: 'block' }} />
+                            <Tooltip label={`Hygiene grade for ${hostName}`} aria-label="Hygiene grade tooltip">
                             <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
                                 {hostHygieneGrade}
                             </Button>
+                            </Tooltip>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            <SubmitReviews />
+                            <SubmitReviews 
+                                hostName={hostName}
+                                guestID={userID}
+                                hostID={hostID}
+                                refreshState={refreshState}
+                                stateRefresh={stateRefresh}
+                            />
                         </Flex>
                     </Flex>
                 </Box>
@@ -132,7 +161,22 @@ function Reviews() {
                 </Box>
             </Flex>
             <Heading mt={5} size="lg"><Text>Reviews</Text></Heading>
-            <SortReviews />
+            <SortReviews 
+                hostID={hostID}
+                guestID={userID}
+                stateRefresh={stateRefresh}
+            />
+            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                <ModalOverlay />
+                <ModalContent maxW="max-content" background="transparent" boxShadow="none">
+                        <Image
+                            boxSize='500px'
+                            borderRadius='full'
+                            src='https://bit.ly/dan-abramov'
+                            alt='Dan Abramov'
+                        />
+                </ModalContent>
+            </Modal>
         </Box>
     )
 }

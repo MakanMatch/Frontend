@@ -26,6 +26,7 @@ import MyAccount from './pages/identity/MyAccount.jsx'
 import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
 import VerifyToken from './pages/identity/VerifyToken.jsx';
 import AuthLayout from './AuthLayout.jsx';
+import GoogleMapsPage from './pages/Listings/GoogleMapsPage'
 
 const store = configureStore({
     reducer: {
@@ -47,6 +48,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={'reviews'} element={<Reviews />} />
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"chat2"} element={<Chat2 />}></Route>
+                        <Route path={"targetListing"} element={<GoogleMapsPage/>} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
                     <Route path='/auth' element={<AuthLayout />}>

@@ -17,8 +17,15 @@ import {
   AlertDialogOverlay,
   Button,
   useMediaQuery,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
-import { FiSmile, FiCamera } from "react-icons/fi";
+import { FiSmile, FiCamera, FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatHistory from "../../components/chat/ChatHistory";
 
@@ -27,7 +34,10 @@ function ChatUi() {
   const [messageInput, setMessageInput] = useState("");
   const [messageToDelete, setMessageToDelete] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
+  const [replyTo, setReplyTo] = useState(null);
+  const [editMessageId, setEditMessageId] = useState(null);
+  const [editMessageContent, setEditMessageContent] = useState("");
+  const chatBottomRef = useRef(null); // Reference to the bottom of chat container
 
   const ws = useRef(null);
 
@@ -58,16 +68,14 @@ function ChatUi() {
         }
       }
 
-      console.log("Received message:", receivedMessage);
 
       if (receivedMessage.type === "chat_history") {
-        console.log(receivedMessage.messages)
-        setMessages(receivedMessage.messages)
+        setMessages(receivedMessage.messages);
       } else if (receivedMessage.action === "edit") {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.messageID === receivedMessage.id
-              ? { ...msg, message: receivedMessage.message, edited: true }
+              ? { ...msg, message: receivedMessage.message }
               : msg
           )
         );
@@ -75,13 +83,10 @@ function ChatUi() {
         setMessages((prevMessages) =>
           prevMessages.filter((msg) => msg.messageID !== receivedMessage.id)
         );
-      } else if (receivedMessage.action === "reload") {
-        window.location.reload();
-      } else if(receivedMessage.action === "error") {
+      } else if (receivedMessage.action === "error") {
         alert(receivedMessage.message);
         window.location.reload();
-      } 
-      else {
+      } else {
         setMessages((prevMessages) => [...prevMessages, receivedMessage]);
       }
     };
@@ -101,6 +106,10 @@ function ChatUi() {
     };
   }, []);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const sendMessage = () => {
     if (ws.current && messageInput.trim() !== "") {
       const newMessage = {
@@ -108,13 +117,14 @@ function ChatUi() {
         receiver: "James",
         message: messageInput,
         datetime: new Date().toISOString(),
+        replyTo: replyTo ? replyTo.message : null,
+        replyToID: replyTo ? replyTo.messageID : null,
       };
 
       ws.current.send(JSON.stringify(newMessage));
-      console.log("Sent message:", newMessage);
 
-    //   setMessages((prevMessages) => [...prevMessages, newMessage]);
       setMessageInput("");
+      setReplyTo(null); // Clear the reply state after sending
     }
   };
 
@@ -124,20 +134,34 @@ function ChatUi() {
     }
   };
 
-  const handleEditPrompt = (messageId, currentMessage) => {
-    const newMessage = prompt("Edit your message:", currentMessage);
-    if (newMessage && newMessage.trim() !== "") {
+  const openEditModal = (messageId, currentMessage) => {
+    setEditMessageId(messageId);
+    setEditMessageContent(currentMessage);
+  };
+
+  const closeEditModal = () => {
+    setEditMessageId(null);
+    setEditMessageContent("");
+  };
+
+  const handleEditMessage = () => {
+    if (editMessageId && editMessageContent.trim() !== "") {
       const editedMessage = {
-        id: messageId,
+        id: editMessageId,
         action: "edit",
         sender: "Jamie",
-        message: newMessage,
-        timestamp: `${new Date().getHours()}:${new Date()
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`,
+        message: editMessageContent,
+        datetime: new Date().toISOString(),
       };
       ws.current.send(JSON.stringify(editedMessage));
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.messageID === editMessageId
+            ? { ...msg, message: editMessageContent, edited: true }
+            : msg
+        )
+      );
+      closeEditModal();
     }
   };
 
@@ -160,6 +184,32 @@ function ChatUi() {
 
   const closeDeleteDialog = () => {
     setDeleteDialogOpen(false);
+  };
+
+  const handleReply = (message) => {
+    setReplyTo(message);
+  };
+
+  const cancelReply = () => {
+    setReplyTo(null);
+  };
+
+  const scrollToBottom = () => {
+    if (chatBottomRef.current) {
+      chatBottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const formatDate = (date) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
+
+  const shouldDisplayDate = (currentMessage, previousMessage) => {
+    if (!previousMessage) return true;
+    const currentDate = new Date(currentMessage.datetime).toDateString();
+    const previousDate = new Date(previousMessage.datetime).toDateString();
+    return currentDate !== previousDate;
   };
 
   return (
@@ -211,23 +261,62 @@ function ChatUi() {
           boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
         >
           <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
-            {messages.map((msg) => (
-              <ChatBubble
-                key={msg.messageID}
-                message={msg.message}
-                timestamp={new Date(msg.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                isSender={msg.sender === "Jamie"}
-                photoUrl={
-                  msg.sender === "Jamie"
-                    ? "https://bit.ly/dan-abramov"
-                    : "https://randomuser.me/api/portraits/men/4.jpg"
-                }
-                onEdit={() => handleEditPrompt(msg.messageID, msg.message)}
-                onDelete={() => handleDeletePrompt(msg.messageID)}
-                edited={msg.edited}
-              />
+            {messages.map((msg, index) => (
+              <React.Fragment key={msg.messageID}>
+                {shouldDisplayDate(msg, messages[index - 1]) && (
+                  <Text
+                    fontSize="sm"
+                    color="gray.500"
+                    textAlign="center"
+                    mb={2}
+                  >
+                    {formatDate(msg.datetime)}
+                  </Text>
+                )}
+                <ChatBubble
+                  message={msg.message}
+                  timestamp={new Date(msg.datetime).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                  isSender={msg.sender === "Jamie"}
+                  photoUrl={
+                    msg.sender === "Jamie"
+                      ? "https://bit.ly/dan-abramov"
+                      : "https://randomuser.me/api/portraits/men/4.jpg"
+                  }
+                  onEdit={() => openEditModal(msg.messageID, msg.message)}
+                  onDelete={() => handleDeletePrompt(msg.messageID)}
+                  onReply={() => handleReply(msg)}
+                  repliedMessage={msg.replyTo}
+                  edited={msg.edited}
+                />
+              </React.Fragment>
             ))}
+            <div ref={chatBottomRef} /> {/* Ref to scroll to */}
           </VStack>
+          {replyTo && (
+            <Flex
+              bg="gray.200"
+              p={2}
+              borderRadius="md"
+              mb={2}
+              align="center"
+              justify="space-between"
+            >
+              <Text fontSize="sm" fontStyle="italic">
+                Replying to: {replyTo.message}
+              </Text>
+              <IconButton
+                aria-label="Cancel reply"
+                icon={<FiX />}
+                variant="ghost"
+                colorScheme="red"
+                size="sm"
+                onClick={cancelReply}
+              />
+            </Flex>
+          )}
           <Flex mt={4} align="center">
             <IconButton
               aria-label="Add emoji"
@@ -244,39 +333,59 @@ function ChatUi() {
               mr={2}
             />
             <Input
-              placeholder="Type a message"
-              bg="white"
-              color="black"
-              borderColor="gray.300"
-              _placeholder={{ color: "gray.500" }}
+              placeholder="Type a message..."
               flex="1"
-              height="48px"
-              fontSize="lg"
-              padding={4}
+              mr={2}
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyDown={handleKeyDown}
             />
+            <Button colorScheme="teal" onClick={sendMessage}>
+              Send
+            </Button>
           </Flex>
         </Box>
       </Center>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog isOpen={deleteDialogOpen} onClose={closeDeleteDialog}>
+      {/* Edit Message Modal */}
+      <Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Message</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              value={editMessageContent}
+              onChange={(e) => setEditMessageContent(e.target.value)}
+              placeholder="Edit your message..."
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
+              Save
+            </Button>
+            <Button onClick={closeEditModal}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Message AlertDialog */}
+      <AlertDialog
+        isOpen={deleteDialogOpen}
+        leastDestructiveRef={undefined}
+        onClose={closeDeleteDialog}
+      >
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Delete Message
             </AlertDialogHeader>
-
             <AlertDialogBody>
-              Are you sure you want to delete this message?
+              Are you sure you want to delete this message? You can't undo this
+              action afterwards.
             </AlertDialogBody>
-
             <AlertDialogFooter>
-              <Button variant="ghost" onClick={closeDeleteDialog}>
-                Cancel
-              </Button>
+              <Button onClick={closeDeleteDialog}>Cancel</Button>
               <Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
                 Delete
               </Button>
@@ -289,4 +398,3 @@ function ChatUi() {
 }
 
 export default ChatUi;
-
