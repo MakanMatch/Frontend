@@ -8,21 +8,21 @@ import { useSelector } from 'react-redux';
 function Navbar() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const navigate = useNavigate();
-    const authToken = useSelector((state) => state.auth.authToken);
+    const { authToken } = useSelector((state) => state.auth);
 
     const handleAvatarClick = () => {
         if (authToken) {
-            navigate('/myAccount');
+            navigate('/identity/myAccount');
         } else {
             console.log("Sign in first.")
-            navigate('/login');
+            navigate('/auth/login');
         }
         onClose()
     };
 
     return (
         <>
-            <Flex as={"nav"} alignItems={"center"} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} rounded={"10px"} mb={"20px"} p={"10px"}>
+            <Flex as={"nav"} alignItems={"center"} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} rounded={"10px"} mb={"20px"} p={"10px"} overflow="hidden">
                 <Button variant={"link"} onClick={onOpen}><HamburgerIcon color={"white"} /></Button>
                 <Spacer />
                 <Link to={"/"}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import StarRating from './StarRatings';
 import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
@@ -16,17 +16,23 @@ import {
 import {
     FormControl,
     FormLabel,
-    FormErrorMessage,
     FormHelperText,
 } from '@chakra-ui/react'
+import configureShowToast from '../../components/showToast';
 
-function SubmitReviews() {
+const SubmitReviews = ({
+    hostName,
+    guestID,
+    hostID,
+    refreshState,
+    stateRefresh
+}) => {
     const toast = useToast();
-    const [foodRating, setFoodRating] = useState(0);
-    const [hygieneRating, setHygieneRating] = useState(0);
+    const showToast = configureShowToast(toast);
+    const [foodRating, setFoodRating] = useState(1);
+    const [hygieneRating, setHygieneRating] = useState(1);
     const [comments, setComments] = useState('');
     const [images, setImages] = useState([]);
-    const [reviewData, setReviewData] = useState(null);
     const [fileFormatError, setFileFormatError] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,43 +80,28 @@ function SubmitReviews() {
             formData.append('images', file);
         });
         formData.append('dateCreated', currentDate);
+        formData.append('guestID', guestID);
+        formData.append('hostID', hostID);
 
         try {
-            await server.post('/reviews', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
+            await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
                 .then((res) => {
                     if (res.data && res.data.startsWith("SUCCESS")) {
-                        toast({
-                            title: 'Review submitted successfully.',
-                            status: 'success',
-                            duration: 3000,
-                            isClosable: true,
-                        });
+                        showToast("Review submitted successfully", "", 3000, true, "success")
                         console.log('Review submitted successfully!');
                         setIsSubmitting(false);
                         setComments('');
                         setImages([]);
-                        setReviewData(null);
                         onClose();
-                        window.location.reload();
+                        refreshState(!stateRefresh)
                     } else {
-                        toast({
-                            title: 'Error',
-                            description: res.data,
-                            status: 'error',
-                            duration: 3000,
-                            isClosable: true,
-                        });
+                        showToast("Failed to submit review", "Please try again later", 3000, true, "error");
                     }
                 })
         } catch (error) {
-            console.error('Failed to submit review:', error);
             setIsSubmitting(false);
-            toast({
-                title: 'Failed to submit review.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
+            showToast("Failed to submit review", "Please try again later", 3000, true, "error");
+            console.log('Failed to submit review:', error);
         }
     };
 
@@ -138,7 +129,7 @@ function SubmitReviews() {
                                 alt='Dan Abramov'
                             />
                             <Text fontSize={{ base: '2xl', md: '3xl' }} textAlign='center' mt={{ base: 2, md: 0 }} ml={{ base: 0, md: 4 }}>
-                                Jamie Oliver
+                                {hostName}
                             </Text>
                         </Flex>
                         <FormControl>

@@ -2,15 +2,25 @@ import React, { useState, useEffect } from 'react';
 import {
     Box, Heading, Text, VStack, Image, Button, useToast
 } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import server from '../../networking';
+import configureShowToast from '../../components/showToast';
 
 function EmailVerification() {
-    const location = useLocation();
-    const email = new URLSearchParams(location.search).get('email');
+    const [searchParams] = useSearchParams();
     const [cooldown, setCooldown] = useState(0);
-    const toast = useToast();
+    const toast = useToast()
+    const showToast = configureShowToast(toast);
 
+    const email = searchParams.get('email');
+    const resendOnLoad = searchParams.get('resendOnLoad');
+
+    useEffect(() => {
+        if (resendOnLoad === 'true') {
+            sendEmailVerification()
+        }
+    }, [])
+    
     useEffect(() => {
         let timer;
         if (cooldown > 0) {
@@ -24,32 +34,14 @@ function EmailVerification() {
             .then((res) => {
                 if (res.data && res.data.startsWith("SUCCESS")) {
                     setCooldown(30);
-                    toast({
-                        title: 'Verification email sent.',
-                        description: "Check your email for the verification link.",
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Verification email sent.', 'Check your email for the verification link.', 3000, true, 'success')
                 } else {
-                    toast({
-                        title: 'Error',
-                        description: res.data,
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                    });
+                    showToast('Error.', res.data, 3000, true, 'error')
                 }
             })
             .catch((err) => {
                 console.log(err)
-                toast({
-                    title: 'Error',
-                    description: err.response?.data || 'Failed to send verification email.',
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                showToast('Error', err.response?.data || 'Failed to send verification email.', 3000, true, 'error')
             });
     };
 
@@ -60,28 +52,28 @@ function EmailVerification() {
         >
             <Box
                 w="50%"
-                bg="rgba(255, 255, 255, 0.8)"
+                bg="rgba(255, 255, 255, 0.85)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
                 p={8}
+                borderRadius={15}
             >
                 <VStack spacing={4} w="full">
-                    <Heading as="h1" size="xl" mb={4} textAlign="center">
+                    <Heading as="h1" size="xl" textAlign="center">
                         Verify your email
                     </Heading>
                     <Image
-                        src="/placeholderImage.png"
+                        src= '/src/assets/EmailVerificationImage.png'
                         alt="Email verification"
                         boxSize="300px"
                         objectFit="cover"
-                        mb={4}
                     />
                     <Text fontSize="lg" textAlign="center">
                         We've just sent a verification link to your email. Click the link provided to verify your email!
                     </Text>
                     <Box>
-                        <Button onClick={sendEmailVerification} colorScheme='purple' isDisabled={cooldown > 0}>
+                        <Button onClick={sendEmailVerification} variant={'MMPrimary'} isDisabled={cooldown > 0}>
                             {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend Verification Email'}
                         </Button>
                     </Box>

@@ -5,14 +5,36 @@ import {
   Flex,
   Image,
   IconButton,
-  Tooltip,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  useColorModeValue,
 } from "@chakra-ui/react";
-import { ChevronRightIcon, ChevronLeftIcon } from "@chakra-ui/icons";
-import { FiEdit, FiTrash2 } from "react-icons/fi"; // Import icons from react-icons/fi
+import { FiEdit, FiTrash2, FiMoreVertical } from "react-icons/fi";
+import { FaReply } from "react-icons/fa";
 
-function ChatBubble({ message, timestamp, isSender, photoUrl, onEdit, onDelete }) {
+function ChatBubble({
+  message,
+  timestamp,
+  isSender,
+  photoUrl,
+  onEdit,
+  onDelete,
+  onReply,
+  repliedMessage,
+  edited,
+}) {
+  const menuItemColor = useColorModeValue("teal.500", "teal.200");
+  const menuItemHoverBg = useColorModeValue("teal.100", "teal.600");
+
   return (
-    <Box position="relative" marginY={2} maxW="70%" alignSelf={isSender ? 'flex-end' : 'flex-start'}>
+    <Box
+      position="relative"
+      marginY={2}
+      maxW="70%"
+      alignSelf={isSender ? "flex-end" : "flex-start"}
+    >
       <Flex alignItems="center">
         {!isSender && (
           <Image
@@ -21,65 +43,96 @@ function ChatBubble({ message, timestamp, isSender, photoUrl, onEdit, onDelete }
             boxSize="40px"
             borderRadius="full"
             marginRight={3}
-            marginTop={"-25px"}
+            marginTop="-40px"
           />
         )}
-        <Box position="relative">
-          {isSender && (
-            <ChevronLeftIcon 
-              color="blue.500" 
-              boxSize={8} 
-              position="absolute" 
-              top="25%" 
-              transform="translateY(-50%)" 
-              right="-20px"
-            />
-          )}
-          {!isSender && (
-            <ChevronRightIcon 
-              color="black.200" 
-              boxSize={8} 
-              position="absolute" 
-              top="25%" 
-              transform="translateY(-50%)" 
-              left="-20px"
-            />
-          )}
+        <Box position="relative" width="100%">
           <Box
-            bg={isSender ? 'blue.500' : 'gray.200'}
-            color={isSender ? 'white' : 'black'}
+            bg={isSender ? "blue.500" : "gray.200"}
+            color={isSender ? "white" : "black"}
             borderRadius="lg"
             p={3}
+            pb={4} // Adding bottom padding
+            pt={6} // Adding top padding to accommodate the menu button
             position="relative"
           >
-            <Text>{message}</Text>
+            <Box position="absolute" top={1} right={1}>
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  icon={<FiMoreVertical />}
+                  size="sm"
+                  variant="ghost"
+                />
+                <MenuList>
+                  {!isSender && (
+                    <MenuItem
+                      icon={<FaReply />}
+                      onClick={onReply}
+                      _hover={{ bg: menuItemHoverBg, color: menuItemColor }}
+                      color={menuItemColor}
+                    >
+                      Reply
+                    </MenuItem>
+                  )}
+                  {isSender && (
+                    <>
+                      <MenuItem
+                        icon={<FiEdit />}
+                        onClick={onEdit}
+                        _hover={{ bg: menuItemHoverBg, color: menuItemColor }}
+                        color={menuItemColor}
+                      >
+                        Edit
+                      </MenuItem>
+                      <MenuItem
+                        icon={<FiTrash2 />}
+                        onClick={onDelete}
+                        _hover={{ bg: menuItemHoverBg, color: menuItemColor }}
+                        color={menuItemColor}
+                      >
+                        Delete
+                      </MenuItem>
+                    </>
+                  )}
+                </MenuList>
+              </Menu>
+            </Box>
+            {repliedMessage && (
+              <Box
+                bg={isSender ? "blue.300" : "gray.100"}
+                p={2}
+                borderRadius="md"
+                mb={2}
+              >
+                <Text fontSize="sm" color={isSender ? "white" : "black"}>
+                  {repliedMessage}
+                </Text>
+              </Box>
+            )}
+            <Text>
+              {message}
+              {edited && (
+                <Text
+                  as="span"
+                  fontSize="xs" // Making the text smaller
+                  color={isSender ? "gray.300" : "gray.500"}
+                  marginLeft={2}
+                >
+                  (edited)
+                </Text>
+              )}
+            </Text>
+
             {timestamp && (
-              <Text fontSize="xs" color={isSender ? 'gray.300' : 'gray.500'} marginTop={1} textAlign="right">
+              <Text
+                fontSize="xs"
+                color={isSender ? "gray.300" : "gray.500"}
+                marginTop={1}
+                textAlign="right"
+              >
                 {timestamp}
               </Text>
-            )}
-            {isSender && (
-              <Flex mt={2} justifyContent="flex-end">
-                <Tooltip label="Edit" hasArrow>
-                  <IconButton
-                    icon={<FiEdit />}
-                    size="sm"
-                    onClick={onEdit}
-                    mr={2}
-                    variant="ghost"
-                    colorScheme="gray"
-                  />
-                </Tooltip>
-                <Tooltip label="Delete" hasArrow>
-                  <IconButton
-                    icon={<FiTrash2 />}
-                    size="sm"
-                    onClick={onDelete}
-                    variant="ghost"
-                    colorScheme="red"
-                  />
-                </Tooltip>
-              </Flex>
             )}
           </Box>
         </Box>
@@ -90,7 +143,7 @@ function ChatBubble({ message, timestamp, isSender, photoUrl, onEdit, onDelete }
             boxSize="40px"
             borderRadius="full"
             marginLeft={3}
-            marginTop={"-25px"}
+            marginTop="-60px" // Adjusted marginTop to align with message bubble
           />
         )}
       </Flex>
