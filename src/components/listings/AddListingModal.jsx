@@ -6,6 +6,8 @@ import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
 import configureShowToast from "../../components/showToast";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const toast = useToast();
@@ -21,6 +23,11 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const [totalSlots, setTotalSlots] = useState(1);
     const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
     const [images, setImages] = useState([]);
+    const [approxAddress, setApproxAddress] = useState("");
+    const [address, setAddress] = useState("");
+    const [hostID, setHostID] = useState("");
+    const { user } = useSelector((state) => state.auth);
+
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
@@ -63,6 +70,57 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         }
     }
 
+    const fetchHostInfo = async () => {
+        if (!user || !user.userID) {
+            showToast("You're not logged in", "Please Login first", "info", 3000)
+            return;
+        }
+        const hostInfo = await server.get(`cdn/accountInfo?userID=${user.userID}`)
+        if (hostInfo.status === 200) {
+            setAddress(hostInfo.data.address)
+            setHostID(hostInfo.data.userID)
+            
+            // Generate approximate address using Geocoding API
+            const encodedAddress = encodeURIComponent(String(hostInfo.data.address));
+            const apiKey = import.meta.env.VITE_GMAPS_API_KEY;
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?address="${encodedAddress}"&key=${apiKey}`;
+            const response = await axios.get(url);
+
+            if (response.data.results.length === 0) {
+                console.error("Address not found");
+            } else {
+                const components = response.data.results[0].address_components;
+                let street = '';
+                let city = '';
+                let state = '';
+
+                components.forEach(component => {
+                    if (component.types.includes('route')) {
+                        street = component.long_name;
+                    }
+                    if (component.types.includes('locality')) {
+                        city = component.long_name;
+                    }
+                    if (component.types.includes('administrative_area_level_1')) {
+                        state = component.long_name;
+                    }
+                });
+                let approximateAddress = `${street}, ${city}`;
+                if (state) {
+                    approximateAddress += `, ${state}`; // For contexts outside of Singapore
+                }
+                setApproxAddress(approximateAddress);
+            }
+
+
+        } else {
+            console.error("Failed to fetch your hosting details")
+            showToast("Failed to fetch your hosting details", "Please try again later", "error", 3000)
+            return;
+        }
+    }
+
+
     const handleSubmitListing = async () => {
         setIsSubmitting(true);
         const formData = new FormData();
@@ -76,6 +134,10 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             images.forEach((image, index) => {
                 formData.append("images", image);
             });
+            formData.append("approxAddress", approxAddress);
+            formData.append("address", address);
+            formData.append("hostID", hostID);
+
 
             const addListingResponse = await server.post("/listings/addListing", formData, {
                 headers: {
@@ -213,6 +275,10 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             );
         }
     }, [totalSlots]);
+
+    useEffect(() => {
+        fetchHostInfo();
+    }, []);
     return (
         <div>
             <Modal

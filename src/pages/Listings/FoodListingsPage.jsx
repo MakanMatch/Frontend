@@ -7,14 +7,11 @@ import AddListingModal from "../../components/listings/AddListingModal";
 import configureShowToast from "../../components/showToast";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
-    const [hostUserID, setHostUserID] = useState("");
-    const [hostName, setHostName] = useState("");
-    const [hostRating, setHostRating] = useState(0);
-    const [guestUserID, setGuestUserID] = useState("");
-    const [guestUsername, setGuestUsername] = useState("");
     const [addresses, setAddresses] = useState([]);
     const [coordinatesList, setCoordinatesList] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -22,7 +19,19 @@ const FoodListingsPage = () => {
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const [loading, setLoading] = useState(true); 
     const toast = useToast();
+    const navigate = useNavigate();
     const showToast = configureShowToast(toast);
+    const { user } = useSelector((state) => state.auth);
+
+    function checkUser(user) {
+        if (!user || !user.userID) {
+            navigate('/auth/login');
+            setTimeout(() => {
+                showToast("You're not logged in", "Please Login first", 3000, false, "info");
+            }, 200);
+            return;
+        }
+    }
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
@@ -57,17 +66,9 @@ const FoodListingsPage = () => {
         }
     };
 
-    const fetchHostDetails = async () => {
-        const response = await server.get("/cdn/fetchHostdetails");
-        setHostUserID(response.data.hostUserID);
-        setHostName(response.data.hostUsername);
-        setHostRating(response.data.hostFoodRating);
-    };
-
-    const fetchGuestDetails = async () => {
-        const response = await server.get("/cdn/fetchGuestDetails");
-        setGuestUserID(response.data.guestUserID);
-        setGuestUsername(response.data.guestUsername);
+    function handleClickAddListing() {
+        checkUser(user);
+        onOpen();
     }
 
     useEffect(() => {
@@ -84,8 +85,6 @@ const FoodListingsPage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            await fetchHostDetails();
-            await fetchGuestDetails();
             await fetchListings();
             setLoading(false);
         }
@@ -95,10 +94,10 @@ const FoodListingsPage = () => {
     return (
         <div>
             <Text fontSize={"30px"} mb={4}>
-                {guestUsername === "" ? "Welcome to MakanMatch!" : `Welcome, ${guestUsername}!`}
+                {!user || user.username === "" ? "Welcome to MakanMatch!" : `Welcome, ${user.username}!`}
             </Text>
             <Box display="flex" justifyContent="center" mb={4}>
-                <Button onClick={onOpen} variant="MMPrimary">
+                <Button onClick={() => handleClickAddListing()} variant="MMPrimary">
                     Host a meal
                 </Button>
             </Box>
@@ -151,10 +150,9 @@ const FoodListingsPage = () => {
                                                 listingID={listing.listingID}
                                                 title={listing.title}
                                                 portionPrice={listing.portionPrice}
-                                                hostName={hostName}
-                                                hostFoodRating={hostRating}
-                                                userID={guestUserID}
-                                                hostID={hostUserID}
+                                                hostName={listing.Host.username}
+                                                hostFoodRating={listing.Host.foodRating}
+                                                hostID={listing.Host.userID}
                                                 images={listing.images.map((imageName) =>
                                                     getImageLink(listing.listingID, imageName)
                                                 )}
@@ -190,7 +188,7 @@ const FoodListingsPage = () => {
                     {!isSmallerThan1095 && coordinatesList.length > 0 && (
                         <Box flex="1" ml={5}>
                             <SlideFade in={true} offsetY="20px">
-                                <MarkeredGMaps coordinatesList={coordinatesList} listings={listings}     isSmallerThan1095={false}/>
+                                <MarkeredGMaps coordinatesList={coordinatesList} listings={listings} isSmallerThan1095={false}/>
                             </SlideFade>
                         </Box>
                     )}

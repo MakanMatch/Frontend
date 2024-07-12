@@ -11,6 +11,10 @@ const ExpandedGoogleMaps = ({ lat, long }) => {
     const showToast = configureShowToast(toast)
 
     useEffect(() => {
+        if (!lat || !long) {
+            showToast("No coordinates found", "Failed to show Host's location on map", 3000, false, "info");
+            return null;
+        }
         const initializeMap = async () => {
             const loader = new Loader({
                 apiKey: import.meta.env.VITE_GMAPS_API_KEY,
@@ -40,6 +44,7 @@ const ExpandedGoogleMaps = ({ lat, long }) => {
 
         initializeMap().catch(() => {
             showToast("An error occured", "Failed to render Google Maps", 3000, false, "error");
+            return;
         });
     }, [lat, long]);
 
