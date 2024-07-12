@@ -45,7 +45,7 @@ const HostSidebar = () => {
             </Button>
 
             <Box position="absolute" bottom={0} width="calc(100% - 2rem)" textAlign="center" p={4}>
-                <Button colorScheme='red' width="50%" onClick={handleLogout} mx="auto">
+                <Button colorScheme='red' width="50%" onClick={handleLogout} mx="auto" borderRadius={10}>
                     Logout
                 </Button>
             </Box>

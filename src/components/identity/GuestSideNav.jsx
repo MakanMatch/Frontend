@@ -28,7 +28,7 @@ const GuestSidebar = () => {
 
 
     return (
-        <Card width="25%" borderRadius={15} boxShadow="0 2px 4px 2px rgba(0.2, 0.2, 0.2, 0.2)" p={4}>
+        <Card h="700" width="25%" borderRadius={15} boxShadow="0 2px 4px 2px rgba(0.2, 0.2, 0.2, 0.2)" p={4}>
             <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} mt={4} onClick={handleMyAccountClick}>
                 <Icon viewBox="0 0 24 24" boxSize={5}><path fill="#515F7C" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></Icon>
                 <Text ml={2}>Account Information</Text>
@@ -47,7 +47,7 @@ const GuestSidebar = () => {
             </Button>
 
             <Box position="absolute" bottom={0} width="calc(100% - 2rem)" textAlign="center" p={4}>
-                <Button colorScheme='red' width="50%" onClick={handleLogout} mx="auto">
+                <Button colorScheme='red' width="50%" onClick={handleLogout} mx="auto" borderRadius={10}>
                     Logout
                 </Button>
             </Box>
