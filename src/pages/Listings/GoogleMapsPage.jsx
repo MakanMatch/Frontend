@@ -11,6 +11,7 @@ const GoogleMapsPage = () => {
     const latitude = Number(localStorage.getItem(`ListingExp-latitude-${listingID}`));
     const longitude = Number(localStorage.getItem(`ListingExp-longitude-${listingID}`));
     const userID = localStorage.getItem("ListingExp-userID");
+    const hostID = localStorage.getItem("ListingExp-hostID");
     const images = localStorage.getItem(`ListingExp-images-${listingID}`);
     const title = localStorage.getItem(`ListingExp-title-${listingID}`);
     const shortDescription = localStorage.getItem(`ListingExp-shortDescription-${listingID}`);
@@ -27,7 +28,7 @@ const GoogleMapsPage = () => {
                     left="10px"
                     transform="translateY(-50%)"
                     zIndex="1">
-                    <ListingCardOverlay listingID={listingID} userID={userID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} />
+                    <ListingCardOverlay listingID={listingID} userID={userID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} />
                 </Box>
             </Box>
         </>
