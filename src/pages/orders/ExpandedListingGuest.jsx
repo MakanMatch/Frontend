@@ -122,7 +122,7 @@ function ExpandedListingGuest() {
                 if (response.status == 200) {
                     const processedData = processHostData(response.data)
                     setHostData(processedData)
-                    setTimeout(() => setLoading(false), 2000)
+                    setLoading(false)
                 } else if (response.status == 404) {
                     console.log("EXPANDEDLISTINGGUEST: Host not found, re-directing to home. Server response: " + response.data)
                     navigate("/")
