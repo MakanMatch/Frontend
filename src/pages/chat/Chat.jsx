@@ -60,11 +60,11 @@ function ChatUi() {
 	useEffect(() => {
 		const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
 		ws.current = new WebSocket(wsUrl);
-		
+
 
 		ws.current.onopen = () => {
 			console.log("Connected to WebSocket server");
-			ws.current.send(JSON.stringify({action : "connect", userID: user.userID}))
+			ws.current.send(JSON.stringify({ action: "connect", userID: user.userID }))
 		};
 
 		ws.current.onmessage = async (event) => {
@@ -260,7 +260,7 @@ function ChatUi() {
 					/>
 					<Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
 						<Text fontSize={20} mt={2} textAlign={"left"}>
-						Chat with {user ? user.username : 'Guest'}
+							Chat with {user ? user.username : 'Guest'}
 						</Text>
 						<Spacer h={3} />
 						<Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
@@ -313,105 +313,105 @@ function ChatUi() {
 						))}
 						<div ref={chatBottomRef} /> {/* Ref to scroll to */}
 					</VStack>
-					{replyTo && (
-						<Flex
-							bg="gray.200"
-							p={2}
-							borderRadius="md"
-							mb={2}
-							align="center"
-							justify="space-between"
-						>
-							<Text fontSize="sm" fontStyle="italic">
-								Replying to: {replyTo.message}
-							</Text>
-							<IconButton
-								aria-label="Cancel reply"
-								icon={<FiX />}
-								variant="ghost"
-								colorScheme="red"
-								size="sm"
-								onClick={cancelReply}
-							/>
-						</Flex>
-					)}
-					<Flex mt={4} align="center">
+				{replyTo && (
+					<Flex
+						bg="gray.200"
+						p={2}
+						borderRadius="md"
+						mb={2}
+						align="center"
+						justify="space-between"
+					>
+						<Text fontSize="sm" fontStyle="italic">
+							Replying to: {replyTo.message}
+						</Text>
 						<IconButton
-							aria-label="Add emoji"
-							icon={<FiSmile boxSize={8} />}
+							aria-label="Cancel reply"
+							icon={<FiX />}
 							variant="ghost"
-							colorScheme="gray"
-							mr={2}
+							colorScheme="red"
+							size="sm"
+							onClick={cancelReply}
 						/>
-						<IconButton
-							aria-label="Add photo"
-							icon={<FiCamera boxSize={8} />}
-							variant="ghost"
-							colorScheme="gray"
-							mr={2}
-						/>
-						<Input
-							placeholder="Type a message..."
-							flex="1"
-							mr={2}
-							value={messageInput}
-							onChange={(e) => setMessageInput(e.target.value)}
-							onKeyDown={handleKeyDown}
-						/>
-						<Button colorScheme="teal" onClick={sendMessage}>
-							Send
-						</Button>
 					</Flex>
-				</Box>
-			</Center>
+				)}
+				<Flex mt={4} align="center">
+					<IconButton
+						aria-label="Add emoji"
+						icon={<FiSmile boxSize={8} />}
+						variant="ghost"
+						colorScheme="gray"
+						mr={2}
+					/>
+					<IconButton
+						aria-label="Add photo"
+						icon={<FiCamera boxSize={8} />}
+						variant="ghost"
+						colorScheme="gray"
+						mr={2}
+					/>
+					<Input
+						placeholder="Type a message..."
+						flex="1"
+						mr={2}
+						value={messageInput}
+						onChange={(e) => setMessageInput(e.target.value)}
+						onKeyDown={handleKeyDown}
+					/>
+					<Button colorScheme="teal" onClick={sendMessage}>
+						Send
+					</Button>
+				</Flex>
+			</Box>
+		</Center>
 
-			{/* Edit Message Modal */}
-			<Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
-				<ModalOverlay />
-				<ModalContent>
-					<ModalHeader>Edit Message</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody>
-						<Input
-							value={editMessageContent}
-							onChange={(e) => setEditMessageContent(e.target.value)}
-							placeholder="Edit your message..."
-						/>
-					</ModalBody>
-					<ModalFooter>
-						<Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
-							Save
-						</Button>
-						<Button onClick={closeEditModal}>Cancel</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+			{/* Edit Message Modal */ }
+	<Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
+		<ModalOverlay />
+		<ModalContent>
+			<ModalHeader>Edit Message</ModalHeader>
+			<ModalCloseButton />
+			<ModalBody>
+				<Input
+					value={editMessageContent}
+					onChange={(e) => setEditMessageContent(e.target.value)}
+					placeholder="Edit your message..."
+				/>
+			</ModalBody>
+			<ModalFooter>
+				<Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
+					Save
+				</Button>
+				<Button onClick={closeEditModal}>Cancel</Button>
+			</ModalFooter>
+		</ModalContent>
+	</Modal>
 
-			{/* Delete Message AlertDialog */}
-			<AlertDialog
-				isOpen={deleteDialogOpen}
-				leastDestructiveRef={undefined}
-				onClose={closeDeleteDialog}
-			>
-				<AlertDialogOverlay>
-					<AlertDialogContent>
-						<AlertDialogHeader fontSize="lg" fontWeight="bold">
-							Delete Message
-						</AlertDialogHeader>
-						<AlertDialogBody>
-							Are you sure you want to delete this message? You can't undo this
-							action afterwards.
-						</AlertDialogBody>
-						<AlertDialogFooter>
-							<Button onClick={closeDeleteDialog}>Cancel</Button>
-							<Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
-								Delete
-							</Button>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialogOverlay>
-			</AlertDialog>
-		</Flex>
+	{/* Delete Message AlertDialog */ }
+	<AlertDialog
+		isOpen={deleteDialogOpen}
+		leastDestructiveRef={undefined}
+		onClose={closeDeleteDialog}
+	>
+		<AlertDialogOverlay>
+			<AlertDialogContent>
+				<AlertDialogHeader fontSize="lg" fontWeight="bold">
+					Delete Message
+				</AlertDialogHeader>
+				<AlertDialogBody>
+					Are you sure you want to delete this message? You can't undo this
+					action afterwards.
+				</AlertDialogBody>
+				<AlertDialogFooter>
+					<Button onClick={closeDeleteDialog}>Cancel</Button>
+					<Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
+						Delete
+					</Button>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialogOverlay>
+	</AlertDialog>
+		</Flex >
 	);
 }
 
