@@ -9,6 +9,8 @@ import GuestSidebar from "../../components/identity/GuestSideNav";
 import HostSidebar from "../../components/identity/HostSideNav";
 import server from "../../networking";
 import configureShowToast from '../../components/showToast';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const MyAccount = () => {
     const navigate = useNavigate();
@@ -19,13 +21,6 @@ const MyAccount = () => {
     const [accountInfo, setAccountInfo] = useState(null);
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
     const { user, loaded, error } = useSelector((state) => state.auth);
-    
-
-    const handleLogout = () => {
-        dispatch(logout());
-        localStorage.removeItem('jwt');
-        navigate("/auth/login");
-    };
 
     useEffect(() => {
         if (!loaded) {
@@ -57,20 +52,6 @@ const MyAccount = () => {
         }
     }, [user]);
 
-    if (!loaded) {
-        console.log("Not loaded");
-        return <Spinner />;
-    }
-
-    if (error) {
-        console.log(error);
-        return <Spinner />;
-    }
-
-    if (!accountInfo) {
-        return <Spinner />;
-    }
-
     const calculateAccountAge = () => {
         const createdAt = new Date(accountInfo.createdAt);
         const currentDate = new Date();
@@ -96,7 +77,28 @@ const MyAccount = () => {
         return JSON.stringify(accountInfo) !== JSON.stringify(originalAccountInfo);
     };
 
+    const validateFields = () => {
+        if (!accountInfo.username || accountInfo.username.trim() === "") {
+            showToast("Invalid input", "Username cannot be empty.", 3000, true, "error");
+            return false;
+        } else if (/\s/.test(accountInfo.username)) {
+            showToast("Invalid input", "Username cannot contain spaces.", 3000, true, "error");
+            return false;
+        } else if (!accountInfo.email || !/\S+@\S+\.\S+/.test(accountInfo.email)) {
+            showToast("Invalid input", "Enter a valid email address.", 3000, true, "error");
+            return false;
+        } else if (!accountInfo.contactNum || !/^\d{8}$/.test(accountInfo.contactNum)) {
+            showToast("Invalid input", "Contact number must be 8 digits.", 3000, true, "error");
+            return false;
+        }
+        return true;
+    };
+
     const handleSaveChanges = () => {
+        if (!validateFields()) {
+            return;
+        }
+
         server.put('/identity/myAccount/updateAccountDetails', {
             userID: user.userID,
             username: accountInfo.username,
@@ -104,24 +106,40 @@ const MyAccount = () => {
             contactNum: accountInfo.contactNum,
             address: accountInfo.address,
         })
-        .then(response => {
-            if (response.status === 200) {
+        .then((res) => {
+            if (res.data.startsWith("SUCCESS")) {
                 showToast('Changes saved', 'Your account details have been updated.', 3000, true, 'success');
                 setOriginalAccountInfo({ ...accountInfo });
-                setChangesMade(false);
+            } else if (res.data.startsWith('UERROR')) {
+                showToast('Invalid input', res.data.substring("UERROR: ".length), 3000, true, 'error');
             } else {
                 showToast('ERROR', 'Failed to save changes. Please try again.', 3000, true, 'error');
             }
         })
-        .catch(err => {
-            console.error("Error saving changes:", err);
+        .catch((err) => {
+            console.log(err);
             showToast('ERROR', 'Failed to save changes. Please try again.', 'error');
         });
     };
 
     const handleCancelChanges = () => {
         setAccountInfo({ ...originalAccountInfo });
+        showToast('Changes not saved', 'All changes made have been discarded.', 3000, true, 'warning');
     };
+    
+    if (!loaded) {
+        console.log("Not loaded");
+        return <Spinner />;
+    }
+
+    if (error) {
+        console.log(error);
+        return <Spinner />;
+    }
+
+    if (!accountInfo) {
+        return <Spinner />;
+    }
 
     return (
         <Flex>
@@ -200,8 +218,8 @@ const MyAccount = () => {
                                 borderWidth={1} 
                                 borderRadius={10}
                             >
-                                <EditablePreview p={2}/>
-                                <EditableInput p={2}/>
+                                <EditablePreview p={2} borderRadius={10}/>
+                                <EditableInput p={2} borderRadius={10}/>
                             </Editable>
                         </FormControl>
 
@@ -215,8 +233,8 @@ const MyAccount = () => {
                                 borderWidth={1} 
                                 borderRadius={10}
                             >
-                                <EditablePreview p={2}/>
-                                <EditableInput p={2}/>
+                                <EditablePreview p={2} borderRadius={10}/>
+                                <EditableInput p={2} borderRadius={10}/>
                             </Editable>
                         </FormControl>
 
@@ -230,8 +248,8 @@ const MyAccount = () => {
                                 borderWidth={1} 
                                 borderRadius={10}
                             >
-                                <EditablePreview p={2}/>
-                                <EditableInput p={2}/>
+                                <EditablePreview p={2} borderRadius={10}/>
+                                <EditableInput p={2} borderRadius={10}/>
                             </Editable>
                         </FormControl>
 
@@ -245,8 +263,8 @@ const MyAccount = () => {
                                 borderWidth={1} 
                                 borderRadius={10}
                             >
-                                <EditablePreview p={2}/>
-                                <EditableInput p={2}/>
+                                <EditablePreview p={2} borderRadius={10}/>
+                                <EditableInput p={2} borderRadius={10}/>
                             </Editable>
                         </FormControl>
 
