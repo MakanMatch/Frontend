@@ -17,11 +17,9 @@ const GoogleMapsPage = () => {
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     if (!location.state) {
-        navigate('/');
-        setTimeout(() => {
-            console.error("Listing details were not found in location state");
-            showToast("No listing details found", "Please try again later", 3000, false, "info");
-        }, 200);
+        if (window.location.pathname !== "/") {
+            window.location.href = "/*";
+        }
     }
 
     const { listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude } = location.state;

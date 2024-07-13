@@ -94,10 +94,10 @@ const FoodListingsPage = () => {
                     <MarkeredGMaps coordinatesList={listings.map((listing) => listing.coordinates)} listings={listings} isSmallerThan1095={true}/>
                 </Box>
             )}
-            <Skeleton isLoaded={!loading}>
+            <Skeleton isLoaded={!loading} style={{ borderRadius: "10px" }}>
                 <Flex display="flex" flexWrap="wrap">
                     <Box
-                        maxH="600px"
+                        height="83vh"
                         overflowY="auto"
                         boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
                         borderRadius={"22px 8px 8px 22px"}
@@ -138,8 +138,8 @@ const FoodListingsPage = () => {
                                                 listingID={listing.listingID}
                                                 title={listing.title}
                                                 portionPrice={listing.portionPrice}
-                                                hostName={listing.Host.username}
-                                                hostFoodRating={listing.Host.foodRating}
+                                                hostName={listing.Host.username || "MakanMatch Host"}
+                                                hostFoodRating={listing.Host.foodRating || 0}
                                                 hostID={listing.Host.userID}
                                                 images={listing.images.map((imageName) =>
                                                     getImageLink(listing.listingID, imageName)

@@ -51,7 +51,7 @@ const ExpandedGoogleMaps = ({ lat, long }) => {
     return (
         <div
             ref={mapRef}
-            style={{ height: "83vh", width: "100%", borderRadius: "10px" }}
+            style={{ height: "83vh", width: "100%", minWidth: "371px", borderRadius: "10px" }}
         />
     );
 };
