@@ -1,4 +1,4 @@
-import {React, useState} from 'react';
+import React from 'react';
 import { Box, Button, Text, Icon, Card } from "@chakra-ui/react";
 import { RepeatClockIcon } from '@chakra-ui/icons'
 import { useNavigate, useLocation } from 'react-router-dom';

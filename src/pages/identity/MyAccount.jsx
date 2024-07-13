@@ -10,6 +10,8 @@ import GuestSidebar from "../../components/identity/GuestSideNav";
 import HostSidebar from "../../components/identity/HostSideNav";
 import server from "../../networking";
 import configureShowToast from '../../components/showToast';
+import ChangePassword from "../../components/identity/ChangePassword";
+
 
 const MyAccount = () => {
     const navigate = useNavigate();
@@ -19,6 +21,7 @@ const MyAccount = () => {
     const cancelRef = React.useRef()
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const { isOpen: isDiscardOpen, onOpen: onDiscardOpen, onClose: onDiscardClose } = useDisclosure();
+    const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const [accountInfo, setAccountInfo] = useState(null);
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
@@ -128,19 +131,16 @@ const MyAccount = () => {
     };
 
     const handleCancelChanges = () => {
-        // Open the discard changes confirmation modal
         onDiscardOpen();
     };
 
     const confirmDiscardChanges = () => {
-        // Reset to original data and close modal
         setAccountInfo({ ...originalAccountInfo });
         onDiscardClose();
         showToast("Changes not saved", "All changes made have been discarded.", 3000, true, "warning");
     };
 
     const handleDeleteAccount = () => {
-        // Open the delete confirmation modal
         onDeleteOpen();
     };
 
@@ -175,6 +175,40 @@ const MyAccount = () => {
         .finally(() => {
             onDeleteClose();
         });
+    };
+
+    const toggleChangePassword = () => {
+        setPasswordModalOpen(!isPasswordModalOpen);
+    };
+
+    const handleCloseModal = () => {
+        setPasswordModalOpen(false);
+    };
+
+    const handleChangePassword = (values, { setSubmitting, setFieldError }) => {
+        server.put("/identity/myAccount/changePassword", {
+                userID: user.userID,
+                userType: user.userType,
+                currentPassword: values.currentPassword,
+                newPassword: values.newPassword,
+                confirmPassword: values.confirmPassword,
+            })
+            .then((res) => {
+                if (res.data.startsWith("SUCCESS")) {
+                    setPasswordModalOpen(false);
+                    showToast("Password changed", "Your password has been updated!", 3000, true, "success");
+                } else if (res.data.startsWith("UERROR")) {
+                    setFieldError("currentPassword", "Incorrect current password")
+                    showToast("ERROR", res.data.substring("UERROR: ".length), 3000, true, "error");
+                }
+            })
+            .catch((err) => {
+                console.error("Error changing password:", err);
+                showToast("ERROR", "Your password cannot be changed. Please try again.", 3000, true, "error");
+            })
+            .finally(() => {
+                setSubmitting(false);
+            });
     };
 
     if (!loaded) {
@@ -316,9 +350,11 @@ const MyAccount = () => {
                             </Editable>
                         </FormControl>
 
-                        <Button variant={"MMPrimary"} mb={4} onClick={() => console.log("Change password clicked")} position="absolute" bottom={0} left={6}>
+                        <Button variant={"MMPrimary"} mb={4} onClick={(toggleChangePassword)} position="absolute" bottom={0} left={6}>
                             Change Password
                         </Button>
+
+                        <ChangePassword isOpen={isPasswordModalOpen} onClose={handleCloseModal} onSubmit={handleChangePassword} />
                     </Box>
 
                     <Box p={2} width={"25%"}>
