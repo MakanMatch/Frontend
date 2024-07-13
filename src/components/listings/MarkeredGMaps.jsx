@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "@googlemaps/js-api-loader";
-import { useToast } from "@chakra-ui/react";
+import { useToast, Skeleton } from "@chakra-ui/react";
 import configureShowToast from "../../components/showToast";
 
 const MarkeredGMaps = ({
@@ -15,6 +14,7 @@ const MarkeredGMaps = ({
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
     const mapRef = useRef(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
@@ -40,6 +40,7 @@ const MarkeredGMaps = ({
                 });
 
                 if (coordinatesList.length === 0 || validCoordinates.length === 0) {
+                    setMapLoaded(true); // Mark map as loaded if no valid coordinates
                     return map;
                 } else {
                     validCoordinates.forEach(({ lat, lng }, index) => {
@@ -47,7 +48,6 @@ const MarkeredGMaps = ({
                             position: { lat, lng },
                             map: map,
                         });
-                        // hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude
                         marker.addListener("click", () => {
                             const listing = listings[index];
                             navigate("/targetListing", {
@@ -66,9 +66,11 @@ const MarkeredGMaps = ({
                             });
                         });
                     });
+                    setMapLoaded(true);
                 }
-            } else return;
+            }
         };
+        
         try {
             const validCoordinates = coordinatesList.filter(
                 ({ lat, lng }) =>
@@ -76,20 +78,24 @@ const MarkeredGMaps = ({
             );
             InitializeMap(validCoordinates);
         } catch (error) {
-            showToast("An error occured", "Failed to render Google Maps", 3000, false, "error");
+            showToast("An error occurred", "Failed to render Google Maps", "error", 3000);
             console.error(error);
         }
-    }, [coordinatesList]);
+    }, [coordinatesList, listings, showToast, navigate]);
 
     return (
-        <div
-            ref={mapRef}
-            style={{
-                height: isSmallerThan1095 ? "45vh" : "83vh",
-                width: "100%",
-                borderRadius: "10px",
-            }}
-        />
+        <>
+            <Skeleton isLoaded={mapLoaded} fadeDuration={1} style={{ borderRadius: "10px" }}>
+                <div
+                    ref={mapRef}
+                    style={{
+                        height: isSmallerThan1095 ? "45vh" : "83vh",
+                        width: "100%",
+                        borderRadius: "10px"
+                    }}
+                />
+            </Skeleton>
+        </>
     );
 };
 
