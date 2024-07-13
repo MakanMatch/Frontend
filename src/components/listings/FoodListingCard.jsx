@@ -21,7 +21,7 @@ const FoodListingCard = ({
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
 
     useEffect(() => {
-        localStorage.setItem("ListingExp-hostID", hostID);
+        localStorage.setItem(`ListingExp-hostID-${listingID}`, hostID);
         localStorage.setItem(`ListingExp-images-${listingID}`, images);
         localStorage.setItem(`ListingExp-title-${listingID}`, title);
         localStorage.setItem(`ListingExp-shortDescription-${listingID}`, shortDescription);

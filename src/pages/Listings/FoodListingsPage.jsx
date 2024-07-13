@@ -21,17 +21,8 @@ const FoodListingsPage = () => {
     const toast = useToast();
     const navigate = useNavigate();
     const showToast = configureShowToast(toast);
-    const { user } = useSelector((state) => state.auth);
-
-    function checkUser(user) {
-        if (!user || !user.userID) {
-            navigate('/auth/login');
-            setTimeout(() => {
-                showToast("You're not logged in", "Please Login first", 3000, false, "info");
-            }, 200);
-            return;
-        }
-    }
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
+    const [username, setUsername] = useState(null);
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
@@ -67,8 +58,14 @@ const FoodListingsPage = () => {
     };
 
     function handleClickAddListing() {
-        checkUser(user);
-        onOpen();
+        if (!authToken) {
+            navigate('/auth/login');
+            setTimeout(() => {
+                showToast("You're not logged in", "Please Login first", 3000, false, "info");
+            }, 200);
+        } else {
+            onOpen();
+        }
     }
 
     useEffect(() => {
@@ -94,7 +91,7 @@ const FoodListingsPage = () => {
     return (
         <div>
             <Text fontSize={"30px"} mb={4}>
-                {!user || user.username === "" ? "Welcome to MakanMatch!" : `Welcome, ${user.username}!`}
+                {loaded && user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
             </Text>
             <Box display="flex" justifyContent="center" mb={4}>
                 <Button onClick={() => handleClickAddListing()} variant="MMPrimary">

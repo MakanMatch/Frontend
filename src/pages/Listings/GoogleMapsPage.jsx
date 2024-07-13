@@ -5,7 +5,7 @@ import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Box, useToast } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import configureShowToast from "../../components/showToast";
 
 const GoogleMapsPage = () => {
@@ -14,11 +14,11 @@ const GoogleMapsPage = () => {
     const listingID = searchParams.get("listingID");
     const toast = useToast();
     const showToast = configureShowToast(toast);
-    const { user } = useSelector((state) => state.auth);
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const latitude = Number(localStorage.getItem(`ListingExp-latitude-${listingID}`));
     const longitude = Number(localStorage.getItem(`ListingExp-longitude-${listingID}`));
-    const hostID = localStorage.getItem("ListingExp-hostID");
+    const hostID = localStorage.getItem(`ListingExp-hostID-${listingID}`);
     const images = localStorage.getItem(`ListingExp-images-${listingID}`);
     const title = localStorage.getItem(`ListingExp-title-${listingID}`);
     const shortDescription = localStorage.getItem(`ListingExp-shortDescription-${listingID}`);
@@ -27,14 +27,19 @@ const GoogleMapsPage = () => {
     const totalSlots = localStorage.getItem(`ListingExp-totalSlots-${listingID}`);
 
     useEffect(() => {
-        if (!user || !user.userID) {
+        if (!authToken) {
             navigate('/auth/login');
             setTimeout(() => {
                 showToast("You're not logged in", "Please Login first", 3000, false, "info");
             }, 200);
             return;
         }
-    }, [user]);
+    }, []);
+
+    if (loaded && user) {
+        console.log("User: ", user);
+        console.log("Sent user type: ", user.userType);
+    }
     return (
         <>
             { user ? (
@@ -46,7 +51,7 @@ const GoogleMapsPage = () => {
                     left="10px"
                     transform="translateY(-50%)"
                     zIndex="1">
-                    <ListingCardOverlay listingID={listingID} userID={user.userID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} />
+                    <ListingCardOverlay listingID={listingID} userID={user.userID} userType={user.userType} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} />
                 </Box>
             </Box>
             ) : null }

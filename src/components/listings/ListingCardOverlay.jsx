@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import server from "../../networking";
 import configureShowToast from "../../components/showToast";
 
-function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
+function ListingCardOverlay({ listingID, userID, userType, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
@@ -33,8 +33,11 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
     }
 
     const toggleFavourite = async () => {
+        console.log("User type: ", userType);
         const favouriteData = {
             userID: userID,
+            userType: userType,
+            hostID: hostID,
             listingID: listingID
         }
         await server.put("/listings/toggleFavouriteListing", favouriteData)
@@ -52,9 +55,8 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
     };
 
     const fetchFavouriteState = async () => {
-        const data = { userID: userID };
-        const response = await server.get("/cdn/fetchGuestDetails", data);
-        const guestFavCuisine = response.data.guestFavCuisine;
+        const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
+        const guestFavCuisine = response.data.favCuisine || "";
         if (guestFavCuisine.includes(listingID)) {
             setFavourite(true);
         } else {
@@ -170,9 +172,10 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
                             mb={5}
                         >
                             <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
-                            <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
+                            {userID !== hostID && (
+                                <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
                                 {favourite ? "🩷" : "🤍"}
-                            </Text>
+                            </Text>)}
                         </Box>
                         <Box className="ratingBox">
                             <Box display="flex" alignItems="center" mb={1}>
