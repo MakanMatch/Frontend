@@ -56,8 +56,6 @@ function ExpandedListingGuest() {
             }
 
             fetchListingDetails(listingID || history.state.listingID)
-        } else {
-            console.log("Loaded user:", loaded)
         }
     }, [loaded])
 
