@@ -74,7 +74,7 @@ const FoodListingCard = ({
                             to={"/targetListing"}
                             state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
                             >
-                                <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
+                                <Button variant="MMPrimary" paddingLeft={"45px"} paddingRight={"45px"}>View</Button>
                             </Link>
                         </ButtonGroup>
                     </CardFooter>
@@ -86,7 +86,7 @@ const FoodListingCard = ({
                             to={"/targetListing"}
                             state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
                             >
-                                <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
+                                <Button variant="MMPrimary" paddingLeft={"45px"} paddingRight={"45px"}>View</Button>
                             </Link>
                         </ButtonGroup>
                     </CardFooter>
