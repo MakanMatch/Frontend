@@ -195,9 +195,6 @@ const MyAccount = () => {
         <Flex>
             {/* Conditionally render the sidebar based on user type */}
             {accountInfo.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
-    
-    
-            {/* Right side content */}
 
             {/* Right side content */}
             <Box width="75%" ml={10} position="relative">
