@@ -3,7 +3,7 @@ import "./App.css";
 import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import { useDispatch } from "react-redux";
-import { fetchUser } from "./slices/AuthState.js";
+import { fetchUser, setLoading } from "./slices/AuthState.js";
 
 const contentWrapperStyles = {
     maxWidth: '1280px',
@@ -18,8 +18,10 @@ function AuthRoot() {
     useEffect(() => {
         if (localStorage.getItem("jwt")) {
             dispatch(fetchUser());
+        } else {
+            dispatch(setLoading(true))
         }
-    }, [dispatch]);
+    }, []);
 
     return (
         <div className="authLayout">

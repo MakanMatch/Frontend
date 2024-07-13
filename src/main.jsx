@@ -43,7 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path='/' element={<Layout />}>
                         <Route index element={<FoodListingsPage />} />
                         <Route path={'version'} element={<Version />} />
-                        <Route path={"expandedListing"} element={<ExpandedListingHost />} />
+                        <Route path={"expandedListingHost"} element={<ExpandedListingHost />} />
                         <Route path={"expandedListingGuest"} element={<ExpandedListingGuest />} />
                         <Route path={'reviews'} element={<Reviews />} />
                         <Route path={'chat'} element={<Chat />} />

@@ -56,12 +56,21 @@ function ExpandedListingGuest() {
             }
 
             fetchListingDetails(listingID || history.state.listingID)
+        } else {
+            console.log("Loaded user:", loaded)
         }
     }, [loaded])
 
     useEffect(() => {
         if (listingData.hostID) {
-            fetchHostData()
+            if (user && listingData.hostID == user.userID) {
+                console.log("Logged in user is host of listing; redirecting to host view...")
+                navigate(`/expandedListingHost?id=${listingData.listingID}`)
+                history.pushState({ listingID: listingData.listingID }, "")
+                return
+            } else {
+                fetchHostData()
+            }
         }
     }, [listingData])
 
