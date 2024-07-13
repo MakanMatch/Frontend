@@ -5,6 +5,7 @@ import server from '../../networking'
 import configureShowToast from '../../components/showToast'
 import placeholderImage from '../../assets/placeholderImage.svg'
 import ReserveCard from '../../components/orders/ReserveCard'
+import { useSelector } from 'react-redux'
 
 function ExpandedListingGuest() {
     const navigate = useNavigate()
@@ -36,22 +37,30 @@ function ExpandedListingGuest() {
         foodRating: 0.0,
         hygieneGrade: 0.0
     })
+    const { user, loaded, error } = useSelector(state => state.auth)
 
     const [listingID, setListingID] = useState(searchParams.get("id"))
     const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
 
     useEffect(() => {
-        if (!listingID) {
-            navigate("/")
-            return
+        if (loaded == true) {
+            if (!history.state.listingID) {
+                if (!listingID) {
+                    console.log("No listing ID provided to render expanded listing view.")
+                    showToast("Something went wrong", "Insufficient information provided.", 1500, true, "error")
+                    navigate("/")
+                    return
+                }
+            } else {
+                setListingID(history.state.listingID)
+            }
+
+            fetchListingDetails(listingID || history.state.listingID)
         }
-        fetchListingDetails()
-    }, [])
+    }, [loaded])
 
     useEffect(() => {
-        if (!listingData.hostID) {
-            return
-        } else {
+        if (listingData.hostID) {
             fetchHostData()
         }
     }, [listingData])
@@ -78,12 +87,12 @@ function ExpandedListingGuest() {
         return { userID, username, foodRating, hygieneGrade }
     }
 
-    const fetchListingDetails = () => {
-        server.get(`/cdn/getListing?id=${listingID}&includeReservations=true`)
+    const fetchListingDetails = (id) => {
+        server.get(`/cdn/getListing?id=${id}&includeReservations=true`)
             .then(response => {
                 if (response.status == 200) {
                     const processedData = processListingData(response.data)
-                    if (processedData.published == false) { console.log("Attempt to access unpublished listing blocked; redirecting..."); navigate("/"); return; }
+                    if (processedData.published == false && processedData.hostID != user.userID) { console.log("Attempt to access unpublished listing blocked; redirecting..."); navigate("/"); return; }
                     setListingData(processedData)
                     return
                 } else if (response.status == 404) {
@@ -113,7 +122,7 @@ function ExpandedListingGuest() {
                 if (response.status == 200) {
                     const processedData = processHostData(response.data)
                     setHostData(processedData)
-                    setLoading(false)
+                    setTimeout(() => setLoading(false), 2000)
                 } else if (response.status == 404) {
                     console.log("EXPANDEDLISTINGGUEST: Host not found, re-directing to home. Server response: " + response.data)
                     navigate("/")
