@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Box, Heading, Text, Flex, Avatar, Button, Spacer, Spinner, useToast, FormControl, FormLabel, Stack, 
-    Editable, EditableInput, EditablePreview
+import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormControl, FormLabel, Stack, 
+    Editable, EditableInput, EditablePreview, AlertDialog, AlertDialogOverlay, AlertDialogHeader, AlertDialogBody,
+    AlertDialogFooter, AlertDialogContent, useDisclosure
 } from "@chakra-ui/react";
-import { logout, fetchUser } from "../../slices/AuthState";
+import { fetchUser, logout } from "../../slices/AuthState";
 import GuestSidebar from "../../components/identity/GuestSideNav";
 import HostSidebar from "../../components/identity/HostSideNav";
 import server from "../../networking";
 import configureShowToast from '../../components/showToast';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
 
 const MyAccount = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const toast = useToast()
+    const toast = useToast();
     const showToast = configureShowToast(toast);
+    const cancelRef = React.useRef()
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+    const { isOpen: isDiscardOpen, onOpen: onDiscardOpen, onClose: onDiscardClose } = useDisclosure();
     const [isHovered, setIsHovered] = useState(false);
     const [accountInfo, setAccountInfo] = useState(null);
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
@@ -30,7 +32,6 @@ const MyAccount = () => {
 
     useEffect(() => {
         if (loaded && !user) {
-            // console.log(localStorage.getItem("jwt"));
             navigate("/auth/login");
         }
     }, [loaded, user, navigate]);
@@ -99,34 +100,83 @@ const MyAccount = () => {
             return;
         }
 
-        server.put('/identity/myAccount/updateAccountDetails', {
-            userID: user.userID,
-            username: accountInfo.username,
-            email: accountInfo.email,
-            contactNum: accountInfo.contactNum,
-            address: accountInfo.address,
-        })
-        .then((res) => {
-            if (res.data.startsWith("SUCCESS")) {
-                showToast('Changes saved', 'Your account details have been updated.', 3000, true, 'success');
-                setOriginalAccountInfo({ ...accountInfo });
-            } else if (res.data.startsWith('UERROR')) {
-                showToast('Invalid input', res.data.substring("UERROR: ".length), 3000, true, 'error');
-            } else {
-                showToast('ERROR', 'Failed to save changes. Please try again.', 3000, true, 'error');
-            }
-        })
-        .catch((err) => {
-            console.log(err);
-            showToast('ERROR', 'Failed to save changes. Please try again.', 'error');
-        });
+        server.put("/identity/myAccount/updateAccountDetails", {
+                userID: user.userID,
+                username: accountInfo.username,
+                email: accountInfo.email,
+                contactNum: accountInfo.contactNum,
+                address: accountInfo.address,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((res) => {
+                if (res.data.startsWith("SUCCESS")) {
+                    showToast("Changes saved", "Your account details have been updated.", 3000, true, "success");
+                    setOriginalAccountInfo({ ...accountInfo });
+                } else if (res.data.startsWith("UERROR")) {
+                    showToast("Invalid input", res.data.substring("UERROR: ".length), 3000, true, "error");
+                } else {
+                    showToast("ERROR", "Failed to save changes. Please try again.", 3000, true, "error");
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                showToast("ERROR", "Failed to save changes. Please try again.", "error");
+            });
     };
 
     const handleCancelChanges = () => {
-        setAccountInfo({ ...originalAccountInfo });
-        showToast('Changes not saved', 'All changes made have been discarded.', 3000, true, 'warning');
+        // Open the discard changes confirmation modal
+        onDiscardOpen();
     };
-    
+
+    const confirmDiscardChanges = () => {
+        // Reset to original data and close modal
+        setAccountInfo({ ...originalAccountInfo });
+        onDiscardClose();
+        showToast("Changes not saved", "All changes made have been discarded.", 3000, true, "warning");
+    };
+
+    const handleDeleteAccount = () => {
+        // Open the delete confirmation modal
+        onDeleteOpen();
+    };
+
+    const confirmDeleteAccount = () => {
+        console.log("Deleting account...");
+        console.log(user.userID)
+        console.log(user.userType)
+        server.delete("/identity/myAccount/deleteAccount", {
+            data: {
+                userID: user.userID,
+                userType: user.userType
+            }, 
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((res) => {
+            if (res.data.startsWith("SUCCESS")) {
+                showToast("Account deleted", "See you again next time!", 3000, true, "success");
+                // Remove the jwt
+                dispatch(logout());
+                localStorage.removeItem('jwt');
+                navigate("/auth/login");
+            } else {
+                showToast("ERROR", "Failed to delete account.", 3000, true, "error");
+            }
+        })
+        .catch((err) => {
+            console.error("Error deleting account:", err);
+            showToast("ERROR", "Failed to delete account.", 3000, true, "error");
+        })
+        .finally(() => {
+            onDeleteClose();
+        });
+    };
+
     if (!loaded) {
         console.log("Not loaded");
         return <Spinner />;
@@ -146,6 +196,9 @@ const MyAccount = () => {
             {/* Conditionally render the sidebar based on user type */}
             {accountInfo.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
     
+    
+            {/* Right side content */}
+
             {/* Right side content */}
             <Box width="75%" ml={10} position="relative">
                 {/* Profile banner */}
@@ -162,7 +215,7 @@ const MyAccount = () => {
                             {accountInfo.userType}
                         </Heading>
                     </Flex>
-                    {/* Circle avatar */}
+
                     <Box
                         position="absolute"
                         bottom="-70px"
@@ -203,38 +256,36 @@ const MyAccount = () => {
                         </Avatar>
                     </Box>
                 </Box>
-    
-                {/* Account info part */}
-                <Stack direction={['column', 'row']} p={4} mt={20} justifyContent="space-between" width="100%" spacing={"20px"}>
-                    <Box p={2} width={"50%"}>
 
+                <Stack direction={["column", "row"]} p={4} mt={20} justifyContent="space-between" width="100%" spacing={"20px"}>
+                    <Box p={2} width={"50%"}>
                         <FormControl mb={2}>
                             <FormLabel>Username</FormLabel>
-                            <Editable 
+                            <Editable
                                 value={accountInfo.username}
                                 onChange={(value) => setAccountInfo({ ...accountInfo, username: value })}
-                                textAlign={'left'} 
-                                borderColor={'black'} 
-                                borderWidth={1} 
+                                textAlign={"left"}
+                                borderColor={"black"}
+                                borderWidth={1}
                                 borderRadius={10}
                             >
-                                <EditablePreview p={2} borderRadius={10}/>
-                                <EditableInput p={2} borderRadius={10}/>
+                                <EditablePreview p={2} borderRadius={10} />
+                                <EditableInput p={2} borderRadius={10} />
                             </Editable>
                         </FormControl>
 
                         <FormControl mb={2}>
                             <FormLabel>Email</FormLabel>
-                            <Editable 
-                                value={accountInfo.email} 
+                            <Editable
+                                value={accountInfo.email}
                                 onChange={(value) => setAccountInfo({ ...accountInfo, email: value })}
-                                textAlign={'left'} 
-                                borderColor={'black'} 
-                                borderWidth={1} 
+                                textAlign={"left"}
+                                borderColor={"black"}
+                                borderWidth={1}
                                 borderRadius={10}
                             >
-                                <EditablePreview p={2} borderRadius={10}/>
-                                <EditableInput p={2} borderRadius={10}/>
+                                <EditablePreview p={2} borderRadius={10} />
+                                <EditableInput p={2} borderRadius={10} />
                             </Editable>
                         </FormControl>
 
@@ -243,104 +294,140 @@ const MyAccount = () => {
                             <Editable 
                                 value={accountInfo.contactNum || "Enter your contact number"} 
                                 onChange={(value) => setAccountInfo({ ...accountInfo, contactNum: value })}
-                                textAlign={'left'} 
-                                borderColor={'black'} 
-                                borderWidth={1} 
+                                textAlign={"left"}
+                                borderColor={"black"}
+                                borderWidth={1}
                                 borderRadius={10}
                             >
-                                <EditablePreview p={2} borderRadius={10}/>
-                                <EditableInput p={2} borderRadius={10}/>
+                                <EditablePreview p={2} borderRadius={10} />
+                                <EditableInput p={2} borderRadius={10} />
                             </Editable>
                         </FormControl>
 
                         <FormControl mb={2}>
                             <FormLabel>Address</FormLabel>
-                            <Editable 
-                                value={accountInfo.address || "Enter your address"} 
+                            <Editable
+                                value={accountInfo.address || "Enter your address"}
                                 onChange={(value) => setAccountInfo({ ...accountInfo, address: value })}
-                                textAlign={'left'} 
-                                borderColor={'black'} 
-                                borderWidth={1} 
+                                textAlign={"left"}
+                                borderColor={"black"}
+                                borderWidth={1}
                                 borderRadius={10}
                             >
-                                <EditablePreview p={2} borderRadius={10}/>
-                                <EditableInput p={2} borderRadius={10}/>
+                                <EditablePreview p={2} borderRadius={10} />
+                                <EditableInput p={2} borderRadius={10} />
                             </Editable>
                         </FormControl>
 
-                        <Button
-                            variant={"MMPrimary"}
-                            mb={4}
-                            onClick={() => console.log("Change password clicked")}
-                            position="absolute" 
-                            bottom={0}
-                            left={6}
-                        >
+                        <Button variant={"MMPrimary"} mb={4} onClick={() => console.log("Change password clicked")} position="absolute" bottom={0} left={6}>
                             Change Password
                         </Button>
                     </Box>
-    
+
                     <Box p={2} width={"25%"}>
-                        
                         <FormControl mb={2}>
                             <FormLabel>Favorite Cuisine</FormLabel>
-                            <Text textAlign={'left'} pt={2} pb={2}>{accountInfo.favCuisine || "None"}</Text>
+                            <Text textAlign={"left"} pt={2} pb={2}>
+                                {accountInfo.favCuisine || "None"}
+                            </Text>
                         </FormControl>
 
                         <FormControl mb={2}>
                             <FormLabel>Meals Matched</FormLabel>
-                            <Text textAlign={'left'} pt={2} pb={2}>{accountInfo.mealsMatched + " meals"}</Text>
+                            <Text textAlign={"left"} pt={2} pb={2}>
+                                {accountInfo.mealsMatched + " meals"}
+                            </Text>
                         </FormControl>
 
                         <FormControl mb={2}>
-                            <FormLabel>Meals Matched</FormLabel>
-                            <Text textAlign={'left'} pt={2} pb={2}>{calculateAccountAge() + " days"}</Text>
+                            <FormLabel>Account Age</FormLabel>
+                            <Text textAlign={"left"} pt={2} pb={2}>
+                                {calculateAccountAge() + " days"}
+                            </Text>
                         </FormControl>
-
-                        
                     </Box>
 
                     <Box p={2} width={"16%"}>
                         <Flex justifyContent={"flex-end"} flexDirection={"column"}>
                             {hasChanges() && (
                                 <>
-                                    <Button
-                                        variant={"MMPrimary"}
-                                        onClick={handleSaveChanges}
-                                        width="full"
-                                        mb={2}
-                                    >
+                                    <Button variant={"MMPrimary"} onClick={handleSaveChanges} width="full" mb={2}>
                                         Save Changes
                                     </Button>
 
-                                    <Button
-                                        colorScheme="red"
-                                        borderRadius={10}
-                                        onClick={handleCancelChanges}
-                                        width="full"
-                                        mb={4}
-                                    >
+                                    <Button colorScheme="red" borderRadius={10} onClick={handleCancelChanges} width="full" mb={4}>
                                         Cancel
                                     </Button>
                                 </>
                             )}
-                            <Button
-                                colorScheme="red"
-                                onClick={() => console.log("Delete account clicked")}
-                                borderRadius={10}
-                                position="absolute"
-                                bottom={0}
-                                mb={4}
-                            >
+
+                            <Button colorScheme="red" onClick={handleDeleteAccount} borderRadius={10} position="absolute" bottom={0} mb={4}>
                                 Delete Account
                             </Button>
                         </Flex>
                     </Box>
                 </Stack>
             </Box>
+
+            {/* Discard Changes Confirmation Modal */}
+            <AlertDialog
+                isOpen={isDiscardOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onDiscardClose}
+                size="sm"
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Discard Changes
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Are you sure you want to discard all changes?
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onDiscardClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme="red" onClick={confirmDiscardChanges} ml={3}>
+                                Discard
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+
+            {/* Delete Account Confirmation Modal */}
+            <AlertDialog
+                isOpen={isDeleteOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onDeleteClose}
+                size="sm"
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Delete Account
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Are you sure? You can't undo this action afterwards.
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onDeleteClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme="red" onClick={confirmDeleteAccount} ml={3}>
+                                Delete
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </Flex>
     );
-    
 };
 
 export default MyAccount;
