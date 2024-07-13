@@ -5,7 +5,7 @@ import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Box, useToast } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import configureShowToast from "../../components/showToast";
 
 const GoogleMapsPage = () => {

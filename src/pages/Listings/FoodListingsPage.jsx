@@ -22,7 +22,6 @@ const FoodListingsPage = () => {
     const navigate = useNavigate();
     const showToast = configureShowToast(toast);
     const { user, authToken, loaded } = useSelector((state) => state.auth);
-    const [username, setUsername] = useState(null);
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
