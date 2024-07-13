@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
 import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { Box, useToast } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -14,17 +15,18 @@ const GoogleMapsPage = () => {
     const listingID = searchParams.get("listingID");
     const toast = useToast();
     const showToast = configureShowToast(toast);
+    const location = useLocation();
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
-    const latitude = Number(localStorage.getItem(`ListingExp-latitude-${listingID}`));
-    const longitude = Number(localStorage.getItem(`ListingExp-longitude-${listingID}`));
-    const hostID = localStorage.getItem(`ListingExp-hostID-${listingID}`);
-    const images = localStorage.getItem(`ListingExp-images-${listingID}`);
-    const title = localStorage.getItem(`ListingExp-title-${listingID}`);
-    const shortDescription = localStorage.getItem(`ListingExp-shortDescription-${listingID}`);
-    const approxAddress = localStorage.getItem(`ListingExp-approxAddress-${listingID}`);
-    const portionPrice = localStorage.getItem(`ListingExp-portionPrice-${listingID}`);
-    const totalSlots = localStorage.getItem(`ListingExp-totalSlots-${listingID}`);
+    if (!location.state) {
+        navigate('/');
+        setTimeout(() => {
+            console.error("Listing details were not found in location state");
+            showToast("No listing details found", "Please try again later", 3000, false, "info");
+        }, 200);
+    }
+
+    const { hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude } = location.state;
 
     useEffect(() => {
         if (!authToken) {
@@ -35,11 +37,6 @@ const GoogleMapsPage = () => {
             return;
         }
     }, []);
-
-    if (loaded && user) {
-        console.log("User: ", user);
-        console.log("Sent user type: ", user.userType);
-    }
     return (
         <>
             { user ? (

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const FoodListingCard = ({
@@ -15,27 +15,11 @@ const FoodListingCard = ({
     shortDescription,
     approxAddress,
     totalSlots,
-    coordinates,
+    latitude,
+    longitude,
 }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
-
-    useEffect(() => {
-        localStorage.setItem(`ListingExp-hostID-${listingID}`, hostID);
-        localStorage.setItem(`ListingExp-images-${listingID}`, images);
-        localStorage.setItem(`ListingExp-title-${listingID}`, title);
-        localStorage.setItem(`ListingExp-shortDescription-${listingID}`, shortDescription);
-        localStorage.setItem(`ListingExp-approxAddress-${listingID}`, approxAddress);
-        localStorage.setItem(`ListingExp-portionPrice-${listingID}`, portionPrice);
-        localStorage.setItem(`ListingExp-totalSlots-${listingID}`, totalSlots);
-    }, []);
-
-    useEffect(() => {
-        if (coordinates) {
-            localStorage.setItem(`ListingExp-latitude-${listingID}`, coordinates.lat);
-            localStorage.setItem(`ListingExp-longitude-${listingID}`, coordinates.lng);
-        }
-    }, [coordinates]);
     return (
         <>
             <style>
@@ -86,7 +70,10 @@ const FoodListingCard = ({
                 {isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link to={`/targetListing?listingID=${listingID}`}>
+                            <Link
+                            to={`/targetListing?listingID=${listingID}`}
+                            state={{ hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
+                            >
                                 <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
                             </Link>
                         </ButtonGroup>
@@ -95,7 +82,10 @@ const FoodListingCard = ({
                 {!isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link to={`/targetListing?listingID=${listingID}`}>
+                            <Link
+                            to={`/targetListing?listingID=${listingID}`}
+                            state={{ hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
+                            >
                                 <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
                             </Link>
                         </ButtonGroup>

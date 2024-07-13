@@ -9,7 +9,7 @@ import configureShowToast from "../../components/showToast";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
-const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
+const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, generateCoordinates }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const today = new Date();
@@ -132,7 +132,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             formData.append("approxAddress", approxAddress);
             formData.append("address", address);
             formData.append("hostID", hostID);
-
+            formData.append("coordinates", await generateCoordinates(address));
 
             const addListingResponse = await server.post("/listings/addListing", formData, {
                 headers: {
@@ -159,6 +159,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             }
         } catch (error) {
             toast.closeAll();
+            onClose();
             if (error.code === "ECONNABORTED") {
                 showToast(
                     "Request timed out",
@@ -168,6 +169,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 );
                 return;
             } else {
+                console.error("Error submitting listing:", error);
                 showToast(
                     "Error submitting listing",
                     "Please try again later.",

@@ -12,8 +12,6 @@ import { useNavigate } from "react-router-dom";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
-    const [addresses, setAddresses] = useState([]);
-    const [coordinatesList, setCoordinatesList] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
@@ -44,7 +42,13 @@ const FoodListingsPage = () => {
     const fetchListings = async () => {
         try {
             const response = await server.get("/cdn/listings");
-            setListings(response.data);
+            const listingsWithCoordinates = await Promise.all(
+                response.data.map(async (listing) => {
+                    const coordinates = await generateCoordinates(listing.address);
+                    return { ...listing, coordinates };
+                })
+            );
+            setListings(listingsWithCoordinates);
         } catch (error) {
             toast.closeAll();
             showToast(
@@ -68,18 +72,6 @@ const FoodListingsPage = () => {
     }
 
     useEffect(() => {
-        setAddresses(listings.map((listing) => listing.address));
-    }, [listings]);
-
-    useEffect(() => {
-        const promiseCoordinates = async () => {
-            const response = await Promise.all(addresses.map((address) => generateCoordinates(address)));
-            setCoordinatesList(response);
-        };
-        promiseCoordinates();
-    }, [addresses]);
-
-    useEffect(() => {
         const fetchData = async () => {
             await fetchListings();
             setLoading(false);
@@ -97,9 +89,9 @@ const FoodListingsPage = () => {
                     Host a meal
                 </Button>
             </Box>
-            {isSmallerThan1095 && coordinatesList.length > 0 && (
+            {isSmallerThan1095 && listings.length > 0 && (
                 <Box mb={4}>
-                    <MarkeredGMaps coordinatesList={coordinatesList} listings={listings} isSmallerThan1095={true}/>
+                    <MarkeredGMaps coordinatesList={listings.map((listing) => listing.coordinates)} listings={listings} isSmallerThan1095={true}/>
                 </Box>
             )}
             <Skeleton isLoaded={!loading}>
@@ -133,7 +125,7 @@ const FoodListingsPage = () => {
                                 spacing={4}
                                 templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
                             >
-                                {listings.map((listing, index) => (
+                                {listings.map((listing) => (
                                     <SlideFade
                                         in={true}
                                         offsetY="20px"
@@ -157,7 +149,8 @@ const FoodListingsPage = () => {
                                                 address={listing.address}
                                                 approxAddress={listing.approxAddress}
                                                 totalSlots={listing.totalSlots}
-                                                coordinates={coordinatesList[index]}
+                                                latitude={listing.coordinates.lat}
+                                                longitude={listing.coordinates.lng}
                                             />
                                         </Box>
                                     </SlideFade>
@@ -181,10 +174,10 @@ const FoodListingsPage = () => {
                             </Box>
                         )}
                     </Box>
-                    {!isSmallerThan1095 && coordinatesList.length > 0 && (
+                    {!isSmallerThan1095 && listings.length > 0 && (
                         <Box flex="1" ml={5}>
                             <SlideFade in={true} offsetY="20px">
-                                <MarkeredGMaps coordinatesList={coordinatesList} listings={listings} isSmallerThan1095={false}/>
+                                <MarkeredGMaps coordinatesList={listings.map((listing) => listing.coordinates)} listings={listings} isSmallerThan1095={false}/>
                             </SlideFade>
                         </Box>
                     )}
@@ -195,6 +188,7 @@ const FoodListingsPage = () => {
                 onClose={onClose}
                 onOpen={onOpen}
                 fetchListings={fetchListings}
+                generateCoordinates={generateCoordinates}
             />
         </div>
     );
