@@ -71,8 +71,8 @@ const FoodListingCard = ({
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
                             <Link
-                            to={`/targetListing?listingID=${listingID}`}
-                            state={{ hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
+                            to={"/targetListing"}
+                            state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
                             >
                                 <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
                             </Link>
@@ -83,8 +83,8 @@ const FoodListingCard = ({
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
                             <Link
-                            to={`/targetListing?listingID=${listingID}`}
-                            state={{ hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
+                            to={"/targetListing"}
+                            state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
                             >
                                 <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
                             </Link>

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton } from "@chakra-ui/react";
 import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,6 +12,7 @@ function ListingCardOverlay({ listingID, userID, userType, hostID, images, title
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
@@ -128,22 +129,25 @@ function ListingCardOverlay({ listingID, userID, userType, hostID, images, title
                                 <ChevronRightIcon boxSize={8} mr={-1} mt={-4} onClick={handleNextImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} right="-5" zIndex={1} />
                             </Box>
                         )}
-                        <Image
-                            key={images[imageIndex]}
-                            src={images[imageIndex]}
-                            onError={(e) => {
-                                e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
-                                e.target.src = "/placeholderImage.png";
-                            }}
-                            borderRadius="5px"
-                            minWidth="310px"
-                            maxWidth="310px"
-                            minHeight="150px"
-                            maxHeight="150px"
-                            objectFit="cover"
-                            style={{ pointerEvents: "none" }}
-                            className="image"
-                        />
+                        <Skeleton isLoaded={imageLoaded} height="150px" width="310px" borderRadius="5px" fadeDuration={1}>
+                            <Image
+                                key={images[imageIndex]}
+                                src={images[imageIndex]}
+                                onError={(e) => {
+                                    e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
+                                    e.target.src = "/placeholderImage.png";
+                                }}
+                                onLoad={() => setImageLoaded(true)}
+                                borderRadius="5px"
+                                minWidth="310px"
+                                maxWidth="310px"
+                                minHeight="150px"
+                                maxHeight="150px"
+                                objectFit="cover"
+                                style={{ pointerEvents: "none" }}
+                                className="image"
+                            />
+                        </Skeleton>
                         <Text
                             borderRadius="50%"
                             height="40px"

@@ -3,7 +3,7 @@
 /* eslint-disable react/prop-types */
 import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
 import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
-import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Box, useToast } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -11,8 +11,6 @@ import configureShowToast from "../../components/showToast";
 
 const GoogleMapsPage = () => {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const listingID = searchParams.get("listingID");
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const location = useLocation();
@@ -26,7 +24,7 @@ const GoogleMapsPage = () => {
         }, 200);
     }
 
-    const { hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude } = location.state;
+    const { listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude } = location.state;
 
     useEffect(() => {
         if (!authToken) {

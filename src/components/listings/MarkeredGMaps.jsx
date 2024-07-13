@@ -16,6 +16,10 @@ const MarkeredGMaps = ({
     const navigate = useNavigate();
     const mapRef = useRef(null);
 
+    function getImageLink(listingID, imageName) {
+        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
+    }
+
     useEffect(() => {
         const InitializeMap = async (validCoordinates) => {
             const loader = new Loader({
@@ -43,9 +47,23 @@ const MarkeredGMaps = ({
                             position: { lat, lng },
                             map: map,
                         });
+                        // hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude
                         marker.addListener("click", () => {
                             const listing = listings[index];
-                            navigate(`/targetListing?listingID=${listing.listingID}`);
+                            navigate("/targetListing", {
+                                state: {
+                                    listingID: listing.listingID,
+                                    hostID: listing.hostID,
+                                    images: listing.images.map((image) => getImageLink(listing.listingID, image)),
+                                    title: listing.title,
+                                    shortDescription: listing.shortDescription,
+                                    approxAddress: listing.address,
+                                    portionPrice: listing.portionPrice,
+                                    totalSlots: listing.totalSlots,
+                                    latitude: lat,
+                                    longitude: lng,
+                                },
+                            });
                         });
                     });
                 }
