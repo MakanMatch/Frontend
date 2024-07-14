@@ -59,6 +59,7 @@ function Reviews() {
             const response = await server.get(`/cdn/accountInfo?userID=${hostID}`);
             if (!response.data) {
                 showToast("No host information found", "Please try again later.", 3000, true, "info")
+                navigate('/')
                 return
             } else {
                 setHostName(response.data.username);
@@ -69,6 +70,7 @@ function Reviews() {
             toast.closeAll();
             showToast("Error fetching host information", "Please try again later", 3000, true, "error");
             console.error("Error fetching host info:", error);
+            navigate('/')
             return
         }
     };

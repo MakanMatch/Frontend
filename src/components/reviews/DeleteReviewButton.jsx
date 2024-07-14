@@ -1,5 +1,5 @@
 import React from 'react'
-import { IconButton, Icon, useToast } from '@chakra-ui/react';
+import { Box, Button, Icon, useToast } from '@chakra-ui/react';
 import { BiTrash } from 'react-icons/bi';
 import configureShowToast from '../showToast';
 import server from '../../networking';
@@ -26,14 +26,15 @@ function DeleteReviewButton({
     }
 
     return (
-        <IconButton
-          aria-label="Delete review"
-          icon={<Icon as={BiTrash} />}
-          onClick={handleDelete}
-          colorScheme="red"
-          size="lg"
-          mt={2}
-        />
+        <Box>
+            <Button
+                onClick={handleDelete}
+                colorScheme="red"
+                ml={2}
+                size="md">
+                    <BiTrash />
+            </Button>
+        </Box>
       );
 }
 

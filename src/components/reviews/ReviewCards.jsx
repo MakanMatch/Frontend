@@ -145,6 +145,7 @@ const CreateReview = ({
                         src={images[0]}
                         alt="Review image"
                         borderRadius="lg"
+                        mt={1}
                         maxWidth={{ base: '100%', md: '60%' }}
                         minHeight={"108px"}
                         maxHeight={"200"}
