@@ -32,9 +32,7 @@ const EditReview = ({
 	reviewFoodRating,
 	reviewHygieneRating,
 	reviewComments,
-	reviewImages,
-	refreshState,
-	stateRefresh
+	reviewImages
 }) => {
 	const toast = useToast();
 	const showToast = configureShowToast(toast);
@@ -50,10 +48,15 @@ const EditReview = ({
 		setFoodRating(reviewFoodRating);
 		setHygieneRating(reviewHygieneRating);
 		setComments(reviewComments);
-		setImages(reviewImages || []);
+		setImages(reviewImages);
 	}, [reviewFoodRating, reviewHygieneRating, reviewComments, reviewImages]);
+
 	const handleFileChange = (event) => {
 		const files = Array.from(event.target.files);
+		if (images.length + files.length > 6) {
+            setFileFormatError("You can upload a maximum of 6 images.");
+            return;
+        }
 		let filesAccepted = false;
 		for (const file of files) {
 			const allowedTypes = [
@@ -85,22 +88,24 @@ const EditReview = ({
 	const handleEdit = async () => {
 		setIsSubmitting(true);
 		const formData = new FormData();
+		formData.append('reviewID', reviewID);
 		formData.append('foodRating', foodRating);
 		formData.append('hygieneRating', hygieneRating);
 		formData.append('comments', comments);
 		images.forEach((file) => {
-			formData.append('images', file);
-		});
+            formData.append('images', file);
+        });
 
 		try {
 			const editReview = await server.put(`/manageReviews?reviewID=${reviewID}`, formData, {
-				headers: { 'Content-Type': 'multipart/form-data' }
+				headers: { 'Content-Type': 'multipart/form-data' },
+				transformRequest: formData => formData
 			});
 			if (editReview.status === 200) {
 				showToast("Review edited successfully", "", 3000, true, "success");
 				setIsSubmitting(false);
+				window.location.reload();
 				onClose();
-				refreshState(!stateRefresh);
 			} else {
 				showToast("Failed to edit review", "Please try again later", 3000, true, "error");
 			}
@@ -112,9 +117,20 @@ const EditReview = ({
 	};
 
 	const handleClose = () => {
-		setComments(comments);
-		setImages(images || []);
+		setFoodRating(reviewFoodRating);
+		setHygieneRating(reviewHygieneRating);
+		setComments(reviewComments);
+		setImages(reviewImages);
 		onClose();
+	};
+
+	const getImageName = (imagePath) => {
+		if (!imagePath) {
+			return "";
+		} else {
+			const parts = imagePath.split('&imageName=');
+			return parts[1] || imagePath;
+		}
 	};
 
 	return (
@@ -157,7 +173,7 @@ const EditReview = ({
 								value={comments}
 								onChange={(e) => setComments(e.target.value)}
 							/>
-							{/* <Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Upload Images</Text>
+							<Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Upload New Images</Text>
 							<Input
 								pt={1}
 								type="file"
@@ -170,23 +186,21 @@ const EditReview = ({
 									{fileFormatError}
 								</FormHelperText>
 							)}
-							<Box mt={2}>
-								{images.length > 0 && (
-									<>
-										<FormLabel>Selected images:</FormLabel>
-										{images.map((image, index) => (
-											<Card key={index} mb={2} padding={"13px"} display="flex" flexDirection="row" justifyContent="space-between">
-												<Text fontSize={"15px"} color={"green"} mt={2}>
-													{image.name}
-												</Text>
-												<Button onClick={() => handleRemoveImage(index)}>
-													<CloseIcon boxSize={3} />
-												</Button>
-											</Card>
-										))}
-									</>
-								)}
-							</Box> */}
+							{images && images.length > 0 && (
+								<Box mt={2}>
+									<Text>Selected images:</Text>
+									{images.map((image, index) => (
+										<Card key={index} mb={2} padding={"13px"} display="flex" flexDirection="row" justifyContent="space-between">
+											<Text fontSize={"15px"} color={"green"} mt={2}>
+												{image instanceof File ? image.name : getImageName(image)}
+											</Text>
+											<Button onClick={() => handleRemoveImage(index)}>
+												<CloseIcon boxSize={3} />
+											</Button>
+										</Card>
+									))}
+								</Box>
+							)}
 						</FormControl>
 					</ModalBody>
 					<ModalFooter>

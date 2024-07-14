@@ -39,6 +39,10 @@ const SubmitReviews = ({
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
+        if (images.length + files.length > 6) {
+            setFileFormatError("You can upload a maximum of 6 images.");
+            return;
+        }
         let filesAccepted = false;
         for (const file of files) {
             const allowedTypes = [
