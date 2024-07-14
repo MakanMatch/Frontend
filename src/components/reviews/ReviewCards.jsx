@@ -84,18 +84,20 @@ const CreateReview = ({
         const numImages = images.length;
         if (numImages === 1) {
             return (
-                <Image
-                    onClick={() => handleImageClick(0)}
-                    key={images[0]}
-                    src={images[0]}
-                    alt="Review image"
-                    borderRadius="lg"
-                    minWidth={"100%"}
-                    minHeight={"200px"}
-                    maxHeight={"400px"}
-                    objectFit="cover"
-                    _hover={{ cursor: "pointer" }}
-                />
+                <Box display="flex" justifyContent="center" alignItems="center">
+                    <Image
+                        onClick={() => handleImageClick(0)}
+                        key={images[0]}
+                        src={images[0]}
+                        alt="Review image"
+                        borderRadius="lg"
+                        maxWidth={"100%"}
+                        minHeight={{ base: '160px', lg: '280px' }}
+                        maxHeight={{ base: '200px', lg: '400px' }}
+                        objectFit="cover"
+                        _hover={{ cursor: "pointer" }}
+                    />
+                </Box>
             );
         }
         if (numImages === 2) {
@@ -104,7 +106,7 @@ const CreateReview = ({
                     wrap="wrap"
                     gap={2}
                     justifyContent='center'
-                    alignItems={{ base: 'center', md: 'flex-start' }}
+                    alignItems={{ base: 'center'}}
                 >
                     <Image
                         onClick={() => handleImageClick(0)}
@@ -112,9 +114,9 @@ const CreateReview = ({
                         src={images[0]}
                         alt="Review image"
                         borderRadius="lg"
-                        minWidth={{ base: '100%', md: '50%' }}
-                        minHeight={"108px"}
-                        maxHeight={"200"}
+                        maxWidth={{ base: '100%', md: '80%' }}
+                        minHeight={"200"}
+                        maxHeight={"400px"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
@@ -124,9 +126,9 @@ const CreateReview = ({
                         src={images[1]}
                         alt="Review image"
                         borderRadius="lg"
-                        minWidth={{ base: '100%', md: '50%' }}
-                        minHeight={"108px"}
-                        maxHeight={"200"}
+                        maxWidth={{ base: '100%', md: '80%' }}
+                        minHeight={"200"}
+                        maxHeight={"400px"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
@@ -138,6 +140,7 @@ const CreateReview = ({
                 <Flex direction={{ base: 'column', md: 'row' }}
                     wrap="wrap"
                     gap={2}
+                    justifyContent="center"
                 >
                     <Image
                         onClick={() => handleImageClick(0)}
@@ -147,8 +150,8 @@ const CreateReview = ({
                         borderRadius="lg"
                         mt={1}
                         maxWidth={{ base: '100%', md: '60%' }}
-                        minHeight={"108px"}
-                        maxHeight={"200"}
+                        minHeight={"200"}
+                        maxHeight={"600px"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
@@ -159,9 +162,9 @@ const CreateReview = ({
                             src={images[1]}
                             alt="Review image"
                             borderRadius="lg"
-                            minWidth={"100%"}
-                            minHeight={{ base: '50%', md: '50%' }}
-                            maxHeight={{ base: "200px", md: "100px" }}
+                            minWidth={{ base: '100%', md: "100%" }}
+                            minHeight={{ base: '160', md: '200' }}
+                            maxHeight={{ base: "200px", md: "300px" }}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -171,9 +174,9 @@ const CreateReview = ({
                             src={images[2]}
                             alt="Review image"
                             borderRadius="lg"
-                            minWidth={"100%"}
-                            minHeight={{ base: '50%', md: '50%' }}
-                            maxHeight={{ base: "200px", md: "100px" }}
+                            minWidth={{ base: '100%', md: "100%"}}
+                            minHeight={{ base: '160', md: '200' }}
+                            maxHeight={{ base: "200px", md: "300px" }}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -183,7 +186,7 @@ const CreateReview = ({
         }
         if (numImages === 4) {
             return (
-                <Flex wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
+                <Flex direction={{ base: 'column', md: 'row' }}wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
                     {images.map((image, index) => (
                         <Image
                             onClick={() => handleImageClick(index)}
@@ -193,7 +196,7 @@ const CreateReview = ({
                             borderRadius="lg"
                             minWidth={{ base: '100%', md: "calc(50% - 6px)" }}
                             minHeight={"100px"}
-                            maxHeight={"108px"}
+                            maxHeight={"158px"}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -212,7 +215,7 @@ const CreateReview = ({
                         borderRadius="lg"
                         minWidth={{ base: '100%', md: "calc(50% - 6px)" }}
                         minHeight={"108px"}
-                        maxHeight={"120px"}
+                        maxHeight={"158px"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
@@ -222,7 +225,7 @@ const CreateReview = ({
                         onClick={onOpen}
                         borderRadius="lg"
                         minWidth={{ base: '100%' }}
-                        minHeight={"108px"}
+                        minHeight={"158px"}
                         bg="gray.200"
                         display="flex"
                         alignItems="center"
@@ -243,7 +246,7 @@ const CreateReview = ({
 
     return (
         <TabPanel>
-            <Card maxW='lg' variant="elevated" key={reviewID} p={4} boxShadow="md">
+            <Card maxW={{ base: "100%" }} variant="elevated" key={reviewID} p={4} boxShadow="md">
                 <CardHeader>
                     <Flex direction={{ base: 'column', md: 'row' }}
                         alignItems={{ base: 'flex-start', md: 'center' }}
@@ -271,7 +274,7 @@ const CreateReview = ({
                                                 starRatedColor="gold"
                                                 numberOfStars={5}
                                                 name='foodRating'
-                                                starDimension="15px"
+                                                starDimension="13px"
                                                 starSpacing="1px"
                                                 starFull={<FaStar />}
                                                 starEmpty={<FaRegStar />}
@@ -294,7 +297,7 @@ const CreateReview = ({
                                                 starRatedColor="gold"
                                                 numberOfStars={5}
                                                 name='hygieneRating'
-                                                starDimension="15px"
+                                                starDimension="13px"
                                                 starSpacing="1px"
                                                 starFull={<FaStar />}
                                                 starEmpty={<FaRegStar />}
