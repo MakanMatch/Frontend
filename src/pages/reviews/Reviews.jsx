@@ -18,7 +18,7 @@ function Reviews() {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
-    const { user } = useSelector((state) => state.auth);
+    const { user, loaded } = useSelector((state) => state.auth);
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
@@ -89,18 +89,20 @@ function Reviews() {
     }
 
     useEffect(() => {
-        if (!user) {
-            navigate('/auth/login');
-        } else {
-            fetchHostInfo();
-            if (user.userID) {
-                fetchGuestInfo();
-            } else {
-                showToast("Error", "Please Log In", 3000, true, "error");
+        if (loaded == true) {
+            if (!user) {
                 navigate('/auth/login');
+            } else {
+                fetchHostInfo();
+                if (user.userID) {
+                    fetchGuestInfo();
+                } else {
+                    showToast("Error", "Please Log In", 3000, true, "error");
+                    navigate('/auth/login');
+                }
             }
         }
-    }, [user])
+    }, [user, loaded])
 
     return (
         <Box p={2} position="relative" width="100%">
