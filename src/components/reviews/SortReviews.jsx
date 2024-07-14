@@ -89,7 +89,7 @@ const SortReviews = ({
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
-                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
@@ -111,7 +111,7 @@ const SortReviews = ({
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
-                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
@@ -133,7 +133,7 @@ const SortReviews = ({
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
-                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
@@ -155,7 +155,7 @@ const SortReviews = ({
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
-                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}

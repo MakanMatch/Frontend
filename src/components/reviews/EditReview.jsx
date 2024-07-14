@@ -48,7 +48,11 @@ const EditReview = ({
 		setFoodRating(reviewFoodRating);
 		setHygieneRating(reviewHygieneRating);
 		setComments(reviewComments);
-		setImages(reviewImages);
+		if (typeof reviewImages === 'string') {
+			setImages(reviewImages.split('|').filter(image => image));
+		} else {
+			setImages(reviewImages || []);
+		}
 	}, [reviewFoodRating, reviewHygieneRating, reviewComments, reviewImages]);
 
 	const handleFileChange = (event) => {
@@ -120,7 +124,11 @@ const EditReview = ({
 		setFoodRating(reviewFoodRating);
 		setHygieneRating(reviewHygieneRating);
 		setComments(reviewComments);
-		setImages(reviewImages);
+		if (typeof reviewImages === 'string') {
+			setImages(reviewImages.split('|').filter(image => image));
+		} else {
+			setImages(reviewImages || []); 
+		}
 		onClose();
 	};
 
