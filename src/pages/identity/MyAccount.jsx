@@ -135,9 +135,6 @@ const MyAccount = () => {
     };
 
     const confirmDeleteAccount = () => {
-        console.log("Deleting account...");
-        console.log(user.userID)
-        console.log(user.userType)
         server.delete("/identity/myAccount/deleteAccount", {
             data: {
                 userID: user.userID,
