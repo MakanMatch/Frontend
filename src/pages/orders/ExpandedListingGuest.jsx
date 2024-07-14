@@ -63,7 +63,7 @@ function ExpandedListingGuest() {
         if (listingData.hostID) {
             if (user && listingData.hostID == user.userID) {
                 console.log("Logged in user is host of listing; redirecting to host view...")
-                navigate(`/expandedListingHost?id=${listingData.listingID}`)
+                navigate(`/expandedListingHost`)
                 history.pushState({ listingID: listingData.listingID }, "")
                 return
             } else {
@@ -81,7 +81,7 @@ function ExpandedListingGuest() {
 
         var slotsTaken = 0;
         if (data.guests) {
-            data.guests.forEach(guest => { slotsTaken++; })
+            data.guests.forEach(() => { slotsTaken++; })
         }
 
         data.slotsTaken = slotsTaken;
