@@ -8,6 +8,8 @@ import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
 import server from '../../networking';
 import Like from './Like';
 import Liked from './Liked';
+import DeleteReviewButton from './DeleteReviewButton';
+import EditReview from './EditReview';
 import {
     Modal,
     ModalOverlay,
@@ -29,6 +31,7 @@ const CreateReview = ({
     images,
     likeCount,
     reviewID,
+    posterID,
     guestID,
     isLiked
 }) => {
@@ -58,9 +61,11 @@ const CreateReview = ({
                 reviewID: reviewID,
                 guestID: guestID
             }
-            const postLikeResponse = await server.post('/likeReview', reviewInfo, {headers: {
-                'Content-Type': 'application/json',
-            }});
+            const postLikeResponse = await server.post('/likeReview', reviewInfo, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
             if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
                 showToast("An error occurred", "Please try again later.", 3000, true, "error");
                 return
@@ -225,7 +230,7 @@ const CreateReview = ({
                         fontSize="lg"
                         fontWeight="bold"
                         transition="all 0.3s ease-in-out"
-                        _hover={{ cursor: "pointer", bg: "gray.300"}}
+                        _hover={{ cursor: "pointer", bg: "gray.300" }}
                         textAlign="center"
                     >
                         +{images.length - 4}
@@ -318,8 +323,8 @@ const CreateReview = ({
                         {renderImages()}
                     </CardBody>
                 )}
-                <CardFooter justifyContent={{ base : 'center', md: 'flex-start'}} display="flex">
-                    <Button  variant='ghost'
+                <CardFooter justifyContent={{ base: 'center', md: 'flex-start' }} display="flex">
+                    <Button variant='ghost'
                         backgroundColor={liked ? 'blue.100' : 'gray.100'}
                         leftIcon={liked ? <Liked /> : <Like />}
                         _hover={{
@@ -329,17 +334,23 @@ const CreateReview = ({
                         onClick={toggleLike}>
                         <Text>{currentLikeCount}</Text>
                     </Button>
+                    {posterID === guestID && (
+                        <Flex ml={4}>
+                            <EditReview reviewID={reviewID} />
+                            <DeleteReviewButton reviewID={reviewID} />
+                        </Flex>
+                    )}
                 </CardFooter>
                 <Modal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} size="lg" isCentered>
-                <ModalOverlay />
-                <ModalContent maxW="max-content" background="transparent" boxShadow="none">
+                    <ModalOverlay />
+                    <ModalContent maxW="max-content" background="transparent" boxShadow="none">
                         <Image
                             boxSize='500px'
                             borderRadius='full'
                             src='https://bit.ly/sage-adebayo'
                             alt='Dan Abramov'
                         />
-                </ModalContent>
+                    </ModalContent>
                 </Modal>
                 <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
                     <ModalOverlay />

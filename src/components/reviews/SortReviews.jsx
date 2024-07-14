@@ -92,6 +92,7 @@ const SortReviews = ({
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
+                                    posterID = {review.guestID}
                                     guestID={guestID}
                                     isLiked={review.isLiked}
                                 />
@@ -113,6 +114,7 @@ const SortReviews = ({
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
+                                    posterID = {review.guestID}
                                     guestID={guestID}
                                     isLiked={review.isLiked}
                                 />
@@ -134,6 +136,7 @@ const SortReviews = ({
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
+                                    posterID = {review.guestID}
                                     guestID={guestID}
                                     isLiked={review.isLiked}
                                 />
@@ -155,6 +158,7 @@ const SortReviews = ({
                                     images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
+                                    posterID = {review.guestID}
                                     guestID={guestID}
                                     isLiked={review.isLiked}
                                 />
