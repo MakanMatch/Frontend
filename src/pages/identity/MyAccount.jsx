@@ -28,33 +28,23 @@ const MyAccount = () => {
     const { user, loaded, error } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        if (!loaded) {
-            dispatch(fetchUser());
-        }
-    }, [dispatch, loaded]);
+        if (loaded == true) {
+            const fetchAccountInfo = async () => {
+                try {
+                    const userID = user.userID;
+                    const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
+                    setAccountInfo(response.data);
+                    setOriginalAccountInfo(response.data);
+                } catch (err) {
+                    console.log("Error fetching account info:", err);
+                }
+            };
 
-    useEffect(() => {
-        if (loaded && !user) {
-            navigate("/auth/login");
-        }
-    }, [loaded, user, navigate]);
-
-    useEffect(() => {
-        const fetchAccountInfo = async () => {
-            try {
-                const userID = user.userID;
-                const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
-                setAccountInfo(response.data);
-                setOriginalAccountInfo(response.data);
-            } catch (err) {
-                console.log("Error fetching account info:", err);
+            if (user && user.userID) {
+                fetchAccountInfo();
             }
-        };
-
-        if (user && user.userID) {
-            fetchAccountInfo();
         }
-    }, [user]);
+    }, [loaded, user]);
 
     const calculateAccountAge = () => {
         const createdAt = new Date(accountInfo.createdAt);
