@@ -336,7 +336,13 @@ const CreateReview = ({
                     </Button>
                     {posterID === guestID && (
                         <Flex ml={4}>
-                            <EditReview reviewID={reviewID} />
+                            <EditReview
+                                reviewID={reviewID}
+                                reviewFoodRating={foodRating}
+                                reviewHygieneRating={hygieneRating}
+                                reviewComments={comments}
+                                reviewImages={images}
+                            />
                             <DeleteReviewButton reviewID={reviewID} />
                         </Flex>
                     )}

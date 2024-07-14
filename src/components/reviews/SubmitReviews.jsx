@@ -136,12 +136,12 @@ const SubmitReviews = ({
                             <Flex direction={{ base: 'column', md: 'row' }} align="center">
                                 <Flex direction='column'>
                                 <Text mt='8px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Food Rating</Text>
-                                <StarRating maxStars={5} rating={foodRating} onChange={setFoodRating} />
+                                <StarRating maxStars={5} propRating={foodRating} onChange={setFoodRating} />
                                 </Flex>
                                 <Spacer display={{ base: 'none', md: 'block' }} />
                                 <Flex direction='column'>
                                 <Text mt="8px" mb="8px" textAlign={{ base: 'center', md: 'left' }}>Hygiene Rating</Text>
-                                <StarRating maxStars={5} rating={hygieneRating} onChange={setHygieneRating} />
+                                <StarRating maxStars={5} propRating={hygieneRating} onChange={setHygieneRating} />
                                 </Flex>
                             </Flex>
                             <Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Comments</Text>
