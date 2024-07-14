@@ -75,33 +75,16 @@ function Reviews() {
         }
     };
 
-    const fetchGuestInfo = async () => {
-        try {
-            const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
-            if (!response.data || response.status !== 200) {
-                showToast("No guest information found", "Please Log In", 3000, true, "info");
-                return
-            }
-        } catch (error) {
-            toast.closeAll();
-            showToast("Error fetching guest information", "Please Log In", 3000, true, "error");
-            console.error("Error fetching guest info:", error);
-            return
-        }
-    }
-
     useEffect(() => {
         if (loaded == true) {
             if (!user) {
                 navigate('/auth/login');
             } else {
                 fetchHostInfo();
-                if (user.userID) {
-                    fetchGuestInfo();
-                } else {
+                if (!user.userID) {
                     showToast("Error", "Please Log In", 3000, true, "error");
                     navigate('/auth/login');
-                }
+                } 
             }
         }
     }, [user, loaded])
