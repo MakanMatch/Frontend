@@ -22,7 +22,6 @@ import configureShowToast from '../../components/showToast';
 
 const SubmitReviews = ({
     hostName,
-    guestID,
     hostID,
     refreshState,
     stateRefresh
@@ -84,7 +83,6 @@ const SubmitReviews = ({
             formData.append('images', file);
         });
         formData.append('dateCreated', currentDate);
-        formData.append('guestID', guestID);
         formData.append('hostID', hostID);
 
         try {

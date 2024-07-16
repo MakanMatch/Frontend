@@ -25,7 +25,7 @@ const SortReviews = ({
     const fetchReviews = async (hostID, sortOrder) => {
         try {
             // Get reviews
-            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&guestID=${guestID}&order=${sortOrder}`);
+            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`);
             if (response.status === 200 && Array.isArray(response.data)) {
                 const reviews = response.data;
                 setReviews(reviews);

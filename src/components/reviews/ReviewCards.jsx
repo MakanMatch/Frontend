@@ -58,8 +58,7 @@ const CreateReview = ({
     const toggleLike = async () => {
         try {
             const reviewInfo = {
-                reviewID: reviewID,
-                guestID: guestID
+                reviewID: reviewID
             }
             const postLikeResponse = await server.post('/likeReview', reviewInfo, {
                 headers: {
