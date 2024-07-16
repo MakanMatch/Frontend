@@ -12,7 +12,11 @@ function DeleteReviewButton({
 
     const handleDelete = async () => {
         try {
-            const deleteReview = await server.delete(`/manageReviews?reviewID=${reviewID}`);
+            const deleteReview = await server.delete(`/manageReviews`, {
+                data: {
+                    reviewID: reviewID
+                }
+            })
             if (deleteReview.status === 200) {
                 showToast("Review deleted", "", 3000, false, "success");
                 window.location.reload();
