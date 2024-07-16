@@ -81,7 +81,9 @@ function ExpandedListingGuest() {
 
         var slotsTaken = 0;
         if (data.guests) {
-            data.guests.forEach(() => { slotsTaken++; })
+            data.guests.forEach((guest) => {
+                slotsTaken += guest.Reservation.portions
+            })
         }
 
         data.slotsTaken = slotsTaken;
