@@ -45,6 +45,7 @@ function ExpandedListingHost() {
     const [imageToBeDeleted, setImageToBeDeleted] = useState(null)
     const [isUploading, setIsUploading] = useState(false)
     const [file, setFile] = useState(null);
+    const { user, loaded, error } = useSelector(state => state.auth)
 
     const handleClose = () => {
         onClose()
@@ -104,20 +105,42 @@ function ExpandedListingHost() {
     }
 
     useEffect(() => {
-        if (!listingID) {
-            navigate("/")
-            return
+        if (loaded == true) {
+            if (!user) {
+                console.log("Unauthenticated user attempting to access user-scoped webpage; redirecting...")
+                showToast("Error", "Please sign in first.", 3000, true, "error")
+                navigate("/")
+                return
+            }
+
+            if (!history.state.listingID) {
+                if (!listingID) {
+                    console.log("No listing ID provided to render expanded listing view.")
+                    showToast("Something went wrong", "Insufficient information provided.", 1500, true, "error")
+                    navigate("/")
+                    return
+                }
+            } else {
+                setListingID(history.state.listingID)
+            }
+
+            fetchListingDetails(listingID || history.state.listingID)
         }
-        fetchListingDetails()
-    }, [])
+    }, [loaded])
 
     useEffect(checkForChanges, [shortDescription, longDescription, guestSlots, pricePerPortion])
 
-    const fetchListingDetails = () => {
-        server.get(`/cdn/getListing?id=${listingID}`)
+    const fetchListingDetails = (id) => {
+        server.get(`/cdn/getListing?id=${id || listingID}`)
             .then(response => {
                 if (response.status == 200) {
                     const processedData = processData(response.data)
+                    if (user && processedData.hostID != user.userID) {
+                        console.log("Logged in user is unauthorised for listing host view action; redirecting...")
+                        navigate("/expandedListingGuest")
+                        history.pushState({ listingID: (id || listingID) }, "")
+                        return
+                    }
                     setListingData(processedData)
                     setShortDescription(processedData.shortDescription || "")
                     setLongDescription(processedData.longDescription || "")
