@@ -133,7 +133,7 @@ function ExpandedListingHost() {
     const fetchListingDetails = (id) => {
         server.get(`/cdn/getListing?id=${id || listingID}`)
             .then(response => {
-                dispatch(reloadAuthToken())
+                dispatch(reloadAuthToken(authToken))
                 if (response.status == 200) {
                     const processedData = processData(response.data)
                     if (user && processedData.hostID != user.userID) {
@@ -163,7 +163,7 @@ function ExpandedListingHost() {
                 }
             })
             .catch(err => {
-                dispatch(reloadAuthToken())
+                dispatch(reloadAuthToken(authToken))
                 console.log("EXPANDEDLISTINGHOST: Failed to retrieve listing details, redirecting to home. Error: " + err)
                 showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
                 navigate("/")
@@ -192,7 +192,7 @@ function ExpandedListingHost() {
 
         server.post("/uploadListingImage", formData, { headers: config, transformRequest: formData => formData })
             .then(res => {
-                dispatch(reloadAuthToken())
+                dispatch(reloadAuthToken(authToken))
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Success", "Image uploaded successfully", 2500, true, "success")
                     setIsUploading(false)
@@ -207,7 +207,7 @@ function ExpandedListingHost() {
                 }
             })
             .catch(err => {
-                dispatch(reloadAuthToken())
+                dispatch(reloadAuthToken(authToken))
                 console.log("Failed to upload image; error: " + err)
                 showToast("Error", "Failed to upload image", 5000, true, "error")
                 setIsUploading(false)
@@ -229,7 +229,7 @@ function ExpandedListingHost() {
 
         server.post("/updateListing", data)
             .then(res => {
-                dispatch(reloadAuthToken());
+                dispatch(reloadAuthToken(authToken));
 
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Success", "Changes saved successfully", 2500, true, "success")
@@ -243,7 +243,7 @@ function ExpandedListingHost() {
                 }
             })
             .catch(err => {
-                dispatch(reloadAuthToken())
+                dispatch(reloadAuthToken(authToken))
                 console.log("Failed to update listing; error: " + err);
                 showToast("Something went wrong", "Failed to update the listing. Try again later.", 1500, true, "error")
             })

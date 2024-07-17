@@ -5,7 +5,8 @@ import server from '../../networking'
 import configureShowToast from '../../components/showToast'
 import placeholderImage from '../../assets/placeholderImage.svg'
 import ReserveCard from '../../components/orders/ReserveCard'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { reloadAuthToken } from '../../slices/AuthState'
 
 function ExpandedListingGuest() {
     const navigate = useNavigate()
@@ -37,7 +38,8 @@ function ExpandedListingGuest() {
         foodRating: 0.0,
         hygieneGrade: 0.0
     })
-    const { user, loaded, error } = useSelector(state => state.auth)
+    const { user, loaded, error, authToken } = useSelector(state => state.auth)
+    const dispatch = useDispatch();
 
     const [listingID, setListingID] = useState(searchParams.get("id"))
     const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
@@ -70,7 +72,7 @@ function ExpandedListingGuest() {
                 fetchHostData()
             }
         }
-    }, [listingData])
+    }, [listingData, user])
 
     const processListingData = (data) => {
         let datetime = new Date(data.datetime)
@@ -99,6 +101,7 @@ function ExpandedListingGuest() {
     const fetchListingDetails = (id) => {
         server.get(`/cdn/getListing?id=${id}&includeReservations=true`)
             .then(response => {
+                dispatch(reloadAuthToken(authToken));
                 if (response.status == 200) {
                     const processedData = processListingData(response.data)
                     if (processedData.published == false && processedData.hostID != user.userID) { console.log("Attempt to access unpublished listing blocked; redirecting..."); navigate("/"); return; }
@@ -117,6 +120,7 @@ function ExpandedListingGuest() {
                 }
             })
             .catch(err => {
+                dispatch(reloadAuthToken(authToken));
                 showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
                 console.log("EXPANDEDLISTINGGUEST: Failed to retrieve listing details, redirecting to home. Response below.")
                 console.log(err)
@@ -128,6 +132,7 @@ function ExpandedListingGuest() {
     const fetchHostData = () => {
         server.get(`/cdn/accountInfo?userID=${listingData.hostID}`)
             .then(response => {
+                dispatch(reloadAuthToken(authToken));
                 if (response.status == 200) {
                     const processedData = processHostData(response.data)
                     setHostData(processedData)
@@ -143,6 +148,7 @@ function ExpandedListingGuest() {
                 }
             })
             .catch(err => {
+                dispatch(reloadAuthToken(authToken));
                 console.log("EXPANDEDLISTINGGUEST: Failed to retrieve host details, redirecting to home. Error: " + err)
                 navigate("/")
                 showToast("Something went wrong", "Couldn't retrieve required information. Try again later.", 5000, true, "error")

@@ -53,12 +53,12 @@ export const fetchUser = () => async (dispatch) => {
     }
 };
 
-export const reloadAuthToken = () => async (dispatch) => {
+export const reloadAuthToken = (authToken) => async (dispatch) => {
     if (localStorage.getItem('tokenRefreshed') == 'true') {
         console.log("Token refreshed.");
         dispatch(changeAuthToken(localStorage.getItem('jwt') || null));
         localStorage.removeItem('tokenRefreshed');
-    } else if (localStorage.getItem('jwt') == undefined || localStorage.getItem('jwt') == null) {
+    } else if (authToken && (localStorage.getItem('jwt') == undefined || localStorage.getItem('jwt') == null)) {
         console.log("Token detected to be missing/expired; logging out from redux state.")
         dispatch(logout());
         return;
