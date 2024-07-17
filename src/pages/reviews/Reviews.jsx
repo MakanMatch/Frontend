@@ -154,7 +154,6 @@ function Reviews() {
             {user && (
                 <SortReviews
                     hostID={hostID}
-                    guestID={user.userID}
                     stateRefresh={stateRefresh}
                 />
             )}

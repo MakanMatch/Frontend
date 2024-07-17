@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Text, useToast, SimpleGrid } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import server from '../../networking'
@@ -7,13 +8,13 @@ import configureShowToast from '../../components/showToast';
 
 const SortReviews = ({
     hostID,
-    guestID,
     stateRefresh
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
+    const { user, loaded } = useSelector((state) => state.auth);
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {
@@ -65,9 +66,24 @@ const SortReviews = ({
         fetchReviews(hostID, sortOrder);
     }
 
+    // useEffect(() => {
+    //     fetchSortedData();
+    // }, [activeTab, stateRefresh]);
+
     useEffect(() => {
-        fetchSortedData();
-    }, [activeTab, stateRefresh]);
+        if (loaded == true) {
+            if (!user) {
+                navigate('/auth/login');
+            } else {
+                fetchSortedData()
+                if (!user.userID) {
+                    showToast("Error", "Please Log In", 3000, true, "error");
+                    navigate('/auth/login');
+                } 
+            }
+        }
+    }, [user, loaded, activeTab, stateRefresh])
+
 
     return (
         <Tabs mt={8} variant="soft-rounded" size='sm' minWidth="310px" onChange={(index) => setActiveTab(index)}>
@@ -93,7 +109,7 @@ const SortReviews = ({
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
-                                    guestID={guestID}
+                                    guestID={user.userID}
                                     isLiked={review.isLiked}
                                 />
                             )) :
@@ -115,7 +131,7 @@ const SortReviews = ({
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
-                                    guestID={guestID}
+                                    guestID={user.userID}
                                     isLiked={review.isLiked}
                                 />
                             )) :
@@ -137,7 +153,7 @@ const SortReviews = ({
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
-                                    guestID={guestID}
+                                    guestID={user.userID}
                                     isLiked={review.isLiked}
                                 />
                             )) :
@@ -159,7 +175,7 @@ const SortReviews = ({
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
-                                    guestID={guestID}
+                                    guestID={user.userID}
                                     isLiked={review.isLiked}
                                 />
                             )) :
