@@ -23,7 +23,7 @@ import {
 import StarRatings from 'react-star-ratings';
 import configureShowToast from '../showToast';
 
-const CreateReview = ({
+const ReviewCard = ({
     username,
     foodRating,
     hygieneRating,
@@ -414,4 +414,4 @@ const CreateReview = ({
     )
 }
 
-export default CreateReview
+export default ReviewCard
