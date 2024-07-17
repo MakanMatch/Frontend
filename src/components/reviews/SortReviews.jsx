@@ -116,7 +116,7 @@ const SortReviews = ({
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                <SimpleGrid  columns={{base: 1, md: 2, xl: 3}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <ReviewCard
@@ -137,7 +137,7 @@ const SortReviews = ({
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                <SimpleGrid  columns={{base: 1, md: 2, xl: 3}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <ReviewCard
@@ -158,7 +158,7 @@ const SortReviews = ({
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                <SimpleGrid  columns={{base: 1, md: 2, xl: 3}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <ReviewCard
