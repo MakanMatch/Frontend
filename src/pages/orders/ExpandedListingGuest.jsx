@@ -14,7 +14,7 @@ function ExpandedListingGuest() {
     const showToast = configureShowToast(toast)
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams] = useSearchParams()
     const [isLargerThan700] = useMediaQuery('(min-width: 700px)')
     const [loading, setLoading] = useState(true)
     const [listingData, setListingData] = useState({
