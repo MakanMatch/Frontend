@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Text, useToast, SimpleGrid } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import server from '../../networking'
-import ReviewCards from './ReviewCards';
+import ReviewCard from './ReviewCard';
 import configureShowToast from '../../components/showToast';
 
 const SortReviews = ({
@@ -98,7 +98,7 @@ const SortReviews = ({
                     <SimpleGrid columns={{base: 1, md: 2, xl: 3}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
-                                <ReviewCards
+                                <ReviewCard
                                     key={review.reviewID}
                                     username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
@@ -119,7 +119,7 @@ const SortReviews = ({
                 <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
-                                <ReviewCards
+                                <ReviewCard
                                     key={review.reviewID}
                                     username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
@@ -140,7 +140,7 @@ const SortReviews = ({
                 <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
-                                <ReviewCards
+                                <ReviewCard
                                     key={review.reviewID}
                                     username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
@@ -161,7 +161,7 @@ const SortReviews = ({
                 <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
-                                <ReviewCards
+                                <ReviewCard
                                     key={review.reviewID}
                                     username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
