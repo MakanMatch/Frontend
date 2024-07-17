@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
     Avatar, useToast, Divider
 } from "@chakra-ui/react";
+import { useSelector } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
 import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
 import server from '../../networking';
@@ -32,7 +33,6 @@ const CreateReview = ({
     likeCount,
     reviewID,
     posterID,
-    guestID,
     isLiked
 }) => {
     const toast = useToast();
@@ -42,6 +42,7 @@ const CreateReview = ({
     const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const imageRefs = useRef([]);
+    const { user, loaded } = useSelector((state) => state.auth);
 
     const handleProfileClick = (image) => {
         setProfileImage(image);
@@ -243,6 +244,20 @@ const CreateReview = ({
         );
     }
 
+    useEffect(() => {
+        if (loaded == true) {
+            if (!user) {
+                navigate('/auth/login');
+            } else {
+                if (!user.userID) {
+                    showToast("Error", "Please Log In", 3000, true, "error");
+                    navigate('/auth/login');
+                } 
+            }
+        }
+    }, [user, loaded])
+
+
     return (
         <TabPanel>
             <Card maxW={{ base: "100%" }} variant="elevated" key={reviewID} p={4} boxShadow="md">
@@ -337,7 +352,7 @@ const CreateReview = ({
                         onClick={toggleLike}>
                         <Text>{currentLikeCount}</Text>
                     </Button>
-                    {posterID === guestID && (
+                    {posterID === user.userID && (
                         <Flex ml={4}>
                             <EditReview
                                 reviewID={reviewID}

@@ -109,7 +109,6 @@ const SortReviews = ({
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
-                                    guestID={user.userID}
                                     isLiked={review.isLiked}
                                 />
                             )) :
@@ -131,7 +130,6 @@ const SortReviews = ({
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
-                                    guestID={user.userID}
                                     isLiked={review.isLiked}
                                 />
                             )) :
@@ -153,7 +151,6 @@ const SortReviews = ({
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
-                                    guestID={user.userID}
                                     isLiked={review.isLiked}
                                 />
                             )) :
@@ -175,7 +172,6 @@ const SortReviews = ({
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
-                                    guestID={user.userID}
                                     isLiked={review.isLiked}
                                 />
                             )) :
