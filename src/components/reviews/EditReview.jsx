@@ -28,8 +28,16 @@ const EditReview = ({
 		setFoodRating(reviewFoodRating);
 		setHygieneRating(reviewHygieneRating);
 		setComments(reviewComments);
-		if (typeof reviewImages === 'string') {
-			setImages(reviewImages.split('|').filter(image => image));
+		if (typeof reviewImages != []) {
+			let imagesList = []
+			for (const image of reviewImages) {
+				if (image instanceof File) {
+					imagesList.push(image);
+				} else {
+					imagesList.push(getImageName(image));
+				}
+			}
+			setImages(imagesList);
 		} else {
 			setImages(reviewImages || []);
 		}
@@ -104,10 +112,18 @@ const EditReview = ({
 		setFoodRating(reviewFoodRating);
 		setHygieneRating(reviewHygieneRating);
 		setComments(reviewComments);
-		if (typeof reviewImages === 'string') {
-			setImages(reviewImages.split('|').filter(image => image));
+		if (typeof reviewImages != []) {
+			let imagesList = []
+			for (const image of reviewImages) {
+				if (image instanceof File) {
+					imagesList.push(image);
+				} else {
+					imagesList.push(getImageName(image));
+				}
+			}
+			setImages(imagesList);
 		} else {
-			setImages(reviewImages || []); 
+			setImages(reviewImages || []);
 		}
 		onClose();
 	};
