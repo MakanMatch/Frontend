@@ -89,7 +89,7 @@ const EditReview = ({
         });
 
 		try {
-			const editReview = await server.put(`/manageReviews?reviewID=${reviewID}`, formData, {
+			const editReview = await server.put(`/manageReviews`, formData, {
 				headers: { 'Content-Type': 'multipart/form-data' },
 				transformRequest: formData => formData
 			});
