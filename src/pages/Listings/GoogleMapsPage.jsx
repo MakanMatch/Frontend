@@ -4,7 +4,7 @@
 import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
 import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Box, useToast, Spinner } from "@chakra-ui/react";
+import { Box, useToast } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import configureShowToast from "../../components/showToast";
