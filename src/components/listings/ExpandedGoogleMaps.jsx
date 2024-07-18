@@ -7,46 +7,56 @@ import configureShowToast from "../../components/showToast";
 
 const ExpandedGoogleMaps = ({ lat, long }) => {
     const mapRef = useRef(null);
-    const toast = useToast()
-    const showToast = configureShowToast(toast)
+    const toast = useToast();
+    const showToast = configureShowToast(toast);
 
     useEffect(() => {
-        if (!lat || !long) {
-            showToast("No coordinates found", "Failed to show Host's location on map", 3000, false, "info");
-            return null;
-        }
         const initializeMap = async () => {
+            if (!mapRef.current || !lat || !long) {
+                // Check if mapRef or coordinates are not available
+                showToast("Invalid coordinates", "Failed to show Host's location on map", 3000, false, "info");
+                return;
+            }
+
             const loader = new Loader({
                 apiKey: import.meta.env.VITE_GMAPS_API_KEY,
                 version: "weekly",
                 libraries: ["places"],
             });
-            const { Map } = await loader.importLibrary("maps");
-            const { AdvancedMarkerElement } = await window.google.maps.importLibrary("marker");
-            const LatLong = { lat: lat, lng: long };
-            if (lat < -90 || lat > 90 || long < -180 || long > 180) {
-                showToast("Invalid coordinates", "Failed to show Host's location on map", 3000, false, "info");
-                return;
+
+            try {
+                const { Map } = await loader.importLibrary("maps");
+                const { AdvancedMarkerElement } = await window.google.maps.importLibrary("marker");
+
+                const LatLong = { lat: lat, lng: long };
+
+                // Check for valid latitude and longitude range
+                if (lat < -90 || lat > 90 || long < -180 || long > 180) {
+                    showToast("Invalid coordinates", "Failed to show Host's location on map", 3000, false, "info");
+                    return;
+                }
+
+                const map = new Map(mapRef.current, {
+                    center: LatLong,
+                    zoom: 17,
+                    mapId: import.meta.env.VITE_GMAPS_MAPID,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                });
+
+                new AdvancedMarkerElement({
+                    position: LatLong,
+                    map: map,
+                    title: "Host's location",
+                });
+            } catch (error) {
+                showToast("An error occurred", "Failed to render Google Maps", 3000, false, "error");
+                console.error(error);
             }
-            const map = new Map(mapRef.current, {
-                center: LatLong,
-                zoom: 17,
-                mapId: import.meta.env.VITE_GMAPS_MAPID,
-                mapTypeControl: false,
-                streetViewControl: false,
-            });
-            new AdvancedMarkerElement({
-                position: LatLong,
-                map: map,
-                title: "Host's location",
-            });
         };
 
-        initializeMap().catch(() => {
-            showToast("An error occured", "Failed to render Google Maps", 3000, false, "error");
-            return;
-        });
-    }, [lat, long]);
+        initializeMap();
+    }, [lat, long, showToast]);
 
     return (
         <div

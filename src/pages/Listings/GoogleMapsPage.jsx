@@ -32,26 +32,31 @@ const GoogleMapsPage = () => {
     }
 
     useEffect(() => {
-        if (!authToken || !user) {
-            navigate('/auth/login');
-            setTimeout(() => {
-                showToast("You're not logged in", "Please Login first", 3000, false, "info");
-            }, 200);
-            return;
+        if (loaded) {
+            if (!authToken || !user) {
+                navigate('/auth/login');
+                setTimeout(() => {
+                    showToast("You're not logged in", "Please Login first", 3000, false, "info");
+                }, 200);
+                return;
+            }
         }
     }, []);
     return (
-        <Box position="relative" height="100%">
-            <ExpandedGoogleMaps lat={latitude} long={longitude} />
-            <Box
-                position="absolute"
-                top="50%"
-                left="10px"
-                transform="translateY(-50%)"
-                zIndex="1">
-                <ListingCardOverlay listingID={listingID} userID={user.userID} userType={user.userType} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} />
-            </Box>
-        </Box>
+        <>
+            {loaded && (
+                <Box position="relative" height="100%">
+                <ExpandedGoogleMaps lat={latitude} long={longitude} />
+                <Box
+                    position="absolute"
+                    top="50%"
+                    left="10px"
+                    transform="translateY(-50%)"
+                    zIndex="1">
+                    <ListingCardOverlay listingID={listingID} userID={user.userID} userType={user.userType} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} />
+                </Box>
+            </Box>)}
+        </>
     );
 };
 
