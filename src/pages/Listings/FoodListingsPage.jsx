@@ -40,7 +40,6 @@ const FoodListingsPage = () => {
     };
 
     function handleClickAddListing() {
-        console.log("Authtoken: ", authToken);
         if (!authToken || !user) {
             navigate('/auth/login');
             setTimeout(() => {
