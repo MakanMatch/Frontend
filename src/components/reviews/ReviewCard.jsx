@@ -58,13 +58,11 @@ const ReviewCard = ({
 
     const toggleLike = async () => {
         try {
-            const reviewInfo = {
-                reviewID: reviewID
-            }
-            const postLikeResponse = await server.post('/likeReview', reviewInfo, {
+            const postLikeResponse = await server.post('/likeReview', {
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                reviewID: reviewID,
             });
             if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
                 showToast("An error occurred", "Please try again later.", 3000, true, "error");
