@@ -26,15 +26,7 @@ function Reviews() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const location = useLocation();
     const [searchParams] = useSearchParams();
-    var { hostID } = {}
-    if (location.state.hostID) {
-        hostID = location.state.hostID;
-    } else if (searchParams.has('hostID')) {
-        hostID = searchParams.get('hostID');
-    } else {
-        showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
-        navigate('/');
-    }
+    const [hostID, setHostID] = useState("");
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -80,14 +72,27 @@ function Reviews() {
             if (!user) {
                 navigate('/auth/login');
             } else {
-                fetchHostInfo();
+                if (location.state.hostID) {
+                    setHostID(location.state.hostID);
+                } else if (searchParams.has('hostID')) {
+                    setHostID(searchParams.get('hostID'));
+                } else {
+                    showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
+                    navigate('/');
+                }
                 if (!user.userID) {
                     showToast("Error", "Please Log In", 3000, true, "error");
                     navigate('/auth/login');
-                } 
+                }
             }
         }
     }, [user, loaded])
+
+    useEffect(() => {
+        if (hostID) {
+            fetchHostInfo();
+        }
+    });
 
     return (
         <Box p={2} position="relative" width="100%">
@@ -130,7 +135,7 @@ function Reviews() {
                                 <SubmitReviews
                                     hostName={hostName}
                                     guestID={user.userID}
-                                    hostID={hostID}
+                                    hostID= {hostID}
                                     refreshState={refreshState}
                                     stateRefresh={stateRefresh}
                                 />

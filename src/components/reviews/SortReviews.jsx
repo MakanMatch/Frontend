@@ -75,7 +75,6 @@ const SortReviews = ({
             if (!user) {
                 navigate('/auth/login');
             } else {
-                fetchSortedData()
                 if (!user.userID) {
                     showToast("Error", "Please Log In", 3000, true, "error");
                     navigate('/auth/login');
@@ -83,6 +82,12 @@ const SortReviews = ({
             }
         }
     }, [user, loaded, activeTab, stateRefresh])
+
+    useEffect(() => {
+        if (hostID) {
+            fetchSortedData();
+        }
+    });
 
 
     return (
