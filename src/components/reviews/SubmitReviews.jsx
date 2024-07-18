@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import StarRating from './StarRatings';
 import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
@@ -19,6 +20,8 @@ import {
     FormHelperText,
 } from '@chakra-ui/react'
 import configureShowToast from '../../components/showToast';
+import { useNavigate } from "react-router-dom"
+
 
 const SubmitReviews = ({
     hostName,
@@ -35,6 +38,8 @@ const SubmitReviews = ({
     const [fileFormatError, setFileFormatError] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { user, loaded } = useSelector((state) => state.auth);
+    const navigate = useNavigate();
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
@@ -107,6 +112,15 @@ const SubmitReviews = ({
         }
     };
 
+    const handleOpenModal = () => {
+        if (loaded && (!user || !user.userID)) {
+            showToast("Please log in ", "You need to log in before submitting a review", 3000, true, "info");
+            navigate('/auth/login');
+        } else {
+            onOpen();
+        }
+    };
+
     const handleClose = () => {
         setComments('');
         setImages([]);
@@ -115,7 +129,7 @@ const SubmitReviews = ({
 
     return (
         <Box>
-            <Button onClick={onOpen} variant={"MMPrimary"}><EditIcon /></Button>
+            <Button onClick={handleOpenModal} variant={"MMPrimary"}><EditIcon /></Button>
             <Modal isOpen={isOpen} onClose={handleClose} motionPreset='slideInBottom' isCentered size="lg" scrollBehavior="inside">
                 <ModalOverlay />
                 <ModalContent overflow="hidden" maxH="90vh" >

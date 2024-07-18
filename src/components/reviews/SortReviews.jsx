@@ -15,6 +15,7 @@ const SortReviews = ({
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
     const { user, loaded } = useSelector((state) => state.auth);
+    const [ guestID, setGuestID ] = useState(null);
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {
@@ -26,7 +27,12 @@ const SortReviews = ({
     const fetchReviews = async (hostID, sortOrder) => {
         try {
             // Get reviews
-            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`);
+            if (loaded && user) {
+                setGuestID(user.userID)
+            } else {
+                setGuestID(null)
+            }
+            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&guestID=${guestID}&order=${sortOrder}`);
             if (response.status === 200 && Array.isArray(response.data)) {
                 const reviews = response.data;
                 setReviews(reviews);
@@ -69,19 +75,6 @@ const SortReviews = ({
     // useEffect(() => {
     //     fetchSortedData();
     // }, [activeTab, stateRefresh]);
-
-    useEffect(() => {
-        if (loaded == true) {
-            if (!user) {
-                navigate('/auth/login');
-            } else {
-                if (!user.userID) {
-                    showToast("Error", "Please Log In", 3000, true, "error");
-                    navigate('/auth/login');
-                } 
-            }
-        }
-    }, [user, loaded, activeTab, stateRefresh])
 
     useEffect(() => {
         if (hostID) {

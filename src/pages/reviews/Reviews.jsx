@@ -68,23 +68,13 @@ function Reviews() {
     };
 
     useEffect(() => {
-        if (loaded == true) {
-            if (!user) {
-                navigate('/auth/login');
-            } else {
-                if (location.state.hostID) {
-                    setHostID(location.state.hostID);
-                } else if (searchParams.has('hostID')) {
-                    setHostID(searchParams.get('hostID'));
-                } else {
-                    showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
-                    navigate('/');
-                }
-                if (!user.userID) {
-                    showToast("Error", "Please Log In", 3000, true, "error");
-                    navigate('/auth/login');
-                }
-            }
+        if (location.state.hostID) {
+            setHostID(location.state.hostID);
+        } else if (searchParams.has('hostID')) {
+            setHostID(searchParams.get('hostID'));
+        } else {
+            showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
+            navigate('/');
         }
     }, [user, loaded])
 
@@ -131,15 +121,12 @@ function Reviews() {
                                 </Button>
                             </Tooltip>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            {user && (
                                 <SubmitReviews
                                     hostName={hostName}
-                                    guestID={user.userID}
-                                    hostID= {hostID}
+                                    hostID={hostID}
                                     refreshState={refreshState}
                                     stateRefresh={stateRefresh}
                                 />
-                            )}
                         </Flex>
                     </Flex>
                 </Box>
@@ -156,12 +143,10 @@ function Reviews() {
                 </Box>
             </Flex>
             <Heading mt={5} size="lg"><Text>Reviews</Text></Heading>
-            {user && (
-                <SortReviews
-                    hostID={hostID}
-                    stateRefresh={stateRefresh}
-                />
-            )}
+            <SortReviews
+                hostID={hostID}
+                stateRefresh={stateRefresh}
+            />
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
                 <ModalContent maxW="max-content" background="transparent" boxShadow="none">

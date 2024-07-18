@@ -23,6 +23,7 @@ import {
 import StarRatings from 'react-star-ratings';
 import configureShowToast from '../showToast';
 
+
 const ReviewCard = ({
     username,
     foodRating,
@@ -242,20 +243,6 @@ const ReviewCard = ({
         );
     }
 
-    useEffect(() => {
-        if (loaded == true) {
-            if (!user) {
-                navigate('/auth/login');
-            } else {
-                if (!user.userID) {
-                    showToast("Error", "Please Log In", 3000, true, "error");
-                    navigate('/auth/login');
-                } 
-            }
-        }
-    }, [user, loaded])
-
-
     return (
         <TabPanel>
             <Card maxW={{ base: "100%" }} variant="elevated" key={reviewID} p={4} boxShadow="md">
@@ -340,17 +327,19 @@ const ReviewCard = ({
                     </CardBody>
                 )}
                 <CardFooter justifyContent={{ base: 'center', md: 'flex-start' }} display="flex">
-                    <Button variant='ghost'
-                        backgroundColor={liked ? 'blue.100' : 'gray.100'}
-                        leftIcon={liked ? <Liked /> : <Like />}
-                        _hover={{
-                            backgroundColor: liked ? 'blue.200' : 'gray.200',
-                            color: liked ? 'black' : 'gray.800'
-                        }}
-                        onClick={toggleLike}>
-                        <Text>{currentLikeCount}</Text>
-                    </Button>
-                    {posterID === user.userID && (
+                    {loaded && user != null && (
+                        <Button variant='ghost'
+                            backgroundColor={liked ? 'blue.100' : 'gray.100'}
+                            leftIcon={liked ? <Liked /> : <Like />}
+                            _hover={{
+                                backgroundColor: liked ? 'blue.200' : 'gray.200',
+                                color: liked ? 'black' : 'gray.800'
+                            }}
+                            onClick={toggleLike}>
+                            <Text>{currentLikeCount}</Text>
+                        </Button>
+                    )}
+                    {loaded && user != null && posterID === user.userID && (
                         <Flex ml={4}>
                             <EditReview
                                 reviewID={reviewID}
