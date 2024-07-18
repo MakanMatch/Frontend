@@ -82,7 +82,7 @@ const MarkeredGMaps = ({
             showToast("An error occurred", "Failed to render Google Maps", "error", 3000);
             console.error(error);
         }
-    }, [coordinatesList, listings]);
+    }, [coordinatesList, listings, showToast]);
 
     return (
         <>
