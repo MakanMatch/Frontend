@@ -87,7 +87,7 @@ const SortReviews = ({
         if (hostID) {
             fetchSortedData();
         }
-    });
+    }, [hostID, activeTab, stateRefresh]);
 
 
     return (

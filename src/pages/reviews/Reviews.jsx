@@ -92,7 +92,7 @@ function Reviews() {
         if (hostID) {
             fetchHostInfo();
         }
-    });
+    }, [hostID]);
 
     return (
         <Box p={2} position="relative" width="100%">
