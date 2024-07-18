@@ -6,7 +6,6 @@ import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
 import configureShowToast from "../../components/showToast";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
-import axios from "axios";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -25,30 +24,10 @@ const FoodListingsPage = () => {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
     }
 
-    const generateCoordinates = async (address) => {
-        const encodedAddress = encodeURIComponent(String(address));
-        const apiKey = import.meta.env.VITE_GMAPS_API_KEY;
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address="${encodedAddress}"&key=${apiKey}`;
-        try {
-            const response = await axios.get(url);
-            const location = response.data.results[0].geometry.location;
-            return { lat: location.lat, lng: location.lng };
-        } catch (error) {
-            showToast("An error occured", "Failed to generate maps coordinates", "error", 3000);
-            return null;
-        }
-    };
-
     const fetchListings = async () => {
         try {
             const response = await server.get("/cdn/listings");
-            const listingsWithCoordinates = await Promise.all(
-                response.data.map(async (listing) => {
-                    const coordinates = await generateCoordinates(listing.address);
-                    return { ...listing, coordinates };
-                })
-            );
-            setListings(listingsWithCoordinates);
+            setListings(response.data);
         } catch (error) {
             toast.closeAll();
             showToast(
@@ -92,7 +71,13 @@ const FoodListingsPage = () => {
             </Box>
             {isSmallerThan1095 && listings.length > 0 && (
                 <Box mb={4}>
-                    <MarkeredGMaps coordinatesList={listings.map((listing) => listing.coordinates)} listings={listings} isSmallerThan1095={true}/>
+                    <MarkeredGMaps
+                    coordinatesList={listings.map((listing) => {
+                        const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
+                        return { lat, lng };
+                    })}
+                    listings={listings}
+                    isSmallerThan1095={true}/>
                 </Box>
             )}
             <Skeleton isLoaded={!loading} style={{ borderRadius: "10px" }}>
@@ -178,7 +163,13 @@ const FoodListingsPage = () => {
                     {!isSmallerThan1095 && listings.length > 0 && (
                         <Box flex="1" ml={5}>
                             <SlideFade in={true} offsetY="20px">
-                                <MarkeredGMaps coordinatesList={listings.map((listing) => listing.coordinates)} listings={listings} isSmallerThan1095={false}/>
+                                <MarkeredGMaps
+                                coordinatesList={listings.map((listing) => {
+                                    const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
+                                    return { lat, lng };
+                                })}
+                                listings={listings}
+                                isSmallerThan1095={false}/>
                             </SlideFade>
                         </Box>
                     )}
