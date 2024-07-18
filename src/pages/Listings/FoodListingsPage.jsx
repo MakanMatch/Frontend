@@ -61,7 +61,8 @@ const FoodListingsPage = () => {
     };
 
     function handleClickAddListing() {
-        if (!authToken) {
+        console.log("Authtoken: ", authToken);
+        if (!authToken || !user) {
             navigate('/auth/login');
             setTimeout(() => {
                 showToast("You're not logged in", "Please Login first", 3000, false, "info");
@@ -188,7 +189,6 @@ const FoodListingsPage = () => {
                 onClose={onClose}
                 onOpen={onOpen}
                 fetchListings={fetchListings}
-                generateCoordinates={generateCoordinates}
             />
         </div>
     );

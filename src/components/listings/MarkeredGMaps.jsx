@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -81,7 +82,7 @@ const MarkeredGMaps = ({
             showToast("An error occurred", "Failed to render Google Maps", "error", 3000);
             console.error(error);
         }
-    }, [coordinatesList, listings, showToast, navigate]);
+    }, [coordinatesList, listings]);
 
     return (
         <>

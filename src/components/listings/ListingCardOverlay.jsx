@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import server from "../../networking";
 import configureShowToast from "../../components/showToast";
 
-function ListingCardOverlay({ listingID, userID, userType, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
+function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
@@ -36,8 +36,6 @@ function ListingCardOverlay({ listingID, userID, userType, hostID, images, title
     const toggleFavourite = async () => {
         const favouriteData = {
             userID: userID,
-            userType: userType,
-            hostID: hostID,
             listingID: listingID
         }
         await server.put("/listings/toggleFavouriteListing", favouriteData)

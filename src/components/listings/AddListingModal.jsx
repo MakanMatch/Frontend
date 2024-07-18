@@ -7,9 +7,8 @@ import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
 import configureShowToast from "../../components/showToast";
 import { useSelector } from "react-redux";
-import axios from "axios";
 
-const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, generateCoordinates }) => {
+const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const today = new Date();
@@ -23,8 +22,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, generateCoord
     const [totalSlots, setTotalSlots] = useState(1);
     const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
     const [images, setImages] = useState([]);
-    const [approxAddress, setApproxAddress] = useState("");
-    const [address, setAddress] = useState("");
     const [hostID, setHostID] = useState("");
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
@@ -69,46 +66,13 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, generateCoord
         }
     }
 
-    const fetchHostInfo = async () => {
+    const fetchHostID = async () => {
         if (loaded) {
             const hostInfo = await server.get(`cdn/accountInfo?userID=${user.userID}`)
             if (hostInfo.status === 200) {
-                setAddress(hostInfo.data.address)
                 setHostID(hostInfo.data.userID)
-                
-                // Generate approximate address using Geocoding API
-                const encodedAddress = encodeURIComponent(String(hostInfo.data.address));
-                const apiKey = import.meta.env.VITE_GMAPS_API_KEY;
-                const url = `https://maps.googleapis.com/maps/api/geocode/json?address="${encodedAddress}"&key=${apiKey}`;
-                const response = await axios.get(url);
-
-                if (response.data.results.length === 0) {
-                    console.error("Address not found");
-                } else {
-                    const components = response.data.results[0].address_components;
-                    let street = '';
-                    let city = '';
-                    let state = '';
-
-                    components.forEach(component => {
-                        if (component.types.includes('route')) {
-                            street = component.long_name;
-                        }
-                        if (component.types.includes('locality')) {
-                            city = component.long_name;
-                        }
-                        if (component.types.includes('administrative_area_level_1')) {
-                            state = component.long_name;
-                        }
-                    });
-                    let approximateAddress = `${street}, ${city}`;
-                    if (state) {
-                        approximateAddress += `, ${state}`; // For contexts outside of Singapore
-                    }
-                    setApproxAddress(approximateAddress);
-                }
             } else {
-                console.error("Failed to fetch your hosting details")
+                console.error("Failed to fetch hostID")
                 showToast("Failed to fetch your hosting details", "Please try again later", "error", 3000)
                 return;
             }
@@ -129,10 +93,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, generateCoord
             images.forEach((image, index) => {
                 formData.append("images", image);
             });
-            formData.append("approxAddress", approxAddress);
-            formData.append("address", address);
             formData.append("hostID", hostID);
-            formData.append("coordinates", await generateCoordinates(address));
 
             const addListingResponse = await server.post("/listings/addListing", formData, {
                 headers: {
@@ -159,7 +120,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, generateCoord
             }
         } catch (error) {
             toast.closeAll();
-            onClose();
             if (error.code === "ECONNABORTED") {
                 showToast(
                     "Request timed out",
@@ -167,7 +127,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, generateCoord
                     "error",
                     2500
                 );
-                return;
             } else {
                 console.error("Error submitting listing:", error);
                 showToast(
@@ -176,8 +135,10 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, generateCoord
                     "error",
                     2500
                 );
-                return;
             }
+            setTimeout(() => {
+                onClose();
+            }, 2500);
         }
     };
 
@@ -274,7 +235,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, generateCoord
     }, [totalSlots]);
 
     useEffect(() => {
-        fetchHostInfo();
+        fetchHostID();
     }, [loaded]);
     return (
         <div>
