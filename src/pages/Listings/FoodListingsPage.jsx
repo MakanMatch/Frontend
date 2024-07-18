@@ -135,8 +135,8 @@ const FoodListingsPage = () => {
                                                 address={listing.address}
                                                 approxAddress={listing.approxAddress}
                                                 totalSlots={listing.totalSlots}
-                                                latitude={listing.coordinates.lat}
-                                                longitude={listing.coordinates.lng}
+                                                latitude={parseFloat(listing.coordinates.split(',')[0])}
+                                                longitude={parseFloat(listing.coordinates.split(',')[1])}
                                             />
                                         </Box>
                                     </SlideFade>
