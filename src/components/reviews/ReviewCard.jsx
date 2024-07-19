@@ -1,13 +1,16 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
     Avatar, useToast, Divider
 } from "@chakra-ui/react";
+import { useSelector } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
 import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
 import server from '../../networking';
 import Like from './Like';
 import Liked from './Liked';
+import DeleteReviewButton from './DeleteReviewButton';
+import EditReview from './EditReview';
 import {
     Modal,
     ModalOverlay,
@@ -20,7 +23,8 @@ import {
 import StarRatings from 'react-star-ratings';
 import configureShowToast from '../showToast';
 
-const CreateReview = ({
+
+const ReviewCard = ({
     username,
     foodRating,
     hygieneRating,
@@ -29,8 +33,10 @@ const CreateReview = ({
     images,
     likeCount,
     reviewID,
-    guestID,
-    isLiked
+    posterID,
+    isLiked,
+    refreshState,
+    stateRefreshReview
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast)
@@ -39,6 +45,7 @@ const CreateReview = ({
     const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const imageRefs = useRef([]);
+    const { user, loaded } = useSelector((state) => state.auth);
 
     const handleProfileClick = (image) => {
         setProfileImage(image);
@@ -54,13 +61,12 @@ const CreateReview = ({
 
     const toggleLike = async () => {
         try {
-            const reviewInfo = {
+            const postLikeResponse = await server.post('/likeReview', {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 reviewID: reviewID,
-                guestID: guestID
-            }
-            const postLikeResponse = await server.post('/likeReview', reviewInfo, {headers: {
-                'Content-Type': 'application/json',
-            }});
+            });
             if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
                 showToast("An error occurred", "Please try again later.", 3000, true, "error");
                 return
@@ -79,18 +85,20 @@ const CreateReview = ({
         const numImages = images.length;
         if (numImages === 1) {
             return (
-                <Image
-                    onClick={() => handleImageClick(0)}
-                    key={images[0]}
-                    src={images[0]}
-                    alt="Review image"
-                    borderRadius="lg"
-                    minWidth={"100%"}
-                    minHeight={"200px"}
-                    maxHeight={"400px"}
-                    objectFit="cover"
-                    _hover={{ cursor: "pointer" }}
-                />
+                <Box display="flex" justifyContent="center" alignItems="center">
+                    <Image
+                        onClick={() => handleImageClick(0)}
+                        key={images[0]}
+                        src={images[0]}
+                        alt="Review image"
+                        borderRadius="lg"
+                        maxWidth={"100%"}
+                        minHeight={{ base: '100%', lg: '280px' }}
+                        maxHeight={{ base: '100%', lg: '400px' }}
+                        objectFit="cover"
+                        _hover={{ cursor: "pointer" }}
+                    />
+                </Box>
             );
         }
         if (numImages === 2) {
@@ -99,7 +107,7 @@ const CreateReview = ({
                     wrap="wrap"
                     gap={2}
                     justifyContent='center'
-                    alignItems={{ base: 'center', md: 'flex-start' }}
+                    alignItems={{ base: 'center'}}
                 >
                     <Image
                         onClick={() => handleImageClick(0)}
@@ -107,9 +115,9 @@ const CreateReview = ({
                         src={images[0]}
                         alt="Review image"
                         borderRadius="lg"
-                        minWidth={{ base: '100%', md: '50%' }}
-                        minHeight={"108px"}
-                        maxHeight={"200"}
+                        maxWidth={{ base: '100%', md: '80%' }}
+                        minHeight={"200"}
+                        maxHeight={"400px"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
@@ -119,9 +127,9 @@ const CreateReview = ({
                         src={images[1]}
                         alt="Review image"
                         borderRadius="lg"
-                        minWidth={{ base: '100%', md: '50%' }}
-                        minHeight={"108px"}
-                        maxHeight={"200"}
+                        maxWidth={{ base: '100%', md: '80%' }}
+                        minHeight={"200"}
+                        maxHeight={"400px"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
@@ -133,6 +141,7 @@ const CreateReview = ({
                 <Flex direction={{ base: 'column', md: 'row' }}
                     wrap="wrap"
                     gap={2}
+                    justifyContent="center"
                 >
                     <Image
                         onClick={() => handleImageClick(0)}
@@ -140,9 +149,10 @@ const CreateReview = ({
                         src={images[0]}
                         alt="Review image"
                         borderRadius="lg"
+                        mt={1}
                         maxWidth={{ base: '100%', md: '60%' }}
-                        minHeight={"108px"}
-                        maxHeight={"200"}
+                        minHeight={"200"}
+                        maxHeight={"600px"}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
@@ -153,9 +163,9 @@ const CreateReview = ({
                             src={images[1]}
                             alt="Review image"
                             borderRadius="lg"
-                            minWidth={"100%"}
-                            minHeight={{ base: '50%', md: '50%' }}
-                            maxHeight={{ base: "200px", md: "100px" }}
+                            minWidth={{ base: '100%', md: "100%" }}
+                            minHeight={{ base: '160', md: '200' }}
+                            maxHeight={{ base: "100%", md: "300px" }}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -165,9 +175,9 @@ const CreateReview = ({
                             src={images[2]}
                             alt="Review image"
                             borderRadius="lg"
-                            minWidth={"100%"}
-                            minHeight={{ base: '50%', md: '50%' }}
-                            maxHeight={{ base: "200px", md: "100px" }}
+                            minWidth={{ base: '100%', md: "100%"}}
+                            minHeight={{ base: '160', md: '200' }}
+                            maxHeight={{ base: "100%", md: "300px" }}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -177,7 +187,7 @@ const CreateReview = ({
         }
         if (numImages === 4) {
             return (
-                <Flex wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
+                <Flex direction={{ base: 'column', md: 'row' }}wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
                     {images.map((image, index) => (
                         <Image
                             onClick={() => handleImageClick(index)}
@@ -186,8 +196,8 @@ const CreateReview = ({
                             alt={`Review image ${index + 1}`}
                             borderRadius="lg"
                             minWidth={{ base: '100%', md: "calc(50% - 6px)" }}
-                            minHeight={"100px"}
-                            maxHeight={"108px"}
+                            minHeight={"200px"}
+                            maxHeight={{ base: "100%", md: "300px" }}
                             objectFit="cover"
                             _hover={{ cursor: "pointer" }}
                         />
@@ -205,8 +215,8 @@ const CreateReview = ({
                         alt={`Review image ${index + 1}`}
                         borderRadius="lg"
                         minWidth={{ base: '100%', md: "calc(50% - 6px)" }}
-                        minHeight={"108px"}
-                        maxHeight={"120px"}
+                        minHeight={"200px"}
+                        maxHeight={{ base: "100%", md: "300px" }}
                         objectFit="cover"
                         _hover={{ cursor: "pointer" }}
                     />
@@ -216,7 +226,7 @@ const CreateReview = ({
                         onClick={onOpen}
                         borderRadius="lg"
                         minWidth={{ base: '100%' }}
-                        minHeight={"108px"}
+                        minHeight={"158px"}
                         bg="gray.200"
                         display="flex"
                         alignItems="center"
@@ -224,7 +234,8 @@ const CreateReview = ({
                         color="gray.700"
                         fontSize="lg"
                         fontWeight="bold"
-                        _hover={{ cursor: "pointer" }}
+                        transition="all 0.3s ease-in-out"
+                        _hover={{ cursor: "pointer", bg: "gray.300" }}
                         textAlign="center"
                     >
                         +{images.length - 4}
@@ -236,7 +247,7 @@ const CreateReview = ({
 
     return (
         <TabPanel>
-            <Card maxW='lg' variant="elevated" key={reviewID} p={4} boxShadow="md">
+            <Card maxW={{ base: "100%" }} variant="elevated" key={reviewID} p={4} boxShadow="md">
                 <CardHeader>
                     <Flex direction={{ base: 'column', md: 'row' }}
                         alignItems={{ base: 'flex-start', md: 'center' }}
@@ -264,7 +275,7 @@ const CreateReview = ({
                                                 starRatedColor="gold"
                                                 numberOfStars={5}
                                                 name='foodRating'
-                                                starDimension="15px"
+                                                starDimension="13px"
                                                 starSpacing="1px"
                                                 starFull={<FaStar />}
                                                 starEmpty={<FaRegStar />}
@@ -287,7 +298,7 @@ const CreateReview = ({
                                                 starRatedColor="gold"
                                                 numberOfStars={5}
                                                 name='hygieneRating'
-                                                starDimension="15px"
+                                                starDimension="13px"
                                                 starSpacing="1px"
                                                 starFull={<FaStar />}
                                                 starEmpty={<FaRegStar />}
@@ -317,28 +328,48 @@ const CreateReview = ({
                         {renderImages()}
                     </CardBody>
                 )}
-                <CardFooter justifyContent={{ base : 'center', md: 'flex-start'}} display="flex">
-                    <Button  variant='ghost'
-                        backgroundColor={liked ? 'blue.100' : 'gray.100'}
-                        leftIcon={liked ? <Liked /> : <Like />}
-                        _hover={{
-                            backgroundColor: liked ? 'blue.200' : 'gray.200',
-                            color: liked ? 'black' : 'gray.800'
-                        }}
-                        onClick={toggleLike}>
-                        <Text>{currentLikeCount}</Text>
-                    </Button>
+                <CardFooter justifyContent={{ base: 'center', md: 'flex-start' }} display="flex">
+                    {loaded && user != null && (
+                        <Button variant='ghost'
+                            backgroundColor={liked ? 'blue.100' : 'gray.100'}
+                            leftIcon={liked ? <Liked /> : <Like />}
+                            _hover={{
+                                backgroundColor: liked ? 'blue.200' : 'gray.200',
+                                color: liked ? 'black' : 'gray.800'
+                            }}
+                            onClick={toggleLike}>
+                            <Text>{currentLikeCount}</Text>
+                        </Button>
+                    )}
+                    {loaded && user != null && posterID === user.userID && (
+                        <Flex ml={4}>
+                            <EditReview
+                                reviewID={reviewID}
+                                reviewFoodRating={foodRating}
+                                reviewHygieneRating={hygieneRating}
+                                reviewComments={comments}
+                                reviewImages={images}
+                                refreshState={refreshState}
+                                stateRefreshReview={stateRefreshReview} 
+                            />
+                            <DeleteReviewButton 
+                                reviewID={reviewID} 
+                                refreshState={refreshState}
+                                stateRefreshReview={stateRefreshReview} 
+                            />
+                        </Flex>
+                    )}
                 </CardFooter>
                 <Modal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} size="lg" isCentered>
-                <ModalOverlay />
-                <ModalContent maxW="max-content" background="transparent" boxShadow="none">
+                    <ModalOverlay />
+                    <ModalContent maxW="max-content" background="transparent" boxShadow="none">
                         <Image
                             boxSize='500px'
                             borderRadius='full'
                             src='https://bit.ly/sage-adebayo'
                             alt='Dan Abramov'
                         />
-                </ModalContent>
+                    </ModalContent>
                 </Modal>
                 <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
                     <ModalOverlay />
@@ -378,4 +409,4 @@ const CreateReview = ({
     )
 }
 
-export default CreateReview
+export default ReviewCard

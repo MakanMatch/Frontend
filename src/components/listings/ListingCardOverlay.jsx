@@ -235,7 +235,7 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
                                 />
                             </Box>
                         </Box>
-                        <Link to={'/reviews'} state={{ userID, hostID }}>
+                        <Link to={`/reviews`} state={{ hostID: hostID }}> {/* To send a state consisting of userId and hostID to the review page.*/}
                             <Text mt={2} mb={-4} textAlign="left" color="blue" fontSize={"13px"} textDecoration={"underline"} cursor={"pointer"}>View Host Reviews</Text>
                         </Link>
                     </Stack>

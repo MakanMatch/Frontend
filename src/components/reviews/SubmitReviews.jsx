@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import StarRating from './StarRatings';
 import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
@@ -19,13 +20,14 @@ import {
     FormHelperText,
 } from '@chakra-ui/react'
 import configureShowToast from '../../components/showToast';
+import { useNavigate } from "react-router-dom"
+
 
 const SubmitReviews = ({
     hostName,
-    guestID,
     hostID,
     refreshState,
-    stateRefresh
+    stateRefreshSubmit
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -36,9 +38,15 @@ const SubmitReviews = ({
     const [fileFormatError, setFileFormatError] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { user, loaded } = useSelector((state) => state.auth);
+    const navigate = useNavigate();
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
+        if (images.length + files.length > 6) {
+            setFileFormatError("You can upload a maximum of 6 images.");
+            return;
+        }
         let filesAccepted = false;
         for (const file of files) {
             const allowedTypes = [
@@ -80,7 +88,6 @@ const SubmitReviews = ({
             formData.append('images', file);
         });
         formData.append('dateCreated', currentDate);
-        formData.append('guestID', guestID);
         formData.append('hostID', hostID);
 
         try {
@@ -93,7 +100,7 @@ const SubmitReviews = ({
                         setComments('');
                         setImages([]);
                         onClose();
-                        refreshState(!stateRefresh)
+                        refreshState(!stateRefreshSubmit)
                     } else {
                         showToast("Failed to submit review", "Please try again later", 3000, true, "error");
                     }
@@ -105,15 +112,25 @@ const SubmitReviews = ({
         }
     };
 
+    const handleOpenModal = () => {
+        if (loaded && (!user || !user.userID)) {
+            showToast("Please log in ", "You need to log in before submitting a review", 3000, true, "info");
+            navigate('/auth/login');
+        } else {
+            onOpen();
+        }
+    };
+
     const handleClose = () => {
         setComments('');
         setImages([]);
         onClose();
+        setFileFormatError("")
     };
 
     return (
         <Box>
-            <Button onClick={onOpen} variant={"MMPrimary"}><EditIcon /></Button>
+            <Button onClick={handleOpenModal} variant={"MMPrimary"}><EditIcon /></Button>
             <Modal isOpen={isOpen} onClose={handleClose} motionPreset='slideInBottom' isCentered size="lg" scrollBehavior="inside">
                 <ModalOverlay />
                 <ModalContent overflow="hidden" maxH="90vh" >
@@ -136,12 +153,12 @@ const SubmitReviews = ({
                             <Flex direction={{ base: 'column', md: 'row' }} align="center">
                                 <Flex direction='column'>
                                 <Text mt='8px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Food Rating</Text>
-                                <StarRating maxStars={5} rating={foodRating} onChange={setFoodRating} />
+                                <StarRating maxStars={5} initialRating={foodRating} onChange={setFoodRating} />
                                 </Flex>
                                 <Spacer display={{ base: 'none', md: 'block' }} />
                                 <Flex direction='column'>
                                 <Text mt="8px" mb="8px" textAlign={{ base: 'center', md: 'left' }}>Hygiene Rating</Text>
-                                <StarRating maxStars={5} rating={hygieneRating} onChange={setHygieneRating} />
+                                <StarRating maxStars={5} initialRating={hygieneRating} onChange={setHygieneRating} />
                                 </Flex>
                             </Flex>
                             <Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Comments</Text>

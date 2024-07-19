@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Text, useToast, SimpleGrid } from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
+import { Text, useToast, SimpleGrid, Spinner } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import server from '../../networking'
-import CreateReview from './ReviewCards';
+import ReviewCard from './ReviewCard';
 import configureShowToast from '../../components/showToast';
 
 const SortReviews = ({
     hostID,
-    guestID,
-    stateRefresh
+    stateRefreshSubmit
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
+    const { user, loaded } = useSelector((state) => state.auth);
+    var [stateRefreshReview, refreshState] = useState(false);
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {
@@ -25,13 +27,14 @@ const SortReviews = ({
     const fetchReviews = async (hostID, sortOrder) => {
         try {
             // Get reviews
-            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&guestID=${guestID}&order=${sortOrder}`);
+            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`);
             if (response.status === 200 && Array.isArray(response.data)) {
-                const reviews = response.data;
-                setReviews(reviews);
-            } else if (response.status === 200 && !Array.isArray(response.data) && response.data.length == 0) {
-                setReviews([]);
-                showToast("No reviews found", "", 3000, false, "info");
+                if (response.data.length === 0) {
+                    setReviews([]);
+                    showToast("No reviews found", "", 3000, false, "info");
+                } else {
+                    setReviews(response.data);
+                }
             } else {
                 showToast("An error occurred", "Please try again later", 3000, true, "error");
                 return
@@ -66,8 +69,10 @@ const SortReviews = ({
     }
 
     useEffect(() => {
-        fetchSortedData();
-    }, [activeTab, stateRefresh]);
+        if (loaded && hostID) {
+            fetchSortedData();
+        }
+    }, [hostID, loaded, user, activeTab, stateRefreshSubmit, stateRefreshReview])
 
     return (
         <Tabs mt={8} variant="soft-rounded" size='sm' minWidth="310px" onChange={(index) => setActiveTab(index)}>
@@ -79,84 +84,92 @@ const SortReviews = ({
             </TabList>
             <TabPanels>
                 <TabPanel>
-                    <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                    <SimpleGrid columns={{base: 1, md: 2, xl: 3}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
-                                <CreateReview
+                                <ReviewCard
                                     key={review.reviewID}
                                     username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
-                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
-                                    guestID={guestID}
+                                    posterID = {review.guestID}
                                     isLiked={review.isLiked}
+                                    refreshState={refreshState}
+                                    stateRefreshReview={stateRefreshReview} 
                                 />
                             )) :
                             null}
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                <SimpleGrid  columns={{base: 1, md: 2, xl: 3}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
-                                <CreateReview
+                                <ReviewCard
                                     key={review.reviewID}
                                     username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
-                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
-                                    guestID={guestID}
+                                    posterID = {review.guestID}
                                     isLiked={review.isLiked}
+                                    refreshState={refreshState}
+                                    stateRefreshReview={stateRefreshReview} 
                                 />
                             )) :
                             null}
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                <SimpleGrid  columns={{base: 1, md: 2, xl: 3}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
-                                <CreateReview
+                                <ReviewCard
                                     key={review.reviewID}
                                     username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
-                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
-                                    guestID={guestID}
+                                    posterID = {review.guestID}
                                     isLiked={review.isLiked}
+                                    refreshState={refreshState}
+                                    stateRefreshReview={stateRefreshReview} 
                                 />
                             )) :
                             null}
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                <SimpleGrid columns={{ base: 1, md: 2}} spacing={4}>
+                <SimpleGrid  columns={{base: 1, md: 2, xl: 3}} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
-                                <CreateReview
+                                <ReviewCard
                                     key={review.reviewID}
                                     username={review.reviewPoster.username ? review.reviewPoster.username : null}
                                     foodRating={review.foodRating}
                                     hygieneRating={review.hygieneRating}
                                     comments={review.comments}
                                     dateCreated={review.dateCreated}
-                                    images={review.images.split("|").map(images => getImageLink(review.reviewID, images))}
+                                    images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
-                                    guestID={guestID}
+                                    posterID = {review.guestID}
                                     isLiked={review.isLiked}
+                                    refreshState={refreshState}
+                                    stateRefreshReview={stateRefreshReview} 
                                 />
                             )) :
                             null}
