@@ -34,7 +34,9 @@ const ReviewCard = ({
     likeCount,
     reviewID,
     posterID,
-    isLiked
+    isLiked,
+    refreshState,
+    stateRefreshReview
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast)
@@ -347,8 +349,14 @@ const ReviewCard = ({
                                 reviewHygieneRating={hygieneRating}
                                 reviewComments={comments}
                                 reviewImages={images}
+                                refreshState={refreshState}
+                                stateRefreshReview={stateRefreshReview} 
                             />
-                            <DeleteReviewButton reviewID={reviewID} />
+                            <DeleteReviewButton 
+                                reviewID={reviewID} 
+                                refreshState={refreshState}
+                                stateRefreshReview={stateRefreshReview} 
+                            />
                         </Flex>
                     )}
                 </CardFooter>

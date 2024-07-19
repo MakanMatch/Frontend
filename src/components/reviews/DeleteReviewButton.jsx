@@ -5,7 +5,9 @@ import configureShowToast from '../showToast';
 import server from '../../networking';
 
 function DeleteReviewButton({
-    reviewID
+    reviewID,
+    refreshState,
+    stateRefreshReview
 }) {
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -19,7 +21,8 @@ function DeleteReviewButton({
             })
             if (deleteReview.status === 200) {
                 showToast("Review deleted", "", 3000, false, "success");
-                window.location.reload();
+                // window.location.reload();
+                refreshState(!stateRefreshReview)
             } else {
                 showToast("Error deleting review", "", 3000, false, "error");
             }

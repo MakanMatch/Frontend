@@ -27,7 +27,7 @@ const SubmitReviews = ({
     hostName,
     hostID,
     refreshState,
-    stateRefresh
+    stateRefreshSubmit
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -100,7 +100,7 @@ const SubmitReviews = ({
                         setComments('');
                         setImages([]);
                         onClose();
-                        refreshState(!stateRefresh)
+                        refreshState(!stateRefreshSubmit)
                     } else {
                         showToast("Failed to submit review", "Please try again later", 3000, true, "error");
                     }

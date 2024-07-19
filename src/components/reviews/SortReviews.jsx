@@ -8,7 +8,7 @@ import configureShowToast from '../../components/showToast';
 
 const SortReviews = ({
     hostID,
-    stateRefresh
+    stateRefreshSubmit
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -16,6 +16,7 @@ const SortReviews = ({
     const [reviews, setReviews] = useState([])
     const { user, loaded } = useSelector((state) => state.auth);
     const [ guestID, setGuestID ] = useState(null);
+    var [stateRefreshReview, refreshState] = useState(false);
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {
@@ -73,15 +74,11 @@ const SortReviews = ({
         fetchReviews(hostID, sortOrder);
     }
 
-    // useEffect(() => {
-    //     fetchSortedData();
-    // }, [activeTab, stateRefresh]);
-
     useEffect(() => {
         if (hostID) {
             fetchSortedData();
         }
-    }, [hostID, activeTab, stateRefresh]);
+    }, [hostID, activeTab, stateRefreshSubmit, stateRefreshReview]);
 
 
     return (
@@ -109,6 +106,8 @@ const SortReviews = ({
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
                                     isLiked={review.isLiked}
+                                    refreshState={refreshState}
+                                    stateRefreshReview={stateRefreshReview} 
                                 />
                             )) :
                             null}
@@ -130,6 +129,8 @@ const SortReviews = ({
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
                                     isLiked={review.isLiked}
+                                    refreshState={refreshState}
+                                    stateRefreshReview={stateRefreshReview} 
                                 />
                             )) :
                             null}
@@ -151,6 +152,8 @@ const SortReviews = ({
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
                                     isLiked={review.isLiked}
+                                    refreshState={refreshState}
+                                    stateRefreshReview={stateRefreshReview} 
                                 />
                             )) :
                             null}
@@ -172,6 +175,8 @@ const SortReviews = ({
                                     reviewID={review.reviewID}
                                     posterID = {review.guestID}
                                     isLiked={review.isLiked}
+                                    refreshState={refreshState}
+                                    stateRefreshReview={stateRefreshReview} 
                                 />
                             )) :
                             null}

@@ -12,7 +12,9 @@ const EditReview = ({
 	reviewFoodRating,
 	reviewHygieneRating,
 	reviewComments,
-	reviewImages
+	reviewImages,
+	refreshState,
+    stateRefreshReview
 }) => {
 	const toast = useToast();
 	const showToast = configureShowToast(toast);
@@ -96,7 +98,8 @@ const EditReview = ({
 			if (editReview.status === 200) {
 				showToast("Review edited successfully", "", 3000, true, "success");
 				setIsSubmitting(false);
-				window.location.reload();
+				// window.location.reload();
+				refreshState(!stateRefreshReview)
 				onClose();
 			} else {
 				showToast("Failed to edit review", "Please try again later", 3000, true, "error");
