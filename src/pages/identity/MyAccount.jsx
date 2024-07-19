@@ -5,13 +5,12 @@ import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormContro
     Editable, EditableInput, EditablePreview, AlertDialog, AlertDialogOverlay, AlertDialogHeader, AlertDialogBody,
     AlertDialogFooter, AlertDialogContent, useDisclosure
 } from "@chakra-ui/react";
-import { fetchUser, logout } from "../../slices/AuthState";
+import { logout } from "../../slices/AuthState";
 import GuestSidebar from "../../components/identity/GuestSideNav";
 import HostSidebar from "../../components/identity/HostSideNav";
 import server from "../../networking";
 import configureShowToast from '../../components/showToast';
 import ChangePassword from "../../components/identity/ChangePassword";
-
 
 const MyAccount = () => {
     const navigate = useNavigate();
@@ -26,6 +25,7 @@ const MyAccount = () => {
     const [accountInfo, setAccountInfo] = useState(null);
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
     const { user, loaded, error } = useSelector((state) => state.auth);
+    const [accountLoaded, setAccountLoaded] = useState(false);
 
     useEffect(() => {
         if (loaded == true) {
@@ -35,13 +35,19 @@ const MyAccount = () => {
                     const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
                     setAccountInfo(response.data);
                     setOriginalAccountInfo(response.data);
+                    setAccountLoaded(true);
                 } catch (err) {
                     console.log("Error fetching account info:", err);
+                    showToast("Unable to retrieve account information", "Please try again", 3000, true, "error");
+                    navigate('/');
                 }
             };
 
             if (user && user.userID) {
                 fetchAccountInfo();
+            } else {
+                showToast("Redirecting to login", "Please log in first.", 3000, true, "error");
+                navigate('/auth/login');
             }
         }
     }, [loaded, user]);
@@ -105,12 +111,13 @@ const MyAccount = () => {
                 }
             })
             .then((res) => {
-                if (res.data.startsWith("SUCCESS")) {
+                if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Changes saved", "Your account details have been updated.", 3000, true, "success");
                     setOriginalAccountInfo({ ...accountInfo });
                 } else if (res.data.startsWith("UERROR")) {
                     showToast("Invalid input", res.data.substring("UERROR: ".length), 3000, true, "error");
                 } else {
+                    console.log(res.data);
                     showToast("ERROR", "Failed to save changes. Please try again.", 3000, true, "error");
                 }
             })
@@ -136,22 +143,19 @@ const MyAccount = () => {
 
     const confirmDeleteAccount = () => {
         server.delete("/identity/myAccount/deleteAccount", {
-            data: {
-                userID: user.userID,
-                userType: user.userType
-            }, 
             headers: {
                 'Content-Type': 'application/json'
             }
         })
         .then((res) => {
-            if (res.data.startsWith("SUCCESS")) {
-                showToast("Account deleted", "See you again next time!", 3000, true, "success");
+            if (res.status == 200 && res.data.startsWith("SUCCESS")) {
+                showToast("We're sorry to see you go! :(", "See you again next time!", 3000, true, "success");
                 // Remove the jwt
                 dispatch(logout());
                 localStorage.removeItem('jwt');
                 navigate("/auth/login");
             } else {
+                console.log(res.data);
                 showToast("ERROR", "Failed to delete account.", 3000, true, "error");
             }
         })
@@ -177,11 +181,10 @@ const MyAccount = () => {
                 userID: user.userID,
                 userType: user.userType,
                 currentPassword: values.currentPassword,
-                newPassword: values.newPassword,
-                confirmPassword: values.confirmPassword,
+                newPassword: values.newPassword
             })
             .then((res) => {
-                if (res.data.startsWith("SUCCESS")) {
+                if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     setPasswordModalOpen(false);
                     showToast("Password changed", "Your password has been updated!", 3000, true, "success");
                 } else if (res.data.startsWith("UERROR")) {
@@ -198,17 +201,12 @@ const MyAccount = () => {
             });
     };
 
-    if (!loaded) {
-        console.log("Not loaded");
+    if (!accountLoaded) {
         return <Spinner />;
     }
 
     if (error) {
         console.log(error);
-        return <Spinner />;
-    }
-
-    if (!accountInfo) {
         return <Spinner />;
     }
 
@@ -344,7 +342,7 @@ const MyAccount = () => {
                         <ChangePassword isOpen={isPasswordModalOpen} onClose={handleCloseModal} onSubmit={handleChangePassword} />
                     </Box>
 
-                    <Box p={2} width={"25%"}>
+                    <Box p={2} width={"22%"}>
                         <FormControl mb={2}>
                             <FormLabel>Favorite Cuisine</FormLabel>
                             <Text textAlign={"left"} pt={2} pb={2}>
@@ -367,15 +365,15 @@ const MyAccount = () => {
                         </FormControl>
                     </Box>
 
-                    <Box p={2} width={"16%"}>
+                    <Box p={2} width={"18%"}>
                         <Flex justifyContent={"flex-end"} flexDirection={"column"}>
                             {hasChanges() && (
                                 <>
-                                    <Button variant={"MMPrimary"} onClick={handleSaveChanges} width="full" mb={2}>
+                                    <Button p={6} variant={"MMPrimary"} onClick={handleSaveChanges} width="full" mb={5}>
                                         Save Changes
                                     </Button>
 
-                                    <Button colorScheme="red" borderRadius={10} onClick={handleCancelChanges} width="full" mb={4}>
+                                    <Button p={6} colorScheme="red" borderRadius={10} onClick={handleCancelChanges} width="full" mb={4}>
                                         Cancel
                                     </Button>
                                 </>
