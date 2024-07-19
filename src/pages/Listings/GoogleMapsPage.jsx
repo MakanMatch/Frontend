@@ -38,18 +38,6 @@ const GoogleMapsPage = () => {
             displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, false);
         }, 200);
     }
-
-    useEffect(() => {
-        if (loaded) {
-            if (!authToken || !user) {
-                navigate('/auth/login');
-                setTimeout(() => {
-                    displayToast("You're not logged in", "Please Login first", "info", 3000, false);
-                }, 200);
-                return;
-            }
-        }
-    }, []);
     return (
         <>
             {loaded && (
@@ -61,7 +49,7 @@ const GoogleMapsPage = () => {
                     left="10px"
                     transform="translateY(-50%)"
                     zIndex="1">
-                    <ListingCardOverlay listingID={listingID} userID={user.userID} userType={user.userType} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
+                    <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
                 </Box>
             </Box>)}
         </>

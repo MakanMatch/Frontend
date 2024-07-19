@@ -65,7 +65,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
     }
 
     const fetchHostID = async () => {
-        if (loaded) {
+        if (loaded && user) {
             const hostInfo = await server.get(`cdn/accountInfo?userID=${user.userID}`)
             if (hostInfo.status === 200) {
                 setHostID(hostInfo.data.userID)

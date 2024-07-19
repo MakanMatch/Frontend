@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton } from "@chakra-ui/react";
@@ -6,14 +7,16 @@ import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import server from "../../networking";
+import { useSelector } from "react-redux";
 
-function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
+function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const toast = useToast();
     const navigate = useNavigate();
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const handlePrevImage = () => {
         if (imageIndex === 0) {
@@ -32,10 +35,15 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
     }
 
     const toggleFavourite = async () => {
-        const favouriteData = {
-            listingID: listingID
-        }
-        await server.put("/listings/toggleFavouriteListing", favouriteData)
+        if (!user || !authToken) {
+            navigate('/auth/login');
+            displayToast("You're not logged in", "Please Login first", "info", 3000, false);
+            return;
+        } else {
+            const favouriteData = {
+                listingID: listingID
+            }
+            await server.put("/listings/toggleFavouriteListing", favouriteData)
             .then((response) => {
                 if (response.data.favourite === true) {
                     setFavourite(true);
@@ -47,15 +55,21 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
                 toast.closeAll();
                 displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
             });
+        }
     };
 
     const fetchFavouriteState = async () => {
-        const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
-        const guestFavCuisine = response.data.favCuisine || "";
-        if (guestFavCuisine.includes(listingID)) {
-            setFavourite(true);
-        } else {
+        if (!user) {
             setFavourite(false);
+            return;
+        } else {
+            const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
+            const guestFavCuisine = response.data.favCuisine || "";
+            if (guestFavCuisine.includes(listingID)) {
+                setFavourite(true);
+            } else {
+                setFavourite(false);
+            }
         }
     }
 
@@ -170,7 +184,7 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
                             mb={5}
                         >
                             <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
-                            {userID !== hostID && (
+                            {user && user.userID !== hostID && (
                                 <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
                                 {favourite ? "🩷" : "🤍"}
                             </Text>)}
