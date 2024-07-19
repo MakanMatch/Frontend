@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Text, useToast, SimpleGrid } from '@chakra-ui/react';
+import { Text, useToast, SimpleGrid, Spinner } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import server from '../../networking'
 import ReviewCard from './ReviewCard';
@@ -15,7 +15,6 @@ const SortReviews = ({
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
     const { user, loaded } = useSelector((state) => state.auth);
-    const [ guestID, setGuestID ] = useState(null);
     var [stateRefreshReview, refreshState] = useState(false);
 
     function getImageLink(listingID, imageName) {
@@ -28,12 +27,7 @@ const SortReviews = ({
     const fetchReviews = async (hostID, sortOrder) => {
         try {
             // Get reviews
-            if (loaded && user) {
-                setGuestID(user.userID)
-            } else {
-                setGuestID(null)
-            }
-            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&guestID=${guestID}&order=${sortOrder}`);
+            const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`);
             if (response.status === 200 && Array.isArray(response.data)) {
                 if (response.data.length === 0) {
                     setReviews([]);
@@ -75,11 +69,10 @@ const SortReviews = ({
     }
 
     useEffect(() => {
-        if (hostID) {
+        if (loaded == true) {
             fetchSortedData();
         }
-    }, [hostID, activeTab, stateRefreshSubmit, stateRefreshReview]);
-
+    }, [hostID, loaded, user, activeTab, stateRefreshSubmit, stateRefreshReview])
 
     return (
         <Tabs mt={8} variant="soft-rounded" size='sm' minWidth="310px" onChange={(index) => setActiveTab(index)}>

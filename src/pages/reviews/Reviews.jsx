@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux';
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip } from '@chakra-ui/react';
+import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip, Spinner } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -83,6 +83,10 @@ function Reviews() {
             fetchHostInfo();
         }
     }, [hostID]);
+
+    if (!loaded) {
+        return <Spinner />
+    }
 
     return (
         <Box p={2} position="relative" width="100%">
