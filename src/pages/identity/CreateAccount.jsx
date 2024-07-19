@@ -23,7 +23,9 @@ function CreateAccount() {
 
     // Validation schema
     const validationSchema = Yup.object().shape({
-        username: Yup.string().required('Username is required'),
+        username: Yup.string()
+            .matches(/^\S*$/, 'Username cannot contain spaces')
+            .required('Username is required'),
         email: Yup.string()
             .matches(
                 /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
@@ -243,7 +245,7 @@ function CreateAccount() {
                                 </>
                             )}
                             <Button
-                                colorScheme='purple'
+                                variant={"MMPrimary"}
                                 isLoading={formik.isSubmitting}
                                 type='submit'
                                 width='150px'

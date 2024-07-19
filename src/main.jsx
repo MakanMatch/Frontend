@@ -27,6 +27,10 @@ import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
 import VerifyToken from './pages/identity/VerifyToken.jsx';
 import AuthLayout from './AuthLayout.jsx';
 import GoogleMapsPage from './pages/Listings/GoogleMapsPage'
+import Schedule from "./pages/identity/Schedule"
+import MakanHistory from './pages/identity/MakanHistory.jsx';
+import Favourites from './pages/identity/Favourites.jsx';
+import MakanReviews from './pages/identity/MakanReviews.jsx';
 
 const store = configureStore({
     reducer: {
@@ -60,6 +64,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     </Route>
                     <Route path='/identity' element={<Layout />}>
                         <Route path={"myAccount"} element={<MyAccount />} />
+                        <Route path={"makanHistory"} element={<MakanHistory/>} />
+                        <Route path={"favourites"} element={<Favourites/>} />
+                        <Route path={"makanReviews"} element={<MakanReviews/>} />
+                        <Route path={"schedule"} element={<Schedule/>} />
                     </Route>
                 </Routes>
             </BrowserRouter>

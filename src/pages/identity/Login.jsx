@@ -140,7 +140,7 @@ function Login() {
                             </Link>
                         </Box>
                         <Button
-                            colorScheme='purple'
+                            variant={"MMPrimary"}
                             isLoading={formik.isSubmitting}
                             type='submit'
                             width='150px'
