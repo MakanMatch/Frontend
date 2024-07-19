@@ -64,7 +64,7 @@ function ChatUi() {
 
 		ws.current.onopen = () => {
 			console.log("Connected to WebSocket server");
-			ws.current.send(JSON.stringify({ action: "connect", userID: user.userID }))
+			ws.current.send(JSON.stringify({ action: "connect", userID: user.userID, userType: user.userType }))
 		};
 
 		ws.current.onmessage = async (event) => {
