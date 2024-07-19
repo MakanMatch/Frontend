@@ -5,11 +5,10 @@ import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
-import configureShowToast from "../../components/showToast";
+import { useSelector } from "react-redux";
 
-const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
+const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast }) => {
     const toast = useToast();
-    const showToast = configureShowToast(toast);
     const today = new Date();
     today.setDate(today.getDate() + 1);
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -21,6 +20,8 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const [totalSlots, setTotalSlots] = useState(1);
     const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
     const [images, setImages] = useState([]);
+    const [hostID, setHostID] = useState("");
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
@@ -52,16 +53,30 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         if (new Date(date) > new Date()) {
             setDatetime(date);
         } else {
-            toast.closeAll();
-            showToast(
+            displayToast(
                 "Invalid Date/Time",
                 "Please select a date-time that's greater than today's date-time",
                 "error",
-                3000
+                3000,
+                false
             );
             return;
         }
     }
+
+    const fetchHostID = async () => {
+        if (loaded && user) {
+            const hostInfo = await server.get(`/cdn/accountInfo?userID=${user.userID}`)
+            if (hostInfo.status === 200) {
+                setHostID(hostInfo.data.userID)
+            } else {
+                console.error("Failed to fetch hostID", hostInfo.data)
+                displayToast("Failed to fetch your hosting details", "Please try again later", "error", 3000, false)
+                return;
+            }
+        }
+    }
+
 
     const handleSubmitListing = async () => {
         setIsSubmitting(true);
@@ -73,7 +88,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             formData.append("portionPrice", portionPrice);
             formData.append("totalSlots", totalSlots);
             formData.append("datetime", datetime);
-            images.forEach((image, index) => {
+            images.forEach((image) => {
                 formData.append("images", image);
             });
 
@@ -85,40 +100,29 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 timeout: 10000,
             }
             )
-            if (addListingResponse.status === 200) {
+            if (addListingResponse.status == 200) {
                 fetchListings();
-                setTimeout(() => {
-                    onClose();
-                    setDefaultState();
-                    setIsSubmitting(false);
-                    toast.closeAll();
-                    showToast(
-                        "Listing published successfully!",
-                        "We'll notify you when all slots have been filled.",
-                        "success",
-                        4000
-                    );
-                }, 1500);
+                onClose();
+                setDefaultState();
+                setIsSubmitting(false);
+                displayToast(
+                    "Listing published successfully!",
+                    "We'll notify you when all slots have been filled.",
+                    "success",
+                    4000,
+                    false
+                );
             }
         } catch (error) {
-            toast.closeAll();
-            if (error.code === "ECONNABORTED") {
-                showToast(
-                    "Request timed out",
-                    "Please try again later.",
-                    "error",
-                    2500
-                );
-                return;
-            } else {
-                showToast(
-                    "Error submitting listing",
-                    "Please try again later.",
-                    "error",
-                    2500
-                );
-                return;
-            }
+            console.log("Failed to submit listing; error: " + error)
+            onClose();
+            displayToast(
+                "Error submitting listing",
+                "Please try again later.",
+                "error",
+                2500,
+                false
+            );
         }
     };
 
@@ -175,11 +179,12 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             setModalError(true);
             setValidListing(false);
             if (images.length > 5) {
-                showToast(
+                displayToast(
                     "That's too many images!",
                     "You can upload a maximum of 5 images",
                     "error",
-                    2500
+                    2500,
+                    false
                 );
             }
         } else {
@@ -191,12 +196,12 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     useEffect(() => {
         if (portionPrice > 10) {
             setPortionPrice(10);
-            toast.closeAll();
-            showToast(
+            displayToast(
                 "Woah, that's too expensive!",
                 "Fee cannot exceed $10",
                 "error",
-                2500
+                2500,
+                false
             );
         }
     }, [portionPrice]);
@@ -204,15 +209,19 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     useEffect(() => {
         if (totalSlots > 5) {
             setTotalSlots(5);
-            toast.closeAll();
-            showToast(
+            displayToast(
                 "Too many Guests!",
                 "You can invite a maximum of 5 Guests",
                 "error",
-                2500
+                2500,
+                false
             );
         }
     }, [totalSlots]);
+
+    useEffect(() => {
+        fetchHostID();
+    }, [loaded]);
     return (
         <div>
             <Modal

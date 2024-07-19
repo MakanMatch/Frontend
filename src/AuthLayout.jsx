@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import "./App.css";
 import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import { useDispatch } from "react-redux";
-import { fetchUser, setLoading } from './slices/AuthState';
+import { fetchUser, setLoading } from "./slices/AuthState.js";
 
 const contentWrapperStyles = {
     maxWidth: '1280px',
