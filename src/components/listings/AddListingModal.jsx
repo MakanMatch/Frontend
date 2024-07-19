@@ -124,6 +124,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                 console.log("Weird thing: " + addListingResponse.status)
             }
         } catch (error) {
+            onClose();
             displayToast(
                 "Error submitting listing",
                 "Please try again later.",
@@ -131,9 +132,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                 2500,
                 false
             );
-            setTimeout(() => {
-                onClose();
-            }, 2500);
         }
     };
 
