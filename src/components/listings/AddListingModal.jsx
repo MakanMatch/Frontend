@@ -100,18 +100,11 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                 timeout: 10000,
             }
             )
-            console.log('status', addListingResponse.status)
             if (addListingResponse.status == 200) {
-                console.log('me')
                 fetchListings();
                 onClose();
                 setDefaultState();
                 setIsSubmitting(false);
-                console.log('hello')
-                // toast({
-                //     title: "Listing published!",
-                //     description: "We'll notify you shotly."
-                // })
                 displayToast(
                     "Listing published successfully!",
                     "We'll notify you when all slots have been filled.",
@@ -119,8 +112,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                     4000,
                     false
                 );
-            } else {
-                console.log("Weird thing: " + addListingResponse.status)
             }
         } catch (error) {
             console.log("Failed to submit listing; error: " + error)
