@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HStack, IconButton } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 
-const StarRating = ({ maxStars = 5, size = '20px', color = 'yellow.400', onChange }) => {
+const StarRating = ({ maxStars = 5, size = '20px', color = 'yellow.400', onChange, initialRating}) => {
     const [rating, setRating] = useState(1);
     const [hoverRating, setHoverRating] = useState(0);
 
@@ -13,6 +13,10 @@ const StarRating = ({ maxStars = 5, size = '20px', color = 'yellow.400', onChang
         setRating(newRating);
         if (onChange) onChange(newRating);
     };
+
+    useEffect(() => {
+        setRating(initialRating); // Update local rating state when initialRating changes
+    }, [initialRating]);
 
     return (
         <HStack spacing={3}>

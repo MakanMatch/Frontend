@@ -22,7 +22,6 @@ function Sidebar({ isOpen, onClose }) {
         if (authToken) {
             navigate('/identity/myAccount');
         } else {
-            console.log("Sign in first.")
             navigate('/auth/login');
         }
         onClose()
