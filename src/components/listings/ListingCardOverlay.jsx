@@ -6,15 +6,13 @@ import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import server from "../../networking";
-import configureShowToast from "../../components/showToast";
 
-function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
+function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const toast = useToast();
-    const showToast = configureShowToast(toast);
     const navigate = useNavigate();
 
     const handlePrevImage = () => {
@@ -47,7 +45,7 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
             })
             .catch(() => {
                 toast.closeAll();
-                showToast("Error", "Failed to add/remove listing from favourites", "error", 3000);
+                displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
             });
     };
 

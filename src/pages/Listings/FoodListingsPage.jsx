@@ -4,7 +4,6 @@ import server from "../../networking";
 import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
-import configureShowToast from "../../components/showToast";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -17,8 +16,17 @@ const FoodListingsPage = () => {
     const [loading, setLoading] = useState(true); 
     const toast = useToast();
     const navigate = useNavigate();
-    const showToast = configureShowToast(toast);
     const { user, authToken, loaded } = useSelector((state) => state.auth);
+
+    function displayToast(title, description, status, duration, isClosable) {
+        toast({
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: isClosable
+        });
+    }
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
@@ -29,13 +37,8 @@ const FoodListingsPage = () => {
             const response = await server.get("/cdn/listings");
             setListings(response.data);
         } catch (error) {
-            toast.closeAll();
-            showToast(
-                "Error fetching food listings",
-                "Please try again later.",
-                "error",
-                2500
-            );
+            console.log("Failed to fetch listings; error: " + error)
+            displayToast("Error fetching food listings", "Please try again later.", "error", 2500, false);
         }
     };
 
@@ -43,7 +46,7 @@ const FoodListingsPage = () => {
         if (!authToken || !user) {
             navigate('/auth/login');
             setTimeout(() => {
-                showToast("You're not logged in", "Please Login first", 3000, false, "info");
+                displayToast("You're not logged in", "Please Login first", "info", 3000, false);
             }, 200);
         } else {
             onOpen();
@@ -179,6 +182,7 @@ const FoodListingsPage = () => {
                 onClose={onClose}
                 onOpen={onOpen}
                 fetchListings={fetchListings}
+                displayToast={displayToast}
             />
         </div>
     );

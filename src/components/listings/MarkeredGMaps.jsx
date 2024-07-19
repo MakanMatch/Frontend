@@ -3,19 +3,27 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "@googlemaps/js-api-loader";
-import { useToast, Skeleton } from "@chakra-ui/react";
-import configureShowToast from "../../components/showToast";
+import { Skeleton, useToast } from "@chakra-ui/react";
 
 const MarkeredGMaps = ({
     coordinatesList,
     listings,
     isSmallerThan1095
 }) => {
-    const toast = useToast();
-    const showToast = configureShowToast(toast);
     const navigate = useNavigate();
     const mapRef = useRef(null);
     const [mapLoaded, setMapLoaded] = useState(false);
+    const toast = useToast();
+
+    function displayToast(title, description, status, duration, isClosable) {
+        toast({
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: isClosable
+        });
+    }
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
@@ -79,10 +87,10 @@ const MarkeredGMaps = ({
             );
             InitializeMap(validCoordinates);
         } catch (error) {
-            showToast("An error occurred", "Failed to render Google Maps", "error", 3000);
+            displayToast("An error occurred", "Failed to render Google Maps", "error", 3000, false);
             console.error(error);
         }
-    }, [coordinatesList, listings, showToast]);
+    }, [coordinatesList, listings, displayToast]);
 
     return (
         <>

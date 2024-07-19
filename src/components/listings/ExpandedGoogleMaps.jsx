@@ -3,18 +3,26 @@
 import { useEffect, useRef } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useToast } from "@chakra-ui/react";
-import configureShowToast from "../../components/showToast";
 
 const ExpandedGoogleMaps = ({ lat, long }) => {
     const mapRef = useRef(null);
     const toast = useToast();
-    const showToast = configureShowToast(toast);
+
+    function displayToast(title, description, status, duration, isClosable) {
+        toast({
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: isClosable
+        });
+    }
 
     useEffect(() => {
         const initializeMap = async () => {
             if (!mapRef.current || !lat || !long) {
                 // Check if mapRef or coordinates are not available
-                showToast("Invalid coordinates", "Failed to show Host's location on map", 3000, false, "info");
+                displayToast("Invalid coordinates", "Failed to show Host's location on map", "info", 3000, false);
                 return;
             }
 
@@ -32,7 +40,7 @@ const ExpandedGoogleMaps = ({ lat, long }) => {
 
                 // Check for valid latitude and longitude range
                 if (lat < -90 || lat > 90 || long < -180 || long > 180) {
-                    showToast("Invalid coordinates", "Failed to show Host's location on map", 3000, false, "info");
+                    displayToast("Invalid coordinates", "Failed to show Host's location on map", "info", 3000, false);
                     return;
                 }
 
@@ -50,13 +58,13 @@ const ExpandedGoogleMaps = ({ lat, long }) => {
                     title: "Host's location",
                 });
             } catch (error) {
-                showToast("An error occurred", "Failed to render Google Maps", 3000, false, "error");
+                displayToast("An error occurred", "Failed to render Google Maps", "error", 3000, false);
                 console.error(error);
             }
         };
 
         initializeMap();
-    }, [lat, long, showToast]);
+    }, [lat, long, displayToast]);
 
     return (
         <div
