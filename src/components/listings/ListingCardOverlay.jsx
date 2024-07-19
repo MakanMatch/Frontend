@@ -35,7 +35,6 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
 
     const toggleFavourite = async () => {
         const favouriteData = {
-            userID: userID,
             listingID: listingID
         }
         await server.put("/listings/toggleFavouriteListing", favouriteData)
