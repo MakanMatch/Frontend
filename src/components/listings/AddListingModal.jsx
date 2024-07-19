@@ -66,7 +66,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
 
     const fetchHostID = async () => {
         if (loaded && user) {
-            const hostInfo = await server.get(`cdn/accountInfo?userID=${user.userID}`)
+            const hostInfo = await server.get(`/cdn/accountInfo?userID=${user.userID}`)
             if (hostInfo.status === 200) {
                 setHostID(hostInfo.data.userID)
             } else {
@@ -123,6 +123,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                 console.log("Weird thing: " + addListingResponse.status)
             }
         } catch (error) {
+            console.log("Failed to submit listing; error: " + error)
             onClose();
             displayToast(
                 "Error submitting listing",

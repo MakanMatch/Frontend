@@ -44,17 +44,23 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                 listingID: listingID
             }
             await server.put("/listings/toggleFavouriteListing", favouriteData)
-            .then((response) => {
-                if (response.data.favourite === true) {
-                    setFavourite(true);
-                } else {
-                    setFavourite(false);
-                }
-            })
-            .catch(() => {
-                toast.closeAll();
-                displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
-            });
+                .then((response) => {
+                    if (response.status == 200 && response.data.favourite != undefined) {
+                        if (response.data.favourite === true) {
+                            setFavourite(true);
+                        } else {
+                            setFavourite(false);
+                        }
+                    } else {
+                        console.log("Unknown response received when toggling favourite status; response: " + response.data)
+                        toast.closeAll();
+                        displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
+                    }
+                })
+                .catch(() => {
+                    toast.closeAll();
+                    displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
+                });
         }
     };
 
@@ -186,8 +192,8 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
                             {user && user.userID !== hostID && (
                                 <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
-                                {favourite ? "🩷" : "🤍"}
-                            </Text>)}
+                                    {favourite ? "🩷" : "🤍"}
+                                </Text>)}
                         </Box>
                         <Box className="ratingBox">
                             <Box display="flex" alignItems="center" mb={1}>
