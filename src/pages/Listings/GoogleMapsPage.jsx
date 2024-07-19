@@ -6,7 +6,6 @@ import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Box, useToast } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
 
 const GoogleMapsPage = () => {
     const navigate = useNavigate();
@@ -42,7 +41,7 @@ const GoogleMapsPage = () => {
         <>
             {loaded && (
                 <Box position="relative" height="100%">
-                <ExpandedGoogleMaps lat={latitude} long={longitude} displayToast={displayToast} />
+                <ExpandedGoogleMaps title={title} lat={latitude} long={longitude} />
                 <Box
                     position="absolute"
                     top="50%"

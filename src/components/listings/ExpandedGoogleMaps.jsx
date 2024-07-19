@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useToast } from "@chakra-ui/react";
 
-const ExpandedGoogleMaps = ({ lat, long }) => {
+const ExpandedGoogleMaps = ({ title, lat, long }) => {
     const mapRef = useRef(null);
     const toast = useToast();
 
@@ -55,7 +55,7 @@ const ExpandedGoogleMaps = ({ lat, long }) => {
                 new AdvancedMarkerElement({
                     position: LatLong,
                     map: map,
-                    title: "Host's location",
+                    title: title,
                 });
             } catch (error) {
                 displayToast("An error occurred", "Failed to render Google Maps", "error", 3000, false);

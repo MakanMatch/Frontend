@@ -70,7 +70,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
             if (hostInfo.status === 200) {
                 setHostID(hostInfo.data.userID)
             } else {
-                console.error("Failed to fetch hostID")
+                console.error("Failed to fetch hostID", hostInfo.data)
                 displayToast("Failed to fetch your hosting details", "Please try again later", "error", 3000, false)
                 return;
             }
