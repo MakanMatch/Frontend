@@ -15,7 +15,7 @@ function App() {
         if (localStorage.getItem('jwt')) {
             dispatch(fetchUser());
         } else {
-            dispatch(setLoading(true));
+            dispatch(setLoading(true))
         }
     }, []);
 

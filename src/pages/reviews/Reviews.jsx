@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux';
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip } from '@chakra-ui/react';
+import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip, Spinner } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -18,23 +18,15 @@ function Reviews() {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
-    const { user } = useSelector((state) => state.auth);
+    const { user, loaded } = useSelector((state) => state.auth);
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
-    const [stateRefresh, refreshState] = useState(false);
+    const [stateRefreshSubmit, refreshState] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const location = useLocation();
     const [searchParams] = useSearchParams();
-    var { hostID } = {}
-    if (location.state.hostID) {
-        hostID = location.state.hostID;
-    } else if (searchParams.has('hostID')) {
-        hostID = searchParams.get('hostID');
-    } else {
-        showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
-        navigate('/');
-    }
+    const [hostID, setHostID] = useState("");
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -59,6 +51,7 @@ function Reviews() {
             const response = await server.get(`/cdn/accountInfo?userID=${hostID}`);
             if (!response.data) {
                 showToast("No host information found", "Please try again later.", 3000, true, "info")
+                navigate('/')
                 return
             } else {
                 setHostName(response.data.username);
@@ -69,39 +62,35 @@ function Reviews() {
             toast.closeAll();
             showToast("Error fetching host information", "Please try again later", 3000, true, "error");
             console.error("Error fetching host info:", error);
+            navigate('/')
             return
         }
     };
-
-    const fetchGuestInfo = async () => {
-        try {
-            const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
-            if (!response.data || response.status !== 200) {
-                showToast("No guest information found", "Please Log In", 3000, true, "info");
-                return
+    
+  
+    useEffect(() => {
+        if (loaded) {
+            if (location.state.hostID) {
+                setHostID(location.state.hostID);
+            } else if (searchParams.has('hostID')) {
+                setHostID(searchParams.get('hostID'));
+            } else {
+                showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
+                navigate('/');
             }
-        } catch (error) {
-            toast.closeAll();
-            showToast("Error fetching guest information", "Please Log In", 3000, true, "error");
-            console.error("Error fetching guest info:", error);
-            return
         }
-    }
+    }, [user, loaded])
 
     useEffect(() => {
-        if (!user) {
-            navigate('/auth/login');
-        } else {
+        if (hostID) {
             fetchHostInfo();
-            if (user.userID) {
-                fetchGuestInfo();
-            } else {
-                showToast("Error", "Please Log In", 3000, true, "error");
-                navigate('/auth/login');
-            }
         }
-    }, [user])
+    }, [hostID]);
 
+    if (!loaded) {
+        return <Spinner />
+    }
+    
     return (
         <Box p={2} position="relative" width="100%">
             <Button
@@ -139,15 +128,12 @@ function Reviews() {
                                 </Button>
                             </Tooltip>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            {user && (
                                 <SubmitReviews
                                     hostName={hostName}
-                                    guestID={user.userID}
                                     hostID={hostID}
                                     refreshState={refreshState}
-                                    stateRefresh={stateRefresh}
+                                    stateRefreshSubmit={stateRefreshSubmit}
                                 />
-                            )}
                         </Flex>
                     </Flex>
                 </Box>
@@ -164,13 +150,10 @@ function Reviews() {
                 </Box>
             </Flex>
             <Heading mt={5} size="lg"><Text>Reviews</Text></Heading>
-            {user && (
-                <SortReviews
-                    hostID={hostID}
-                    guestID={user.userID}
-                    stateRefresh={stateRefresh}
-                />
-            )}
+            <SortReviews
+                hostID={hostID}
+                stateRefreshSubmit={stateRefreshSubmit}
+            />
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
                 <ModalContent maxW="max-content" background="transparent" boxShadow="none">
