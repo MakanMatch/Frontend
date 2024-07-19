@@ -1,11 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useToast, useDisclosure, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useMediaQuery, Skeleton } from "@chakra-ui/react";
-import { DeleteIcon } from '@chakra-ui/icons';
-import { useEffect, useState } from "react";
-import server from "../../networking";
-import { Link, useNavigate } from "react-router-dom";
-import configureShowToast from "../../components/showToast";
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const FoodListingCard = ({
     listingID,
@@ -13,51 +10,16 @@ const FoodListingCard = ({
     portionPrice,
     hostName,
     hostFoodRating,
-    userID,
     hostID,
     images,
-    fetchListings,
     shortDescription,
     approxAddress,
     totalSlots,
-    coordinates,
+    latitude,
+    longitude,
 }) => {
-    const toast = useToast();
-    const showToast = configureShowToast(toast);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
-    const { isOpen: isOpenAlert, onOpen: onOpenAlert, onClose: onCloseAlert } = useDisclosure();
-    const navigate = useNavigate();
-
-    const handleDeleteListing = async () => {
-        const deleteListing = await server.delete("/listings/deleteListing", { data: { listingID: listingID } });
-        if (deleteListing.status === 200) {
-            toast.closeAll();
-            showToast("Listing removed", "Your listing has been successfully removed!", "success", 3000);
-            fetchListings();
-        } else {
-            toast.closeAll();
-            showToast("Error", "Failed to remove listing", "error", 3000);
-        }
-    };
-
-    useEffect(() => {
-        localStorage.setItem("ListingExp-userID", userID);
-        localStorage.setItem("ListingExp-hostID", hostID);
-        localStorage.setItem(`ListingExp-images-${listingID}`, images);
-        localStorage.setItem(`ListingExp-title-${listingID}`, title);
-        localStorage.setItem(`ListingExp-shortDescription-${listingID}`, shortDescription);
-        localStorage.setItem(`ListingExp-approxAddress-${listingID}`, approxAddress);
-        localStorage.setItem(`ListingExp-portionPrice-${listingID}`, portionPrice);
-        localStorage.setItem(`ListingExp-totalSlots-${listingID}`, totalSlots);
-    }, []);
-
-    useEffect(() => {
-        if (coordinates) {
-            localStorage.setItem(`ListingExp-latitude-${listingID}`, coordinates.lat);
-            localStorage.setItem(`ListingExp-longitude-${listingID}`, coordinates.lng);
-        }
-    }, [coordinates]);
     return (
         <>
             <style>
@@ -102,61 +64,34 @@ const FoodListingCard = ({
                         <Text color="blue.600" fontSize="2xl">
                             ${portionPrice}/pax
                         </Text>
-                        <Link to={`/reviews`} state={{ hostID: hostID }}> {/* To send a state consisting of userId and hostID to the review page.*/}
-                            <Text textDecoration={"underline"} color={"blue"}>See reviews</Text>
-                        </Link>
                     </Stack>
                 </CardBody>
                 <Divider />
                 {isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link to={`/targetListing?listingID=${listingID}`}>
-                                <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
+                            <Link
+                            to={"/targetListing"}
+                            state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
+                            >
+                                <Button variant="MMPrimary" paddingLeft={"45px"} paddingRight={"45px"}>View</Button>
                             </Link>
-                            <Button onClick={onOpenAlert}>
-                                <Text fontSize={"15px"}><DeleteIcon color="red" mb={1} /> Remove</Text>
-                            </Button>
                         </ButtonGroup>
                     </CardFooter>
                 )}
                 {!isSmallerThan710 && (
                     <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
                         <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link to={`/targetListing?listingID=${listingID}`}>
-                                <Button variant="MMPrimary" paddingLeft={"25px"} paddingRight={"25px"}>View</Button>
+                            <Link
+                            to={"/targetListing"}
+                            state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
+                            >
+                                <Button variant="MMPrimary" paddingLeft={"45px"} paddingRight={"45px"}>View</Button>
                             </Link>
-                            <Button onClick={onOpenAlert}>
-                                <DeleteIcon color="red" />
-                            </Button>
                         </ButtonGroup>
                     </CardFooter>
                 )}
             </Card>
-            <AlertDialog
-                isOpen={isOpenAlert}
-                onClose={onCloseAlert}
-            >
-                <AlertDialogOverlay>
-                    <AlertDialogContent>
-                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                            Remove Listing
-                        </AlertDialogHeader>
-                        <AlertDialogCloseButton />
-                        <AlertDialogBody>
-                            Are you sure you want to remove this listing?
-                        </AlertDialogBody>
-                        <AlertDialogFooter>
-                            <Button onClick={onCloseAlert}>
-                                Cancel
-                            </Button>
-                            <Button colorScheme="red" onClick={handleDeleteListing} ml={3}>
-                                Remove
-                            </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
         </>
     );
 };

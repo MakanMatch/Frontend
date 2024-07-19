@@ -66,7 +66,8 @@ function Reviews() {
             return
         }
     };
-
+    
+  
     useEffect(() => {
         if (loaded) {
             if (location.state.hostID) {
@@ -89,7 +90,7 @@ function Reviews() {
     if (!loaded) {
         return <Spinner />
     }
-
+    
     return (
         <Box p={2} position="relative" width="100%">
             <Button
