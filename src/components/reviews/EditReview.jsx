@@ -127,6 +127,7 @@ const EditReview = ({
 		} else {
 			setImages(reviewImages || []);
 		}
+		setFileFormatError("");
 		onClose();
 	};
 

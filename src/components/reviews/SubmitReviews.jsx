@@ -125,6 +125,7 @@ const SubmitReviews = ({
         setComments('');
         setImages([]);
         onClose();
+        setFileFormatError("")
     };
 
     return (
