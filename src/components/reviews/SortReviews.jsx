@@ -69,7 +69,7 @@ const SortReviews = ({
     }
 
     useEffect(() => {
-        if (loaded == true) {
+        if (loaded && hostID) {
             fetchSortedData();
         }
     }, [hostID, loaded, user, activeTab, stateRefreshSubmit, stateRefreshReview])

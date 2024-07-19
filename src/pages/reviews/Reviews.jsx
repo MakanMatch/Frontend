@@ -68,13 +68,15 @@ function Reviews() {
     };
 
     useEffect(() => {
-        if (location.state.hostID) {
-            setHostID(location.state.hostID);
-        } else if (searchParams.has('hostID')) {
-            setHostID(searchParams.get('hostID'));
-        } else {
-            showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
-            navigate('/');
+        if (loaded) {
+            if (location.state.hostID) {
+                setHostID(location.state.hostID);
+            } else if (searchParams.has('hostID')) {
+                setHostID(searchParams.get('hostID'));
+            } else {
+                showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
+                navigate('/');
+            }
         }
     }, [user, loaded])
 
