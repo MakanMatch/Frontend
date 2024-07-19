@@ -91,7 +91,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
             images.forEach((image) => {
                 formData.append("images", image);
             });
-            formData.append("hostID", hostID);
 
             const addListingResponse = await server.post("/listings/addListing", formData, {
                 headers: {
