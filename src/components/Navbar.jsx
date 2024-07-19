@@ -14,7 +14,6 @@ function Navbar() {
         if (authToken) {
             navigate('/identity/myAccount');
         } else {
-            console.log("Sign in first.")
             navigate('/auth/login');
         }
         onClose()

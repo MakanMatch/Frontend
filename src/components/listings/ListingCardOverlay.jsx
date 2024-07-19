@@ -62,6 +62,11 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
         }
     }
 
+    const proceedToExpandedListing = (id) => {
+        navigate("/expandedListingGuest")
+        history.pushState({listingID: id}, "")
+    }
+
     useEffect(() => {
         fetchFavouriteState();
     }, []);
@@ -255,7 +260,7 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
                 </Box>
                 <CardFooter display="flex" justifyContent="center">
                     <ButtonGroup spacing="2">
-                        <Button variant="MMPrimary" colorScheme="blue" onClick={() => navigate(`/expandedListingGuest?id=${listingID}`)} mt={-4}>
+                        <Button variant="MMPrimary" colorScheme="blue" onClick={() => proceedToExpandedListing(listingID)} mt={-4}>
                             Proceed
                         </Button>
                     </ButtonGroup>

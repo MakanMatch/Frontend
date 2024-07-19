@@ -16,4 +16,22 @@ instance.interceptors.request.use((config) => {
     return Promise.reject(err);
 })
 
+instance.interceptors.response.use((config) => {
+    const refreshedtoken = config.headers.toJSON()['refreshedtoken']
+
+    if (refreshedtoken) {
+        localStorage.setItem('jwt', refreshedtoken)
+        localStorage.setItem('tokenRefreshed', 'true')
+    }
+
+    return config
+}, (err) => {
+    if (err.response.data.startsWith("ERROR: Token expired")) {
+        localStorage.removeItem('jwt')
+        localStorage.removeItem('tokenRefreshed')
+    }
+
+    return Promise.reject(err)
+})
+
 export default instance;
