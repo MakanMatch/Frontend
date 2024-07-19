@@ -25,6 +25,7 @@ const EditReview = ({
 	const [fileFormatError, setFileFormatError] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [hasChanges, setHasChanges] = useState(false);
 
 	useEffect(() => {
 		setFoodRating(reviewFoodRating);
@@ -43,6 +44,7 @@ const EditReview = ({
 		} else {
 			setImages(reviewImages || []);
 		}
+		setHasChanges(false);
 	}, [reviewFoodRating, reviewHygieneRating, reviewComments, reviewImages]);
 
 	const handleFileChange = (event) => {
@@ -62,6 +64,7 @@ const EditReview = ({
 			];
 			if (allowedTypes.includes(file.type)) {
 				filesAccepted = true;
+				setHasChanges(true);
 			} else {
 				filesAccepted = false;
 				break;
@@ -77,6 +80,7 @@ const EditReview = ({
 
 	const handleRemoveImage = (index) => {
 		setImages((prevImages) => prevImages.filter((image, imageIndex) => imageIndex !== index));
+		setHasChanges(true);
 	};
 
 	const handleEdit = async () => {
@@ -128,6 +132,7 @@ const EditReview = ({
 			setImages(reviewImages || []);
 		}
 		setFileFormatError("");
+		setHasChanges(false);
 		onClose();
 	};
 
@@ -164,12 +169,12 @@ const EditReview = ({
 							<Flex direction={{ base: 'column', md: 'row' }} align="center">
 								<Flex direction='column'>
 									<Text mt='8px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Food Rating</Text>
-									<StarRating maxStars={5} initialRating={foodRating} onChange={setFoodRating} />
+									<StarRating maxStars={5} initialRating={foodRating} onChange={(rating) => { setFoodRating(rating); setHasChanges(true); }} />
 								</Flex>
 								<Spacer display={{ base: 'none', md: 'block' }} />
 								<Flex direction='column'>
 									<Text mt="8px" mb="8px" textAlign={{ base: 'center', md: 'left' }}>Hygiene Rating</Text>
-									<StarRating maxStars={5} initialRating={hygieneRating} onChange={setHygieneRating} />
+									<StarRating maxStars={5} initialRating={hygieneRating} onChange={(rating) => { setHygieneRating(rating); setHasChanges(true); }} />
 								</Flex>
 							</Flex>
 							<Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Comments</Text>
@@ -178,7 +183,7 @@ const EditReview = ({
 								size='sm'
 								resize='none'
 								value={comments}
-								onChange={(e) => setComments(e.target.value)}
+								onChange={(e) => { setComments(e.target.value); setHasChanges(true); }}
 							/>
 							<Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Upload New Images</Text>
 							<Input
@@ -226,6 +231,7 @@ const EditReview = ({
 							<Button
 								onClick={handleEdit}
 								variant="MMPrimary"
+								isDisabled={!hasChanges}
 							>
 								Save
 							</Button>
