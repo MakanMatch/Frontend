@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import "./App.css";
 import { Outlet } from "react-router-dom";
@@ -16,7 +17,7 @@ function AuthRoot() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (localStorage.getItem("jwt")) {
+        if (localStorage.getItem('jwt')) {
             dispatch(fetchUser());
         } else {
             dispatch(setLoading(true))

@@ -1,31 +1,33 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton } from "@chakra-ui/react";
 import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import server from "../../networking";
-import configureShowToast from "../../components/showToast";
+import { useSelector } from "react-redux";
 
-function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots }) {
+function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
     const toast = useToast();
-    const showToast = configureShowToast(toast);
     const navigate = useNavigate();
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const handlePrevImage = () => {
         if (imageIndex === 0) {
-            setImageIndex(images.split(",").length - 1);
+            setImageIndex(images.length - 1);
         } else {
             setImageIndex(imageIndex - 1);
         }
     }
 
     const handleNextImage = () => {
-        if (imageIndex === images.split(",").length - 1) {
+        if (imageIndex === images.length - 1) {
             setImageIndex(0);
         } else {
             setImageIndex(imageIndex + 1);
@@ -33,32 +35,47 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
     }
 
     const toggleFavourite = async () => {
-        const favouriteData = {
-            userID: userID,
-            listingID: listingID
+        if (!user || !authToken) {
+            navigate('/auth/login');
+            displayToast("You're not logged in", "Please Login first", "info", 3000, false);
+            return;
+        } else {
+            const favouriteData = {
+                listingID: listingID
+            }
+            await server.put("/listings/toggleFavouriteListing", favouriteData)
+                .then((response) => {
+                    if (response.status == 200 && response.data.favourite != undefined) {
+                        if (response.data.favourite === true) {
+                            setFavourite(true);
+                        } else {
+                            setFavourite(false);
+                        }
+                    } else {
+                        console.log("Unknown response received when toggling favourite status; response: " + response.data)
+                        toast.closeAll();
+                        displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
+                    }
+                })
+                .catch(() => {
+                    toast.closeAll();
+                    displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
+                });
         }
-        await server.put("/listings/toggleFavouriteListing", favouriteData)
-            .then((response) => {
-                if (response.data.favourite === true) {
-                    setFavourite(true);
-                } else {
-                    setFavourite(false);
-                }
-            })
-            .catch(() => {
-                toast.closeAll();
-                showToast("Error", "Failed to add/remove listing from favourites", "error", 3000);
-            });
     };
 
     const fetchFavouriteState = async () => {
-        const data = { userID: userID };
-        const response = await server.get("/cdn/fetchGuestDetails", data);
-        const guestFavCuisine = response.data.guestFavCuisine;
-        if (guestFavCuisine.includes(listingID)) {
-            setFavourite(true);
-        } else {
+        if (!user) {
             setFavourite(false);
+            return;
+        } else {
+            const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
+            const guestFavCuisine = response.data.favCuisine || "";
+            if (guestFavCuisine.includes(listingID)) {
+                setFavourite(true);
+            } else {
+                setFavourite(false);
+            }
         }
     }
 
@@ -126,28 +143,31 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
                 }}>
                 <CardBody>
                     <Box position="relative" width="fit-content">
-                        {images.split(",").length > 1 && (
+                        {images.length > 1 && (
                             <Box position={"absolute"} top="50%" transform="translateY(-50%)" width={"100%"}>
                                 <ChevronLeftIcon boxSize={8} ml={-1} mt={-4} onClick={handlePrevImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} left="-5" zIndex={1} />
                                 <ChevronRightIcon boxSize={8} mr={-1} mt={-4} onClick={handleNextImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} right="-5" zIndex={1} />
                             </Box>
                         )}
-                        <Image
-                            key={images.split(",")[imageIndex]}
-                            src={images.split(",")[imageIndex]}
-                            onError={(e) => {
-                                e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
-                                e.target.src = "/placeholderImage.png";
-                            }}
-                            borderRadius="5px"
-                            minWidth="310px"
-                            maxWidth="310px"
-                            minHeight="150px"
-                            maxHeight="150px"
-                            objectFit="cover"
-                            style={{ pointerEvents: "none" }}
-                            className="image"
-                        />
+                        <Skeleton isLoaded={imageLoaded} height="150px" width="310px" borderRadius="5px" fadeDuration={1}>
+                            <Image
+                                key={images[imageIndex]}
+                                src={images[imageIndex]}
+                                onError={(e) => {
+                                    e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
+                                    e.target.src = "/placeholderImage.png";
+                                }}
+                                onLoad={() => setImageLoaded(true)}
+                                borderRadius="5px"
+                                minWidth="310px"
+                                maxWidth="310px"
+                                minHeight="150px"
+                                maxHeight="150px"
+                                objectFit="cover"
+                                style={{ pointerEvents: "none" }}
+                                className="image"
+                            />
+                        </Skeleton>
                         <Text
                             borderRadius="50%"
                             height="40px"
@@ -175,9 +195,10 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
                             mb={5}
                         >
                             <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
-                            <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
-                                {favourite ? "🩷" : "🤍"}
-                            </Text>
+                            {user && user.userID !== hostID && (
+                                <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
+                                    {favourite ? "🩷" : "🤍"}
+                                </Text>)}
                         </Box>
                         <Box className="ratingBox">
                             <Box display="flex" alignItems="center" mb={1}>
@@ -235,7 +256,7 @@ function ListingCardOverlay({ listingID, userID, hostID, images, title, shortDes
                                 />
                             </Box>
                         </Box>
-                        <Link to={'/reviews'} state={{ userID, hostID }}>
+                        <Link to={'/reviews'} state={{ hostID }}>
                             <Text mt={2} mb={-4} textAlign="left" color="blue" fontSize={"13px"} textDecoration={"underline"} cursor={"pointer"}>View Host Reviews</Text>
                         </Link>
                     </Stack>

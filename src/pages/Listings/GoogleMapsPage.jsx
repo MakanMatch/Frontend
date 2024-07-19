@@ -1,36 +1,56 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
 import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
-import { useSearchParams } from "react-router-dom";
-import { Box } from "@chakra-ui/react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Box, useToast } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
 
 const GoogleMapsPage = () => {
-    const [searchParams] = useSearchParams();
-    const listingID = searchParams.get("listingID");
+    const navigate = useNavigate();
+    const toast = useToast();
+    const location = useLocation();
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
-    const latitude = Number(localStorage.getItem(`ListingExp-latitude-${listingID}`));
-    const longitude = Number(localStorage.getItem(`ListingExp-longitude-${listingID}`));
-    const userID = localStorage.getItem("ListingExp-userID");
-    const hostID = localStorage.getItem("ListingExp-hostID");
-    const images = localStorage.getItem(`ListingExp-images-${listingID}`);
-    const title = localStorage.getItem(`ListingExp-title-${listingID}`);
-    const shortDescription = localStorage.getItem(`ListingExp-shortDescription-${listingID}`);
-    const approxAddress = localStorage.getItem(`ListingExp-approxAddress-${listingID}`);
-    const portionPrice = localStorage.getItem(`ListingExp-portionPrice-${listingID}`);
-    const totalSlots = localStorage.getItem(`ListingExp-totalSlots-${listingID}`);
+    function displayToast(title, description, status, duration, isClosable) {
+        toast({
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: isClosable
+        });
+    }
+
+    if (!location.state) {
+        if (window.location.pathname !== "/") {
+            window.location.href = "/*";
+        }
+    }
+
+    const { listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude } = location.state;
+    // if location.state doesnt have the required data, navigate back to homepage and show a toast
+    if (!listingID || !hostID || !images || !title || !shortDescription || !approxAddress || !portionPrice || !totalSlots || !latitude || !longitude) {
+        navigate("/");
+        setTimeout(() => {
+            displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, false);
+        }, 200);
+    }
     return (
         <>
-            <Box position="relative" height="100%">
-                <ExpandedGoogleMaps lat={latitude} long={longitude} />
+            {loaded && (
+                <Box position="relative" height="100%">
+                <ExpandedGoogleMaps title={title} lat={latitude} long={longitude} />
                 <Box
                     position="absolute"
                     top="50%"
                     left="10px"
                     transform="translateY(-50%)"
                     zIndex="1">
-                    <ListingCardOverlay listingID={listingID} userID={userID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} />
+                    <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
                 </Box>
-            </Box>
+            </Box>)}
         </>
     );
 };

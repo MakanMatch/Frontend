@@ -111,7 +111,7 @@ function AccountRecovery() {
                         Recover your account
                     </Heading>
                     <Box w="400px" display="flex" justifyContent="start">
-                        <Button onClick={() => navigate('/auth/login')} mb={4} colorScheme='purple'>
+                        <Button onClick={() => navigate('/auth/login')} mb={4} variant={"MMPrimary"}>
                             Back
                         </Button>
                     </Box>
@@ -131,7 +131,7 @@ function AccountRecovery() {
                         <FormErrorMessage fontSize='12px'>{formik.errors.usernameOrEmail}</FormErrorMessage>
                     </FormControl>
                     <Box w="400px" display="flex" justifyContent="start">
-                        <Button onClick={sendResetKey} colorScheme='purple' isDisabled={cooldown > 0} mb={4}>
+                        <Button onClick={sendResetKey} variant={"MMPrimary"} isDisabled={cooldown > 0} mb={4}>
                             {cooldown > 0 ? `Resend in ${cooldown}s` : 'Send password reset key'}
                         </Button>
                     </Box>
@@ -207,7 +207,7 @@ function AccountRecovery() {
                                 <FormErrorMessage fontSize='12px'>{formik.errors.confirmNewPassword}</FormErrorMessage>
                             </FormControl>
                             <Box w="full" display="flex" justifyContent="start">
-                                <Button type="submit" colorScheme='purple' mb={4} mt={4}>
+                                <Button type="submit" variant={"MMPrimary"} mb={4} mt={4}>
                                     Reset Password
                                 </Button>
                             </Box>
