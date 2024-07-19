@@ -21,7 +21,6 @@ function DeleteReviewButton({
             })
             if (deleteReview.status === 200) {
                 showToast("Review deleted", "", 3000, false, "success");
-                // window.location.reload();
                 refreshState(!stateRefreshReview)
             } else {
                 showToast("Error deleting review", "", 3000, false, "error");

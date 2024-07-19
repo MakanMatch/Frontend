@@ -98,7 +98,6 @@ const EditReview = ({
 			if (editReview.status === 200) {
 				showToast("Review edited successfully", "", 3000, true, "success");
 				setIsSubmitting(false);
-				// window.location.reload();
 				refreshState(!stateRefreshReview)
 				onClose();
 			} else {
