@@ -37,7 +37,7 @@ const FoodListingsPage = () => {
             const response = await server.get("/cdn/listings");
             setListings(response.data);
         } catch (error) {
-            console.log("Failed to fetch listings; error: " + error)
+            console.log("Failed to fetch listings: " + error)
             displayToast("Error fetching food listings", "Please try again later.", "error", 2500, false);
         }
     };
