@@ -1,4 +1,4 @@
-import { Box, Button, Divider, FormControl, FormHelperText, FormLabel, HStack, Heading, Input, Spacer, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
+import { Box, Button, Divider, FormControl, FormHelperText, FormLabel, HStack, Heading, Input, Spacer, Spinner, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
@@ -66,6 +66,7 @@ function ConfirmReservation() {
                     const processedHostData = processHostData(response.data.Host)
                     setListingData(processedData)
                     setHostData(processedHostData)
+                    setLoading(false);
                     return
                 } else if (response.status == 404) {
                     console.log("Listing not found, re-directing to home.")
@@ -105,6 +106,18 @@ function ConfirmReservation() {
             fetchListingDetails(state.listingID || listingID)
         }
     }, [loaded, user])
+
+    if (loading) {
+        return (
+            <Box p={"15px"}>
+                <VStack alignItems={"flex-start"}>
+                    <Button onClick={handleGoBack} bg={'none'} p={0}><ArrowBackIcon /></Button>
+                    <Heading fontFamily={'Sora'} fontWeight={'bold'} fontSize={{ 'base': 'x-large', 'lg': 'xx-large' }}>Confirm Reservation</Heading>
+                </VStack>
+                <Spinner />
+            </Box>
+        )
+    }
 
     return (
         <Box p={"15px"}>
