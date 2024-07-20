@@ -12,7 +12,8 @@ import { reloadAuthToken } from '../../slices/AuthState';
 function ConfirmReserveCard({
     listingData,
     hostData,
-    userData
+    userData,
+    fetchListingDetails
 }) {
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
     const toast = useToast();
@@ -46,7 +47,7 @@ function ConfirmReserveCard({
                     isClosable: true
                 })
                 console.log("Reservation created; reference number: " + res.data.referenceNum)
-                navigate('/')
+                fetchListingDetails(listingData.listingID);
             } else if (res.data.startsWith("UERROR")) {
                 console.log("User error occurred in creating reservation; response: " + res.data)
                 toast({
