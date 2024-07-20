@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
-    Avatar, useToast, Divider
+    Avatar, useToast, Divider, Tooltip
 } from "@chakra-ui/react";
 import { useSelector } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
@@ -329,18 +329,25 @@ const ReviewCard = ({
                     </CardBody>
                 )}
                 <CardFooter justifyContent={{ base: 'center', md: 'flex-start' }} display="flex">
-                    {loaded && user != null && (
-                        <Button variant='ghost'
-                            backgroundColor={liked ? 'blue.100' : 'gray.100'}
-                            leftIcon={liked ? <Liked /> : <Like />}
-                            _hover={{
-                                backgroundColor: liked ? 'blue.200' : 'gray.200',
-                                color: liked ? 'black' : 'gray.800'
-                            }}
-                            onClick={toggleLike}>
-                            <Text>{currentLikeCount}</Text>
-                        </Button>
-                    )}
+                    <Button 
+                        variant='ghost'
+                        backgroundColor={liked ? 'blue.100' : 'gray.100'}
+                        leftIcon={liked ? <Liked /> : <Like />}
+                        _hover={{
+                            backgroundColor: liked ? 'blue.200' : 'gray.200',
+                            color: liked ? 'black' : 'gray.800'
+                        }}
+                        _disabled={{ // Styling of like button when it is in a disabled state
+                            backgroundColor:'gray.100',
+                            color: 'black',
+                            opacity: 1,  // Ensure the button is fully opaque
+                            pointerEvents: 'none'  // Ensure the button is not clickable
+                        }}
+                        onClick={toggleLike}
+                        isDisabled={user == null}
+                        >
+                        <Text>{currentLikeCount}</Text>
+                    </Button>
                     {loaded && user != null && posterID === user.userID && (
                         <Flex ml={4}>
                             <EditReview
