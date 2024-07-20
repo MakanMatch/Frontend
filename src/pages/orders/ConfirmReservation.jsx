@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { reloadAuthToken } from '../../slices/AuthState';
 import server from '../../networking';
 import ConfirmReservationLayout from '../../components/orders/ConfirmReservationLayout';
+import ConfirmReservationSuccess from '../../components/orders/ConfirmReservationSuccess';
 
 function ConfirmReservation() {
     const navigate = useNavigate();
@@ -152,8 +153,8 @@ function ConfirmReservation() {
     return (
         <>
             {listingData.alreadyReserved ? (
-                <ScaleFade in={true} transition={{ duration: 0.7 }} initialScale={0.6}>
-                    <CheckIcon />
+                <ScaleFade in={true} transition={{ duration: 2 }} initialScale={0.6}>
+                    <ConfirmReservationSuccess listingData={listingData} hostData={hostData} />
                 </ScaleFade>
             ) : (
                 <ConfirmReservationLayout listingData={listingData} hostData={hostData} userData={userData} fetchListingDetails={fetchListingDetails} />
