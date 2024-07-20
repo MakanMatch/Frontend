@@ -1,4 +1,4 @@
-import { Box, Button, HStack, Heading, Spacer, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
+import { Box, Button, Divider, FormControl, FormHelperText, FormLabel, HStack, Heading, Input, Spacer, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
@@ -66,6 +66,20 @@ function ConfirmReservation() {
                                 }}
                             />
                         )}
+                    </Box>
+
+                    <Divider mt={"30px"} mb={"30px"} />
+
+                    <Box textAlign={"left"} flexDirection={"column"}>
+                        <Heading as={"h5"} size={"md"} mb={"5px"}>Profile</Heading>
+                        <Text fontWeight={"light"}>Details auto-filled from your MakanMatch account.</Text>
+
+                        <FormControl mt={"10px"}>
+                            <FormLabel>Username</FormLabel>
+                            <Input type='text' placeholder='John Doe' />
+                            <FormLabel mt={"10px"}>Email</FormLabel>
+                            <Input type='text' placeholder='email@example.com' />
+                        </FormControl>
                     </Box>
                 </Box>
 
