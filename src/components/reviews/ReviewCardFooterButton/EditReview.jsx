@@ -232,6 +232,9 @@ const EditReview = ({
 								onClick={handleEdit}
 								variant="MMPrimary"
 								isDisabled={!hasChanges}
+								_hover={{
+									color: 'white'
+								}}
 							>
 								Save
 							</Button>
