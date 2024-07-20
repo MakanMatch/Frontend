@@ -91,8 +91,7 @@ function ConfirmReservation() {
 
     useEffect(() => {
         if (loaded == true) {
-            console.log(state)
-            if (!state.listingID) {
+            if (!state || !state.listingID) {
                 if (!listingID) {
                     console.log("No listing ID provided to show confirm reservation.")
                     showToast("Something went wrong", "Insufficient information provided.", 1500, true, "error")
@@ -100,7 +99,7 @@ function ConfirmReservation() {
                     return
                 }
             } else {
-                setListingID(history.state.listingID)
+                setListingID(state.listingID)
             }
 
             fetchListingDetails(state.listingID || listingID)
