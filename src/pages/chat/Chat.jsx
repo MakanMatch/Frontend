@@ -41,6 +41,7 @@ function ChatUi() {
 	const [replyTo, setReplyTo] = useState(null);
 	const [editMessageId, setEditMessageId] = useState(null);
 	const [editMessageContent, setEditMessageContent] = useState("");
+	const [chatPartnerUsername, setChatPartnerUsername] = useState(null);
 	const chatBottomRef = useRef(null); // Reference to the bottom of chat container
 	const { user, loaded, error } = useSelector((state) => state.auth);
 
@@ -86,8 +87,10 @@ function ChatUi() {
 				}
 			}
 
-
-			if (receivedMessage.type === "chat_history") {
+			if (receivedMessage.action === "connect"){
+				setChatPartnerUsername(receivedMessage.chatPartnerUsername);
+			}
+			else if (receivedMessage.type === "chat_history") {
 				setMessages(receivedMessage.messages);
 			} else if (receivedMessage.action === "edit") {
 				setMessages((prevMessages) =>
@@ -260,7 +263,7 @@ function ChatUi() {
 					/>
 					<Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
 						<Text fontSize={20} mt={2} textAlign={"left"}>
-							Chat with {user ? user.username : 'Guest'}
+						{chatPartnerUsername ? `Chat with ${chatPartnerUsername}` : "Chat"} {/* Display chat partner's username */}
 						</Text>
 						<Spacer h={3} />
 						<Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
