@@ -1,8 +1,8 @@
 import React from 'react'
 import { Box, Button, Icon, useToast } from '@chakra-ui/react';
 import { BiTrash } from 'react-icons/bi';
-import configureShowToast from '../showToast';
-import server from '../../networking';
+import configureShowToast from '../../showToast';
+import server from '../../../networking';
 
 function DeleteReviewButton({
     reviewID,

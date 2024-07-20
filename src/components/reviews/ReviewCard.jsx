@@ -7,10 +7,10 @@ import { useSelector } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
 import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
 import server from '../../networking';
-import Like from './Like';
-import Liked from './Liked';
-import DeleteReviewButton from './DeleteReviewButton';
-import EditReview from './EditReview';
+import Like from './ReviewCardFooterButton/Like';
+import Liked from './ReviewCardFooterButton/Liked';
+import DeleteReviewButton from './ReviewCardFooterButton/DeleteReviewButton';
+import EditReview from './ReviewCardFooterButton/EditReview';
 import {
     Modal,
     ModalOverlay,

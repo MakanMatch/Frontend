@@ -3,9 +3,9 @@ import {Button, Box, Input, Flex, Text, Image, Textarea, Spacer, useToast, Modal
 } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 import { useDisclosure } from '@chakra-ui/react';
-import StarRating from './StarRatings';
-import server from '../../networking';
-import configureShowToast from '../../components/showToast';
+import StarRating from '../StarRatings';
+import server from '../../../networking';
+import configureShowToast from '../../showToast';
 
 const EditReview = ({
 	reviewID,
