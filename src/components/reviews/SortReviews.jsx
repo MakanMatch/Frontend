@@ -69,10 +69,8 @@ const SortReviews = ({
     }
 
     useEffect(() => {
-        if (loaded && hostID) {
-            fetchSortedData();
-        }
-    }, [hostID, loaded, user, activeTab, stateRefreshSubmit, stateRefreshReview])
+        fetchSortedData();
+    }, [loaded, user, activeTab, stateRefreshSubmit, stateRefreshReview])
 
     return (
         <Tabs mt={8} variant="soft-rounded" size='sm' minWidth="310px" onChange={(index) => setActiveTab(index)}>

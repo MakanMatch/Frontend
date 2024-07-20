@@ -69,17 +69,15 @@ function Reviews() {
 
 
     useEffect(() => {
-        if (loaded) {
-            if (location.state.hostID) {
-                setHostID(location.state.hostID);
-            } else if (searchParams.has('hostID')) {
-                setHostID(searchParams.get('hostID'));
-            } else {
-                showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
-                navigate('/');
-            }
+        if (location.state.hostID) {
+            setHostID(location.state.hostID);
+        } else if (searchParams.has('hostID')) {
+            setHostID(searchParams.get('hostID'));
+        } else {
+            showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
+            navigate('/');
         }
-    }, [user, loaded])
+    })
 
     useEffect(() => {
         if (hostID) {
@@ -87,7 +85,7 @@ function Reviews() {
         }
     }, [hostID]);
 
-    if (!loaded) {
+    if (!loaded || !hostID) {
         return <Spinner />
     }
 
