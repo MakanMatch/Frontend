@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Box, Heading, Input, Button, Text, VStack, useToast, Checkbox, InputGroup, InputRightElement,
-    FormControl, FormLabel, FormErrorMessage, Link, IconButton
+    FormControl, FormLabel, FormErrorMessage, Link, IconButton, HStack
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
@@ -45,8 +45,17 @@ function CreateAccount() {
                     .required('Contact number is required')
                 : Yup.string().notRequired()
         ),
-        address: Yup.lazy((value, context) =>
-            isHostAccount ? Yup.string().required('Address is required') : Yup.string().notRequired()
+        blkNo: Yup.lazy((value, context) =>
+            isHostAccount ? Yup.string().required('Block Number is required') : Yup.string().notRequired()
+        ),
+        street: Yup.lazy((value, context) =>
+            isHostAccount ? Yup.string().required('Street is required') : Yup.string().notRequired()
+        ),
+        postalCode: Yup.lazy((value, context) =>
+            isHostAccount ? Yup.string().required('Postal code is required') : Yup.string().notRequired()
+        ),
+        unitNum: Yup.lazy((value, context) =>
+            isHostAccount ? Yup.string().required('Unit number is required') : Yup.string().notRequired()
         )
     });
 
@@ -91,7 +100,10 @@ function CreateAccount() {
             password: '',
             confirmPassword: '',
             contactNum: '',
-            address: '',
+            blkNo: '',
+            street: '',
+            postalCode: '',
+            unitNum: '',
             isHostAccount: false
         },
         validationSchema,
@@ -122,7 +134,7 @@ function CreateAccount() {
                                     borderColor='black'
                                     size='md'
                                     borderRadius='5px'
-                                    w="400px"
+                                    minW="400px"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     value={formik.values.username}
@@ -228,20 +240,66 @@ function CreateAccount() {
                                         />
                                         <FormErrorMessage fontSize='12px'>{formik.errors.contactNum}</FormErrorMessage>
                                     </FormControl>
-                                    <FormControl isInvalid={formik.errors.address && formik.touched.address} mb={4}>
-                                        <FormLabel fontSize='15px'>Address</FormLabel>
-                                        <Input
-                                            name="address"
-                                            placeholder='Address'
-                                            borderColor='black'
-                                            size='md'
-                                            borderRadius='5px'
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            value={formik.values.address}
-                                        />
-                                        <FormErrorMessage fontSize='12px'>{formik.errors.address}</FormErrorMessage>
-                                    </FormControl>
+                                    <HStack spacing={4} mb={4}>
+                                        <FormControl isInvalid={formik.errors.blkNo && formik.touched.blkNo} flex={1}>
+                                            <FormLabel fontSize='15px'>Block Number</FormLabel>
+                                            <Input
+                                                name="blkNo"
+                                                placeholder='Enter Block Number'
+                                                borderColor='black'
+                                                size='md'
+                                                borderRadius='5px'
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.blkNo}
+                                            />
+                                            <FormErrorMessage fontSize='12px'>{formik.errors.blkNo}</FormErrorMessage>
+                                        </FormControl>
+                                        <FormControl isInvalid={formik.errors.street && formik.touched.street} flex={1}>
+                                            <FormLabel fontSize='15px'>Street</FormLabel>
+                                            <Input
+                                                name="street"
+                                                placeholder='Enter Street (eg. '
+                                                borderColor='black'
+                                                size='md'
+                                                borderRadius='5px'
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.street}
+                                            />
+                                            <FormErrorMessage fontSize='12px'>{formik.errors.street}</FormErrorMessage>
+                                        </FormControl>
+                                    </HStack>
+                                    <HStack spacing={4} mb={4}>
+                                        <FormControl isInvalid={formik.errors.postalCode && formik.touched.postalCode} flex={1}>
+                                            <FormLabel fontSize='15px'>Postal Code</FormLabel>
+                                            <Input
+                                                name="postalCode"
+                                                placeholder='Enter postal Code'
+                                                borderColor='black'
+                                                size='md'
+                                                borderRadius='5px'
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.postalCode}
+                                            />
+                                            <FormErrorMessage fontSize='12px'>{formik.errors.postalCode}</FormErrorMessage>
+                                        </FormControl>
+                                        <FormControl isInvalid={formik.errors.unitNum && formik.touched.unitNum} flex={1}>
+                                            <FormLabel fontSize='15px'>Unit Number</FormLabel>
+                                            <Input
+                                                name="unitNum"
+                                                placeholder='Enter unit number'
+                                                borderColor='black'
+                                                size='md'
+                                                borderRadius='5px'
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.unitNum}
+                                            />
+                                            <FormErrorMessage fontSize='12px'>{formik.errors.unitNum}</FormErrorMessage>
+                                        </FormControl>
+                                    </HStack>
                                 </>
                             )}
                             <Button

@@ -104,7 +104,7 @@ const MyAccount = () => {
                 username: accountInfo.username,
                 email: accountInfo.email,
                 contactNum: accountInfo.contactNum,
-                address: accountInfo.address,
+                address: accountInfo.address || '',
             }, {
                 headers: {
                     'Content-Type': 'application/json'
