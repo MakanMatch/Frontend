@@ -177,14 +177,14 @@ function ConfirmReservation() {
                             )}
 
                             <Text fontWeight={"bold"}>Date and Time:</Text>
-                            <Text>13 May, Tuesday, 2024</Text>
-                            <Text mb={"20px"}>6:00PM-8:00PM</Text>
+                            <Text>{listingData.datetime}</Text>
+                            <Text mb={"20px"}>{new Date(listingData.fullDatetime).toLocaleString('en-US', { timeStyle: 'short' }) }</Text>
 
                             <Text fontWeight={"bold"}>Host:</Text>
-                            <Text mb={"20px"}>Jamie Oliver</Text>
+                            <Text mb={"20px"}>{hostData.username}</Text>
 
-                            <Text fontWeight={"bold"}>Total Guests Served:</Text>
-                            <Text mb={"20px"}>2/5 Reserved</Text>
+                            <Text fontWeight={"bold"}>Total Reservations:</Text>
+                            <Text mb={"20px"}>{listingData.slotsTaken}/{listingData.totalSlots} Reserved</Text>
                         </Box>
 
                         {!isSmallerThan800 && (
