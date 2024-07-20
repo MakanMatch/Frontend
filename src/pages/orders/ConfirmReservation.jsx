@@ -5,6 +5,7 @@ import configureShowToast from '../../components/showToast';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import MarkeredGMaps from '../../components/listings/MarkeredGMaps';
 import StaticGMaps from '../../components/listings/StaticGMaps';
+import ConfirmReserveCard from '../../components/orders/ConfirmReserveCard';
 
 function ConfirmReservation() {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ function ConfirmReservation() {
 
 
             <Box mt={"30px"} display={"flex"} flexDirection={"row"} justifyContent={"space-between"} maxW={"100%"}>
-                <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} width={"50%"}>
+                <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} width={!isSmallerThan600 ? "50%": "100%"}>
                     <Box display={"flex"} justifyContent={"space-between"} flexDirection={"row"}>
                         <Box textAlign={"left"} flexDirection={"column"}>
                             {isSmallerThan600 && (
@@ -84,15 +85,15 @@ function ConfirmReservation() {
                 </Box>
 
                 {!isSmallerThan600 && (
-                    <Box display={"flex"} justifyContent={"left"}>
-                        <Heading as={"h4"}>Coming Soon</Heading>
+                    <Box display={"flex"} justifyContent={"center"}>
+                        <ConfirmReserveCard />
                     </Box>
                 )}
             </Box>
 
             {isSmallerThan600 && (
-                <Box display={"flex"} justifyContent={"left"} mt={"50px"}>
-                    <Heading as={"h4"}>Coming Soon</Heading>
+                <Box display={"flex"} justifyContent={"center"} mt={"50px"}>
+                    <ConfirmReserveCard />
                 </Box>
             )}
         </Box>
