@@ -241,25 +241,11 @@ function CreateAccount() {
                                         <FormErrorMessage fontSize='12px'>{formik.errors.contactNum}</FormErrorMessage>
                                     </FormControl>
                                     <HStack spacing={4} mb={4}>
-                                        <FormControl isInvalid={formik.errors.blkNo && formik.touched.blkNo} flex={1}>
-                                            <FormLabel fontSize='15px'>Block Number</FormLabel>
-                                            <Input
-                                                name="blkNo"
-                                                placeholder='Enter Block Number'
-                                                borderColor='black'
-                                                size='md'
-                                                borderRadius='5px'
-                                                onChange={formik.handleChange}
-                                                onBlur={formik.handleBlur}
-                                                value={formik.values.blkNo}
-                                            />
-                                            <FormErrorMessage fontSize='12px'>{formik.errors.blkNo}</FormErrorMessage>
-                                        </FormControl>
                                         <FormControl isInvalid={formik.errors.street && formik.touched.street} flex={1}>
-                                            <FormLabel fontSize='15px'>Street</FormLabel>
+                                            <FormLabel fontSize='15px'>Street </FormLabel>
                                             <Input
                                                 name="street"
-                                                placeholder='Enter Street (eg. '
+                                                placeholder='Eg. Madagascar Lane'
                                                 borderColor='black'
                                                 size='md'
                                                 borderRadius='5px'
@@ -269,13 +255,11 @@ function CreateAccount() {
                                             />
                                             <FormErrorMessage fontSize='12px'>{formik.errors.street}</FormErrorMessage>
                                         </FormControl>
-                                    </HStack>
-                                    <HStack spacing={4} mb={4}>
                                         <FormControl isInvalid={formik.errors.postalCode && formik.touched.postalCode} flex={1}>
                                             <FormLabel fontSize='15px'>Postal Code</FormLabel>
                                             <Input
                                                 name="postalCode"
-                                                placeholder='Enter postal Code'
+                                                placeholder='Eg. 542301'
                                                 borderColor='black'
                                                 size='md'
                                                 borderRadius='5px'
@@ -285,11 +269,27 @@ function CreateAccount() {
                                             />
                                             <FormErrorMessage fontSize='12px'>{formik.errors.postalCode}</FormErrorMessage>
                                         </FormControl>
+                                    </HStack>
+                                    <HStack spacing={4} mb={4}>
+                                        <FormControl isInvalid={formik.errors.blkNo && formik.touched.blkNo} flex={1}>
+                                            <FormLabel fontSize='15px'>Block Number</FormLabel>
+                                            <Input
+                                                name="blkNo"
+                                                placeholder='Eg. 301A'
+                                                borderColor='black'
+                                                size='md'
+                                                borderRadius='5px'
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.blkNo}
+                                            />
+                                            <FormErrorMessage fontSize='12px'>{formik.errors.blkNo}</FormErrorMessage>
+                                        </FormControl>
                                         <FormControl isInvalid={formik.errors.unitNum && formik.touched.unitNum} flex={1}>
                                             <FormLabel fontSize='15px'>Unit Number</FormLabel>
                                             <Input
                                                 name="unitNum"
-                                                placeholder='Enter unit number'
+                                                placeholder='Eg. 07-15'
                                                 borderColor='black'
                                                 size='md'
                                                 borderRadius='5px'
