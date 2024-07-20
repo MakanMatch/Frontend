@@ -107,7 +107,7 @@ const ReviewCard = ({
                     wrap="wrap"
                     gap={2}
                     justifyContent='center'
-                    alignItems={{ base: 'center'}}
+                    alignItems={{ base: 'center' }}
                 >
                     <Image
                         onClick={() => handleImageClick(0)}
@@ -175,7 +175,7 @@ const ReviewCard = ({
                             src={images[2]}
                             alt="Review image"
                             borderRadius="lg"
-                            minWidth={{ base: '100%', md: "100%"}}
+                            minWidth={{ base: '100%', md: "100%" }}
                             minHeight={{ base: '160', md: '200' }}
                             maxHeight={{ base: "100%", md: "300px" }}
                             objectFit="cover"
@@ -187,7 +187,7 @@ const ReviewCard = ({
         }
         if (numImages === 4) {
             return (
-                <Flex direction={{ base: 'column', md: 'row' }}wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
+                <Flex direction={{ base: 'column', md: 'row' }} wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
                     {images.map((image, index) => (
                         <Image
                             onClick={() => handleImageClick(index)}
@@ -254,13 +254,11 @@ const ReviewCard = ({
                         justifyContent="space-between"
                         wrap="wrap">
                         <Flex alignItems='center' mb={{ base: 2, md: 0 }}>
-                            {username ? (
-                                <Avatar name={username} src='https://bit.ly/sage-adebayo'
-                                    onClick={() => handleProfileClick('https://bit.ly/sage-adebayo')}
-                                    _hover={{ cursor: "pointer" }} />
-                            ) : (
-                                <Avatar src='https://bit.ly/sage-adebayo' />
-                            )}
+                            <Avatar name={username}
+                                // src='../../src/assets/Logo.png'  // Change to actual profile picture
+                                // onClick={() => handleProfileClick('../../src/assets/Logo.png')} // Change to actual profile picture
+                                // _hover={{ cursor: "pointer" }} // Uncomment if profile picture is clickable
+                                />
                             <Box ml={4}>
                                 <Heading textAlign="left" size='sm'>{username ? username : "Guest"}</Heading>
                                 <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 2, md: 5 }} mt={1}>
@@ -329,7 +327,7 @@ const ReviewCard = ({
                     </CardBody>
                 )}
                 <CardFooter justifyContent={{ base: 'center', md: 'flex-start' }} display="flex">
-                    <Button 
+                    <Button
                         variant='ghost'
                         backgroundColor={liked ? 'blue.100' : 'gray.100'}
                         leftIcon={liked ? <Liked /> : <Like />}
@@ -338,14 +336,14 @@ const ReviewCard = ({
                             color: liked ? 'black' : 'gray.800'
                         }}
                         _disabled={{ // Styling of like button when it is in a disabled state
-                            backgroundColor:'gray.100',
+                            backgroundColor: 'gray.100',
                             color: 'black',
                             opacity: 1,  // Ensure the button is fully opaque
                             pointerEvents: 'none'  // Ensure the button is not clickable
                         }}
                         onClick={toggleLike}
                         isDisabled={user == null}
-                        >
+                    >
                         <Text>{currentLikeCount}</Text>
                     </Button>
                     {loaded && user != null && posterID === user.userID && (
@@ -357,12 +355,12 @@ const ReviewCard = ({
                                 reviewComments={comments}
                                 reviewImages={images}
                                 refreshState={refreshState}
-                                stateRefreshReview={stateRefreshReview} 
+                                stateRefreshReview={stateRefreshReview}
                             />
-                            <DeleteReviewButton 
-                                reviewID={reviewID} 
+                            <DeleteReviewButton
+                                reviewID={reviewID}
                                 refreshState={refreshState}
-                                stateRefreshReview={stateRefreshReview} 
+                                stateRefreshReview={stateRefreshReview}
                             />
                         </Flex>
                     )}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux';
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip, Spinner } from '@chakra-ui/react';
+import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip, Spinner, Avatar } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -66,8 +66,8 @@ function Reviews() {
             return
         }
     };
-    
-  
+
+
     useEffect(() => {
         if (loaded) {
             if (location.state.hostID) {
@@ -90,7 +90,7 @@ function Reviews() {
     if (!loaded) {
         return <Spinner />
     }
-    
+
     return (
         <Box p={2} position="relative" width="100%">
             <Button
@@ -107,11 +107,11 @@ function Reviews() {
                 <Box>
                     <Flex direction={{ base: 'column', md: 'row' }} align="center" mb={4} gap={3}>
                         <Spacer display={{ base: 'none', md: 'block' }} />
-                        <Image
-                            borderRadius='full'
+                        <Avatar
+                            name={hostName}
                             boxSize='100px'
-                            src='https://bit.ly/dan-abramov'
-                            alt='Dan Abramov'
+                            // src='https://bit.ly/dan-abramov' // Change this to the actual host image
+                            alt={hostName}
                             onClick={onOpen}
                             cursor="pointer"
                             ml={{ base: 0, md: 4 }}
@@ -128,12 +128,12 @@ function Reviews() {
                                 </Button>
                             </Tooltip>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                                <SubmitReviews
-                                    hostName={hostName}
-                                    hostID={hostID}
-                                    refreshState={refreshState}
-                                    stateRefreshSubmit={stateRefreshSubmit}
-                                />
+                            <SubmitReviews
+                                hostName={hostName}
+                                hostID={hostID}
+                                refreshState={refreshState}
+                                stateRefreshSubmit={stateRefreshSubmit}
+                            />
                         </Flex>
                     </Flex>
                 </Box>
@@ -157,11 +157,11 @@ function Reviews() {
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
                 <ModalContent maxW="max-content" background="transparent" boxShadow="none">
-                    <Image
-                        boxSize='500px'
-                        borderRadius='full'
-                        src='https://bit.ly/dan-abramov'
-                        alt='Dan Abramov'
+                    <Avatar
+                        name={hostName}
+                        boxSize={{ base: '40vw', md: '30vw' }}  // Responsive size for different screen sizes
+                        // src='https://bit.ly/dan-abramov' // Uncomment and use actual host image URL
+                        alt={hostName}
                     />
                 </ModalContent>
             </Modal>
