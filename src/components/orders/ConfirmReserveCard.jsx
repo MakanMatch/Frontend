@@ -46,7 +46,7 @@ function ConfirmReserveCard({
                 <HStack mt={'15px'}>
                     <Text>Portion:</Text>
                     <Spacer />
-                    <NumberInput isDisabled={false} defaultValue={1} min={1} max={4} value={portionSize} onChange={(v) => setPortionSize(v)}>
+                    <NumberInput isDisabled={noSlotsRemaining} defaultValue={1} min={1} max={remainingSlots} value={portionSize} onChange={(v) => setPortionSize(v)}>
                         <NumberInputField />
                         <NumberInputStepper>
                             <NumberIncrementStepper />
@@ -63,10 +63,10 @@ function ConfirmReserveCard({
                     </VStack>
                     <Spacer />
                     {loaded && user ? (
-                        <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} isDisabled={false}>Reserve</Button>
+                        <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} isDisabled={noSlotsRemaining} _hover={'none'}>Reserve</Button>
                     ) : (
                         <Link to={'/auth/login'}>
-                            <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} minW={'fit-content'} isDisabled={false}>Login/Sign Up</Button>
+                            <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} minW={'fit-content'}>Login/Sign Up</Button>
                         </Link>
                     )}
                 </HStack>

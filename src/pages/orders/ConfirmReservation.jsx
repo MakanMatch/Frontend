@@ -124,7 +124,7 @@ function ConfirmReservation() {
 
     useEffect(() => {
         if (loaded == true) {
-            if (!state || !state.listingID) {
+            if (state == null || !state.listingID) {
                 if (!listingID) {
                     console.log("No listing ID provided to show confirm reservation.")
                     showToast("Something went wrong", "Insufficient information provided.", 1500, true, "error")
@@ -135,7 +135,7 @@ function ConfirmReservation() {
                 setListingID(state.listingID)
             }
 
-            fetchListingDetails(state.listingID || listingID)
+            fetchListingDetails(listingID || state.listingID)
             fetchUserDetails() // Will only fetch if user is logged in. If not fetched, UI will show "Login or sign up to reserve."
         }
     }, [loaded, user])

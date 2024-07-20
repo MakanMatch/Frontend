@@ -47,7 +47,7 @@ function ExpandedListingGuest() {
 
     useEffect(() => {
         if (loaded == true) {
-            if (!state || !state.listingID) {
+            if (state == null || !state.listingID) {
                 if (!listingID) {
                     console.log("No listing ID provided to render expanded listing view.")
                     showToast("Something went wrong", "Insufficient information provided.", 1500, true, "error")
@@ -58,7 +58,7 @@ function ExpandedListingGuest() {
                 setListingID(state.listingID)
             }
 
-            fetchListingDetails(state.listingID || listingID)
+            fetchListingDetails(listingID || state.listingID)
         }
     }, [loaded])
 

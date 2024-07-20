@@ -21,7 +21,7 @@ function ReserveCard({ hostData, listingData }) {
                     <Spacer />
                     <Box w={'50%'}>
                         <Link to={"/listing/reserve"} state={{ listingID: listingData.listingID }}>
-                            <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} minW={'fit-content'} isDisabled={noSlotsRemaining}>Reserve</Button>
+                            <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} minW={'fit-content'} isDisabled={noSlotsRemaining} _hover={'none'}>Reserve</Button>
                         </Link>
                         </Box>
                 </HStack>
