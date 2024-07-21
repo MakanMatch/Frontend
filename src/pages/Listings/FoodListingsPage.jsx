@@ -68,12 +68,14 @@ const FoodListingsPage = () => {
                     <Text fontSize={"30px"} mb={4}>
                         {user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
                     </Text>
-                    {user && user.userType === "Host" && (
+                    {user && user.userType === "Host" ? (
                         <Box display="flex" justifyContent="center" mb={4}>
                             <Button onClick={handleClickAddListing} variant="MMPrimary">
                                 Host a meal
                             </Button>
                         </Box>
+                    ) : (
+                        <Box m={10} />
                     )}
                     {isSmallerThan1095 && listings.length > 0 && (
                         <Box mb={4}>
