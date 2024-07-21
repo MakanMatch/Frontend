@@ -66,11 +66,13 @@ const FoodListingsPage = () => {
             <Text fontSize={"30px"} mb={4}>
                 {loaded && user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
             </Text>
-            <Box display="flex" justifyContent="center" mb={4}>
-                <Button onClick={() => handleClickAddListing()} variant="MMPrimary">
-                    Host a meal
-                </Button>
-            </Box>
+            {loaded && user && user.userType === "host" ? (
+                <Box display="flex" justifyContent="center" mb={4}>
+                    <Button onClick={() => handleClickAddListing()} variant="MMPrimary">
+                        Host a meal
+                    </Button>
+                </Box>
+            ) : <Box m={10} />}
             {isSmallerThan1095 && listings.length > 0 && (
                 <Box mb={4}>
                     <MarkeredGMaps
