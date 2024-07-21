@@ -23,6 +23,12 @@ function CreateAccount() {
 
     // Validation schema
     const validationSchema = Yup.object().shape({
+        fname: Yup.string()
+            .matches(/^[a-zA-Z\s]*$/, 'First Name cannot contain numbers')
+            .required('First Name is required'),
+        lname: Yup.string()
+            .matches(/^[a-zA-Z\s]*$/, 'Last Name cannot contain numbers')
+            .required('Last Name is required'),
         username: Yup.string()
             .matches(/^\S*$/, 'Username cannot contain spaces')
             .required('Username is required'),
@@ -70,14 +76,14 @@ function CreateAccount() {
         })
             .then((res) => {
                 if (res && res.data && res.data.startsWith("SUCCESS")) {
-                    showToast('Account created', 'Please verify your email to continue', 3000, true, 'success')
+                    showToast('Account created', 'Please verify your email to continue', 3000, true, 'success');
                     if (res.data.startsWith("SUCCESS RESENDVERIFICATION")) {
                         navigate(`/auth/emailVerification?email=${submitValues.email}&resendOnLoad=true`);
                     } else {
                         navigate(`/auth/emailVerification?email=${submitValues.email}`);
                     }
                 } else {
-                    showToast('Account creation failed', 'An error has occured creating the account.', 3000, true, '')
+                    showToast('Account creation failed', 'An error has occurred creating the account.', 3000, true, '');
                 }
             })
             .catch((err) => {
@@ -88,13 +94,15 @@ function CreateAccount() {
                 } else if (err.response.data === "UERROR: Contact number already exists.") {
                     actions.setFieldError('contactNum', 'Contact number already in use.');
                 }
-                showToast('Account creation failed.', `${err.response.data}`.substring("UERROR: ".length), 3000, true, 'error')
+                showToast('Account creation failed.', `${err.response.data}`.substring("UERROR: ".length), 3000, true, 'error');
                 actions.setSubmitting(false);
             });
     };
 
     const formik = useFormik({
         initialValues: {
+            fname: '',
+            lname: '',
             username: '',
             email: '',
             password: '',
@@ -126,6 +134,36 @@ function CreateAccount() {
                             Create an account
                         </Heading>
                         <Box as="form" onSubmit={formik.handleSubmit}>
+                            <HStack spacing={4} mb={4}>
+                                <FormControl isInvalid={formik.errors.fname && formik.touched.fname} flex={1}>
+                                    <FormLabel fontSize='15px'>First Name</FormLabel>
+                                    <Input
+                                        name="fname"
+                                        placeholder='First Name'
+                                        borderColor='black'
+                                        size='md'
+                                        borderRadius='5px'
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.fname}
+                                    />
+                                    <FormErrorMessage fontSize='12px'>{formik.errors.fname}</FormErrorMessage>
+                                </FormControl>
+                                <FormControl isInvalid={formik.errors.lname && formik.touched.lname} flex={1}>
+                                    <FormLabel fontSize='15px'>Last Name</FormLabel>
+                                    <Input
+                                        name="lname"
+                                        placeholder='Last Name'
+                                        borderColor='black'
+                                        size='md'
+                                        borderRadius='5px'
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.lname}
+                                    />
+                                    <FormErrorMessage fontSize='12px'>{formik.errors.lname}</FormErrorMessage>
+                                </FormControl>
+                            </HStack>
                             <FormControl isInvalid={formik.errors.username && formik.touched.username} mb={4}>
                                 <FormLabel fontSize='15px'>Username</FormLabel>
                                 <Input
