@@ -66,7 +66,7 @@ const FoodListingsPage = () => {
             <Text fontSize={"30px"} mb={4}>
                 {loaded && user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
             </Text>
-            {loaded && user && user.userType === "host" ? (
+            {loaded && user && user.userType === "Host" ? (
                 <Box display="flex" justifyContent="center" mb={4}>
                     <Button onClick={() => handleClickAddListing()} variant="MMPrimary">
                         Host a meal
