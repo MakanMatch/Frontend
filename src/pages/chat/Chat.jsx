@@ -136,6 +136,7 @@ function ChatUi() {
 			const newMessage = {
 				action: "send",
 				sender: user.username,
+				userID: user.userID,
 				message: messageInput,
 				datetime: new Date().toISOString(),
 				replyTo: replyTo ? replyTo.message : null,
