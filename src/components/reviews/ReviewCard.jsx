@@ -1,14 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
-    Avatar, useToast, Divider, Tooltip
+    Avatar, useToast, Divider
 } from "@chakra-ui/react";
 import { useSelector } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
 import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
-import server from '../../networking';
-import Like from './ReviewCardFooterButton/Like';
-import Liked from './ReviewCardFooterButton/Liked';
+import LikeButton from './ReviewCardFooterButton/LikeButton';
 import DeleteReviewButton from './ReviewCardFooterButton/DeleteReviewButton';
 import EditReview from './ReviewCardFooterButton/EditReview';
 import {
@@ -22,7 +20,7 @@ import {
 } from '@chakra-ui/react'
 import StarRatings from 'react-star-ratings';
 import configureShowToast from '../showToast';
-
+import { useNavigate } from "react-router-dom"
 
 const ReviewCard = ({
     username,
@@ -46,6 +44,7 @@ const ReviewCard = ({
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const imageRefs = useRef([]);
     const { user, loaded } = useSelector((state) => state.auth);
+    const navigate = useNavigate();
 
     const handleProfileClick = (image) => {
         setProfileImage(image);
@@ -59,28 +58,6 @@ const ReviewCard = ({
         }, 0);
     }
 
-    const toggleLike = async () => {
-        try {
-            const postLikeResponse = await server.post('/likeReview', {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                reviewID: reviewID,
-            });
-            if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
-                showToast("An error occurred", "Please try again later.", 3000, true, "error");
-                return
-            } else {
-                const { liked, likeCount } = postLikeResponse.data;
-                setLiked(liked);
-                setCurrentLikeCount(likeCount);
-            }
-        } catch (error) {
-            showToast("An error occurred", "Please try again later.", 3000, true, "error");
-            console.log("Error liking review:", error);
-            return
-        }
-    }
     const renderImages = () => {
         const numImages = images.length;
         if (numImages === 1) {
@@ -255,10 +232,10 @@ const ReviewCard = ({
                         wrap="wrap">
                         <Flex alignItems='center' mb={{ base: 2, md: 0 }}>
                             <Avatar name={username}
-                                // src='../../src/assets/Logo.png'  // Change to actual profile picture
-                                // onClick={() => handleProfileClick('../../src/assets/Logo.png')} // Change to actual profile picture
-                                // _hover={{ cursor: "pointer" }} // Uncomment if profile picture is clickable
-                                />
+                            // src='../../src/assets/Logo.png'  // Change to actual profile picture
+                            // onClick={() => handleProfileClick('../../src/assets/Logo.png')} // Change to actual profile picture
+                            // _hover={{ cursor: "pointer" }} // Uncomment if profile picture is clickable
+                            />
                             <Box ml={4}>
                                 <Heading textAlign="left" size='sm'>{username ? username : "Guest"}</Heading>
                                 <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 2, md: 5 }} mt={1}>
@@ -327,25 +304,11 @@ const ReviewCard = ({
                     </CardBody>
                 )}
                 <CardFooter justifyContent={{ base: 'center', md: 'flex-start' }} display="flex">
-                    <Button
-                        variant='ghost'
-                        backgroundColor={liked ? 'blue.100' : 'gray.100'}
-                        leftIcon={liked ? <Liked /> : <Like />}
-                        _hover={{
-                            backgroundColor: liked ? 'blue.200' : 'gray.200',
-                            color: liked ? 'black' : 'gray.800'
-                        }}
-                        _disabled={{ // Styling of like button when it is in a disabled state
-                            backgroundColor: 'gray.100',
-                            color: 'black',
-                            opacity: 1,  // Ensure the button is fully opaque
-                            pointerEvents: 'none'  // Ensure the button is not clickable
-                        }}
-                        onClick={toggleLike}
-                        isDisabled={user == null}
-                    >
-                        <Text>{currentLikeCount}</Text>
-                    </Button>
+                    <LikeButton 
+                        reviewID={reviewID}
+                        isLiked={liked}
+                        likeCount={currentLikeCount}
+                    />
                     {loaded && user != null && posterID === user.userID && (
                         <Flex ml={4}>
                             <EditReview
