@@ -21,7 +21,6 @@ import AccountRecovery from './pages/identity/AccountRecovery';
 import Reviews from './pages/reviews/Reviews.jsx'
 import NotFound from './pages/404.jsx'
 import Chat from './pages/chat/Chat.jsx'
-import Chat2 from './pages/chat/Chat2.jsx'
 import MyAccount from './pages/identity/MyAccount.jsx'
 import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
 import VerifyToken from './pages/identity/VerifyToken.jsx';
@@ -47,7 +46,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"expandedListingGuest"} element={<ExpandedListingGuest />} />
                         <Route path={'reviews'} element={<Reviews />} />
                         <Route path={'chat'} element={<Chat />} />
-                        <Route path={"chat2"} element={<Chat2 />}></Route>
                         <Route path={"targetListing"} element={<GoogleMapsPage/>} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
