@@ -9,7 +9,6 @@ import ConfirmReserveCard from '../../components/orders/ConfirmReserveCard';
 import { useSelector } from 'react-redux';
 
 function ConfirmReservationLayout({
-    handleGoBack,
     listingData,
     hostData,
     userData,
@@ -17,6 +16,14 @@ function ConfirmReservationLayout({
 }) {
     const [isSmallerThan800] = useMediaQuery("(max-width: 800px)");
     const { user, loaded, authToken } = useSelector(state => state.auth)
+
+    const handleGoBack = () => {
+        if (window.history.length > 1) {
+            navigate(-1);
+        } else {
+            navigate('/');
+        }
+    }
 
     return (
         <Box p={"15px"}>

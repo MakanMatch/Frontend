@@ -23,14 +23,6 @@ function ConfirmReservation() {
     const dispatch = useDispatch();
     const { user, loaded, authToken } = useSelector(state => state.auth)
 
-    const handleGoBack = () => {
-        if (window.history.length > 1) {
-            navigate(-1);
-        } else {
-            navigate('/');
-        }
-    }
-
     const processListingData = (data) => {
         const before = data.datetime;
         let datetime = new Date(data.datetime)
@@ -64,38 +56,37 @@ function ConfirmReservation() {
         return { userID, username, foodRating, hygieneGrade }
     }
 
-    const fetchListingDetails = (id) => {
-        server.get(`/cdn/getListing?id=${id}&includeReservations=true&includeHost=true`)
-            .then(response => {
-                dispatch(reloadAuthToken(authToken));
-                if (response.status == 200) {
-                    const processedData = processListingData(response.data)
-                    if (user && processedData.hostID == user.userID) { console.log("Attempt to reserve listing blocked; redirecting..."); navigate("/"); return; }
-                    const processedHostData = processHostData(response.data.Host)
-                    setListingData(processedData)
-                    setHostData(processedHostData)
-                    setLoading(false);
-                    return
-                } else if (response.status == 404) {
-                    console.log("Listing not found, re-directing to home.")
-                    navigate("/")
-                    return
-                } else {
-                    showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
-                    console.log("LISTING RESERVE: Failed to retrieve listing details, redirecting to home. Response below.")
-                    console.log(response.data)
-                    navigate("/")
-                    return
-                }
-            })
-            .catch(err => {
-                dispatch(reloadAuthToken(authToken));
-                showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
-                console.log("LISTING RESERVE: Failed to retrieve listing details, redirecting to home. Response below.")
-                console.log(err)
+    const fetchListingDetails = async (id) => {
+        try {
+            const response = await server.get(`/cdn/getListing?id=${id}&includeReservations=true&includeHost=true`)
+            dispatch(reloadAuthToken(authToken));
+            if (response.status == 200) {
+                const processedData = processListingData(response.data)
+                if (user && processedData.hostID == user.userID) { console.log("Attempt to reserve listing blocked; redirecting..."); navigate("/"); return; }
+                const processedHostData = processHostData(response.data.Host)
+                setListingData(processedData)
+                setHostData(processedHostData)
+                setLoading(false);
+                return
+            } else if (response.status == 404) {
+                console.log("Listing not found, re-directing to home.")
                 navigate("/")
                 return
-            })
+            } else {
+                showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
+                console.log("LISTING RESERVE: Failed to retrieve listing details, redirecting to home. Response below.")
+                console.log(response.data)
+                navigate("/")
+                return
+            }
+        } catch (err) {
+            dispatch(reloadAuthToken(authToken));
+            showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
+            console.log("LISTING RESERVE: Failed to retrieve listing details, redirecting to home. Response below.")
+            console.log(err)
+            navigate("/")
+            return
+        }
     }
 
     const fetchUserDetails = () => {
@@ -140,7 +131,9 @@ function ConfirmReservation() {
             }
 
             fetchListingDetails(listingID || state.listingID)
-            fetchUserDetails() // Will only fetch if user is logged in. If not fetched, UI will show "Login or sign up to reserve."
+                .then(() => {
+                    fetchUserDetails() // Will only fetch if user is logged in. If not fetched, UI will show "Login or sign up to reserve."
+                })
         }
     }, [loaded, user])
 
