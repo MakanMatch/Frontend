@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { Text, useToast, SimpleGrid, Spinner } from '@chakra-ui/react';
+import { useSelector,useDispatch } from 'react-redux';
+import { Text, useToast, SimpleGrid } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import server from '../../networking'
 import ReviewCard from './ReviewCard';
 import configureShowToast from '../../components/showToast';
+import { reloadAuthToken } from '../../slices/AuthState';
 
 const SortReviews = ({
     hostID,
@@ -15,7 +16,8 @@ const SortReviews = ({
     const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
-    const { user, loaded, error } = useSelector((state) => state.auth);
+    const { user, loaded, error, authToken } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {
@@ -28,6 +30,7 @@ const SortReviews = ({
         try {
             // Get reviews
             const response = await server.get(`/cdn/getReviews?hostID=${hostID}&order=${sortOrder}`);
+            dispatch(reloadAuthToken(authToken))
             if (response.status === 200 && Array.isArray(response.data)) {
                 if (response.data.length === 0) {
                     setReviews([]);
@@ -40,6 +43,7 @@ const SortReviews = ({
                 return
             }
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             showToast("An error occurred", "Please try again later", 3000, true, "error");
             console.log("Error fetching reviews:", error)
             return

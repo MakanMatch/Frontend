@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
 import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip, Spinner, Avatar } from '@chakra-ui/react';
@@ -8,6 +8,7 @@ import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
 import { useDisclosure } from '@chakra-ui/react';
+import { reloadAuthToken } from '../../slices/AuthState';
 import {
     Modal,
     ModalOverlay,
@@ -18,7 +19,7 @@ function Reviews() {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
-    const { user, loaded, error } = useSelector((state) => state.auth);
+    const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
@@ -27,6 +28,7 @@ function Reviews() {
     const location = useLocation();
     const [searchParams] = useSearchParams();
     const [hostID, setHostID] = useState("");
+    const dispatch = useDispatch();
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -49,6 +51,7 @@ function Reviews() {
     const fetchHostInfo = async () => {
         try {
             const response = await server.get(`/cdn/accountInfo?userID=${hostID}`);
+            dispatch(reloadAuthToken(authToken))
             if (!response.data) {
                 showToast("No host information found", "Please try again later.", 3000, true, "info")
                 navigate('/')
@@ -59,6 +62,7 @@ function Reviews() {
                 setHostHygieneGrade(response.data.hygieneGrade);
             }
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             toast.closeAll();
             showToast("Error fetching host information", "Please try again later", 3000, true, "error");
             console.error("Error fetching host info:", error);
@@ -82,6 +86,12 @@ function Reviews() {
     })
 
     useEffect(() => {
+        if (!user && loaded) {
+            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+        }
+    }, [user])
+
+    useEffect(() => {   
         if (hostID) {
             fetchHostInfo();
         }

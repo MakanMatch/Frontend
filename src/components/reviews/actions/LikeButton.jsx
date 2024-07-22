@@ -67,6 +67,10 @@ function LikeButton({
         }
     }, [user])
 
+    useEffect(() => {
+        setLiked(isLiked);
+    }, [isLiked]);
+
     return (
         <Button
             variant='ghost'
@@ -78,6 +82,8 @@ function LikeButton({
             }}
             onClick={handleLikeClick}
         >
+            <Text>{String(isLiked)}</Text>
+            <Text>{String(liked)}</Text>
             <Text>{currentLikeCount}</Text>
         </Button>
     )
