@@ -19,6 +19,7 @@ const FoodListingsPage = () => {
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
         toast({
             title: title,
             description: description,
