@@ -5,8 +5,9 @@ import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import AddListingModal from "../../components/listings/AddListingModal";
 import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton, Spinner, Center, Fade } from "@chakra-ui/react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { reloadAuthToken } from "../../slices/AuthState";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
@@ -16,6 +17,7 @@ const FoodListingsPage = () => {
     const [loading, setLoading] = useState(true); 
     const toast = useToast();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     function displayToast(title, description, status, duration, isClosable) {
@@ -36,8 +38,10 @@ const FoodListingsPage = () => {
     const fetchListings = async () => {
         try {
             const response = await server.get("/cdn/listings");
+            dispatch(reloadAuthToken(authToken));
             setListings(response.data);
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             console.log("Failed to fetch listings: " + error)
             displayToast("Error fetching food listings", "Please try again later.", "error", 2500, false);
         }

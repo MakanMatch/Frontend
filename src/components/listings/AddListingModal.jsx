@@ -5,7 +5,9 @@ import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { reloadAuthToken } from "../../slices/AuthState";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast }) => {
     const toast = useToast();
@@ -27,6 +29,9 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
     const [fileFormatError, setFileFormatError] = useState("");
     const [modalError, setModalError] = useState(false);
     const [validListing, setValidListing] = useState(false);
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const cancelRef = useRef();
     const {
@@ -68,8 +73,10 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
         if (loaded && user) {
             const hostInfo = await server.get(`/cdn/accountInfo?userID=${user.userID}`)
             if (hostInfo.status === 200) {
+                dispatch(reloadAuthToken(authToken))
                 setHostID(hostInfo.data.userID)
             } else {
+                dispatch(reloadAuthToken(authToken))
                 console.error("Failed to fetch hostID", hostInfo.data)
                 displayToast("Failed to fetch your hosting details", "Please try again later", "error", 3000, false)
                 return;
@@ -101,6 +108,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
             }
             )
             if (addListingResponse.status == 200) {
+                dispatch(reloadAuthToken(authToken))
                 fetchListings();
                 onClose();
                 setDefaultState();
@@ -114,6 +122,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                 );
             }
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             console.log("Failed to submit listing; error: " + error)
             onClose();
             displayToast(
@@ -220,8 +229,15 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
     }, [totalSlots]);
 
     useEffect(() => {
-        fetchHostID();
-    }, [loaded]);
+        if (loaded == true) {
+            if (!user) {
+                navigate("/auth/login");
+                displayToast("You're not logged in!", "Please sign-in first", "info", 3000, false)
+                return;
+            }
+            fetchHostID();
+        }
+    }, [loaded, user]);
     return (
         <div>
             <Modal

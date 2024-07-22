@@ -7,7 +7,8 @@ import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import server from "../../networking";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { reloadAuthToken } from "../../slices/AuthState";
 
 function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
     const [imageIndex, setImageIndex] = useState(0);
@@ -16,6 +17,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const [imageLoaded, setImageLoaded] = useState(false);
     const toast = useToast();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const [oneStarRatings, setOneStarRatings] = useState(0);
@@ -52,6 +54,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             }
             await server.put("/listings/toggleFavouriteListing", favouriteData)
                 .then((response) => {
+                    dispatch(reloadAuthToken(authToken))
                     if (response.status == 200 && response.data.favourite != undefined) {
                         if (response.data.favourite === true) {
                             setFavourite(true);
@@ -65,6 +68,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                     }
                 })
                 .catch(() => {
+                    dispatch(reloadAuthToken(authToken))
                     toast.closeAll();
                     displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
                 });
@@ -79,8 +83,10 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
             const guestFavCuisine = response.data.favCuisine || "";
             if (guestFavCuisine.includes(listingID)) {
+                dispatch(reloadAuthToken(authToken))
                 setFavourite(true);
             } else {
+                dispatch(reloadAuthToken(authToken))
                 setFavourite(false);
             }
         }
@@ -94,6 +100,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const fetchRatingProgress = async () => {
         const response = await server.get(`/cdn/consolidateReviewsStatistics?hostID=${hostID}`);
         if (response.status === 200) {
+            dispatch(reloadAuthToken(authToken))
             console.log("Successfully fetched reviews statistics", response.data);
             const data = response.data;
             setOneStarRatings(data.oneStar);
@@ -103,6 +110,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             setFiveStarRatings(data.fiveStar);
             setRatingsLoaded(true);
         } else {
+            dispatch(reloadAuthToken(authToken))
             console.log("Failed to fetch reviews statistics");
             displayToast("Error fetching reviews statistics", "Please try again later.", "error", 2500, false);
         }
