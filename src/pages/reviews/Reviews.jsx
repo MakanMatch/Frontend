@@ -18,7 +18,7 @@ function Reviews() {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
-    const { user, loaded } = useSelector((state) => state.auth);
+    const { user, loaded, error } = useSelector((state) => state.auth);
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
@@ -69,13 +69,15 @@ function Reviews() {
 
 
     useEffect(() => {
-        if (location.state.hostID) {
-            setHostID(location.state.hostID);
-        } else if (searchParams.has('hostID')) {
-            setHostID(searchParams.get('hostID'));
-        } else {
-            showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
-            navigate('/');
+        if (loaded == true && !error) {
+            if (location.state.hostID) {
+                setHostID(location.state.hostID);
+            } else if (searchParams.has('hostID')) {
+                setHostID(searchParams.get('hostID'));
+            } else {
+                showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
+                navigate('/');
+            }
         }
     })
 
