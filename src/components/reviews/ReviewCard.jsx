@@ -35,8 +35,6 @@ const ReviewCard = ({
     stateRefresh
 }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [liked, setLiked] = useState(isLiked);
-    const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const imageRefs = useRef([]);
     const { user, loaded } = useSelector((state) => state.auth);
@@ -301,8 +299,8 @@ const ReviewCard = ({
                 <CardFooter justifyContent={{ base: 'center', md: 'flex-start' }} display="flex">
                     <LikeButton
                         reviewID={reviewID}
-                        isLiked={liked}
-                        likeCount={currentLikeCount}
+                        isLiked={isLiked}
+                        likeCount={likeCount}
                     />
                     {loaded && user != null && posterID === user.userID && (
                         <Flex ml={4}>
