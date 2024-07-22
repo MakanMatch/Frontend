@@ -41,14 +41,14 @@ export const fetchUser = () => async (dispatch) => {
         const response = await server.get('/cdn/myAccount', {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-            },
+                Authorization: `Bearer ${localStorage.getItem('jwt')}`
+            }
         });
         dispatch(setUser(response.data));
         dispatch(setLoading(true));
     } catch (err) {
         console.log('Error fetching user:', err);
-        dispatch(setError(err.response.data));
+        dispatch(setError(err.message));
         dispatch(setLoading(true));
     }
 };

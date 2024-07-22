@@ -21,7 +21,7 @@ function ConfirmReservation() {
     const [userData, setUserData] = useState({});
     const [loading, setLoading] = useState(true);
     const dispatch = useDispatch();
-    const { user, loaded, authToken } = useSelector(state => state.auth)
+    const { user, loaded, authToken, error } = useSelector(state => state.auth)
 
     const processListingData = (data) => {
         const before = data.datetime;
@@ -118,7 +118,14 @@ function ConfirmReservation() {
     }
 
     useEffect(() => {
-        if (loaded == true) {
+        if (error) {
+            console.log("Auth failed to load; error: " + error)
+            showToast("Something went wrong", "We failed to load information for you. Please try again.", 3000, true, "error")
+        }
+    }, [error])
+
+    useEffect(() => {
+        if (loaded == true && !error) {
             if (state == null || !state.listingID) {
                 if (!listingID) {
                     console.log("No listing ID provided to show confirm reservation.")
