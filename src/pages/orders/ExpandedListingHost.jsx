@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
 import server from '../../networking';
 import axios from 'axios'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
 import UploadNewImageModal from '../../components/orders/UploadNewImageModal'
 import HostListingImage from '../../components/orders/HostListingImage'
@@ -19,6 +19,7 @@ function ExpandedListingHost() {
     const navigate = useNavigate()
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
+    const { state } = useLocation();
     const [searchParams, setSearchParams] = useSearchParams()
     const [listingID, setListingID] = useState(searchParams.get("id"))
     const [pricePerPortion, setPricePerPortion] = useState('0.00')
@@ -113,7 +114,7 @@ function ExpandedListingHost() {
                 return
             }
 
-            if (!history.state.listingID) {
+            if (state == null || !state.listingID) {
                 if (!listingID) {
                     console.log("No listing ID provided to render expanded listing view.")
                     showToast("Something went wrong", "Insufficient information provided.", 1500, true, "error")
@@ -121,10 +122,10 @@ function ExpandedListingHost() {
                     return
                 }
             } else {
-                setListingID(history.state.listingID)
+                setListingID(state.listingID)
             }
 
-            fetchListingDetails(listingID || history.state.listingID)
+            fetchListingDetails(listingID || state.listingID)
         }
     }, [loaded, user, authToken])
 
