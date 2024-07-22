@@ -15,7 +15,7 @@ const SortReviews = ({
     const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
-    const { user, loaded } = useSelector((state) => state.auth);
+    const { user, loaded, error } = useSelector((state) => state.auth);
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {
@@ -69,7 +69,9 @@ const SortReviews = ({
     }
 
     useEffect(() => {
-        fetchSortedData();
+        if (loaded == true && !error) {
+            fetchSortedData();
+        }
     }, [loaded, user, activeTab, stateRefresh])
 
     return (
