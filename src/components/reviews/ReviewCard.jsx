@@ -79,7 +79,7 @@ const ReviewCard = ({
                     wrap="wrap"
                     gap={2}
                     justifyContent='center'
-                    alignItems={{ base: 'center' }}
+                    alignItems='center'
                 >
                     <Image
                         onClick={() => handleImageClick(0)}
@@ -197,7 +197,7 @@ const ReviewCard = ({
                     <Box
                         onClick={onOpen}
                         borderRadius="lg"
-                        minWidth={{ base: '100%' }}
+                        minWidth='100%'
                         minHeight={"158px"}
                         bg="gray.200"
                         display="flex"
@@ -219,7 +219,7 @@ const ReviewCard = ({
 
     return (
         <TabPanel>
-            <Card maxW={{ base: "100%" }} variant="elevated" key={reviewID} p={4} boxShadow="md">
+            <Card maxW="100%" variant="elevated" key={reviewID} p={4} boxShadow="md">
                 <CardHeader>
                     <Flex direction={{ base: 'column', md: 'row' }}
                         alignItems={{ base: 'flex-start', md: 'center' }}
