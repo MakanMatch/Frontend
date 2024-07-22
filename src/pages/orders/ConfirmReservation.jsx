@@ -118,14 +118,7 @@ function ConfirmReservation() {
     }
 
     useEffect(() => {
-        if (error) {
-            console.log("Auth failed to load; error: " + error)
-            showToast("Something went wrong", "We failed to load information for you. Please try again.", 3000, true, "error")
-        }
-    }, [error])
-
-    useEffect(() => {
-        if (loaded == true && !error) {
+        if (loaded == true) {
             if (state == null || !state.listingID) {
                 if (!listingID) {
                     console.log("No listing ID provided to show confirm reservation.")

@@ -49,7 +49,7 @@ export const fetchUser = () => async (dispatch) => {
     } catch (err) {
         console.log('Error fetching user:', err);
         dispatch(setError(err.message));
-        dispatch(setLoading(true));
+        // dispatch(setLoading(true));
     }
 };
 
