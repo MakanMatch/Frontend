@@ -226,60 +226,66 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                 </Text>)}
                         </Box>
                         <Box className="ratingBox">
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} ml={0.5} mt={-2}>1⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={oneStarRatings}
-                                    mb={2}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} mt={-2}>2⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={twoStarRatings}
-                                    mb={2}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} mt={-2}>3⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={threeStarRatings}
-                                    mb={2}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} mt={-2}>4⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={fourStarRatings}
-                                    mb={2}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} mt={-1}>5⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={fiveStarRatings}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
+                            {ratingsLoaded ? (
+                                <>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} ml={0.5} mt={-2}>1⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={oneStarRatings}
+                                            mb={2}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} mt={-2}>2⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={twoStarRatings}
+                                            mb={2}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} mt={-2}>3⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={threeStarRatings}
+                                            mb={2}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} mt={-2}>4⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={fourStarRatings}
+                                            mb={2}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} mt={-1}>5⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={fiveStarRatings}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                </>
+                            ) : (
+                                <Skeleton height="100px" width="100%" borderRadius={"10px"} />
+                            )}
                         </Box>
                         <Link to={'/reviews'} state={{ hostID }}>
                             <Text mt={2} mb={-4} textAlign="left" color="blue" fontSize={"13px"} textDecoration={"underline"} cursor={"pointer"}>View Host Reviews</Text>
