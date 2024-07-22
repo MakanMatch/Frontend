@@ -6,9 +6,9 @@ import {
 import { useSelector } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
 import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
-import LikeButton from './ReviewCardFooterButton/LikeButton';
-import DeleteReviewButton from './ReviewCardFooterButton/DeleteReviewButton';
-import EditReview from './ReviewCardFooterButton/EditReview';
+import LikeButton from './actions/LikeButton';
+import DeleteReviewButton from './actions/DeleteReviewButton';
+import EditReview from './actions/EditReview';
 import {
     Modal,
     ModalOverlay,
