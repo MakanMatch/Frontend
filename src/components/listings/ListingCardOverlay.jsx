@@ -18,6 +18,14 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const navigate = useNavigate();
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
+    const [oneStarRatings, setOneStarRatings] = useState(0);
+    const [twoStarRatings, setTwoStarRatings] = useState(0);
+    const [threeStarRatings, setThreeStarRatings] = useState(0);
+    const [fourStarRatings, setFourStarRatings] = useState(0);
+    const [fiveStarRatings, setFiveStarRatings] = useState(0);
+    const [totalRatings, setTotalRatings] = useState(0);
+    const [ratingsLoaded, setRatingsLoaded] = useState(false);
+
     const handlePrevImage = () => {
         if (imageIndex === 0) {
             setImageIndex(images.length - 1);
@@ -84,9 +92,37 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
         history.pushState({listingID: id}, "")
     }
 
+    const fetchRatingProgress = async () => {
+        const response = await server.get(`/cdn/consolidateReviewsStatistics?hostID=${hostID}`);
+        if (response.status === 200) {
+            console.log("Successfully fetched reviews statistics", response.data);
+            const data = response.data;
+            setOneStarRatings((data.oneStar / data.totalRatings) * 100);
+            setTwoStarRatings((data.twoStar / data.totalRatings) * 100);
+            setThreeStarRatings((data.threeStar / data.totalRatings) * 100);
+            setFourStarRatings((data.fourStar / data.totalRatings) * 100);
+            setFiveStarRatings((data.fiveStar / data.totalRatings) * 100);
+            setRatingsLoaded(true);
+        } else {
+            console.log("Failed to fetch reviews statistics");
+            displayToast("Error fetching reviews statistics", "Please try again later.", "error", 2500, false);
+        }
+    }
+
     useEffect(() => {
         fetchFavouriteState();
+        fetchRatingProgress();
     }, []);
+
+    useEffect(() => {
+        if (ratingsLoaded) {
+            console.log("One star rating bar: ", oneStarRatings);
+            console.log("Two star rating bar: ", twoStarRatings);
+            console.log("Three star rating bar: ", threeStarRatings);
+            console.log("Four star rating bar: ", fourStarRatings);
+            console.log("Five star rating bar: ", fiveStarRatings);
+        }
+    }, [ratingsLoaded]);
 
     const renderDescription = () => {
         if (shortDescription.length <= 43 || showFullDescription) {
@@ -206,7 +242,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
-                                    value={70}
+                                    value={oneStarRatings}
                                     mb={2}
                                     borderRadius="5px"
                                     flex={1}
@@ -217,7 +253,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
-                                    value={90}
+                                    value={twoStarRatings}
                                     mb={2}
                                     borderRadius="5px"
                                     flex={1}
@@ -228,7 +264,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
-                                    value={30}
+                                    value={threeStarRatings}
                                     mb={2}
                                     borderRadius="5px"
                                     flex={1}
@@ -239,7 +275,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
-                                    value={10}
+                                    value={fourStarRatings}
                                     mb={2}
                                     borderRadius="5px"
                                     flex={1}
@@ -250,7 +286,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                 <Progress
                                     colorScheme="green"
                                     size="sm"
-                                    value={20}
+                                    value={fiveStarRatings}
                                     borderRadius="5px"
                                     flex={1}
                                 />
