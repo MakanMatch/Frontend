@@ -23,7 +23,6 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const [threeStarRatings, setThreeStarRatings] = useState(0);
     const [fourStarRatings, setFourStarRatings] = useState(0);
     const [fiveStarRatings, setFiveStarRatings] = useState(0);
-    const [totalRatings, setTotalRatings] = useState(0);
     const [ratingsLoaded, setRatingsLoaded] = useState(false);
 
     const handlePrevImage = () => {
@@ -97,11 +96,11 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
         if (response.status === 200) {
             console.log("Successfully fetched reviews statistics", response.data);
             const data = response.data;
-            setOneStarRatings((data.oneStar / data.totalRatings) * 100);
-            setTwoStarRatings((data.twoStar / data.totalRatings) * 100);
-            setThreeStarRatings((data.threeStar / data.totalRatings) * 100);
-            setFourStarRatings((data.fourStar / data.totalRatings) * 100);
-            setFiveStarRatings((data.fiveStar / data.totalRatings) * 100);
+            setOneStarRatings(data.oneStar);
+            setTwoStarRatings(data.twoStar);
+            setThreeStarRatings(data.threeStar);
+            setFourStarRatings(data.fourStar);
+            setFiveStarRatings(data.fiveStar);
             setRatingsLoaded(true);
         } else {
             console.log("Failed to fetch reviews statistics");
@@ -113,16 +112,6 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
         fetchFavouriteState();
         fetchRatingProgress();
     }, []);
-
-    useEffect(() => {
-        if (ratingsLoaded) {
-            console.log("One star rating bar: ", oneStarRatings);
-            console.log("Two star rating bar: ", twoStarRatings);
-            console.log("Three star rating bar: ", threeStarRatings);
-            console.log("Four star rating bar: ", fourStarRatings);
-            console.log("Five star rating bar: ", fiveStarRatings);
-        }
-    }, [ratingsLoaded]);
 
     const renderDescription = () => {
         if (shortDescription.length <= 43 || showFullDescription) {
