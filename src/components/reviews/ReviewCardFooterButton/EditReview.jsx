@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {Button, Box, Input, Flex, Text, Image, Textarea, Spacer, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormHelperText, Card
 } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
@@ -6,6 +6,8 @@ import { useDisclosure } from '@chakra-ui/react';
 import StarRating from '../StarRatings';
 import server from '../../../networking';
 import configureShowToast from '../../showToast';
+import { useSelector, useDispatch } from 'react-redux';
+import { reloadAuthToken } from '../../../slices/AuthState';
 
 const EditReview = ({
 	reviewID,
@@ -26,6 +28,8 @@ const EditReview = ({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [hasChanges, setHasChanges] = useState(false);
+	const { user,authToken } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
 	useEffect(() => {
 		setFoodRating(reviewFoodRating);
@@ -95,24 +99,33 @@ const EditReview = ({
         });
 
 		try {
-			const editReview = await server.put(`/manageReviews`, formData, {
+			await server.put(`/manageReviews`, formData, {
 				headers: { 'Content-Type': 'multipart/form-data' },
 				transformRequest: formData => formData
-			});
-			if (editReview.status === 200) {
-				showToast("Review edited successfully", "", 3000, true, "success");
-				setIsSubmitting(false);
-				refreshState(!stateRefreshReview)
-				onClose();
-			} else {
-				showToast("Failed to edit review", "Please try again later", 3000, true, "error");
-			}
+			}).then((editReview) => {
+				dispatch(reloadAuthToken(authToken))
+				if (editReview.status === 200) {
+					showToast("Review edited successfully", "", 3000, true, "success");
+					setIsSubmitting(false);
+					refreshState(!stateRefreshReview)
+					onClose();
+				} else {
+					showToast("Failed to edit review", "Please try again later", 3000, true, "error");
+				}
+			})
 		} catch (error) {
+			dispatch(reloadAuthToken(authToken))
 			setIsSubmitting(false);
 			showToast("Failed to edit review", "Please try again later", 3000, true, "error");
 			console.log('Failed to edit review:', error);
 		}
 	};
+
+	useEffect(() => {
+        if (!user) {
+            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+        }
+    }, [user])
 
 	const handleClose = () => {
 		setFoodRating(reviewFoodRating);

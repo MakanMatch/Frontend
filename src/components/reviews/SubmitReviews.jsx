@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import StarRating from './StarRatings';
 import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
@@ -21,6 +21,7 @@ import {
 } from '@chakra-ui/react'
 import configureShowToast from '../../components/showToast';
 import { useNavigate } from "react-router-dom"
+import { reloadAuthToken } from '../../slices/AuthState';
 
 
 const SubmitReviews = ({
@@ -38,7 +39,9 @@ const SubmitReviews = ({
     const [fileFormatError, setFileFormatError] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { user, loaded } = useSelector((state) => state.auth);
+    const { user, loaded, authToken } = useSelector((state) => state.auth);
+    const [initialUserLoginToastIgnore, setInitialUserLoginToastIgnore] = useState(true);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleFileChange = (event) => {
@@ -78,6 +81,11 @@ const SubmitReviews = ({
     };
 
     const handleSubmit = async () => {
+        if (!user) {
+            navigate("/auth/login");
+            showToast("Please log in", "You need to log in before submitting a review", 3000, true, "info");
+            return
+        }
         setIsSubmitting(true);
         const currentDate = new Date().toISOString();
         const formData = new FormData();
@@ -93,6 +101,7 @@ const SubmitReviews = ({
         try {
             await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
                 .then((res) => {
+                    dispatch(reloadAuthToken(authToken))
                     if (res.data && res.data.startsWith("SUCCESS")) {
                         showToast("Review submitted successfully", "", 3000, true, "success")
                         console.log('Review submitted successfully!');
@@ -106,6 +115,7 @@ const SubmitReviews = ({
                     }
                 })
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             setIsSubmitting(false);
             showToast("Failed to submit review", "Please try again later", 3000, true, "error");
             console.log('Failed to submit review:', error);
@@ -127,6 +137,18 @@ const SubmitReviews = ({
         onClose();
         setFileFormatError("")
     };
+
+    useEffect(() => {
+        if (loaded == true) {
+            setInitialUserLoginToastIgnore(false);
+        }
+    }, [loaded])
+
+    useEffect(() => {
+        if (!user && !initialUserLoginToastIgnore) {
+            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+        }
+    }, [user])
 
     return (
         <Box>

@@ -1,11 +1,12 @@
-import React, { useState }  from 'react'
+import React, { useState, useEffect }  from 'react'
 import Like from './LikeIcon';
 import Liked from './LikedIcon';
 import server from '../../../networking';
 import { useToast, Button, Text } from '@chakra-ui/react';
 import { useNavigate } from "react-router-dom"
 import configureShowToast from '../../showToast';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { reloadAuthToken } from '../../../slices/AuthState';
 
 function LikeButton({
     reviewID,
@@ -16,8 +17,9 @@ function LikeButton({
     const showToast = configureShowToast(toast)
     const [liked, setLiked] = useState(isLiked);
     const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
+    const { user, loaded, authToken } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { user, loaded } = useSelector((state) => state.auth);
 
     const handleLikeClick = () => {
         if (loaded && (!user || !user.userID)) {
@@ -36,26 +38,35 @@ function LikeButton({
 
     const toggleLike = async () => {
         try {
-            const postLikeResponse = await server.post('/likeReview', {
+            await server.post('/likeReview', {
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 reviewID: reviewID,
-            });
-            if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
-                showToast("An error occurred", "Please try again later.", 3000, true, "error");
-                return
-            } else {
-                const { liked, likeCount } = postLikeResponse.data;
-                setLiked(liked);
-                setCurrentLikeCount(likeCount);
-            }
+            }).then((postLikeResponse) => {
+                dispatch(reloadAuthToken(authToken))
+                if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
+                    showToast("An error occurred", "Please try again later.", 3000, true, "error");
+                    return
+                } else {
+                    const { liked, likeCount } = postLikeResponse.data;
+                    setLiked(liked);
+                    setCurrentLikeCount(likeCount);
+                }
+            })
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             showToast("An error occurred", "Please try again later.", 3000, true, "error");
             console.log("Error liking review:", error);
             return
         }
     }
+
+    useEffect(() => {
+        if (!user) {
+            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+        }
+    }, [user])
 
     return (
         <Button
