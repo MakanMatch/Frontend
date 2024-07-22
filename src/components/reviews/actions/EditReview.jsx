@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
 	Button, Box, Input, Flex, Text, Image, Textarea, Spacer, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormHelperText, Card
 } from '@chakra-ui/react';
@@ -31,6 +31,8 @@ const EditReview = ({
 	const [hasChanges, setHasChanges] = useState(false);
 	const { user, authToken } = useSelector((state) => state.auth);
 	const dispatch = useDispatch();
+	const cancelRef = useRef();
+    const hasRendered = useRef(false);
 
 	useEffect(() => {
 		setFoodRating(reviewFoodRating);
@@ -122,10 +124,14 @@ const EditReview = ({
 	};
 
 	useEffect(() => {
-		if (!user) {
-			showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
-		}
-	}, [user])
+        if (hasRendered.current) {
+            if (!user) {
+                showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+            }
+        } else {
+            hasRendered.current = true;
+        }
+    }, [user]);
 
 	const handleClose = () => {
 		setFoodRating(reviewFoodRating);

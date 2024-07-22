@@ -26,6 +26,7 @@ function DeleteReviewButton({
     const [isOpen, setIsOpen] = useState(false);
     const onClose = () => setIsOpen(false);
     const cancelRef = useRef();
+    const hasRendered = useRef(false);
 
     const handleDelete = async () => {
         try {
@@ -49,10 +50,14 @@ function DeleteReviewButton({
     }
 
     useEffect(() => {
-        if (!user) {
-            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+        if (hasRendered.current) {
+            if (!user) {
+                showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+            }
+        } else {
+            hasRendered.current = true;
         }
-    }, [user])
+    }, [user]);
 
     return (
         <Box>

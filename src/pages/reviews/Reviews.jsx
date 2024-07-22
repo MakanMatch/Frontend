@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
@@ -29,6 +29,8 @@ function Reviews() {
     const [searchParams] = useSearchParams();
     const [hostID, setHostID] = useState("");
     const dispatch = useDispatch();
+    const cancelRef = useRef();
+    const hasRendered = useRef(false);
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -86,10 +88,14 @@ function Reviews() {
     })
 
     useEffect(() => {
-        if (!user && loaded) {
-            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+        if (hasRendered.current) {
+            if (!user) {
+                showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+            }
+        } else {
+            hasRendered.current = true;
         }
-    }, [user])
+    }, [user]);
 
     useEffect(() => {   
         if (hostID) {

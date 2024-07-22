@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef} from 'react'
 import Like from './LikeIcon';
 import Liked from './LikedIcon';
 import server from '../../../networking';
@@ -20,6 +20,8 @@ function LikeButton({
     const { user, loaded, authToken } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const cancelRef = useRef();
+    const hasRendered = useRef(false);
 
     const handleLikeClick = () => {
         if (loaded && (!user || !user.userID)) {
@@ -62,10 +64,14 @@ function LikeButton({
     }
 
     useEffect(() => {
-        if (!user) {
-            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+        if (hasRendered.current) {
+            if (!user) {
+                showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+            }
+        } else {
+            hasRendered.current = true;
         }
-    }, [user])
+    }, [user]);
 
     useEffect(() => {
         setLiked(isLiked);
