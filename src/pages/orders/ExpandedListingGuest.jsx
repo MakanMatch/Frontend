@@ -84,10 +84,17 @@ function ExpandedListingGuest() {
         data.images = data.images.split("|")
 
         var slotsTaken = 0;
+        var includesUser = false;
         if (data.guests) {
             data.guests.forEach((guest) => {
+                if (user && guest.userID == user.userID) {
+                    includesUser = true;
+                }
                 slotsTaken += guest.Reservation.portions
             })
+        }
+        if (includesUser) {
+            data.alreadyReserved = true;
         }
 
         data.slotsTaken = slotsTaken;
