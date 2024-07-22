@@ -8,14 +8,14 @@ import configureShowToast from '../../components/showToast';
 
 const SortReviews = ({
     hostID,
-    stateRefreshSubmit
+    refreshState,
+    stateRefresh
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const [activeTab, setActiveTab] = useState(0)
     const [reviews, setReviews] = useState([])
     const { user, loaded } = useSelector((state) => state.auth);
-    var [stateRefreshReview, refreshState] = useState(false);
 
     function getImageLink(listingID, imageName) {
         if (!listingID || !imageName) {
@@ -70,7 +70,7 @@ const SortReviews = ({
 
     useEffect(() => {
         fetchSortedData();
-    }, [loaded, user, activeTab, stateRefreshSubmit, stateRefreshReview])
+    }, [loaded, user, activeTab, stateRefresh])
 
     return (
         <Tabs mt={8} variant="soft-rounded" size='sm' minWidth="310px" onChange={(index) => setActiveTab(index)}>
@@ -82,7 +82,7 @@ const SortReviews = ({
             </TabList>
             <TabPanels>
                 <TabPanel>
-                    <SimpleGrid columns={{base: 1, md: 2, xl: 3}} spacing={4}>
+                    <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <ReviewCard
@@ -95,17 +95,17 @@ const SortReviews = ({
                                     images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
-                                    posterID = {review.guestID}
+                                    posterID={review.guestID}
                                     isLiked={review.isLiked}
                                     refreshState={refreshState}
-                                    stateRefreshReview={stateRefreshReview} 
+                                    stateRefresh={stateRefresh}
                                 />
                             )) :
                             null}
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                <SimpleGrid  columns={{base: 1, md: 2, xl: 3}} spacing={4}>
+                    <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <ReviewCard
@@ -118,17 +118,17 @@ const SortReviews = ({
                                     images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
-                                    posterID = {review.guestID}
+                                    posterID={review.guestID}
                                     isLiked={review.isLiked}
                                     refreshState={refreshState}
-                                    stateRefreshReview={stateRefreshReview} 
+                                    stateRefresh={stateRefresh}
                                 />
                             )) :
                             null}
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                <SimpleGrid  columns={{base: 1, md: 2, xl: 3}} spacing={4}>
+                    <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <ReviewCard
@@ -141,17 +141,17 @@ const SortReviews = ({
                                     images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
-                                    posterID = {review.guestID}
+                                    posterID={review.guestID}
                                     isLiked={review.isLiked}
                                     refreshState={refreshState}
-                                    stateRefreshReview={stateRefreshReview} 
+                                    stateRefresh={stateRefresh}
                                 />
                             )) :
                             null}
                     </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
-                <SimpleGrid  columns={{base: 1, md: 2, xl: 3}} spacing={4}>
+                    <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
                         {reviews.length > 0 ?
                             reviews.map((review) => (
                                 <ReviewCard
@@ -164,10 +164,10 @@ const SortReviews = ({
                                     images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                     likeCount={review.likeCount}
                                     reviewID={review.reviewID}
-                                    posterID = {review.guestID}
+                                    posterID={review.guestID}
                                     isLiked={review.isLiked}
                                     refreshState={refreshState}
-                                    stateRefreshReview={stateRefreshReview} 
+                                    stateRefresh={stateRefresh}
                                 />
                             )) :
                             null}

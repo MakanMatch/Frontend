@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import {Button, Box, Input, Flex, Text, Image, Textarea, Spacer, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormHelperText, Card
+import {
+	Button, Box, Input, Flex, Text, Image, Textarea, Spacer, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormHelperText, Card
 } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 import { useDisclosure } from '@chakra-ui/react';
@@ -16,7 +17,7 @@ const EditReview = ({
 	reviewComments,
 	reviewImages,
 	refreshState,
-    stateRefreshReview
+	stateRefresh
 }) => {
 	const toast = useToast();
 	const showToast = configureShowToast(toast);
@@ -28,8 +29,8 @@ const EditReview = ({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [hasChanges, setHasChanges] = useState(false);
-	const { user,authToken } = useSelector((state) => state.auth);
-    const dispatch = useDispatch();
+	const { user, authToken } = useSelector((state) => state.auth);
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		setFoodRating(reviewFoodRating);
@@ -54,9 +55,9 @@ const EditReview = ({
 	const handleFileChange = (event) => {
 		const files = Array.from(event.target.files);
 		if (images.length + files.length > 6) {
-            setFileFormatError("You can upload a maximum of 6 images.");
-            return;
-        }
+			setFileFormatError("You can upload a maximum of 6 images.");
+			return;
+		}
 		let filesAccepted = false;
 		for (const file of files) {
 			const allowedTypes = [
@@ -95,8 +96,8 @@ const EditReview = ({
 		formData.append('hygieneRating', hygieneRating);
 		formData.append('comments', comments);
 		images.forEach((file) => {
-            formData.append('images', file);
-        });
+			formData.append('images', file);
+		});
 
 		try {
 			await server.put(`/manageReviews`, formData, {
@@ -107,7 +108,7 @@ const EditReview = ({
 				if (editReview.status === 200) {
 					showToast("Review edited successfully", "", 3000, true, "success");
 					setIsSubmitting(false);
-					refreshState(!stateRefreshReview)
+					refreshState(!stateRefresh)
 					onClose();
 				} else {
 					showToast("Failed to edit review", "Please try again later", 3000, true, "error");
@@ -122,10 +123,10 @@ const EditReview = ({
 	};
 
 	useEffect(() => {
-        if (!user) {
-            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
-        }
-    }, [user])
+		if (!user) {
+			showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+		}
+	}, [user])
 
 	const handleClose = () => {
 		setFoodRating(reviewFoodRating);

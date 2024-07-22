@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
-    Avatar, useToast, Divider
+    Avatar, Divider
 } from "@chakra-ui/react";
 import { useSelector } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
@@ -19,8 +19,6 @@ import {
     ModalCloseButton,
 } from '@chakra-ui/react'
 import StarRatings from 'react-star-ratings';
-import configureShowToast from '../showToast';
-import { useNavigate } from "react-router-dom"
 
 const ReviewCard = ({
     username,
@@ -34,17 +32,14 @@ const ReviewCard = ({
     posterID,
     isLiked,
     refreshState,
-    stateRefreshReview
+    stateRefresh
 }) => {
-    const toast = useToast();
-    const showToast = configureShowToast(toast)
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [liked, setLiked] = useState(isLiked);
     const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const imageRefs = useRef([]);
     const { user, loaded } = useSelector((state) => state.auth);
-    const navigate = useNavigate();
 
     const handleProfileClick = (image) => {
         setProfileImage(image);
@@ -304,7 +299,7 @@ const ReviewCard = ({
                     </CardBody>
                 )}
                 <CardFooter justifyContent={{ base: 'center', md: 'flex-start' }} display="flex">
-                    <LikeButton 
+                    <LikeButton
                         reviewID={reviewID}
                         isLiked={liked}
                         likeCount={currentLikeCount}
@@ -318,12 +313,12 @@ const ReviewCard = ({
                                 reviewComments={comments}
                                 reviewImages={images}
                                 refreshState={refreshState}
-                                stateRefreshReview={stateRefreshReview}
+                                stateRefresh={stateRefresh}
                             />
                             <DeleteReviewButton
                                 reviewID={reviewID}
                                 refreshState={refreshState}
-                                stateRefreshReview={stateRefreshReview}
+                                stateRefresh={stateRefresh}
                             />
                         </Flex>
                     )}

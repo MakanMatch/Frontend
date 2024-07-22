@@ -9,7 +9,7 @@ import { reloadAuthToken } from '../../../slices/AuthState';
 function DeleteReviewButton({
     reviewID,
     refreshState,
-    stateRefreshReview
+    stateRefresh
 }) {
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -26,7 +26,7 @@ function DeleteReviewButton({
                 dispatch(reloadAuthToken(authToken))
                 if (deleteReview.status === 200) {
                     showToast("Review deleted", "", 3000, false, "success");
-                    refreshState(!stateRefreshReview)
+                    refreshState(!stateRefresh)
                 } else {
                     showToast("Error deleting review", "", 3000, false, "error");
                 }
@@ -51,10 +51,10 @@ function DeleteReviewButton({
                 colorScheme="red"
                 ml={2}
                 size="md">
-                    <BiTrash />
+                <BiTrash />
             </Button>
         </Box>
-      );
+    );
 }
 
 export default DeleteReviewButton

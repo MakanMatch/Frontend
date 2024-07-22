@@ -22,7 +22,7 @@ function Reviews() {
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
-    const [stateRefreshSubmit, refreshState] = useState(false);
+    const [stateRefresh, refreshState] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const location = useLocation();
     const [searchParams] = useSearchParams();
@@ -130,7 +130,7 @@ function Reviews() {
                                 hostName={hostName}
                                 hostID={hostID}
                                 refreshState={refreshState}
-                                stateRefreshSubmit={stateRefreshSubmit}
+                                stateRefresh={stateRefresh}
                             />
                         </Flex>
                     </Flex>
@@ -150,7 +150,8 @@ function Reviews() {
             <Heading mt={5} size="lg"><Text>Reviews</Text></Heading>
             <SortReviews
                 hostID={hostID}
-                stateRefreshSubmit={stateRefreshSubmit}
+                refreshState={refreshState}
+                stateRefresh={stateRefresh}
             />
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
