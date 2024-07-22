@@ -82,8 +82,6 @@ function LikeButton({
             }}
             onClick={handleLikeClick}
         >
-            <Text>{String(isLiked)}</Text>
-            <Text>{String(liked)}</Text>
             <Text>{currentLikeCount}</Text>
         </Button>
     )
