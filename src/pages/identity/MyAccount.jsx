@@ -11,6 +11,7 @@ import HostSidebar from "../../components/identity/HostSideNav";
 import server from "../../networking";
 import configureShowToast from '../../components/showToast';
 import ChangePassword from "../../components/identity/ChangePassword";
+import EditPicture from "../../components/identity/EditPicture";
 
 const MyAccount = () => {
     const navigate = useNavigate();
@@ -20,6 +21,7 @@ const MyAccount = () => {
     const cancelRef = React.useRef()
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const { isOpen: isDiscardOpen, onOpen: onDiscardOpen, onClose: onDiscardClose } = useDisclosure();
+    const [isEditPictureModalOpen, setEditPictureModalOpen] = useState(false);
     const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const [accountInfo, setAccountInfo] = useState(null);
@@ -172,7 +174,7 @@ const MyAccount = () => {
         setPasswordModalOpen(!isPasswordModalOpen);
     };
 
-    const handleCloseModal = () => {
+    const handlePasswordCloseModal = () => {
         setPasswordModalOpen(false);
     };
 
@@ -199,6 +201,19 @@ const MyAccount = () => {
             .finally(() => {
                 setSubmitting(false);
             });
+    };
+
+    const toggleEditPicture = () => {
+        setEditPictureModalOpen(!isEditPictureModalOpen);
+    };
+
+    const handleEditPictureCloseModal = () => {
+        setEditPictureModalOpen(false);
+        setIsHovered(false)
+    };
+
+    const handleEditPicture = () => {
+        console.log("Edit picture clicked");
     };
 
     if (!accountLoaded) {
@@ -240,11 +255,11 @@ const MyAccount = () => {
                         zIndex={1}
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => setIsHovered(false)}
+                        cursor={"pointer"}
                         overflow="visible"
                     >
                         <Avatar
                             size="3xl"
-                            name={accountInfo.username}
                             src="https://via.placeholder.com/150"
                             position="relative"
                             bg="white"
@@ -263,10 +278,13 @@ const MyAccount = () => {
                                     alignItems="center"
                                     justifyContent="center"
                                     borderRadius="50%"
+                                    onClick={(toggleEditPicture)}
                                 >
                                     <Text fontSize="sm" color="white">
                                         Edit Picture
                                     </Text>
+
+                                    <EditPicture isOpen={isEditPictureModalOpen} onClose={handleEditPictureCloseModal} onSubmit={handleEditPicture} />
                                 </Box>
                             )}
                         </Avatar>
@@ -339,7 +357,7 @@ const MyAccount = () => {
                             Change Password
                         </Button>
 
-                        <ChangePassword isOpen={isPasswordModalOpen} onClose={handleCloseModal} onSubmit={handleChangePassword} />
+                        <ChangePassword isOpen={isPasswordModalOpen} onClose={handlePasswordCloseModal} onSubmit={handleChangePassword} />
                     </Box>
 
                     <Box p={2} width={"22%"}>

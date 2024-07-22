@@ -11,6 +11,9 @@ export default function DemoApp() {
     const { user, authToken, loaded } = useSelector((state) => state.auth);
     const { isOpen, onOpen, onClose } = useDisclosure()
 
+    const [targetListingID, setTargetListingID] = useState(null)
+    
+
     function displayToast(title, description, status, duration, isClosable) {
         toast({
             title: title,
