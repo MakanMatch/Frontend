@@ -99,21 +99,19 @@ const SubmitReviews = ({
         formData.append('hostID', hostID);
 
         try {
-            await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
-                .then((res) => {
-                    dispatch(reloadAuthToken(authToken))
-                    if (res.data && res.data.startsWith("SUCCESS")) {
-                        showToast("Review submitted successfully", "", 3000, true, "success")
-                        console.log('Review submitted successfully!');
-                        setIsSubmitting(false);
-                        setComments('');
-                        setImages([]);
-                        onClose();
-                        refreshState(!stateRefresh)
-                    } else {
-                        showToast("Failed to submit review", "Please try again later", 3000, true, "error");
-                    }
-                })
+            const submitReview = await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
+                dispatch(reloadAuthToken(authToken))
+                if (submitReview.data && submitReview.data.startsWith("SUCCESS")) {
+                    showToast("Review submitted successfully", "", 3000, true, "success")
+                    console.log('Review submitted successfully!');
+                    setIsSubmitting(false);
+                    setComments('');
+                    setImages([]);
+                    onClose();
+                    refreshState(!stateRefresh)
+                } else {
+                    showToast("Failed to submit review", "Please try again later", 3000, true, "error");
+                }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
             setIsSubmitting(false);

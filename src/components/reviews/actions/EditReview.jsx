@@ -100,20 +100,19 @@ const EditReview = ({
 		});
 
 		try {
-			await server.put(`/manageReviews`, formData, {
+			const editReview = await server.put(`/manageReviews`, formData, {
 				headers: { 'Content-Type': 'multipart/form-data' },
 				transformRequest: formData => formData
-			}).then((editReview) => {
-				dispatch(reloadAuthToken(authToken))
-				if (editReview.status === 200) {
-					showToast("Review edited successfully", "", 3000, true, "success");
-					setIsSubmitting(false);
-					refreshState(!stateRefresh)
-					onClose();
-				} else {
-					showToast("Failed to edit review", "Please try again later", 3000, true, "error");
-				}
 			})
+			dispatch(reloadAuthToken(authToken))
+			if (editReview.status === 200) {
+				showToast("Review edited successfully", "", 3000, true, "success");
+				setIsSubmitting(false);
+				refreshState(!stateRefresh)
+				onClose();
+			} else {
+				showToast("Failed to edit review", "Please try again later", 3000, true, "error");
+			}
 		} catch (error) {
 			dispatch(reloadAuthToken(authToken))
 			setIsSubmitting(false);

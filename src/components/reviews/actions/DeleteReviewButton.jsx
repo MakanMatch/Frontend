@@ -29,19 +29,18 @@ function DeleteReviewButton({
 
     const handleDelete = async () => {
         try {
-            await server.delete(`/manageReviews`, {
+            const deleteReview = await server.delete(`/manageReviews`, {
                 data: {
                     reviewID: reviewID
                 }
-            }).then((deleteReview) => {
-                dispatch(reloadAuthToken(authToken))
-                if (deleteReview.status === 200) {
-                    showToast("Review deleted", "", 3000, false, "success");
-                    refreshState(!stateRefresh)
-                } else {
-                    showToast("Error deleting review", "", 3000, false, "error");
-                }
             })
+            dispatch(reloadAuthToken(authToken))
+            if (deleteReview.status === 200) {
+                showToast("Review deleted", "", 3000, false, "success");
+                refreshState(!stateRefresh)
+            } else {
+                showToast("Error deleting review", "", 3000, false, "error");
+            }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
             showToast("Error deleting review", "", 3000, false, "error");

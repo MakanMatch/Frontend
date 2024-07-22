@@ -38,22 +38,21 @@ function LikeButton({
 
     const toggleLike = async () => {
         try {
-            await server.post('/likeReview', {
+            const postLikeResponse = await server.post('/likeReview', {
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 reviewID: reviewID,
-            }).then((postLikeResponse) => {
-                dispatch(reloadAuthToken(authToken))
-                if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
-                    showToast("An error occurred", "Please try again later.", 3000, true, "error");
-                    return
-                } else {
-                    const { liked, likeCount } = postLikeResponse.data;
-                    setLiked(liked);
-                    setCurrentLikeCount(likeCount);
-                }
             })
+            dispatch(reloadAuthToken(authToken))
+            if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
+                showToast("An error occurred", "Please try again later.", 3000, true, "error");
+                return
+            } else {
+                const { liked, likeCount } = postLikeResponse.data;
+                setLiked(liked);
+                setCurrentLikeCount(likeCount);
+            }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
             showToast("An error occurred", "Please try again later.", 3000, true, "error");
