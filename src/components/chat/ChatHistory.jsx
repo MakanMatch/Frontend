@@ -8,7 +8,7 @@ const users = [
   { name: "Ryan Florence", lastMessage: "Let's catch up later this week.", avatar: "https://bit.ly/ryan-florence" },
 ];
 
-function ChatHistory() {
+function ChatHistory({ onUserClick }) {
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
 
   if (!isSmallerThan950px) {
@@ -27,6 +27,7 @@ function ChatHistory() {
             _hover={{ bg: "gray.100", cursor: "pointer" }} 
             borderRadius="md" 
             w="100%"
+            onClick={() => onUserClick(user.name)} // Trigger the click handler
           >
             <Avatar src={user.avatar} name={user.name} mr={3} minW={"55px"} minH={"55px"} />
             <Box flex="1" minW={0}>

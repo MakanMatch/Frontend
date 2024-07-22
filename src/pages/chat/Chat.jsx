@@ -42,6 +42,7 @@ function ChatUi() {
 	const [editMessageId, setEditMessageId] = useState(null);
 	const [editMessageContent, setEditMessageContent] = useState("");
 	const [chatPartnerUsername, setChatPartnerUsername] = useState(null);
+	const [isChatVisible, setIsChatVisible] = useState(false); // State for chat visibility
 	const chatBottomRef = useRef(null); // Reference to the bottom of chat container
 	const { user, loaded, error } = useSelector((state) => state.auth);
 
@@ -54,14 +55,13 @@ function ChatUi() {
 
 	useEffect(() => {
 		if (loaded && !user) {
-			// console.log(localStorage.getItem("jwt"));
 			navigate("/auth/login");
 		}
 	}, [loaded, user, navigate]);
+
 	useEffect(() => {
 		const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
 		ws.current = new WebSocket(wsUrl);
-
 
 		ws.current.onopen = () => {
 			console.log("Connected to WebSocket server");
@@ -234,9 +234,15 @@ function ChatUi() {
 		return currentDate !== previousDate;
 	};
 
+	// Function to toggle chat visibility
+	const toggleChatVisibility = () => {
+		setIsChatVisible((prev) => !prev);
+	};
+
 	return (
 		<Flex>
-			<ChatHistory />
+			<ChatHistory onUserClick={toggleChatVisibility} />
+			{isChatVisible && (
 			<Center flexDirection="column" alignItems="center" p={5} flex="1">
 				<Box
 					bg="white"
@@ -368,6 +374,7 @@ function ChatUi() {
 				</Flex>
 			</Box>
 		</Center>
+			)}
 
 			{/* Edit Message Modal */ }
 	<Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
