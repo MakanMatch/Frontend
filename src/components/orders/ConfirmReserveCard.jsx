@@ -72,9 +72,14 @@ function ConfirmReserveCard({
             dispatch(reloadAuthToken(authToken));
             setReserving(false)
             console.log("Failed to create reservation; error: " + err)
+            var errorMessage = "Failed to make a reservation. Please try again later."
+            if (err.response && err.response.data && typeof err.response.data == 'string' && err.response.data.startsWith("UERROR")) {
+                errorMessage = err.response.data.substring("UERROR: ".length)
+            }
+            
             toast({
                 title: "Something went wrong",
-                description: "Failed to make a reservation. Please try again later.",
+                description: errorMessage,
                 status: "error",
                 duration: 5000,
                 isClosable: true

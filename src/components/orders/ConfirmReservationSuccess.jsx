@@ -75,6 +75,7 @@ function ConfirmReservationSuccess({
                         <BsFillCheckCircleFill color={'lime'} size={'50px'} />
                         <Heading fontFamily={'Sora'} fontWeight={'bold'} fontSize={{ 'base': 'x-large', 'lg': 'xx-large' }} mt={'30px'}>Reservation Successful!</Heading>
                         <Text mt={'10px'}>Thank you for reserving with <strong>{hostData.username}</strong>. Bon Appetit!</Text>
+                        <Text mt={'15px'} fontSize={'small'}>Reference Num: {reservation.Reservation.referenceNum}</Text>
                     </Box>
                 </Box>
 
