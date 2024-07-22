@@ -207,11 +207,11 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
     }, [portionPrice]);
 
     useEffect(() => {
-        if (totalSlots > 5) {
+        if (totalSlots > 10) {
             setTotalSlots(5);
             displayToast(
-                "Too many Guests!",
-                "You can invite a maximum of 5 Guests",
+                "Too many Slots!",
+                "You can prepare for a maximum of 5 slots",
                 "error",
                 2500,
                 false
@@ -312,13 +312,13 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                             </FormControl>
 
                             <FormControl flex="1" ml={2} isRequired>
-                                <FormLabel>No. of Guests (Max: 5)</FormLabel>
+                                <FormLabel>No. of Slots (Max: 10)</FormLabel>
                                 <NumberInput
                                     step={1}
                                     defaultValue={1}
                                     value={totalSlots}
                                     min={1}
-                                    max={5}
+                                    max={10}
                                     mb={4}
                                     onChange={(valueAsString, valueAsNumber) =>
                                         setTotalSlots(valueAsNumber || 1)
