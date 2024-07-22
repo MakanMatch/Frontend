@@ -1,7 +1,7 @@
 import { Box, Button, Divider, FormControl, FormHelperText, FormLabel, HStack, Heading, Input, Spacer, Spinner, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
 import { Link as ChakraLink } from '@chakra-ui/react';
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import StaticGMaps from '../../components/listings/StaticGMaps';
@@ -14,10 +14,12 @@ function ConfirmReservationLayout({
     userData,
     fetchListingDetails
 }) {
+    const navigate = useNavigate();
     const [isSmallerThan800] = useMediaQuery("(max-width: 800px)");
     const { user, loaded, authToken } = useSelector(state => state.auth)
 
     const handleGoBack = () => {
+        console.log("hello")
         if (window.history.length > 1) {
             navigate(-1);
         } else {

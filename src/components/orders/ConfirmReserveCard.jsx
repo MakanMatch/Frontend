@@ -91,7 +91,7 @@ function ConfirmReserveCard({
         <Card variant={'elevated'} height={'fit-content'} w={'400px'}>
             <CardBody textAlign={'left'}>
                 <HStack width={'100%'} spacing={'10px'} mb={'20px'}>
-                    <Image src={firstImageLink} placeholder={placeholderImage} borderRadius={'10px'} h={'100px'} />
+                    <Image src={firstImageLink} fallbackSrc={placeholderImage} borderRadius={'10px'} h={'100px'} />
 
                     <VStack maxW={'100%'} alignItems={'flex-start'} spacing={'5px'} ml={'10px'}>
                         <Heading size={'md'} fontWeight={'bold'} fontFamily={'Sora'}>{listingData.title}</Heading>

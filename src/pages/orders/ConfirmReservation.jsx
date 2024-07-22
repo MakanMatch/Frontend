@@ -1,4 +1,4 @@
-import { Box, Button, Divider, FormControl, FormHelperText, FormLabel, HStack, Heading, Input, ScaleFade, SlideFade, Spacer, Spinner, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
+import { Box, Button, Divider, Fade, FormControl, FormHelperText, FormLabel, HStack, Heading, Input, ScaleFade, SlideFade, Spacer, Spinner, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
@@ -153,11 +153,13 @@ function ConfirmReservation() {
     return (
         <>
             {listingData.alreadyReserved ? (
-                <ScaleFade in={true} transition={{ duration: 2 }} initialScale={0.6}>
+                <ScaleFade in={true} transition={{ enter: { duration: 0.4 }}} initialScale={0.8}>
                     <ConfirmReservationSuccess listingData={listingData} hostData={hostData} />
                 </ScaleFade>
             ) : (
-                <ConfirmReservationLayout listingData={listingData} hostData={hostData} userData={userData} fetchListingDetails={fetchListingDetails} />
+                <Fade in={true} transition={{ enter: { duration: 0.4 }}}>
+                    <ConfirmReservationLayout listingData={listingData} hostData={hostData} userData={userData} fetchListingDetails={fetchListingDetails} />
+                </Fade>
             )}
         </>
     )
