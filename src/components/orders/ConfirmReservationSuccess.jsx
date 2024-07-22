@@ -22,7 +22,6 @@ function ConfirmReservationSuccess({
             showToast("Something went wrong", "Failed to load your reservation details. Please try again.", 2000, true, "error")
             return <Spinner />
         }
-        console.log(reservation)
     } catch (err) {
         console.log("Failed to load reservation; error: " + err)
         showToast("Something went wrong", "Failed to load your reservation details. Please try again.", 2000, true, "error")
