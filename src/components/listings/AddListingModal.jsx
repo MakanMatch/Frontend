@@ -87,7 +87,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
             formData.append("longDescription", longDescription);
             formData.append("portionPrice", portionPrice);
             formData.append("totalSlots", totalSlots);
-            formData.append("datetime", datetime);
+            formData.append("datetime", new Date(datetime).toISOString());
             images.forEach((image) => {
                 formData.append("images", image);
             });
