@@ -64,7 +64,6 @@ function Reviews() {
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
-            toast.closeAll();
             showToast("Error fetching host information", "Please try again later", 3000, true, "error");
             console.error("Error fetching host info:", error);
             navigate('/')
