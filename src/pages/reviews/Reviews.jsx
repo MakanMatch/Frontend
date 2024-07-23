@@ -29,7 +29,6 @@ function Reviews() {
     const [searchParams] = useSearchParams();
     const [hostID, setHostID] = useState("");
     const dispatch = useDispatch();
-    const cancelRef = useRef();
     const hasRendered = useRef(false);
 
     const getColorScheme = (hygieneGrade) => {
