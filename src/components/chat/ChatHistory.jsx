@@ -8,7 +8,7 @@ const users = [
   { name: "Ryan Florence", lastMessage: "Let's catch up later this week.", avatar: "https://bit.ly/ryan-florence" },
 ];
 
-function ChatHistory({ onUserClick, lastMessage } ) {
+function ChatHistory({ onUserClick, lastMessage, chatPartnerUsername } ) {
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
 
   if (!isSmallerThan950px) {
@@ -29,9 +29,9 @@ function ChatHistory({ onUserClick, lastMessage } ) {
             w="100%"
             onClick={() => onUserClick(user.name)} // Trigger the click handler
           >
-            <Avatar src={user.avatar} name={user.name} mr={3} minW={"55px"} minH={"55px"} />
+            <Avatar src={user.avatar} name={chatPartnerUsername} mr={3} minW={"55px"} minH={"55px"} />
             <Box flex="1" minW={0}>
-              <Text fontWeight="bold" textAlign={"left"}>{user.name}</Text>
+              <Text fontWeight="bold" textAlign={"left"}>{chatPartnerUsername}</Text>
               <Text fontSize="sm" color="gray.500" maxW="100%" textAlign={"left"} isTruncated>
                 {lastMessage.message}
               </Text>
