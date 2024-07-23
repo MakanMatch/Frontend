@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip, Spinner, Avatar } from '@chakra-ui/react';
+import { Button, Box, Flex, Text, Spacer, useToast, Heading, Tooltip, Spinner, Avatar } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -29,7 +29,7 @@ function Reviews() {
     const [searchParams] = useSearchParams();
     const [hostID, setHostID] = useState("");
     const dispatch = useDispatch();
-    const hasRendered = useRef(false);
+    const [initialUserLoginToastIgnore, setInitialUserLoginToastIgnore] = useState(true);
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -86,12 +86,14 @@ function Reviews() {
     })
 
     useEffect(() => {
-        if (hasRendered.current) {
-            if (!user) {
-                showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
-            }
-        } else {
-            hasRendered.current = true;
+        if (loaded == true) {
+            setInitialUserLoginToastIgnore(false);
+        }
+    }, [loaded])
+
+    useEffect(() => {
+        if (!user && !initialUserLoginToastIgnore) {
+            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
         }
     }, [user]);
 

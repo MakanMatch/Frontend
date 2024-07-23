@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import StarRating from './StarRatings';
 import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
@@ -40,11 +40,8 @@ const SubmitReviews = ({
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { user, loaded, authToken } = useSelector((state) => state.auth);
-    const [initialUserLoginToastIgnore, setInitialUserLoginToastIgnore] = useState(true);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const cancelRef = useRef();
-    const hasRendered = useRef(false);
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
@@ -137,22 +134,6 @@ const SubmitReviews = ({
         onClose();
         setFileFormatError("")
     };
-
-    useEffect(() => {
-        if (loaded == true) {
-            setInitialUserLoginToastIgnore(false);
-        }
-    }, [loaded])
-
-    useEffect(() => {
-        if (hasRendered.current) {
-            if (!user && !initialUserLoginToastIgnore) {
-                showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
-            }
-        } else {
-            hasRendered.current = true;
-        }
-    }, [user]);
 
     return (
         <Box>

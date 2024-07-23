@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { Box, Button, useToast } from '@chakra-ui/react';
 import { BiTrash } from 'react-icons/bi';
 import configureShowToast from '../../showToast';
@@ -26,7 +26,6 @@ function DeleteReviewButton({
     const [isOpen, setIsOpen] = useState(false);
     const onClose = () => setIsOpen(false);
     const cancelRef = useRef();
-    const hasRendered = useRef(false);
 
     const handleDelete = async () => {
         try {
@@ -48,17 +47,7 @@ function DeleteReviewButton({
             console.log("Error deleting review:", error);
         }
     }
-
-    useEffect(() => {
-        if (hasRendered.current) {
-            if (!user) {
-                showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
-            }
-        } else {
-            hasRendered.current = true;
-        }
-    }, [user]);
-
+    
     return (
         <Box>
             <Button
