@@ -43,6 +43,7 @@ function ChatUi() {
 	const [editMessageContent, setEditMessageContent] = useState("");
 	const [chatPartnerUsername, setChatPartnerUsername] = useState(null);
 	const [isChatVisible, setIsChatVisible] = useState(false); // State for chat visibility
+	const [lastMessage, setLastMessage] = useState(null); // State for last message
 	const chatBottomRef = useRef(null); // Reference to the bottom of chat container
 	const { user, loaded, error } = useSelector((state) => state.auth);
 
@@ -92,6 +93,9 @@ function ChatUi() {
 			}
 			else if (receivedMessage.type === "chat_history") {
 				setMessages(receivedMessage.messages);
+				let lastMessage = receivedMessage.messages[receivedMessage.messages.length - 1];
+				setLastMessage(lastMessage);
+				console.log(lastMessage);
 			} else if (receivedMessage.action === "edit") {
 				setMessages((prevMessages) =>
 					prevMessages.map((msg) =>
@@ -241,7 +245,7 @@ function ChatUi() {
 
 	return (
 		<Flex>
-			<ChatHistory onUserClick={toggleChatVisibility} />
+			<ChatHistory onUserClick={toggleChatVisibility} lastMessage={lastMessage} />
 			{isChatVisible && (
 			<Center flexDirection="column" alignItems="center" p={5} flex="1">
 				<Box

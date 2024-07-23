@@ -8,7 +8,7 @@ const users = [
   { name: "Ryan Florence", lastMessage: "Let's catch up later this week.", avatar: "https://bit.ly/ryan-florence" },
 ];
 
-function ChatHistory({ onUserClick }) {
+function ChatHistory({ onUserClick, lastMessage } ) {
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
 
   if (!isSmallerThan950px) {
@@ -33,7 +33,7 @@ function ChatHistory({ onUserClick }) {
             <Box flex="1" minW={0}>
               <Text fontWeight="bold" textAlign={"left"}>{user.name}</Text>
               <Text fontSize="sm" color="gray.500" maxW="100%" textAlign={"left"} isTruncated>
-                {user.lastMessage}
+                {lastMessage.message}
               </Text>
             </Box>
           </Flex>
