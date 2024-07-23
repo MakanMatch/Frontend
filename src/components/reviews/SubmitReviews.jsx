@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import StarRating from './StarRatings';
 import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
@@ -102,18 +102,18 @@ const SubmitReviews = ({
 
         try {
             const submitReview = await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
-                dispatch(reloadAuthToken(authToken))
-                if (submitReview.data && submitReview.data.startsWith("SUCCESS")) {
-                    showToast("Review submitted successfully", "", 3000, true, "success")
-                    console.log('Review submitted successfully!');
-                    setIsSubmitting(false);
-                    setComments('');
-                    setImages([]);
-                    onClose();
-                    refreshState(!stateRefresh)
-                } else {
-                    showToast("Failed to submit review", "Please try again later", 3000, true, "error");
-                }
+            dispatch(reloadAuthToken(authToken))
+            if (submitReview.data && submitReview.data.startsWith("SUCCESS")) {
+                showToast("Review submitted successfully", "", 3000, true, "success")
+                console.log('Review submitted successfully!');
+                setIsSubmitting(false);
+                setComments('');
+                setImages([]);
+                onClose();
+                refreshState(!stateRefresh)
+            } else {
+                showToast("Failed to submit review", "Please try again later", 3000, true, "error");
+            }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
             setIsSubmitting(false);
@@ -178,13 +178,13 @@ const SubmitReviews = ({
                         <FormControl>
                             <Flex direction={{ base: 'column', md: 'row' }} align="center">
                                 <Flex direction='column'>
-                                <Text mt='8px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Food Rating</Text>
-                                <StarRating maxStars={5} initialRating={foodRating} onChange={setFoodRating} />
+                                    <Text mt='8px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Food Rating</Text>
+                                    <StarRating maxStars={5} initialRating={foodRating} onChange={setFoodRating} />
                                 </Flex>
                                 <Spacer display={{ base: 'none', md: 'block' }} />
                                 <Flex direction='column'>
-                                <Text mt="8px" mb="8px" textAlign={{ base: 'center', md: 'left' }}>Hygiene Rating</Text>
-                                <StarRating maxStars={5} initialRating={hygieneRating} onChange={setHygieneRating} />
+                                    <Text mt="8px" mb="8px" textAlign={{ base: 'center', md: 'left' }}>Hygiene Rating</Text>
+                                    <StarRating maxStars={5} initialRating={hygieneRating} onChange={setHygieneRating} />
                                 </Flex>
                             </Flex>
                             <Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Comments</Text>
@@ -231,25 +231,25 @@ const SubmitReviews = ({
                         <Button colorScheme='red' borderRadius='10px' mr={3} onClick={handleClose}>
                             Close
                         </Button>
-                    
-                            <>
-                                {isSubmitting ? (
-                                    <Button
-                                        isLoading
-                                        loadingText="Submitting..."
-                                        borderRadius={"10px"}
-                                    >
-                                        Submitting...
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        onClick={handleSubmit}
-                                        variant="MMPrimary"
-                                    >
-                                        Submit
-                                    </Button>
-                                )}
-                            </>
+
+                        <>
+                            {isSubmitting ? (
+                                <Button
+                                    isLoading
+                                    loadingText="Submitting..."
+                                    borderRadius={"10px"}
+                                >
+                                    Submitting...
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={handleSubmit}
+                                    variant="MMPrimary"
+                                >
+                                    Submit
+                                </Button>
+                            )}
+                        </>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
