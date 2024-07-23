@@ -1,16 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import {
     Button, Card, CardBody, CardFooter, TabPanel, Heading, Image, Text, Box, CardHeader, Flex,
-    Avatar, useToast, Divider
+    Avatar, Divider
 } from "@chakra-ui/react";
 import { useSelector } from 'react-redux';
 import { useDisclosure } from '@chakra-ui/react'
 import { FaUtensils, FaSoap, FaStar, FaRegStar } from "react-icons/fa";
-import server from '../../networking';
-import Like from './Like';
-import Liked from './Liked';
-import DeleteReviewButton from './DeleteReviewButton';
-import EditReview from './EditReview';
+import LikeButton from './actions/LikeButton';
+import DeleteReviewButton from './actions/DeleteReviewButton';
+import EditReview from './actions/EditReview';
 import {
     Modal,
     ModalOverlay,
@@ -21,8 +19,6 @@ import {
     ModalCloseButton,
 } from '@chakra-ui/react'
 import StarRatings from 'react-star-ratings';
-import configureShowToast from '../showToast';
-
 
 const ReviewCard = ({
     username,
@@ -36,13 +32,9 @@ const ReviewCard = ({
     posterID,
     isLiked,
     refreshState,
-    stateRefreshReview
+    stateRefresh
 }) => {
-    const toast = useToast();
-    const showToast = configureShowToast(toast)
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [liked, setLiked] = useState(isLiked);
-    const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const imageRefs = useRef([]);
     const { user, loaded } = useSelector((state) => state.auth);
@@ -59,28 +51,6 @@ const ReviewCard = ({
         }, 0);
     }
 
-    const toggleLike = async () => {
-        try {
-            const postLikeResponse = await server.post('/likeReview', {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                reviewID: reviewID,
-            });
-            if (postLikeResponse.status === 400 || postLikeResponse.status === 500) {
-                showToast("An error occurred", "Please try again later.", 3000, true, "error");
-                return
-            } else {
-                const { liked, likeCount } = postLikeResponse.data;
-                setLiked(liked);
-                setCurrentLikeCount(likeCount);
-            }
-        } catch (error) {
-            showToast("An error occurred", "Please try again later.", 3000, true, "error");
-            console.log("Error liking review:", error);
-            return
-        }
-    }
     const renderImages = () => {
         const numImages = images.length;
         if (numImages === 1) {
@@ -107,7 +77,7 @@ const ReviewCard = ({
                     wrap="wrap"
                     gap={2}
                     justifyContent='center'
-                    alignItems={{ base: 'center'}}
+                    alignItems='center'
                 >
                     <Image
                         onClick={() => handleImageClick(0)}
@@ -175,7 +145,7 @@ const ReviewCard = ({
                             src={images[2]}
                             alt="Review image"
                             borderRadius="lg"
-                            minWidth={{ base: '100%', md: "100%"}}
+                            minWidth={{ base: '100%', md: "100%" }}
                             minHeight={{ base: '160', md: '200' }}
                             maxHeight={{ base: "100%", md: "300px" }}
                             objectFit="cover"
@@ -187,7 +157,7 @@ const ReviewCard = ({
         }
         if (numImages === 4) {
             return (
-                <Flex direction={{ base: 'column', md: 'row' }}wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
+                <Flex direction={{ base: 'column', md: 'row' }} wrap="wrap" gap={2} justifyContent='center' alignItems={{ base: 'center', md: 'flex-start' }}>
                     {images.map((image, index) => (
                         <Image
                             onClick={() => handleImageClick(index)}
@@ -225,7 +195,7 @@ const ReviewCard = ({
                     <Box
                         onClick={onOpen}
                         borderRadius="lg"
-                        minWidth={{ base: '100%' }}
+                        minWidth='100%'
                         minHeight={"158px"}
                         bg="gray.200"
                         display="flex"
@@ -247,20 +217,18 @@ const ReviewCard = ({
 
     return (
         <TabPanel>
-            <Card maxW={{ base: "100%" }} variant="elevated" key={reviewID} p={4} boxShadow="md">
+            <Card maxW="100%" variant="elevated" key={reviewID} p={4} boxShadow="md">
                 <CardHeader>
                     <Flex direction={{ base: 'column', md: 'row' }}
                         alignItems={{ base: 'flex-start', md: 'center' }}
                         justifyContent="space-between"
                         wrap="wrap">
                         <Flex alignItems='center' mb={{ base: 2, md: 0 }}>
-                            {username ? (
-                                <Avatar name={username} src='https://bit.ly/sage-adebayo'
-                                    onClick={() => handleProfileClick('https://bit.ly/sage-adebayo')}
-                                    _hover={{ cursor: "pointer" }} />
-                            ) : (
-                                <Avatar src='https://bit.ly/sage-adebayo' />
-                            )}
+                            <Avatar name={username}
+                            // src='../../src/assets/Logo.png'  // Change to actual profile picture
+                            // onClick={() => handleProfileClick('../../src/assets/Logo.png')} // Change to actual profile picture
+                            // _hover={{ cursor: "pointer" }} // Uncomment if profile picture is clickable
+                            />
                             <Box ml={4}>
                                 <Heading textAlign="left" size='sm'>{username ? username : "Guest"}</Heading>
                                 <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 2, md: 5 }} mt={1}>
@@ -329,18 +297,11 @@ const ReviewCard = ({
                     </CardBody>
                 )}
                 <CardFooter justifyContent={{ base: 'center', md: 'flex-start' }} display="flex">
-                    {loaded && user != null && (
-                        <Button variant='ghost'
-                            backgroundColor={liked ? 'blue.100' : 'gray.100'}
-                            leftIcon={liked ? <Liked /> : <Like />}
-                            _hover={{
-                                backgroundColor: liked ? 'blue.200' : 'gray.200',
-                                color: liked ? 'black' : 'gray.800'
-                            }}
-                            onClick={toggleLike}>
-                            <Text>{currentLikeCount}</Text>
-                        </Button>
-                    )}
+                    <LikeButton
+                        reviewID={reviewID}
+                        isLiked={isLiked}
+                        likeCount={likeCount}
+                    />
                     {loaded && user != null && posterID === user.userID && (
                         <Flex ml={4}>
                             <EditReview
@@ -350,12 +311,12 @@ const ReviewCard = ({
                                 reviewComments={comments}
                                 reviewImages={images}
                                 refreshState={refreshState}
-                                stateRefreshReview={stateRefreshReview} 
+                                stateRefresh={stateRefresh}
                             />
-                            <DeleteReviewButton 
-                                reviewID={reviewID} 
+                            <DeleteReviewButton
+                                reviewID={reviewID}
                                 refreshState={refreshState}
-                                stateRefreshReview={stateRefreshReview} 
+                                stateRefresh={stateRefresh}
                             />
                         </Flex>
                     )}
