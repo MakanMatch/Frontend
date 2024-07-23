@@ -31,6 +31,7 @@ import Schedule from "./pages/identity/Schedule"
 import MakanHistory from './pages/identity/MakanHistory.jsx';
 import Favourites from './pages/identity/Favourites.jsx';
 import MakanReviews from './pages/identity/MakanReviews.jsx';
+import ConfirmReservation from './pages/orders/ConfirmReservation.jsx';
 
 const store = configureStore({
     reducer: {
@@ -53,6 +54,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"chat2"} element={<Chat2 />}></Route>
                         <Route path={"targetListing"} element={<GoogleMapsPage/>} />
+                        <Route path={"listing"}>
+                            <Route path={"reserve"} element={<ConfirmReservation />} />
+                        </Route>
                         <Route path='*' element={<NotFound />} />
                     </Route>
                     <Route path='/auth' element={<AuthLayout />}>
@@ -61,6 +65,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"emailVerification"} element={<EmailVerification />} />
                         <Route path={"accountRecovery"} element={<AccountRecovery />} />
                         <Route path={"verifyToken"} element={<VerifyToken />} />
+                        <Route path='*' element={<NotFound />} />
                     </Route>
                     <Route path='/identity' element={<Layout />}>
                         <Route path={"myAccount"} element={<MyAccount />} />
@@ -68,6 +73,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"favourites"} element={<Favourites/>} />
                         <Route path={"makanReviews"} element={<MakanReviews/>} />
                         <Route path={"schedule"} element={<Schedule/>} />
+                        <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
