@@ -3,20 +3,16 @@ import { useState, useEffect } from "react";
 import server from "../../networking";
 import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
-import AddListingModal from "../../components/listings/AddListingModal";
-import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton, Spinner, Center, Fade } from "@chakra-ui/react";
+import { SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton, Spinner, Center, Fade } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { reloadAuthToken } from "../../slices/AuthState";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
-    const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const [loading, setLoading] = useState(true); 
     const toast = useToast();
-    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
@@ -47,23 +43,26 @@ const FoodListingsPage = () => {
         }
     };
 
-    function handleClickAddListing() {
-        if (!authToken || !user) {
-            navigate('/auth/login');
-            setTimeout(() => {
-                displayToast("You're not logged in", "Please Login first", "info", 3000, false);
-            }, 200);
-        } else {
-            onOpen();
-        }
-    }
-
     useEffect(() => {
         const fetchData = async () => {
             await fetchListings();
             setLoading(false);
         }
         fetchData();
+        // check if localstorage contains published=true
+        if (localStorage.getItem("published") === "true") {
+            displayToast(
+                "Listing published successfully!",
+                "We'll notify you when all slots have been filled.",
+                "success",
+                4000,
+                false
+            );
+            console.log("Toast triggered")
+            localStorage.removeItem("published");
+            console.log("Localstorage item removed")
+        }
+        
     }, []);
 
     return (
@@ -73,15 +72,6 @@ const FoodListingsPage = () => {
                     <Text fontSize={"30px"} mb={4}>
                         {user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
                     </Text>
-                    {user && user.userType === "Host" ? (
-                        <Box display="flex" justifyContent="center" mb={4}>
-                            <Button onClick={handleClickAddListing} variant="MMPrimary">
-                                Host a meal
-                            </Button>
-                        </Box>
-                    ) : (
-                        <Box m={10} />
-                    )}
                     {isSmallerThan1095 && listings.length > 0 && (
                         <Box mb={4}>
                             <MarkeredGMaps
@@ -182,13 +172,6 @@ const FoodListingsPage = () => {
                             )}
                         </Flex>
                     </Skeleton>
-                    <AddListingModal
-                        isOpen={isOpen}
-                        onClose={onClose}
-                        onOpen={onOpen}
-                        fetchListings={fetchListings}
-                        displayToast={displayToast}
-                    />
                 </>
             ) : (
                 <Center height="100vh">

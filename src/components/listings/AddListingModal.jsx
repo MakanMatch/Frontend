@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { reloadAuthToken } from "../../slices/AuthState";
 
-const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast }) => {
+const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }) => {
     const toast = useToast();
     const today = new Date();
     today.setDate(today.getDate() + 1);
@@ -30,7 +30,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
     const [modalError, setModalError] = useState(false);
     const [validListing, setValidListing] = useState(false);
 
-    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const cancelRef = useRef();
@@ -69,23 +68,8 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
         }
     }
 
-    const fetchHostID = async () => {
-        if (loaded && user) {
-            const hostInfo = await server.get(`/cdn/accountInfo?userID=${user.userID}`)
-            if (hostInfo.status === 200) {
-                dispatch(reloadAuthToken(authToken))
-                setHostID(hostInfo.data.userID)
-            } else {
-                dispatch(reloadAuthToken(authToken))
-                console.error("Failed to fetch hostID", hostInfo.data)
-                displayToast("Failed to fetch your hosting details", "Please try again later", "error", 3000, false)
-                return;
-            }
-        }
-    }
-
-
     const handleSubmitListing = async () => {
+        closeSidebar();
         setIsSubmitting(true);
         const formData = new FormData();
         try {
@@ -109,17 +93,11 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
             )
             if (addListingResponse.status == 200) {
                 dispatch(reloadAuthToken(authToken))
-                fetchListings();
                 onClose();
                 setDefaultState();
                 setIsSubmitting(false);
-                displayToast(
-                    "Listing published successfully!",
-                    "We'll notify you when all slots have been filled.",
-                    "success",
-                    4000,
-                    false
-                );
+                localStorage.setItem("published", "true");
+                window.location.href = "/";
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
@@ -227,17 +205,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
             );
         }
     }, [totalSlots]);
-
-    useEffect(() => {
-        if (loaded == true) {
-            if (!user) {
-                navigate("/auth/login");
-                displayToast("You're not logged in!", "Please sign-in first", "info", 3000, false)
-                return;
-            }
-            fetchHostID();
-        }
-    }, [loaded, user]);
     return (
         <div>
             <Modal
