@@ -41,13 +41,13 @@ function ChatUi() {
 	const [replyTo, setReplyTo] = useState(null);
 	const [editMessageId, setEditMessageId] = useState(null);
 	const [editMessageContent, setEditMessageContent] = useState("");
-	const [chatPartnerUsername, setChatPartnerUsername] = useState("");
-	const [isChatVisible, setIsChatVisible] = useState(false); // State for chat visibility
-	const [lastMessage, setLastMessage] = useState(""); // State for last message
-	const [chatID, setChatID] = useState(null); // State for chat ID
-	const [chatHistory, setChatHistory] = useState([]); // State for chat history
-	const [chatSelected, setChatSelected] = useState(null); // State for chat selection
-	const chatBottomRef = useRef(null); // Reference to the bottom of chat container
+	const [chatID, setChatID] = useState(null);
+	const [chatHistory, setChatHistory] = useState([]); // Array of chat IDs
+	const [chatPartnerUsernames, setChatPartnerUsernames] = useState({}); // Object to map chat ID to username
+	const [chatSelected, setChatSelected] = useState(null);
+	const [isChatVisible, setIsChatVisible] = useState(false);
+	const [lastMessage, setLastMessage] = useState("");
+	const chatBottomRef = useRef(null);
 	const { user, loaded, error } = useSelector((state) => state.auth);
 
 	const ws = useRef(null);
@@ -69,11 +69,19 @@ function ChatUi() {
 
 		ws.current.onopen = () => {
 			console.log("Connected to WebSocket server");
-			ws.current.send(JSON.stringify({ action: "connect", userID: user.userID, username: user.username, userType: user.userType }));
+			ws.current.send(
+				JSON.stringify({
+					action: "connect",
+					userID: user.userID,
+					username: user.username,
+					userType: user.userType,
+				})
+			);
 		};
 
 		ws.current.onmessage = async (event) => {
 			let receivedMessage;
+			console.log(receivedMessage);
 			if (event.data instanceof Blob) {
 				const text = await event.data.text();
 				try {
@@ -89,22 +97,35 @@ function ChatUi() {
 					console.error("Error parsing message:", error);
 					return;
 				}
-			}
-			if (receivedMessage.action === "connect") {
-				setChatPartnerUsername(receivedMessage.chatPartnerUsername)
-			}
-			else if (receivedMessage.action === "chat_id") {
+			}  
+			if (receivedMessage.action === "chat_id") {
+				console.log('you made it here');
 				setChatID(receivedMessage.chatID);
-				setChatHistory(prevChatHistory => {
+				setChatHistory((prevChatHistory) => {
 					const chatHistorySet = new Set(prevChatHistory);
 					chatHistorySet.add(receivedMessage.chatID);
 					return Array.from(chatHistorySet);
 				});
-				console.log("Updated chatHistory:", chatHistory);
-
+				console.log(receivedMessage.username1);
+				console.log(receivedMessage.username2);
+				if(receivedMessage.username1 === user.username){
+					setChatPartnerUsernames((prevUsernames) => ({
+						...prevUsernames,
+						[receivedMessage.chatID]: receivedMessage.username2,
+					}));
+				} else {
+					setChatPartnerUsernames((prevUsernames) => ({
+						...prevUsernames,
+						[receivedMessage.chatID]: receivedMessage.username1,
+					}));	
+				}
 			} else if (receivedMessage.previousMessages) {
 				setMessages(receivedMessage.previousMessages);
-				setLastMessage(receivedMessage.previousMessages[receivedMessage.previousMessages.length - 1]?.message || "");
+				setLastMessage(
+					receivedMessage.previousMessages[
+						receivedMessage.previousMessages.length - 1
+					]?.message || ""
+				);
 			} else if (receivedMessage.action === "send") {
 				setMessages((prevMessages) => [...prevMessages, receivedMessage]);
 				setLastMessage(receivedMessage.message);
@@ -127,7 +148,7 @@ function ChatUi() {
 	}, [loaded, user, messages]);
 
 	useEffect(() => {
-		console.log("upadtin chatID", chatID);
+		console.log("Updating chatID", chatID);
 	}, [chatID]);
 
 	useEffect(() => {
@@ -151,13 +172,14 @@ function ChatUi() {
 			ws.current.send(JSON.stringify(newMessage));
 
 			setMessageInput("");
-			setReplyTo(null); // Clear the reply state after sending
+			setReplyTo(null);
 		}
 	};
 
 	const fetchChatHistory = (chatID) => {
+		console.log(chatID)
 		if (ws.current) {
-			console.log("Fetching chat history for chatID:", chatID); // Debugging line
+			console.log("Fetching chat history for chatID:", chatID);
 			const request = {
 				action: "chat_history",
 				userID: user.userID,
@@ -166,7 +188,6 @@ function ChatUi() {
 			ws.current.send(JSON.stringify(request));
 		}
 	};
-	
 
 	const handleKeyDown = (event) => {
 		if (event.key === "Enter") {
@@ -252,25 +273,24 @@ function ChatUi() {
 		return currentDate !== previousDate;
 	};
 
-	// Function to toggle chat visibility
 	const toggleChatVisibility = () => {
 		setIsChatVisible((prev) => !prev);
 	};
 
 	const handleChatClick = (clickedChatID) => {
-		console.log("clicked", clickedChatID);
 		setChatSelected(clickedChatID);
-		// You can use a callback to fetch history if needed
 		fetchChatHistory(clickedChatID);
-		toggleChatVisibility(); // Ensure the chat visibility is toggled
+		toggleChatVisibility();
 	};
-	
-
 	return (
+		console.log(chatPartnerUsernames),
+		console.log(chatHistory),
+		console.log('r u even here'),
 		<Flex>
 			<ChatHistory
-				onUserClick={handleChatClick} // Pass the click handler to ChatHistory
+				onUserClick={handleChatClick}
 				chatHistory={chatHistory}
+				chatPartnerUsernames={chatPartnerUsernames} // Pass the map of chat partner usernames
 			/>
 
 			{isChatVisible && (
@@ -301,7 +321,9 @@ function ChatUi() {
 						/>
 						<Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
 							<Text fontSize={20} mt={2} textAlign={"left"}>
-								{chatPartnerUsername ? `Chat with ${chatPartnerUsername}` : "Chat"} {/* Display chat partner's username */}
+							{chatPartnerUsernames[chatSelected]
+                  ? `Chat with ${chatPartnerUsernames[chatSelected]}`
+                  : "Chat"}
 							</Text>
 							<Spacer h={3} />
 							<Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
