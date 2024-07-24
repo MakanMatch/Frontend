@@ -27,6 +27,7 @@ const MyAccount = () => {
     const [isEditPictureModalOpen, setEditPictureModalOpen] = useState(false);
     const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
     const [passwordChangeInProgress, setPasswordChangeInProgress] = useState(false);
+    const [deleteInProgress, setDeleteInProgress] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const [accountInfo, setAccountInfo] = useState(null);
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
@@ -56,7 +57,7 @@ const MyAccount = () => {
             if (user && user.userID) {
                 fetchAccountInfo();
             } else {
-                if (!passwordChangeInProgress) {
+                if (!passwordChangeInProgress && !deleteInProgress) {
                     showToast("Redirecting to login", "Please log in first.", 3000, true, "error");
                     navigate('/auth/login');
                 }
@@ -154,6 +155,7 @@ const MyAccount = () => {
     };
 
     const confirmDeleteAccount = () => {
+        setDeleteInProgress(true);
         server.delete("/identity/myAccount/deleteAccount", {
             headers: {
                 'Content-Type': 'application/json'
@@ -177,6 +179,7 @@ const MyAccount = () => {
         })
         .finally(() => {
             onDeleteClose();
+            setDeleteInProgress(false);
         });
     };
 

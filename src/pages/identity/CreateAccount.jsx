@@ -52,7 +52,7 @@ function CreateAccount() {
                 : Yup.string().notRequired()
         ),
         blkNo: Yup.lazy((value, context) =>
-            isHostAccount ? Yup.string().required('Block Number is required') : Yup.string().notRequired()
+            isHostAccount ? Yup.string() : Yup.string().notRequired()
         ),
         street: Yup.lazy((value, context) =>
             isHostAccount ? Yup.string().required('Street is required') : Yup.string().notRequired()
@@ -61,7 +61,7 @@ function CreateAccount() {
             isHostAccount ? Yup.string().required('Postal code is required') : Yup.string().notRequired()
         ),
         unitNum: Yup.lazy((value, context) =>
-            isHostAccount ? Yup.string().required('Unit number is required') : Yup.string().notRequired()
+            isHostAccount ? Yup.string() : Yup.string().notRequired()
         )
     });
 
@@ -135,7 +135,7 @@ function CreateAccount() {
                         </Heading>
                         <Box as="form" onSubmit={formik.handleSubmit}>
                             <HStack spacing={4} mb={4}>
-                                <FormControl isInvalid={formik.errors.fname && formik.touched.fname} flex={1}>
+                                <FormControl isRequired isInvalid={formik.errors.fname && formik.touched.fname} flex={1}>
                                     <FormLabel fontSize='15px'>First Name</FormLabel>
                                     <Input
                                         name="fname"
@@ -149,7 +149,7 @@ function CreateAccount() {
                                     />
                                     <FormErrorMessage fontSize='12px'>{formik.errors.fname}</FormErrorMessage>
                                 </FormControl>
-                                <FormControl isInvalid={formik.errors.lname && formik.touched.lname} flex={1}>
+                                <FormControl isRequired isInvalid={formik.errors.lname && formik.touched.lname} flex={1}>
                                     <FormLabel fontSize='15px'>Last Name</FormLabel>
                                     <Input
                                         name="lname"
@@ -164,7 +164,7 @@ function CreateAccount() {
                                     <FormErrorMessage fontSize='12px'>{formik.errors.lname}</FormErrorMessage>
                                 </FormControl>
                             </HStack>
-                            <FormControl isInvalid={formik.errors.username && formik.touched.username} mb={4}>
+                            <FormControl isRequired isInvalid={formik.errors.username && formik.touched.username} mb={4}>
                                 <FormLabel fontSize='15px'>Username</FormLabel>
                                 <Input
                                     name="username"
@@ -179,7 +179,7 @@ function CreateAccount() {
                                 />
                                 <FormErrorMessage fontSize='12px'>{formik.errors.username}</FormErrorMessage>
                             </FormControl>
-                            <FormControl isInvalid={formik.errors.email && formik.touched.email} mb={4}>
+                            <FormControl isRequired isInvalid={formik.errors.email && formik.touched.email} mb={4}>
                                 <FormLabel fontSize='15px'>Email</FormLabel>
                                 <Input
                                     name="email"
@@ -195,7 +195,7 @@ function CreateAccount() {
                                 />
                                 <FormErrorMessage fontSize='12px'>{formik.errors.email}</FormErrorMessage>
                             </FormControl>
-                            <FormControl isInvalid={formik.errors.password && formik.touched.password} mb={4}>
+                            <FormControl isRequired isInvalid={formik.errors.password && formik.touched.password} mb={4}>
                                 <FormLabel fontSize='15px'>Password</FormLabel>
                                 <InputGroup>
                                     <Input
@@ -222,7 +222,7 @@ function CreateAccount() {
                                 </InputGroup>
                                 <FormErrorMessage fontSize='12px'>{formik.errors.password}</FormErrorMessage>
                             </FormControl>
-                            <FormControl isInvalid={formik.errors.confirmPassword && formik.touched.confirmPassword} mb={4}>
+                            <FormControl isRequired isInvalid={formik.errors.confirmPassword && formik.touched.confirmPassword} mb={4}>
                                 <FormLabel fontSize='15px'>Confirm Password</FormLabel>
                                 <InputGroup>
                                     <Input
@@ -264,7 +264,7 @@ function CreateAccount() {
                             </Box>
                             {formik.values.isHostAccount && (
                                 <>
-                                    <FormControl isInvalid={formik.errors.contactNum && formik.touched.contactNum} mb={4}>
+                                    <FormControl isRequired isInvalid={formik.errors.contactNum && formik.touched.contactNum} mb={4}>
                                         <FormLabel fontSize='15px'>Contact Number</FormLabel>
                                         <Input
                                             name="contactNum"
@@ -279,7 +279,7 @@ function CreateAccount() {
                                         <FormErrorMessage fontSize='12px'>{formik.errors.contactNum}</FormErrorMessage>
                                     </FormControl>
                                     <HStack spacing={4} mb={4}>
-                                        <FormControl isInvalid={formik.errors.street && formik.touched.street} flex={1}>
+                                        <FormControl isRequired isInvalid={formik.errors.street && formik.touched.street} flex={1}>
                                             <FormLabel fontSize='15px'>Street </FormLabel>
                                             <Input
                                                 name="street"
@@ -293,7 +293,7 @@ function CreateAccount() {
                                             />
                                             <FormErrorMessage fontSize='12px'>{formik.errors.street}</FormErrorMessage>
                                         </FormControl>
-                                        <FormControl isInvalid={formik.errors.postalCode && formik.touched.postalCode} flex={1}>
+                                        <FormControl isRequired isInvalid={formik.errors.postalCode && formik.touched.postalCode} flex={1}>
                                             <FormLabel fontSize='15px'>Postal Code</FormLabel>
                                             <Input
                                                 name="postalCode"
