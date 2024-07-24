@@ -45,6 +45,7 @@ function ChatUi() {
 	const [isChatVisible, setIsChatVisible] = useState(false); // State for chat visibility
 	const [lastMessage, setLastMessage] = useState(""); // State for last message
 	const [chatID, setChatID] = useState(""); // State for chat ID
+	const [chatHistory, setChatHistory] = useState([]); // State for chat history
 	const chatBottomRef = useRef(null); // Reference to the bottom of chat container
 	const { user, loaded, error } = useSelector((state) => state.auth);
 
@@ -106,10 +107,26 @@ function ChatUi() {
 			} else if (receivedMessage.action === "error") {
 				alert(receivedMessage.message);
 				window.location.reload();
-			} else {
-				console.log(receivedMessage);
+			} else if (receivedMessage.action === "chat_id") {
+				console.log("recv", receivedMessage.chatID)
 				setChatID(receivedMessage.chatID);
+				if (!chatHistory.includes(receivedMessage.chatID)) {
+					console.log('New chatID found. Adding to chatHistory...');
+					setChatHistory(prevChatHistory => [
+						...prevChatHistory,
+						receivedMessage.chatID
+					]);
+				}
+				console.log("chatHistory", chatHistory)
+			}
+			else if (receivedMessage.previousMessages) {
+				console.log("prev", receivedMessage)
+				setMessages(receivedMessage.previousMessages);
+				setLastMessage(receivedMessage.previousMessages[receivedMessage.previousMessages.length - 1]?.message || "");
+			}
+			else if (receivedMessage.action === "send") {
 				setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+				setLastMessage(receivedMessage.message);
 			}
 		};
 
@@ -126,7 +143,7 @@ function ChatUi() {
 				ws.current.close();
 			}
 		};
-	}, [loaded, user]);
+	}, [loaded, user, messages]);
 
 
 	useEffect(() => {
@@ -139,6 +156,7 @@ function ChatUi() {
 				action: "send",
 				sender: user.username,
 				userID: user.userID,
+				chatID: chatID,
 				message: messageInput,
 				datetime: new Date().toISOString(),
 				replyTo: replyTo ? replyTo.message : null,
@@ -154,6 +172,7 @@ function ChatUi() {
 
 	const fetchChatHistory = () => {
 		if (ws.current) {
+			console.log(chatID)
 			const request = {
 				action: "chat_history",
 				userID: user.userID,
@@ -251,17 +270,24 @@ function ChatUi() {
 	const toggleChatVisibility = () => {
 		setIsChatVisible((prev) => !prev);
 	};
-
+	console.log(typeof chatID);
+	console.log(chatID);
+	for (let chat in chatHistory) {
+		console.log(chat)
+	}
 	return (
+		console.log("chathistory", chatHistory),
+		console.log("chatID", chatID),
 		<Flex>
 			<ChatHistory
-				onUserClick={() => {
+				onUserClick={(chatID) => {
 					toggleChatVisibility();
-					fetchChatHistory(); // Fetch chat history when clicking on the sidebar
+					fetchChatHistory(chatID); // Fetch chat history when clicking on the sidebar
 				}}
 				lastMessage={lastMessage}
 				chatPartnerUsername={chatPartnerUsername}
 				chatID={chatID}
+				chatHistory={chatHistory}
 			/>
 
 			{isChatVisible && (
@@ -448,4 +474,4 @@ function ChatUi() {
 	);
 }
 
-export default ChatUi
+export default ChatUi;
