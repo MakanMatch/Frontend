@@ -81,7 +81,6 @@ function ChatUi() {
 
 		ws.current.onmessage = async (event) => {
 			let receivedMessage;
-			console.log(receivedMessage);
 			if (event.data instanceof Blob) {
 				const text = await event.data.text();
 				try {
@@ -99,15 +98,12 @@ function ChatUi() {
 				}
 			}  
 			if (receivedMessage.action === "chat_id") {
-				console.log('you made it here');
 				setChatID(receivedMessage.chatID);
 				setChatHistory((prevChatHistory) => {
 					const chatHistorySet = new Set(prevChatHistory);
 					chatHistorySet.add(receivedMessage.chatID);
 					return Array.from(chatHistorySet);
 				});
-				console.log(receivedMessage.username1);
-				console.log(receivedMessage.username2);
 				if(receivedMessage.username1 === user.username){
 					setChatPartnerUsernames((prevUsernames) => ({
 						...prevUsernames,
@@ -148,16 +144,11 @@ function ChatUi() {
 	}, [loaded, user, messages]);
 
 	useEffect(() => {
-		console.log("Updating chatID", chatID);
-	}, [chatID]);
-
-	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
 
 	const sendMessage = () => {
 		if (ws.current && messageInput.trim() !== "") {
-			console.log(chatID);
 			const newMessage = {
 				action: "send",
 				sender: user.username,
@@ -177,9 +168,7 @@ function ChatUi() {
 	};
 
 	const fetchChatHistory = (chatID) => {
-		console.log(chatID)
 		if (ws.current) {
-			console.log("Fetching chat history for chatID:", chatID);
 			const request = {
 				action: "chat_history",
 				userID: user.userID,
@@ -283,9 +272,7 @@ function ChatUi() {
 		toggleChatVisibility();
 	};
 	return (
-		console.log(chatPartnerUsernames),
-		console.log(chatHistory),
-		console.log('r u even here'),
+
 		<Flex>
 			<ChatHistory
 				onUserClick={handleChatClick}
