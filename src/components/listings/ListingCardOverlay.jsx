@@ -46,32 +46,25 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const toggleFavourite = async () => {
         if (!user || !authToken) {
             navigate('/auth/login');
-            displayToast("You're not logged in", "Please Login first", "info", 3000, false);
+            displayToast("You're not logged in", "Please login first", "info", 3000, false);
             return;
         } else {
             const favouriteData = {
                 listingID: listingID
             }
-            await server.put("/listings/toggleFavouriteListing", favouriteData)
-                .then((response) => {
-                    dispatch(reloadAuthToken(authToken))
-                    if (response.status == 200 && response.data.favourite != undefined) {
-                        if (response.data.favourite === true) {
-                            setFavourite(true);
-                        } else {
-                            setFavourite(false);
-                        }
-                    } else {
-                        console.log("Unknown response received when toggling favourite status; response: " + response.data)
-                        toast.closeAll();
-                        displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
-                    }
-                })
-                .catch(() => {
-                    dispatch(reloadAuthToken(authToken))
-                    toast.closeAll();
-                    displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
-                });
+            const toggleResponse = await server.put("/listings/toggleFavouriteListing", favouriteData)
+            dispatch(reloadAuthToken(authToken))
+            if (toggleResponse.status == 200 && toggleResponse.data.favourite != undefined) {
+                if (toggleResponse.data.favourite === true) {
+                    setFavourite(true);
+                } else {
+                    setFavourite(false);
+                }
+            } else {
+                toast.closeAll();
+                console.error(toggleResponse.data.error);
+                displayToast(toggleResponse.data.message, "Please try again", "error", 3000, false);
+            }
         }
     };
 
@@ -81,13 +74,17 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             return;
         } else {
             const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
-            const guestFavCuisine = response.data.favCuisine || "";
-            if (guestFavCuisine.includes(listingID)) {
-                dispatch(reloadAuthToken(authToken))
-                setFavourite(true);
+            dispatch(reloadAuthToken(authToken))
+            if (response.status == 200) {
+                const guestFavCuisine = response.data.favCuisine || "";
+                if (guestFavCuisine.includes(listingID)) {
+                    setFavourite(true);
+                } else {
+                    setFavourite(false);
+                }
             } else {
-                dispatch(reloadAuthToken(authToken))
-                setFavourite(false);
+                console.error(response.data.error);
+                displayToast("Failed to add listing to your favourites", "Please try again", "error", 2500, false);
             }
         }
     }
@@ -99,9 +96,8 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
 
     const fetchRatingProgress = async () => {
         const response = await server.get(`/cdn/consolidateReviewsStatistics?hostID=${hostID}`);
+        dispatch(reloadAuthToken(authToken))
         if (response.status === 200) {
-            dispatch(reloadAuthToken(authToken))
-            console.log("Successfully fetched reviews statistics", response.data);
             const data = response.data;
             setOneStarRatings(data.oneStar);
             setTwoStarRatings(data.twoStar);
@@ -110,9 +106,8 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             setFiveStarRatings(data.fiveStar);
             setRatingsLoaded(true);
         } else {
-            dispatch(reloadAuthToken(authToken))
-            console.log("Failed to fetch reviews statistics");
-            displayToast("Error fetching reviews statistics", "Please try again later.", "error", 2500, false);
+            console.error(response.data.error);
+            displayToast(response.data.message, "Please try again", "error", 2500, false);
         }
     }
 

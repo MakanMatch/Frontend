@@ -72,40 +72,35 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
         closeSidebar();
         setIsSubmitting(true);
         const formData = new FormData();
-        try {
-            formData.append("title", title);
-            formData.append("shortDescription", shortDescription);
-            formData.append("longDescription", longDescription);
-            formData.append("portionPrice", portionPrice);
-            formData.append("totalSlots", totalSlots);
-            formData.append("datetime", new Date(datetime).toISOString());
-            images.forEach((image) => {
-                formData.append("images", image);
-            });
+        formData.append("title", title);
+        formData.append("shortDescription", shortDescription);
+        formData.append("longDescription", longDescription);
+        formData.append("portionPrice", portionPrice);
+        formData.append("totalSlots", totalSlots);
+        formData.append("datetime", new Date(datetime).toISOString());
+        images.forEach((image) => {
+            formData.append("images", image);
+        });
 
-            const addListingResponse = await server.post("/listings/addListing", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-                transformRequest: formData => formData,
-                timeout: 10000,
-            }
-            )
-            if (addListingResponse.status == 200) {
-                dispatch(reloadAuthToken(authToken))
-                onClose();
-                setDefaultState();
-                setIsSubmitting(false);
-                localStorage.setItem("published", "true");
-                window.location.href = "/";
-            }
-        } catch (error) {
-            dispatch(reloadAuthToken(authToken))
-            console.log("Failed to submit listing; error: " + error)
-            onClose();
+        const addListingResponse = await server.post("/listings/addListing", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+            transformRequest: formData => formData,
+            timeout: 10000,
+        })
+        dispatch(reloadAuthToken(authToken))
+        onClose();
+        if (addListingResponse.status == 200) {
+            setDefaultState();
+            setIsSubmitting(false);
+            localStorage.setItem("published", "true");
+            window.location.href = "/";
+        } else {
+            console.error(addListingResponse.data.error);
             displayToast(
-                "Error submitting listing",
-                "Please try again later.",
+                addListingResponse.data.message,
+                "Please try again",
                 "error",
                 2500,
                 false

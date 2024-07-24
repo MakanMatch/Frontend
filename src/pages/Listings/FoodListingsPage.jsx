@@ -32,14 +32,13 @@ const FoodListingsPage = () => {
     }
 
     const fetchListings = async () => {
-        try {
-            const response = await server.get("/cdn/listings");
-            dispatch(reloadAuthToken(authToken));
+        const response = await server.get("/cdn/listings");
+        dispatch(reloadAuthToken(authToken));
+        if (response.status === 200) {
             setListings(response.data);
-        } catch (error) {
-            dispatch(reloadAuthToken(authToken))
-            console.log("Failed to fetch listings: " + error)
-            displayToast("Error fetching food listings", "Please try again later.", "error", 2500, false);
+        } else {
+            console.error(response.data.error);
+            displayToast(response.data.message, "Please try again", "error", 2500, false);
         }
     };
 
@@ -49,18 +48,15 @@ const FoodListingsPage = () => {
             setLoading(false);
         }
         fetchData();
-        // check if localstorage contains published=true
         if (localStorage.getItem("published") === "true") {
+            localStorage.removeItem("published");
             displayToast(
                 "Listing published successfully!",
-                "We'll notify you when all slots have been filled.",
+                "We'll notify you when all slots have been filled",
                 "success",
                 4000,
                 false
             );
-            console.log("Toast triggered")
-            localStorage.removeItem("published");
-            console.log("Localstorage item removed")
         }
         
     }, []);
