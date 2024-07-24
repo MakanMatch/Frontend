@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import {
 	Box,
 	Input,
-	Image,
 	Text,
 	Center,
 	Flex,
@@ -281,7 +280,7 @@ function ChatUi() {
 				chatPartnerUsernames={chatPartnerUsernames} // Pass the map of chat partner usernames
 			/>
 
-			{isChatVisible && (
+			{isChatVisible ? (
 				<Center flexDirection="column" alignItems="center" p={5} flex="1">
 					<Box
 						bg="white"
@@ -411,8 +410,13 @@ function ChatUi() {
 						</Flex>
 					</Box>
 				</Center>
+			): (
+				<Center flex="1">
+					<Text fontSize="xl" color="gray.500">
+						Select a chat to start messaging or make a reservation.
+					</Text>
+				</Center>
 			)}
-
 			{/* Edit Message Modal */}
 			<Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
 				<ModalOverlay />
