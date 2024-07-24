@@ -44,6 +44,7 @@ function ChatUi() {
 	const [chatPartnerUsername, setChatPartnerUsername] = useState("");
 	const [isChatVisible, setIsChatVisible] = useState(false); // State for chat visibility
 	const [lastMessage, setLastMessage] = useState(""); // State for last message
+	const [chatID, setChatID] = useState(""); // State for chat ID
 	const chatBottomRef = useRef(null); // Reference to the bottom of chat container
 	const { user, loaded, error } = useSelector((state) => state.auth);
 
@@ -88,19 +89,8 @@ function ChatUi() {
 				}
 			}
 
-			if (receivedMessage.action === "connect"){
+			if (receivedMessage.action === "connect") {
 				setChatPartnerUsername(receivedMessage.chatPartnerUsername);
-			}
-			else if (receivedMessage.type === "chat_history") {
-				setMessages(receivedMessage.messages);
-				if (receivedMessage.username1 === user.username) {
-					setChatPartnerUsername(receivedMessage.username2);
-				}
-				else{
-					setChatPartnerUsername(receivedMessage.username1);
-				}
-				let lastMessage = receivedMessage.messages[receivedMessage.messages.length - 1];
-				setLastMessage(lastMessage);
 			} else if (receivedMessage.action === "edit") {
 				setMessages((prevMessages) =>
 					prevMessages.map((msg) =>
@@ -117,6 +107,8 @@ function ChatUi() {
 				alert(receivedMessage.message);
 				window.location.reload();
 			} else {
+				console.log(receivedMessage);
+				setChatID(receivedMessage.chatID);
 				setMessages((prevMessages) => [...prevMessages, receivedMessage]);
 			}
 		};
@@ -135,6 +127,7 @@ function ChatUi() {
 			}
 		};
 	}, [loaded, user]);
+
 
 	useEffect(() => {
 		scrollToBottom();
@@ -156,6 +149,17 @@ function ChatUi() {
 
 			setMessageInput("");
 			setReplyTo(null); // Clear the reply state after sending
+		}
+	};
+
+	const fetchChatHistory = () => {
+		if (ws.current) {
+			const request = {
+				action: "chat_history",
+				userID: user.userID,
+				chatID: chatID, // Pass the current chatID or any other identifier needed
+			};
+			ws.current.send(JSON.stringify(request));
 		}
 	};
 
@@ -250,189 +254,198 @@ function ChatUi() {
 
 	return (
 		<Flex>
-			<ChatHistory onUserClick={toggleChatVisibility} lastMessage={lastMessage} chatPartnerUsername={chatPartnerUsername} />
+			<ChatHistory
+				onUserClick={() => {
+					toggleChatVisibility();
+					fetchChatHistory(); // Fetch chat history when clicking on the sidebar
+				}}
+				lastMessage={lastMessage}
+				chatPartnerUsername={chatPartnerUsername}
+				chatID={chatID}
+			/>
+
 			{isChatVisible && (
-			<Center flexDirection="column" alignItems="center" p={5} flex="1">
-				<Box
-					bg="white"
-					w="75%"
-					p={2}
-					borderRadius={20}
-					h="auto"
-					textColor="black"
-					alignItems="center"
-					display="flex"
-					boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
-					mb={4}
-					mt={-4}
-				>
-					<Image
-						src="https://randomuser.me/api/portraits/men/4.jpg"
-						alt="UserA"
-						borderRadius="full"
-						w={{ base: "20%", md: "10%" }}
-						h="100%"
-						minH={"55px"}
-						maxH={"55px"}
-						minW={"55px"}
-						maxW={"55px"}
-					/>
-					<Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
-						<Text fontSize={20} mt={2} textAlign={"left"}>
-						{chatPartnerUsername ? `Chat with ${chatPartnerUsername}` : "Chat"} {/* Display chat partner's username */}
-						</Text>
-						<Spacer h={3} />
-						<Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
-							Online
-						</Text>
-					</Box>
-				</Box>
-				<Box
-					bg="gray.100"
-					w="75%"
-					h="70vh"
-					p={4}
-					display="flex"
-					flexDirection="column"
-					borderRadius={20}
-					boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
-				>
-					<VStack spacing={4} align="stretch" flex="1" overflowY="auto">
-						{messages.map((msg, index) => (
-							<React.Fragment key={msg.messageID}>
-								{shouldDisplayDate(msg, messages[index - 1]) && (
-									<Text
-										fontSize="sm"
-										color="gray.500"
-										textAlign="center"
-										mb={2}
-									>
-										{formatDate(msg.datetime)}
-									</Text>
-								)}
-								<ChatBubble
-									message={msg.message}
-									timestamp={new Date(msg.datetime).toLocaleTimeString([], {
-										hour: "2-digit",
-										minute: "2-digit",
-									})}
-									isSender={msg.sender === user.username}
-									photoUrl={
-										msg.sender === user.username
-											? "https://bit.ly/dan-abramov"
-											: "https://randomuser.me/api/portraits/men/4.jpg"
-									}
-									onEdit={() => openEditModal(msg.messageID, msg.message)}
-									onDelete={() => handleDeletePrompt(msg.messageID)}
-									onReply={() => handleReply(msg)}
-									repliedMessage={msg.replyTo}
-									edited={msg.edited}
-								/>
-							</React.Fragment>
-						))}
-						<div ref={chatBottomRef} /> {/* Ref to scroll to */}
-					</VStack>
-				{replyTo && (
-					<Flex
-						bg="gray.200"
+				<Center flexDirection="column" alignItems="center" p={5} flex="1">
+					<Box
+						bg="white"
+						w="75%"
 						p={2}
-						borderRadius="md"
-						mb={2}
-						align="center"
-						justify="space-between"
+						borderRadius={20}
+						h="auto"
+						textColor="black"
+						alignItems="center"
+						display="flex"
+						boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
+						mb={4}
+						mt={-4}
 					>
-						<Text fontSize="sm" fontStyle="italic">
-							Replying to: {replyTo.message}
-						</Text>
-						<IconButton
-							aria-label="Cancel reply"
-							icon={<FiX />}
-							variant="ghost"
-							colorScheme="red"
-							size="sm"
-							onClick={cancelReply}
+						<Image
+							src="https://randomuser.me/api/portraits/men/4.jpg"
+							alt="UserA"
+							borderRadius="full"
+							w={{ base: "20%", md: "10%" }}
+							h="100%"
+							minH={"55px"}
+							maxH={"55px"}
+							minW={"55px"}
+							maxW={"55px"}
 						/>
-					</Flex>
-				)}
-				<Flex mt={4} align="center">
-					<IconButton
-						aria-label="Add emoji"
-						icon={<FiSmile boxSize={8} />}
-						variant="ghost"
-						colorScheme="gray"
-						mr={2}
-					/>
-					<IconButton
-						aria-label="Add photo"
-						icon={<FiCamera boxSize={8} />}
-						variant="ghost"
-						colorScheme="gray"
-						mr={2}
-					/>
-					<Input
-						placeholder="Type a message..."
-						flex="1"
-						mr={2}
-						value={messageInput}
-						onChange={(e) => setMessageInput(e.target.value)}
-						onKeyDown={handleKeyDown}
-					/>
-					<Button colorScheme="teal" onClick={sendMessage}>
-						Send
-					</Button>
-				</Flex>
-			</Box>
-		</Center>
+						<Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
+							<Text fontSize={20} mt={2} textAlign={"left"}>
+								{chatPartnerUsername ? `Chat with ${chatPartnerUsername}` : "Chat"} {/* Display chat partner's username */}
+							</Text>
+							<Spacer h={3} />
+							<Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
+								Online
+							</Text>
+						</Box>
+					</Box>
+					<Box
+						bg="gray.100"
+						w="75%"
+						h="70vh"
+						p={4}
+						display="flex"
+						flexDirection="column"
+						borderRadius={20}
+						boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
+					>
+						<VStack spacing={4} align="stretch" flex="1" overflowY="auto">
+							{messages.map((msg, index) => (
+								<React.Fragment key={msg.messageID}>
+									{shouldDisplayDate(msg, messages[index - 1]) && (
+										<Text
+											fontSize="sm"
+											color="gray.500"
+											textAlign="center"
+											mb={2}
+										>
+											{formatDate(msg.datetime)}
+										</Text>
+									)}
+									<ChatBubble
+										message={msg.message}
+										timestamp={new Date(msg.datetime).toLocaleTimeString([], {
+											hour: "2-digit",
+											minute: "2-digit",
+										})}
+										isSender={msg.sender === user.username}
+										photoUrl={
+											msg.sender === user.username
+												? "https://bit.ly/dan-abramov"
+												: "https://randomuser.me/api/portraits/men/4.jpg"
+										}
+										onEdit={() => openEditModal(msg.messageID, msg.message)}
+										onDelete={() => handleDeletePrompt(msg.messageID)}
+										onReply={() => handleReply(msg)}
+										repliedMessage={msg.replyTo}
+										edited={msg.edited}
+									/>
+								</React.Fragment>
+							))}
+							<div ref={chatBottomRef} /> {/* Ref to scroll to */}
+						</VStack>
+						{replyTo && (
+							<Flex
+								bg="gray.200"
+								p={2}
+								borderRadius="md"
+								mb={2}
+								align="center"
+								justify="space-between"
+							>
+								<Text fontSize="sm" fontStyle="italic">
+									Replying to: {replyTo.message}
+								</Text>
+								<IconButton
+									aria-label="Cancel reply"
+									icon={<FiX />}
+									variant="ghost"
+									colorScheme="red"
+									size="sm"
+									onClick={cancelReply}
+								/>
+							</Flex>
+						)}
+						<Flex mt={4} align="center">
+							<IconButton
+								aria-label="Add emoji"
+								icon={<FiSmile boxSize={8} />}
+								variant="ghost"
+								colorScheme="gray"
+								mr={2}
+							/>
+							<IconButton
+								aria-label="Add photo"
+								icon={<FiCamera boxSize={8} />}
+								variant="ghost"
+								colorScheme="gray"
+								mr={2}
+							/>
+							<Input
+								placeholder="Type a message..."
+								flex="1"
+								mr={2}
+								value={messageInput}
+								onChange={(e) => setMessageInput(e.target.value)}
+								onKeyDown={handleKeyDown}
+							/>
+							<Button colorScheme="teal" onClick={sendMessage}>
+								Send
+							</Button>
+						</Flex>
+					</Box>
+				</Center>
 			)}
 
-			{/* Edit Message Modal */ }
-	<Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
-		<ModalOverlay />
-		<ModalContent>
-			<ModalHeader>Edit Message</ModalHeader>
-			<ModalCloseButton />
-			<ModalBody>
-				<Input
-					value={editMessageContent}
-					onChange={(e) => setEditMessageContent(e.target.value)}
-					placeholder="Edit your message..."
-				/>
-			</ModalBody>
-			<ModalFooter>
-				<Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
-					Save
-				</Button>
-				<Button onClick={closeEditModal}>Cancel</Button>
-			</ModalFooter>
-		</ModalContent>
-	</Modal>
+			{/* Edit Message Modal */}
+			<Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
+				<ModalOverlay />
+				<ModalContent>
+					<ModalHeader>Edit Message</ModalHeader>
+					<ModalCloseButton />
+					<ModalBody>
+						<Input
+							value={editMessageContent}
+							onChange={(e) => setEditMessageContent(e.target.value)}
+							placeholder="Edit your message..."
+						/>
+					</ModalBody>
+					<ModalFooter>
+						<Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
+							Save
+						</Button>
+						<Button onClick={closeEditModal}>Cancel</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
 
-	{/* Delete Message AlertDialog */ }
-	<AlertDialog
-		isOpen={deleteDialogOpen}
-		leastDestructiveRef={undefined}
-		onClose={closeDeleteDialog}
-	>
-		<AlertDialogOverlay>
-			<AlertDialogContent>
-				<AlertDialogHeader fontSize="lg" fontWeight="bold">
-					Delete Message
-				</AlertDialogHeader>
-				<AlertDialogBody>
-					Are you sure you want to delete this message? You can't undo this
-					action afterwards.
-				</AlertDialogBody>
-				<AlertDialogFooter>
-					<Button onClick={closeDeleteDialog}>Cancel</Button>
-					<Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
-						Delete
-					</Button>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialogOverlay>
-	</AlertDialog>
+			{/* Delete Message AlertDialog */}
+			<AlertDialog
+				isOpen={deleteDialogOpen}
+				leastDestructiveRef={undefined}
+				onClose={closeDeleteDialog}
+			>
+				<AlertDialogOverlay>
+					<AlertDialogContent>
+						<AlertDialogHeader fontSize="lg" fontWeight="bold">
+							Delete Message
+						</AlertDialogHeader>
+						<AlertDialogBody>
+							Are you sure you want to delete this message? You can't undo this
+							action afterwards.
+						</AlertDialogBody>
+						<AlertDialogFooter>
+							<Button onClick={closeDeleteDialog}>Cancel</Button>
+							<Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
+								Delete
+							</Button>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialogOverlay>
+			</AlertDialog>
 		</Flex >
 	);
 }
 
-export default ChatUi;
+export default ChatUi
