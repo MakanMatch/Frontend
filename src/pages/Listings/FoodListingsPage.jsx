@@ -131,9 +131,7 @@ const FoodListingsPage = () => {
                                                         images={listing.images.map((imageName) =>
                                                             getImageLink(listing.listingID, imageName)
                                                         )}
-                                                        fetchListings={fetchListings}
                                                         shortDescription={listing.shortDescription}
-                                                        address={listing.address}
                                                         approxAddress={listing.approxAddress}
                                                         totalSlots={listing.totalSlots}
                                                         latitude={parseFloat(listing.coordinates.split(',')[0])}
