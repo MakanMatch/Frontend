@@ -212,14 +212,14 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                 isOpen={isOpen}
                 onClose={onClose}
                 size={"lg"}
-                scrollBehavior="inside"
+                scrollBehavior="auto"
                 closeOnOverlayClick={false}
                 isCentered
             >
                 <ModalOverlay
                     backdropFilter="brightness(1)"
                 />
-                <ModalContent overflow={"hidden"} maxH={"90vh"}>
+                <ModalContent>
                     <ModalHeader>Host your next meal!</ModalHeader>
                     <ModalBody>
                         <FormControl mb={5} isRequired>
