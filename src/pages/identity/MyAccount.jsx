@@ -26,6 +26,7 @@ const MyAccount = () => {
     const { isOpen: isDiscardOpen, onOpen: onDiscardOpen, onClose: onDiscardClose } = useDisclosure();
     const [isEditPictureModalOpen, setEditPictureModalOpen] = useState(false);
     const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
+    const [passwordChangeInProgress, setPasswordChangeInProgress] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const [accountInfo, setAccountInfo] = useState(null);
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
@@ -55,8 +56,10 @@ const MyAccount = () => {
             if (user && user.userID) {
                 fetchAccountInfo();
             } else {
-                showToast("Redirecting to login", "Please log in first.", 3000, true, "error");
-                navigate('/auth/login');
+                if (!passwordChangeInProgress) {
+                    showToast("Redirecting to login", "Please log in first.", 3000, true, "error");
+                    navigate('/auth/login');
+                }
             }
         }
     }, [loaded, user]);
@@ -186,6 +189,7 @@ const MyAccount = () => {
     };
 
     const handleChangePassword = (values, { setSubmitting, setFieldError }) => {
+        setPasswordChangeInProgress(true);
         server.put("/identity/myAccount/changePassword", {
                 userID: user.userID,
                 userType: user.userType,
@@ -195,7 +199,10 @@ const MyAccount = () => {
             .then((res) => {
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     setPasswordModalOpen(false);
-                    showToast("Password changed", "Your password has been updated!", 3000, true, "success");
+                    showToast("Password changed", "Please log in with your new password.", 3000, true, "success");
+                    dispatch(logout());
+                    localStorage.removeItem('jwt');
+                    navigate("/auth/login");
                 } else if (res.data.startsWith("UERROR")) {
                     setFieldError("currentPassword", "Incorrect current password")
                     showToast("ERROR", res.data.substring("UERROR: ".length), 3000, true, "error");
@@ -207,6 +214,7 @@ const MyAccount = () => {
             })
             .finally(() => {
                 setSubmitting(false);
+                setPasswordChangeInProgress(false);
             });
     };
 
