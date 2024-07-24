@@ -23,6 +23,7 @@ import {
 	ModalFooter,
 	ModalBody,
 	ModalCloseButton,
+	Avatar,
 } from "@chakra-ui/react";
 import { FiSmile, FiCamera, FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
@@ -348,11 +349,8 @@ function ChatUi() {
 											minute: "2-digit",
 										})}
 										isSender={msg.sender === user.username}
-										photoUrl={
-											msg.sender === user.username
-												? "https://bit.ly/dan-abramov"
-												: "https://randomuser.me/api/portraits/men/4.jpg"
-										}
+										sender={user.username}
+										reciever={chatPartnerUsernames[chatSelected]}
 										onEdit={() => openEditModal(msg.messageID, msg.message)}
 										onDelete={() => handleDeletePrompt(msg.messageID)}
 										onReply={() => handleReply(msg)}
