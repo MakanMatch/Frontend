@@ -30,10 +30,9 @@ const EditPicture = ({ isOpen, onClose, onSubmit, currentAvatar }) => {
                             boxSize="150px"
                             borderRadius="full"
                             src={newPicture}
-                            alt="Avatar"
                             mb={4}
                         />
-                        <Button colorScheme="teal" onClick={handleChangePicture}>
+                        <Button colorScheme="teal" onClick={handleChangePicture} mb={5}>
                             Upload new image
                         </Button>
                     </Box>

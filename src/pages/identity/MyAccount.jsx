@@ -389,8 +389,6 @@ const MyAccount = () => {
                         left="16%"
                         transform="translateX(-50%)"
                         zIndex={1}
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => setIsHovered(false)}
                         cursor={"pointer"}
                         overflow="visible"
                     >
@@ -400,6 +398,9 @@ const MyAccount = () => {
                             position="relative"
                             bg="white"
                             border="4px solid white"
+                            onClick={(toggleEditPicture)}
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
                         >
                             {isHovered && (
                                 <Box
@@ -414,16 +415,15 @@ const MyAccount = () => {
                                     alignItems="center"
                                     justifyContent="center"
                                     borderRadius="50%"
-                                    onClick={(toggleEditPicture)}
                                 >
                                     <Text fontSize="sm" color="white">
                                         Edit Picture
                                     </Text>
-
-                                    <EditPicture isOpen={isEditPictureModalOpen} onClose={handleEditPictureCloseModal} onSubmit={handleEditPicture} />
                                 </Box>
                             )}
                         </Avatar>
+
+                        <EditPicture isOpen={isEditPictureModalOpen} onClose={handleEditPictureCloseModal} onSubmit={handleEditPicture} />
                     </Box>
                 </Box>
 
