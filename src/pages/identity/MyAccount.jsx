@@ -3,8 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormControl, FormLabel, Stack, 
     Editable, EditableInput, EditablePreview, AlertDialog, AlertDialogOverlay, AlertDialogHeader, AlertDialogBody,
-    AlertDialogFooter, AlertDialogContent, useDisclosure
+    AlertDialogFooter, AlertDialogContent, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, 
+    PopoverCloseButton, IconButton, Input, ButtonGroup
 } from "@chakra-ui/react";
+import { EditIcon, } from "@chakra-ui/icons";
+import  FocusLock from "react-focus-lock"
 import { logout } from "../../slices/AuthState";
 import GuestSidebar from "../../components/identity/GuestSideNav";
 import HostSidebar from "../../components/identity/HostSideNav";
@@ -220,6 +223,29 @@ const MyAccount = () => {
         console.log("Edit picture clicked");
     };
 
+    const handleChangeName = (fname, lname, onClose) => {
+        server.put("/identity/myAccount/changeName", {
+            fname: fname,
+            lname: lname
+        })
+        .then((res) => {
+            if (res.status === 200 && res.data.startsWith("SUCCESS")) {
+                showToast("Name changed", "Your name has been updated!", 3000, true, "success");
+                onClose();
+            } else {
+                showToast("ERROR", res.data, 3000, true, "error");
+            }
+        })
+        .catch((err) => {
+            if (err.response && err.response.status === 400) {
+                showToast("Invalid Input", err.response.data, 3000, true, "error");
+            } else {
+                console.error("Error changing name:", err);
+                showToast("ERROR", "Failed to change name.", 3000, true, "error");
+            }
+        });
+    };
+    
     if (!accountLoaded) {
         return <Spinner />;
     }
@@ -228,6 +254,112 @@ const MyAccount = () => {
         console.log(error);
         return <Spinner />;
     }
+
+    const TextInput = React.forwardRef((props, ref) => {
+        return (
+            <FormControl>
+                <FormLabel htmlFor={props.id}>{props.label}</FormLabel>
+                <Input ref={ref} id={props.id} {...props} />
+            </FormControl>
+        );
+    });
+    
+    const Form = ({ firstFieldRef, onCancel, onSave, fname, setFname, lname, setLname }) => {
+        return (
+            <Stack spacing={4}>
+                <TextInput
+                    label='First name'
+                    id='first-name'
+                    ref={firstFieldRef}
+                    value={fname}
+                    onChange={(e) => setFname(e.target.value)}
+                />
+                <TextInput
+                    label='Last name'
+                    id='last-name'
+                    value={lname}
+                    onChange={(e) => setLname(e.target.value)}
+                />
+                <ButtonGroup display='flex' justifyContent='flex-end'>
+                    <Button variant='outline' onClick={onCancel}>
+                        Cancel
+                    </Button>
+                    <Button colorScheme='teal' onClick={() => onSave(fname, lname)}>
+                        Save
+                    </Button>
+                </ButtonGroup>
+            </Stack>
+        );
+    };
+    
+    const PopoverForm = () => {
+        const { onOpen, onClose, isOpen } = useDisclosure();
+        const firstFieldRef = React.useRef(null);
+        const [fname, setFname] = useState(accountInfo.fname);
+        const [lname, setLname] = useState(accountInfo.lname);
+        const [localAccountInfo, setLocalAccountInfo] = useState(accountInfo);
+    
+        const onSave = (fname, lname) => {
+            handleChangeName(fname, lname, () => {
+                setLocalAccountInfo({ fname, lname });
+                onClose();
+            });
+        };
+    
+        const handleOpen = () => {
+            setFname(localAccountInfo.fname);
+            setLname(localAccountInfo.lname);
+            onOpen();
+        };
+    
+        const handleCancel = () => {
+            setFname(localAccountInfo.fname);
+            setLname(localAccountInfo.lname);
+            onClose();
+        };
+    
+        React.useEffect(() => {
+            if (!isOpen) {
+                setFname(localAccountInfo.fname);
+                setLname(localAccountInfo.lname);
+            }
+        }, [isOpen]);
+    
+        return (
+            <Box display='flex' alignItems='center' mt="3%" ml="30%">
+                <Box display='flex' alignItems='center' mr={3}>
+                    <Text fontSize={25}><b>{localAccountInfo.fname} {localAccountInfo.lname}</b></Text>
+                    <Popover
+                        isOpen={isOpen}
+                        initialFocusRef={firstFieldRef}
+                        onOpen={handleOpen}
+                        onClose={onClose}
+                        placement='right'
+                        closeOnBlur={false}
+                    >
+                        <PopoverTrigger>
+                            <IconButton size='sm' icon={<EditIcon />} ml={2} />
+                        </PopoverTrigger>
+                        <PopoverContent p={5}>
+                            <FocusLock returnFocus persistentFocus={false}>
+                                <PopoverArrow />
+                                <PopoverCloseButton />
+                                <Form
+                                    firstFieldRef={firstFieldRef}
+                                    onCancel={handleCancel}
+                                    onSave={onSave}
+                                    fname={fname}
+                                    setFname={setFname}
+                                    lname={lname}
+                                    setLname={setLname}
+                                />
+                            </FocusLock>
+                        </PopoverContent>
+                    </Popover>
+                </Box>
+            </Box>
+        );
+    };
 
     return (
         <Flex>
@@ -246,7 +378,7 @@ const MyAccount = () => {
                         : bannerStyles.host)}
                 >
                     <Flex align="center" justify="flex-end" height="100%" pr={10}>
-                        <Heading mr={5} size={"2xl"} color="Black">
+                        <Heading mr={5} size={'2xl'} color="Black">
                             {accountInfo.userType}
                         </Heading>
                     </Flex>
@@ -254,7 +386,7 @@ const MyAccount = () => {
                     <Box
                         position="absolute"
                         bottom="-70px"
-                        left="20%"
+                        left="16%"
                         transform="translateX(-50%)"
                         zIndex={1}
                         onMouseEnter={() => setIsHovered(true)}
@@ -295,7 +427,9 @@ const MyAccount = () => {
                     </Box>
                 </Box>
 
-                <Stack direction={["column", "row"]} p={4} mt={20} justifyContent="space-between" width="100%" spacing={"20px"}>
+                <PopoverForm />
+
+                <Stack direction={["column", "row"]} p={4} mt={5} justifyContent="space-between" width="100%" spacing={"20px"}>
                     <Box p={2} width={"50%"}>
                         <FormControl mb={2}>
                             <FormLabel>Username</FormLabel>
