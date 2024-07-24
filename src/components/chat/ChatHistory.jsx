@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Flex, Text, Avatar, VStack, useMediaQuery } from "@chakra-ui/react";
 
-function ChatHistory({ chatHistory = [], onUserClick, lastMessage, chatPartnerUsername, chatID }) {
+function ChatHistory({ chatHistory = [], onUserClick, lastMessage, chatPartnerUsername }) {
   const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
 
   if (!isSmallerThan950px) {
@@ -24,34 +24,33 @@ function ChatHistory({ chatHistory = [], onUserClick, lastMessage, chatPartnerUs
               Messages
           </Text>
           <VStack spacing={4} align="stretch" alignContent={"left"}>
-              {chatHistory.map((chatID, index) => (
-                console.log(chatID, index),
-                  <Flex
-                      key={chatID} // Use index as key if chatID is not unique
-                      align="center"
-                      p={3}
-                      _hover={{ bg: "gray.100", cursor: "pointer" }}
-                      borderRadius="md"
-                      w="100%"
-                      onClick={() => onUserClick(chatID)}
-                  >
-                      <Avatar 
-                          src={`https://api.adorable.io/avatars/285/${chatID}.png`} 
-                          name={chatPartnerUsername} // Use chatID as name if no other info is available
-                          mr={3} 
-                          minW={"55px"} 
-                          minH={"55px"} 
-                      />
-                      <Box flex="1" minW={0}>
-                          <Text fontWeight="bold" textAlign={"left"}>
-                              {chatPartnerUsername}
-                          </Text>
-                          <Text fontSize="sm" color="gray.500" maxW="100%" textAlign={"left"} isTruncated>
-                               {lastMessage}
-                          </Text>
-                      </Box>
-                  </Flex>
-              ))}
+              {chatHistory.map((chatID) => (
+                <Flex
+                    key={chatID} // Ensure chatID is unique
+                    align="center"
+                    p={3}
+                    _hover={{ bg: "gray.100", cursor: "pointer" }}
+                    borderRadius="md"
+                    w="100%"
+                    onClick={() => onUserClick(chatID)}
+                >
+                    <Avatar 
+                        src={`https://api.adorable.io/avatars/285/${chatID}.png`} 
+                        name={chatPartnerUsername || `Chat ${chatID}`} 
+                        mr={3} 
+                        minW={"55px"} 
+                        minH={"55px"} 
+                    />
+                    <Box flex="1" minW={0}>
+                        <Text fontWeight="bold" textAlign={"left"}>
+                            {chatPartnerUsername || `Chat ${chatID}`}
+                        </Text>
+                        <Text fontSize="sm" color="gray.500" maxW="100%" textAlign={"left"} isTruncated>
+                             {lastMessage || "No messages yet"}
+                        </Text>
+                    </Box>
+                </Flex>
+            ))}
           </VStack>
       </Box>
   );
