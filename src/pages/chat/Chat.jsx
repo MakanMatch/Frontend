@@ -296,9 +296,8 @@ function ChatUi() {
 						mb={4}
 						mt={-4}
 					>
-						<Image
-							src="https://randomuser.me/api/portraits/men/4.jpg"
-							alt="UserA"
+						<Avatar
+							name = {chatPartnerUsernames[chatSelected]}
 							borderRadius="full"
 							w={{ base: "20%", md: "10%" }}
 							h="100%"
