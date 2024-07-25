@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import StarRating from './StarRatings';
-import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
+import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast,Avatar } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 import { useDisclosure } from '@chakra-ui/react'
 import server from '../../networking'
@@ -153,11 +153,12 @@ const SubmitReviews = ({
                     <ModalCloseButton />
                     <ModalBody>
                         <Flex direction='column' align="center" mb={4}>
-                            <Image
+                            <Avatar
                                 borderRadius='full'
                                 boxSize='100px'
-                                src='https://bit.ly/dan-abramov'
-                                alt='Dan Abramov'
+                                // src='https://bit.ly/dan-abramov'
+                                name={hostName}
+                                alt={hostName}
                             />
                             <Text fontSize={{ base: '2xl', md: '3xl' }} textAlign='center' mt={{ base: 2, md: 0 }} ml={{ base: 0, md: 4 }}>
                                 {hostName}
