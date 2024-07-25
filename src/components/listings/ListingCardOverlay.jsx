@@ -68,14 +68,6 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
         if (!user) {
             setFavourite(false);
             return;
-        } else {
-            const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
-            const guestFavCuisine = response.data.favCuisine || "";
-            if (guestFavCuisine.includes(listingID)) {
-                setFavourite(true);
-            } else {
-                setFavourite(false);
-            }
         }
     }
 
