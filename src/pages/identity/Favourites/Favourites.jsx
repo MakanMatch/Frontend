@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Text } from "@chakra-ui/react";
-import GuestSideNav from "../../components/identity/GuestSideNav";
+import GuestSideNav from "../../../components/identity/GuestSideNav";
 
 const Favourites = () => {
     return (
