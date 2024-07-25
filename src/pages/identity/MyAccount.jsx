@@ -15,6 +15,7 @@ import server from "../../networking";
 import configureShowToast from '../../components/showToast';
 import ChangePassword from "../../components/identity/ChangePassword";
 import EditPicture from "../../components/identity/EditPicture";
+import ChangeAddress from "../../components/identity/ChangeAddress";
 
 const MyAccount = () => {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ const MyAccount = () => {
     const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
     const [passwordChangeInProgress, setPasswordChangeInProgress] = useState(false);
     const [deleteInProgress, setDeleteInProgress] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
+    const [isChangeAddressModalOpen, setChangeAddressModalOpen] = useState(false);
     const [accountInfo, setAccountInfo] = useState(null);
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
     const { user, loaded, error } = useSelector((state) => state.auth);
@@ -117,7 +118,6 @@ const MyAccount = () => {
                 username: accountInfo.username,
                 email: accountInfo.email,
                 contactNum: accountInfo.contactNum,
-                address: accountInfo.address || '',
             }, {
                 headers: {
                     'Content-Type': 'application/json'
@@ -227,12 +227,44 @@ const MyAccount = () => {
 
     const handleEditPictureCloseModal = () => {
         setEditPictureModalOpen(false);
-        setIsHovered(false)
     };
 
     const handleEditPicture = () => {
         console.log("Edit picture clicked");
     };
+
+    const toggleChangeAddress = () => {
+        setChangeAddressModalOpen(!isChangeAddressModalOpen)
+    };
+
+    const handleChangeAddressCloseModal = () => {
+        setChangeAddressModalOpen(false);
+    };
+
+    const handleChangeAddress = (values) => {
+        server.put("/identity/myAccount/changeAddress", {
+            blkNo: values.blkNo,
+            street: values.street,
+            postalCode: values.postalCode,
+            unitNum: values.unitNum,
+        })
+        .then((res) => {
+            if (res.status === 200 && res.data.startsWith("SUCCESS")) {
+                showToast("Address changed", "Your address has been updated!", 3000, true, "success");
+                setChangeAddressModalOpen(false);
+            } else {
+                showToast("ERROR", res.data, 3000, true, "error");
+            }
+        })
+        .catch((err) => {
+            if (err.response && err.response.status === 400) {
+                showToast("Invalid Input", err.response.data, 3000, true, "error");
+            } else {
+                console.error("Error changing address:", err);
+                showToast("ERROR", "Failed to change address.", 3000, true, "error");
+            }
+        })
+    }  
 
     const handleChangeName = (fname, lname, onClose) => {
         server.put("/identity/myAccount/changeName", {
@@ -422,29 +454,7 @@ const MyAccount = () => {
                             bg="white"
                             border="4px solid white"
                             onClick={(toggleEditPicture)}
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                        >
-                            {isHovered && (
-                                <Box
-                                    position="absolute"
-                                    top={0}
-                                    left={0}
-                                    right={0}
-                                    bottom={0}
-                                    bg="rgba(0, 0, 0, 0.5)"
-                                    zIndex={2}
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                    borderRadius="50%"
-                                >
-                                    <Text fontSize="sm" color="white">
-                                        Edit Picture
-                                    </Text>
-                                </Box>
-                            )}
-                        </Avatar>
+                        />
 
                         <EditPicture isOpen={isEditPictureModalOpen} onClose={handleEditPictureCloseModal} onSubmit={handleEditPicture} />
                     </Box>
@@ -478,6 +488,9 @@ const MyAccount = () => {
                                 borderColor={"black"}
                                 borderWidth={1}
                                 borderRadius={10}
+                                overflow={"hidden"}
+                                textOverflow="ellipsis"
+                                whiteSpace="nowrap"
                             >
                                 <EditablePreview p={2} borderRadius={10} />
                                 <EditableInput p={2} borderRadius={10} />
@@ -499,19 +512,25 @@ const MyAccount = () => {
                             </Editable>
                         </FormControl>
 
-                        <FormControl mb={2}>
+                        <FormControl>
                             <FormLabel>Address</FormLabel>
-                            <Editable
-                                value={accountInfo.address || "Enter your address"}
-                                onChange={(value) => setAccountInfo({ ...accountInfo, address: value })}
-                                textAlign={"left"}
-                                borderColor={"black"}
-                                borderWidth={1}
-                                borderRadius={10}
-                            >
-                                <EditablePreview p={2} borderRadius={10} />
-                                <EditableInput p={2} borderRadius={10} />
-                            </Editable>
+                            <Flex alignItems="center" justifyContent={"space-between"}>
+                                <Box 
+                                    textAlign={"left"}
+                                    borderColor={"black"}
+                                    borderWidth={1}
+                                    borderRadius={10}
+                                    overflow={"hidden"}
+                                    width="80%"
+                                    height="40px"
+                                >
+                                    <Text p={2} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{accountInfo.address || "Enter your address"}</Text>
+                                </Box>
+
+                                <Button onClick={toggleChangeAddress}>Edit</Button>
+
+                                <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} address={accountInfo.address} onSave={handleChangeAddress}/>
+                            </Flex>
                         </FormControl>
 
                         <Button variant={"MMPrimary"} mb={4} onClick={(toggleChangePassword)} position="absolute" bottom={0} left={6}>
