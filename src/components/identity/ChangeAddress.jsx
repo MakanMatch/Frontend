@@ -2,24 +2,61 @@ import React, { useState } from 'react';
 import {
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
     ModalBody, ModalCloseButton, Button, FormControl, FormLabel,
-    Input, useToast, Text, HStack, FormErrorMessage, VStack
+    Input, useToast, Text, HStack, FormErrorMessage, VStack,
+    Spinner,
+    Box
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import server from '../../networking';
+import configureShowToast from '../showToast';
 
-const ChangeAddress = ({ isOpen, onClose, address, onSave }) => {
+const ChangeAddress = ({ isOpen, onClose, accountInfo, setAccountInfo }) => {
     const toast = useToast();
-    
+    const showToast = configureShowToast(toast);
+
+    const handleChangeAddress = (values) => {
+        server.put("/identity/myAccount/changeAddress", {
+            blkNo: values.blkNo,
+            street: values.street,
+            postalCode: values.postalCode,
+            unitNum: values.unitNum,
+        })
+            .then((res) => {
+                if (res.status === 200 && res.data.startsWith("SUCCESS")) {
+                    showToast("Address changed", "Your address has been updated!", 3000, true, "success");
+                    setAccountInfo((prev) => {
+                        var newObj = {}
+                        for (const key of Object.keys(prev)) {
+                            newObj[key] = key === "address" ? `${values.blkNo ? values.blkNo + " " : ""}${values.street} ${values.unitNum ? "#" + values.unitNum : ""} ${values.postalCode}` : prev[key];
+                        }
+                        return newObj;
+                    });
+                    onClose();
+                } else {
+                    showToast("ERROR", res.data, 3000, true, "error");
+                }
+            })
+            .catch((err) => {
+                if (err.response && err.response.status === 400) {
+                    showToast("Invalid Input", err.response.data, 3000, true, "error");
+                } else {
+                    console.error("Error changing address:", err);
+                    showToast("ERROR", "Failed to change address.", 3000, true, "error");
+                }
+            })
+    }
+
     const formik = useFormik({
         initialValues: {
-            street: address?.street || '',
-            postalCode: address?.postalCode || '',
-            blkNo: address?.blkNo || '',
-            unitNum: address?.unitNum || '',
+            street: '',
+            postalCode: '',
+            blkNo: '',
+            unitNum: '',
         },
         validationSchema: Yup.object({
-            street: Yup.string().required('Street is required'),
-            postalCode: Yup.string().required('Postal Code is required'),
+            street: Yup.string().required('Street is required').trim(),
+            postalCode: Yup.string().required('Postal Code is required').trim(),
             blkNo: Yup.string(),
             unitNum: Yup.string(),
         }),
@@ -35,10 +72,24 @@ const ChangeAddress = ({ isOpen, onClose, address, onSave }) => {
                 return;
             }
 
-            onSave(values);
-            onClose();
+            handleChangeAddress(values);
         },
     });
+
+    if (!accountInfo) {
+        return (
+            <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalBody>
+                        <Box p={"20px"} textAlign={"center"}>
+                            <Spinner />
+                        </Box>
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
+        )
+    }
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -47,7 +98,7 @@ const ChangeAddress = ({ isOpen, onClose, address, onSave }) => {
                 <ModalHeader>Change Address</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <Text fontSize="15px" mb={4}>{address}</Text>
+                    <Text fontSize="15px" mb={4}>{accountInfo.address}</Text>
                     <form onSubmit={formik.handleSubmit}>
                         <VStack spacing={4} mb={4}>
                             <FormControl isRequired isInvalid={formik.errors.street && formik.touched.street} flex={1}>
@@ -114,7 +165,7 @@ const ChangeAddress = ({ isOpen, onClose, address, onSave }) => {
                     <Button variant='ghost' onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button colorScheme='blue' type="submit" onClick={formik.handleSubmit}>
+                    <Button variant={"MMPrimary"} type="submit" onClick={formik.handleSubmit} ml={"20px"}>
                         Save
                     </Button>
                 </ModalFooter>

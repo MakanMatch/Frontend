@@ -29,8 +29,10 @@ const MyAccount = () => {
     const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
     const [passwordChangeInProgress, setPasswordChangeInProgress] = useState(false);
     const [deleteInProgress, setDeleteInProgress] = useState(false);
+
     const [isChangeAddressModalOpen, setChangeAddressModalOpen] = useState(false);
-    const [accountInfo, setAccountInfo] = useState(null);
+
+    const [accountInfo, setAccountInfo] = useState({});
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
     const { user, loaded, error } = useSelector((state) => state.auth);
     const [accountLoaded, setAccountLoaded] = useState(false);
@@ -40,7 +42,7 @@ const MyAccount = () => {
             const fetchAccountInfo = async () => {
                 try {
                     const userID = user.userID;
-                    const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
+                    const response = await server.get(`/cdn/accountInfo?userID=${userID}`);                    
                     setAccountInfo(response.data);
                     setOriginalAccountInfo(response.data);
                     setAccountLoaded(true);
@@ -241,31 +243,6 @@ const MyAccount = () => {
         setChangeAddressModalOpen(false);
     };
 
-    const handleChangeAddress = (values) => {
-        server.put("/identity/myAccount/changeAddress", {
-            blkNo: values.blkNo,
-            street: values.street,
-            postalCode: values.postalCode,
-            unitNum: values.unitNum,
-        })
-        .then((res) => {
-            if (res.status === 200 && res.data.startsWith("SUCCESS")) {
-                showToast("Address changed", "Your address has been updated!", 3000, true, "success");
-                setChangeAddressModalOpen(false);
-            } else {
-                showToast("ERROR", res.data, 3000, true, "error");
-            }
-        })
-        .catch((err) => {
-            if (err.response && err.response.status === 400) {
-                showToast("Invalid Input", err.response.data, 3000, true, "error");
-            } else {
-                console.error("Error changing address:", err);
-                showToast("ERROR", "Failed to change address.", 3000, true, "error");
-            }
-        })
-    }  
-
     const handleChangeName = (fname, lname, onClose) => {
         server.put("/identity/myAccount/changeName", {
             fname: fname,
@@ -288,7 +265,7 @@ const MyAccount = () => {
             }
         });
     };
-    
+
     if (!accountLoaded) {
         return <Spinner />;
     }
@@ -529,7 +506,7 @@ const MyAccount = () => {
 
                                 <Button onClick={toggleChangeAddress}>Edit</Button>
 
-                                <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} address={accountInfo.address} onSave={handleChangeAddress}/>
+                                <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} accountInfo={accountInfo} setAccountInfo={setAccountInfo} />
                             </Flex>
                         </FormControl>
 
