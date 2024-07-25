@@ -32,13 +32,42 @@ const FoodListingsPage = () => {
     }
 
     const fetchListings = async () => {
-        const response = await server.get("/cdn/listings");
-        dispatch(reloadAuthToken(authToken));
-        if (response.status === 200) {
-            setListings(response.data);
-        } else {
-            console.error(response.data.error);
-            displayToast(response.data.message, "Please try again", "error", 2500, false);
+        try {
+            const response = await server.get("/cdn/listings");
+            dispatch(reloadAuthToken(authToken));
+            if (response.status === 200) {
+                setListings(response.data);
+            }
+        } catch (error) {
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to fetch listings; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    displayToast(
+                        error.response.data.substring("UERROR: ".length),
+                        "Please try again",
+                        "info",
+                        3500,
+                        true
+                    )
+                } else {
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to fetch listings. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when fetching listings; error: " + error)
+                displayToast(
+                    "Something went wrong",
+                    "Failed to fetch listings. Please try again",
+                    "error",
+                    3500,
+                    true
+                )
+            }
         }
     };
 

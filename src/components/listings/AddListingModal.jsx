@@ -7,6 +7,7 @@ import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
+import { toast } from "react-toastify";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }) => {
     const today = new Date();
@@ -79,29 +80,54 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
             formData.append("images", image);
         });
 
-        const addListingResponse = await server.post("/listings/addListing", formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-            transformRequest: formData => formData,
-            timeout: 10000,
-        })
-        dispatch(reloadAuthToken(authToken))
-        onClose();
-        if (addListingResponse.status == 200) {
+        try {
+            const addListingResponse = await server.post("/listings/addListing", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                transformRequest: formData => formData
+            })
+            dispatch(reloadAuthToken(authToken))
+            onClose();
+            if (addListingResponse.status == 200) {
+                setDefaultState();
+                setIsSubmitting(false);
+                localStorage.setItem("published", "true");
+                window.location.href = "/";
+            }
+        } catch (error) {
+            onClose();
             setDefaultState();
             setIsSubmitting(false);
-            localStorage.setItem("published", "true");
-            window.location.href = "/";
-        } else {
-            console.error(addListingResponse.data.error);
-            displayToast(
-                addListingResponse.data.message,
-                "Please try again",
-                "error",
-                2500,
-                false
-            );
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to add listing; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    displayToast(
+                        error.response.data.substring("UERROR: ".length),
+                        "Please try again",
+                        "info",
+                        3500,
+                        true
+                    )
+                } else {
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to add listing. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when adding listing; error: " + error)
+                displayToast(
+                    "Something went wrong",
+                    "Failed to add listing. Please try again",
+                    "error",
+                    3500,
+                    true
+                )
+            }
         }
     };
 
@@ -131,12 +157,12 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
         } else {
             setFileFormatError("Invalid file format. Only JPEG, JPG, PNG, and SVG are allowed.");
         }
-    };    
+    };
 
     const handleRemoveImage = (index) => {
         setImages((prevImages) => prevImages.filter((image, imageIndex) => imageIndex !== index));
     };
-    
+
 
     const handleCancelClick = () => {
         onAlertOpen();
@@ -344,7 +370,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                                                     {image.name}
                                                 </Text>
                                                 <Button onClick={() => handleRemoveImage(index)}>
-                                                    <CloseIcon boxSize={3}/>
+                                                    <CloseIcon boxSize={3} />
                                                 </Button>
                                             </Card>
                                         ))}

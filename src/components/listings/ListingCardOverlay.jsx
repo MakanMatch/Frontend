@@ -52,18 +52,46 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             const favouriteData = {
                 listingID: listingID
             }
-            const toggleResponse = await server.put("/listings/toggleFavouriteListing", favouriteData)
-            dispatch(reloadAuthToken(authToken))
-            if (toggleResponse.status == 200 && toggleResponse.data.favourite != undefined) {
-                if (toggleResponse.data.favourite === true) {
-                    setFavourite(true);
-                } else {
-                    setFavourite(false);
+            try {
+                const toggleResponse = await server.put("/listings/toggleFavouriteListing", favouriteData)
+                dispatch(reloadAuthToken(authToken))
+                if (toggleResponse.status == 200 && toggleResponse.data.favourite != undefined) {
+                    if (toggleResponse.data.favourite === true) {
+                        setFavourite(true);
+                    } else {
+                        setFavourite(false);
+                    }
                 }
-            } else {
-                toast.closeAll();
-                console.error(toggleResponse.data.error);
-                displayToast(toggleResponse.data.message, "Please try again", "error", 3000, false);
+            } catch (error) {
+                if (error.response && error.response.data && typeof error.response.data == "string") {
+                    console.log("Failed to favourite listing; response: " + error.response)
+                    if (error.response.data.startsWith("UERROR")) {
+                        displayToast(
+                            error.response.data.substring("UERROR: ".length),
+                            "Please try again",
+                            "info",
+                            3500,
+                            true
+                        )
+                    } else {
+                        displayToast(
+                            "Something went wrong",
+                            "Failed to favourite listing. Please try again",
+                            "error",
+                            3500,
+                            true
+                        )
+                    }
+                } else {
+                    console.log("Unknown error occurred when adding listing to favourites; error: " + error)
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to favourite listing. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
             }
         }
     };
@@ -73,18 +101,47 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             setFavourite(false);
             return;
         } else {
-            const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
-            dispatch(reloadAuthToken(authToken))
-            if (response.status == 200) {
-                const guestFavCuisine = response.data.favCuisine || "";
-                if (guestFavCuisine.includes(listingID)) {
-                    setFavourite(true);
-                } else {
-                    setFavourite(false);
+            try {
+                const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
+                dispatch(reloadAuthToken(authToken))
+                if (response.status == 200) {
+                    const guestFavCuisine = response.data.favCuisine || "";
+                    if (guestFavCuisine.includes(listingID)) {
+                        setFavourite(true);
+                    } else {
+                        setFavourite(false);
+                    }
                 }
-            } else {
-                console.error(response.data.error);
-                displayToast("Failed to add listing to your favourites", "Please try again", "error", 2500, false);
+            } catch (error) {
+                if (error.response && error.response.data && typeof error.response.data == "string") {
+                    console.log("Failed to fetch favourites state; response: " + error.response)
+                    if (error.response.data.startsWith("UERROR")) {
+                        displayToast(
+                            error.response.data.substring("UERROR: ".length),
+                            "Please try again",
+                            "info",
+                            3500,
+                            true
+                        )
+                    } else {
+                        displayToast(
+                            "Something went wrong",
+                            "Failed to fetch favourites state. Please try again",
+                            "error",
+                            3500,
+                            true
+                        )
+                    }
+                } else {
+                    console.log("Unknown error occurred when fetching favourites state; error: " + error)
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to fetch favourites state. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
             }
         }
     }
@@ -95,19 +152,48 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     }
 
     const fetchRatingProgress = async () => {
-        const response = await server.get(`/cdn/consolidateReviewsStatistics?hostID=${hostID}`);
-        dispatch(reloadAuthToken(authToken))
-        if (response.status === 200) {
-            const data = response.data;
-            setOneStarRatings(data.oneStar);
-            setTwoStarRatings(data.twoStar);
-            setThreeStarRatings(data.threeStar);
-            setFourStarRatings(data.fourStar);
-            setFiveStarRatings(data.fiveStar);
-            setRatingsLoaded(true);
-        } else {
-            console.error(response.data.error);
-            displayToast(response.data.message, "Please try again", "error", 2500, false);
+        try {
+            const response = await server.get(`/cdn/consolidateReviewsStatistics?hostID=${hostID}`);
+            dispatch(reloadAuthToken(authToken))
+            if (response.status === 200) {
+                const data = response.data;
+                setOneStarRatings(data.oneStar);
+                setTwoStarRatings(data.twoStar);
+                setThreeStarRatings(data.threeStar);
+                setFourStarRatings(data.fourStar);
+                setFiveStarRatings(data.fiveStar);
+                setRatingsLoaded(true);
+            }
+        } catch (error) {
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to fetch host's food rating; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    displayToast(
+                        error.response.data.substring("UERROR: ".length),
+                        "Please try again",
+                        "info",
+                        3500,
+                        true
+                    )
+                } else {
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to fetch host's food rating. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when fetching host's food rating; error: " + error)
+                displayToast(
+                    "Something went wrong",
+                    "Failed to fetch host's food rating. Please try again",
+                    "error",
+                    3500,
+                    true
+                )
+            }
         }
     }
 
