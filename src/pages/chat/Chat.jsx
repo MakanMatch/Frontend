@@ -122,12 +122,13 @@ function ChatUi() {
 			else if (receivedMessage.action === "edit") {
 				setMessages((prevMessages) =>
 					prevMessages.map((msg) =>
-						msg.messageID === receivedMessage.id
-							? { ...msg, message: receivedMessage.message }
+						msg.messageID === receivedMessage.messageID
+							? { ...msg, message: receivedMessage.message, edited: true }
 							: msg
 					)
 				);
-			} else if (receivedMessage.action === "delete") {
+				console.log(messages);
+			}else if (receivedMessage.action === "delete") {
 				setMessages((prevMessages) =>
 					prevMessages.filter((msg) => msg.messageID !== receivedMessage.id)
 				);
