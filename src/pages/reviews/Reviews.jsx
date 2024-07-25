@@ -97,7 +97,7 @@ function Reviews() {
         }
     }, [user]);
 
-    useEffect(() => {   
+    useEffect(() => {
         if (hostID) {
             fetchHostInfo();
         }
@@ -144,12 +144,14 @@ function Reviews() {
                                 </Button>
                             </Tooltip>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            <SubmitReviews
-                                hostName={hostName}
-                                hostID={hostID}
-                                refreshState={refreshState}
-                                stateRefresh={stateRefresh}
-                            />
+                            {user && user.userID && user.userID != hostID && (
+                                <SubmitReviews
+                                    hostName={hostName}
+                                    hostID={hostID}
+                                    refreshState={refreshState}
+                                    stateRefresh={stateRefresh}
+                                />
+                            )}
                         </Flex>
                     </Flex>
                 </Box>
