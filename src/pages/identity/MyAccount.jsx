@@ -276,6 +276,12 @@ const MyAccount = () => {
     });
     
     const Form = ({ firstFieldRef, onCancel, onSave, fname, setFname, lname, setLname }) => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Enter') {
+                onSave(fname, lname);
+            }
+        };
+    
         return (
             <Stack spacing={4}>
                 <TextInput
@@ -284,18 +290,24 @@ const MyAccount = () => {
                     ref={firstFieldRef}
                     value={fname}
                     onChange={(e) => setFname(e.target.value)}
+                    onKeyDown={handleKeyDown}
                 />
                 <TextInput
                     label='Last name'
                     id='last-name'
                     value={lname}
                     onChange={(e) => setLname(e.target.value)}
+                    onKeyDown={handleKeyDown}
                 />
                 <ButtonGroup display='flex' justifyContent='flex-end'>
                     <Button variant='outline' onClick={onCancel}>
                         Cancel
                     </Button>
-                    <Button colorScheme='teal' onClick={() => onSave(fname, lname)}>
+                    <Button 
+                        colorScheme='teal' 
+                        onClick={() => onSave(fname, lname)}
+                        onKeyDown={handleKeyDown}
+                    >
                         Save
                     </Button>
                 </ButtonGroup>
