@@ -35,7 +35,7 @@ const GoogleMapsPage = () => {
     if (!listingID || !hostID || !images || !title || !shortDescription || !approxAddress || !portionPrice || !totalSlots || !latitude || !longitude) {
         navigate("/");
         setTimeout(() => {
-            displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, false);
+            displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, true);
         }, 200);
     }
     return (

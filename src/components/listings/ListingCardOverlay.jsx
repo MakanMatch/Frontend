@@ -46,7 +46,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const toggleFavourite = async () => {
         if (!user || !authToken) {
             navigate('/auth/login');
-            displayToast("You're not logged in", "Please login first", "info", 3000, false);
+            displayToast("You're not logged in", "Please login first", "info", 3000, true);
             return;
         } else {
             const favouriteData = {

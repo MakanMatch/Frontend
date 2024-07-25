@@ -4,9 +4,10 @@
 import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card } from "@chakra-ui/react";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Switch } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
+import { useNavigate } from "react-router-dom";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }) => {
     const today = new Date();
@@ -19,6 +20,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
     const [portionPrice, setPortionPrice] = useState(1);
     const [totalSlots, setTotalSlots] = useState(1);
     const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
+    const [isChecked, setIsChecked] = useState(false);
     const [images, setImages] = useState([]);
     const authToken = useSelector((state) => state.auth.authToken);
 
@@ -27,6 +29,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
     const [modalError, setModalError] = useState(false);
     const [validListing, setValidListing] = useState(false);
 
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const cancelRef = useRef();
@@ -48,6 +51,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
         setTotalSlots(1);
         setDatetime(today.toISOString().slice(0, 16));
         setImages([]);
+        setIsChecked(false);
     }
 
     function checkDate(date) {
@@ -59,7 +63,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                 "Please select a date-time that's greater than today's date-time",
                 "error",
                 3000,
-                false
+                true
             );
             return;
         }
@@ -75,6 +79,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
         formData.append("portionPrice", portionPrice);
         formData.append("totalSlots", totalSlots);
         formData.append("datetime", new Date(datetime).toISOString());
+        formData.append("publishInstantly", isChecked);
         images.forEach((image) => {
             formData.append("images", image);
         });
@@ -91,8 +96,18 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
             if (addListingResponse.status == 200) {
                 setDefaultState();
                 setIsSubmitting(false);
-                localStorage.setItem("published", "true");
-                window.location.href = "/";
+                console.log("Listing ID: ", addListingResponse.data.listingDetails.listingID);
+                if (addListingResponse.data.listingDetails.published === false) {
+                    navigate("/expandedListingHost", {
+                        state: {
+                            listingID: addListingResponse.data.listingDetails.listingID
+                        } 
+                    });
+                    displayToast("Listing created successfully", "You can manage your listing here", "success", 3000, true);
+                } else {
+                    localStorage.setItem("published", "true");
+                    window.location.href = "/";
+                }
             }
         } catch (error) {
             onClose();
@@ -128,6 +143,10 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                 )
             }
         }
+    };
+
+    const handlePublishToggle = () => {
+        setIsChecked(!isChecked);
     };
 
     const handleFileChange = (event) => {
@@ -188,7 +207,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                     "You can upload a maximum of 5 images",
                     "error",
                     2500,
-                    false
+                    true
                 );
             }
         } else {
@@ -205,7 +224,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                 "Fee cannot exceed $10",
                 "error",
                 2500,
-                false
+                true
             );
         }
     }, [portionPrice]);
@@ -218,7 +237,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                 "You can prepare for a maximum of 5 slots",
                 "error",
                 2500,
-                false
+                true
             );
         }
     }, [totalSlots]);
@@ -345,7 +364,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                             />
                         </FormControl>
 
-                        <FormControl isRequired>
+                        <FormControl mb={5} isRequired>
                             <FormLabel>Upload photos of your dish (Max: 5 images)</FormLabel>
                             <Input
                                 type="file"
@@ -375,6 +394,12 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                                     </>
                                 )}
                             </Box>
+                        </FormControl>
+                        <FormControl display='flex' alignItems='center'>
+                            <FormLabel mb='0'>
+                                Publish instantly?
+                            </FormLabel>
+                            <Switch isChecked={isChecked} onChange={handlePublishToggle} />
                         </FormControl>
                     </ModalBody>
 

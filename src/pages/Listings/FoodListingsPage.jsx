@@ -84,10 +84,9 @@ const FoodListingsPage = () => {
                 "We'll notify you when all slots have been filled",
                 "success",
                 4000,
-                false
+                true
             );
         }
-        
     }, []);
 
     return (

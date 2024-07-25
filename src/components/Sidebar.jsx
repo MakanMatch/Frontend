@@ -48,7 +48,7 @@ function Sidebar({ isOpen, onClose }) {
         if (!authToken || !user) {
             navigate('/auth/login');
             setTimeout(() => {
-                displayToast("You're not logged in", "Please login first", "info", 3000, false);
+                displayToast("You're not logged in", "Please login first", "info", 3000, true);
             }, 200);
         } else {
             onAddListingModalOpen();

@@ -23,7 +23,7 @@ const ExpandedGoogleMaps = ({ title, lat, long }) => {
         const initializeMap = async () => {
             if (!mapRef.current || !lat || !long) {
                 // Check if mapRef or coordinates are not available
-                displayToast("Invalid coordinates", "Failed to show Host's location on map", "info", 3000, false);
+                displayToast("Invalid coordinates", "Failed to show Host's location on map", "info", 3000, true);
                 return;
             }
 
@@ -41,7 +41,7 @@ const ExpandedGoogleMaps = ({ title, lat, long }) => {
 
                 // Check for valid latitude and longitude range
                 if (lat < -90 || lat > 90 || long < -180 || long > 180) {
-                    displayToast("Invalid coordinates", "Failed to show Host's location on map", "info", 3000, false);
+                    displayToast("Invalid coordinates", "Failed to show Host's location on map", "info", 3000, true);
                     return;
                 }
 
@@ -59,7 +59,7 @@ const ExpandedGoogleMaps = ({ title, lat, long }) => {
                     title: title,
                 });
             } catch (error) {
-                displayToast("An error occurred", "Failed to render Google Maps", "error", 3000, false);
+                displayToast("An error occurred", "Failed to render Google Maps", "error", 3000, true);
                 console.error(error);
             }
         };
