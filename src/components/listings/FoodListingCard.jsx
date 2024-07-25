@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Divider, Heading, Image, Stack, Text, Box, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
+import { Card, CardBody, Image, Text, Box, SlideFade, Skeleton } from "@chakra-ui/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -19,7 +19,6 @@ const FoodListingCard = ({
     longitude,
 }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [isSmallerThan710] = useMediaQuery("(min-width: 700px) and (max-width: 739px)");
     return (
         <>
             <style>
@@ -34,64 +33,41 @@ const FoodListingCard = ({
                     }
                 `}
             </style>
-            <Card maxW="sm" className="image-container">
-                <CardBody>
-                    <Box position="relative">
-                        <SlideFade in={true} offsetY="20px">
-                            <Skeleton isLoaded={imageLoaded} height="108px" width="100%" borderRadius="lg" fadeDuration={2}>
-                                <Image
-                                    key={images[0]}
-                                    src={images[0]}
-                                    onLoad={() => setImageLoaded(true)}
-                                    onError={(e) => {
-                                        e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
-                                        e.target.src = "/placeholderImage.png";
-                                    }}
-                                    borderRadius="lg"
-                                    minWidth={"100%"}
-                                    minHeight={"108px"}
-                                    maxHeight={"108px"}
-                                    objectFit="cover"
-                                    style={{ pointerEvents: "none" }}
-                                />
-                            </Skeleton>
-                        </SlideFade>
-                    </Box>
-                    <Stack mt="6" spacing="3">
-                        <Heading size="md">{title}</Heading>
-                        <Text>Hosted by <i>{hostName}</i></Text>
-                        <Text>Food Rating: {hostFoodRating}/5 ⭐️</Text>
-                        <Text color="blue.600" fontSize="2xl">
-                            ${portionPrice}/pax
-                        </Text>
-                    </Stack>
-                </CardBody>
-                <Divider />
-                {isSmallerThan710 && (
-                    <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
-                        <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link
-                            to={"/targetListing"}
-                            state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
-                            >
-                                <Button variant="MMPrimary" paddingLeft={"45px"} paddingRight={"45px"}>View</Button>
-                            </Link>
-                        </ButtonGroup>
-                    </CardFooter>
-                )}
-                {!isSmallerThan710 && (
-                    <CardFooter display="flex" flexDirection={"column"} justifyContent="center">
-                        <ButtonGroup flex={1} spacing="2" mb={2} justifyContent={"space-evenly"}>
-                            <Link
-                            to={"/targetListing"}
-                            state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}
-                            >
-                                <Button variant="MMPrimary" paddingLeft={"45px"} paddingRight={"45px"}>View</Button>
-                            </Link>
-                        </ButtonGroup>
-                    </CardFooter>
-                )}
-            </Card>
+            <Link to={"/targetListing"} state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}>
+                <Card maxW="sm" className="image-container">
+                    <CardBody padding={0}>
+                        <Box>
+                            <SlideFade in={true} offsetY="20px">
+                                <Skeleton isLoaded={imageLoaded} height="108px" width="100%" borderRadius="lg" fadeDuration={2}>
+                                    <Image
+                                        key={images[0]}
+                                        src={images[0]}
+                                        onLoad={() => setImageLoaded(true)}
+                                        onError={(e) => {
+                                            e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
+                                            e.target.src = "/placeholderImage.png";
+                                        }}
+                                        borderRadius="6px 6px 0 0"
+                                        minWidth={"100%"}
+                                        minHeight={"108px"}
+                                        maxHeight={"108px"}
+                                        objectFit="cover"
+                                        style={{ pointerEvents: "none" }}
+                                    />
+                                </Skeleton>
+                            </SlideFade>
+                        </Box>
+                        <Box mt={1}>
+                            <Text fontSize={"20px"} textAlign={"left"} ml={4}>{title}</Text>
+                            <Text fontSize={"12px"} textAlign={"left"} ml={5}>By <i>{hostName}</i></Text>
+                            <Box display="flex" justifyContent={"space-between"} mt={3} mb={1} ml={4} mr={4}>
+                                <Text color="blue.600" fontSize="18px">${portionPrice} / portion</Text>
+                                <Text>{hostFoodRating} ⭐️</Text>
+                            </Box>
+                        </Box>
+                    </CardBody>
+                </Card>
+            </Link>
         </>
     );
 };
