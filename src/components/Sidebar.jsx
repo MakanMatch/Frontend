@@ -44,6 +44,7 @@ function Sidebar({ isOpen, onClose }) {
     }
 
     function handleClickAddListing() {
+        onClose();
         if (!authToken || !user) {
             navigate('/auth/login');
             setTimeout(() => {
