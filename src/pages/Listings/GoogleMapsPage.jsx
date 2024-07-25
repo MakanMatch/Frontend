@@ -11,7 +11,7 @@ const GoogleMapsPage = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const location = useLocation();
-    const { user, authToken, loaded } = useSelector((state) => state.auth);
+    const loaded = useSelector((state) => state.auth.loaded);
 
     function displayToast(title, description, status, duration, isClosable) {
         toast.closeAll();

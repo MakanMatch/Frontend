@@ -6,11 +6,9 @@ import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { reloadAuthToken } from "../../slices/AuthState";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }) => {
-    const toast = useToast();
     const today = new Date();
     today.setDate(today.getDate() + 1);
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -22,8 +20,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
     const [totalSlots, setTotalSlots] = useState(1);
     const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
     const [images, setImages] = useState([]);
-    const [hostID, setHostID] = useState("");
-    const { user, authToken, loaded } = useSelector((state) => state.auth);
+    const authToken = useSelector((state) => state.auth.authToken);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
