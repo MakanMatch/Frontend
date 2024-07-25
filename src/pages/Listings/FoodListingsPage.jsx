@@ -40,7 +40,7 @@ const FoodListingsPage = () => {
             }
         } catch (error) {
             if (error.response && error.response.data && typeof error.response.data == "string") {
-                console.log("Failed to fetch listings; response: " + error.response)
+                console.log("Failed to fetch listings; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
                         error.response.data.substring("UERROR: ".length),

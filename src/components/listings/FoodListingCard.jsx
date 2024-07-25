@@ -34,11 +34,11 @@ const FoodListingCard = ({
                 `}
             </style>
             <Link to={"/targetListing"} state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}>
-                <Card maxW="sm" className="image-container">
+                <Card maxW="sm" className="image-container" borderRadius={"2xl"}>
                     <CardBody padding={0}>
                         <Box>
                             <SlideFade in={true} offsetY="20px">
-                                <Skeleton isLoaded={imageLoaded} height="108px" width="100%" borderRadius="lg" fadeDuration={2}>
+                                <Skeleton isLoaded={imageLoaded} height="108px" width="100%" borderRadius="2xl" fadeDuration={2}>
                                     <Image
                                         key={images[0]}
                                         src={images[0]}
@@ -47,7 +47,7 @@ const FoodListingCard = ({
                                             e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
                                             e.target.src = "/placeholderImage.png";
                                         }}
-                                        borderRadius="6px 6px 0 0"
+                                        borderRadius="13px 13px 0 0"
                                         minWidth={"100%"}
                                         minHeight={"108px"}
                                         maxHeight={"108px"}
