@@ -119,6 +119,19 @@ function ChatUi() {
 			} else if (receivedMessage.action === "send") {
 				setMessages((prevMessages) => [...prevMessages, receivedMessage]);
 			}
+			else if (receivedMessage.action === "edit") {
+				setMessages((prevMessages) =>
+					prevMessages.map((msg) =>
+						msg.messageID === receivedMessage.id
+							? { ...msg, message: receivedMessage.message }
+							: msg
+					)
+				);
+			} else if (receivedMessage.action === "delete") {
+				setMessages((prevMessages) =>
+					prevMessages.filter((msg) => msg.messageID !== receivedMessage.id)
+				);
+			}
 		};
 
 		ws.current.onerror = (error) => {
@@ -207,6 +220,7 @@ function ChatUi() {
 			closeEditModal();
 		}
 	};
+
 
 	const handleDeletePrompt = (messageId) => {
 		setMessageToDelete(messageId);
