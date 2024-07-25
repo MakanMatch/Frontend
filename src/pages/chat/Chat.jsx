@@ -46,7 +46,6 @@ function ChatUi() {
 	const [chatPartnerUsernames, setChatPartnerUsernames] = useState({}); // Object to map chat ID to username
 	const [chatSelected, setChatSelected] = useState(null);
 	const [isChatVisible, setIsChatVisible] = useState(false);
-	const [lastMessage, setLastMessage] = useState("");
 	const chatBottomRef = useRef(null);
 	const { user, loaded, error } = useSelector((state) => state.auth);
 
@@ -117,14 +116,8 @@ function ChatUi() {
 				}
 			} else if (receivedMessage.previousMessages) {
 				setMessages(receivedMessage.previousMessages);
-				setLastMessage(
-					receivedMessage.previousMessages[
-						receivedMessage.previousMessages.length - 1
-					]?.message || ""
-				);
 			} else if (receivedMessage.action === "send") {
 				setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-				setLastMessage(receivedMessage.message);
 			}
 		};
 
