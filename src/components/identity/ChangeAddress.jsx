@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 import server from '../../networking';
 import configureShowToast from '../showToast';
 
-const ChangeAddress = ({ isOpen, onClose, accountInfo, setAccountInfo }) => {
+const ChangeAddress = ({ isOpen, onClose, accountInfo, setAccountInfo, setOriginalAccountInfo }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
 
@@ -24,14 +24,17 @@ const ChangeAddress = ({ isOpen, onClose, accountInfo, setAccountInfo }) => {
         })
             .then((res) => {
                 if (res.status === 200 && res.data.startsWith("SUCCESS")) {
+                    var newData = {}
                     showToast("Address changed", "Your address has been updated!", 3000, true, "success");
                     setAccountInfo((prev) => {
                         var newObj = {}
                         for (const key of Object.keys(prev)) {
-                            newObj[key] = key === "address" ? `${values.blkNo ? values.blkNo + " " : ""}${values.street} ${values.unitNum ? "#" + values.unitNum : ""} ${values.postalCode}` : prev[key];
+                            newObj[key] = key === "address" ? `${values.blkNo ? "Block " + values.blkNo + " " : ""}${values.street} ${values.postalCode} ${values.unitNum ? "#" + values.unitNum : ""}`.trim() : prev[key];
                         }
+                        newData = newObj
                         return newObj;
                     });
+                    setOriginalAccountInfo(newData);
                     onClose();
                 } else {
                     showToast("ERROR", res.data, 3000, true, "error");

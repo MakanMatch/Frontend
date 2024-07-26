@@ -249,16 +249,19 @@ const MyAccount = () => {
             lname: lname
         })
         .then((res) => {
-            if (res.status === 200 && res.data.startsWith("SUCCESS")) {
+            if (res.status === 200 && res.data === "SUCCESS: Nothing to update.") {
+                showToast("No changes made", "You are good to go!", 3000, true, "success");
+                onClose();
+            } else if (res.status === 200 && res.data.startsWith("SUCCESS")) {
                 showToast("Name changed", "Your name has been updated!", 3000, true, "success");
                 onClose();
             } else {
-                showToast("ERROR", res.data, 3000, true, "error");
+                showToast("Something went wrong", "Please try again later.", 3000, true, "error");
             }
         })
         .catch((err) => {
             if (err.response && err.response.status === 400) {
-                showToast("Invalid Input", err.response.data, 3000, true, "error");
+                showToast("Invalid Input", err.response.data.substring("UERROR: "), 3000, true, "error");
             } else {
                 console.error("Error changing name:", err);
                 showToast("ERROR", "Failed to change name.", 3000, true, "error");
@@ -506,7 +509,7 @@ const MyAccount = () => {
 
                                 <Button onClick={toggleChangeAddress}>Edit</Button>
 
-                                <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} accountInfo={accountInfo} setAccountInfo={setAccountInfo} />
+                                <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} accountInfo={accountInfo} setAccountInfo={setAccountInfo} setOriginalAccountInfo={setOriginalAccountInfo}/>
                             </Flex>
                         </FormControl>
 

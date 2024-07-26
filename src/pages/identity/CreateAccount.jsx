@@ -94,7 +94,7 @@ function CreateAccount() {
                 } else if (err.response.data === "UERROR: Contact number already exists.") {
                     actions.setFieldError('contactNum', 'Contact number already in use.');
                 }
-                showToast('Account creation failed.', `${err.response.data}`.substring("UERROR: ".length), 3000, true, 'error');
+                showToast('Account creation failed.', err.response.data.substring("UERROR: "), 3000, true, 'error');
                 actions.setSubmitting(false);
             });
     };
@@ -279,36 +279,6 @@ function CreateAccount() {
                                         <FormErrorMessage fontSize='12px'>{formik.errors.contactNum}</FormErrorMessage>
                                     </FormControl>
                                     <HStack spacing={4} mb={4}>
-                                        <FormControl isRequired isInvalid={formik.errors.street && formik.touched.street} flex={1}>
-                                            <FormLabel fontSize='15px'>Street </FormLabel>
-                                            <Input
-                                                name="street"
-                                                placeholder='Eg. Madagascar Lane'
-                                                borderColor='black'
-                                                size='md'
-                                                borderRadius='5px'
-                                                onChange={formik.handleChange}
-                                                onBlur={formik.handleBlur}
-                                                value={formik.values.street}
-                                            />
-                                            <FormErrorMessage fontSize='12px'>{formik.errors.street}</FormErrorMessage>
-                                        </FormControl>
-                                        <FormControl isRequired isInvalid={formik.errors.postalCode && formik.touched.postalCode} flex={1}>
-                                            <FormLabel fontSize='15px'>Postal Code</FormLabel>
-                                            <Input
-                                                name="postalCode"
-                                                placeholder='Eg. 542301'
-                                                borderColor='black'
-                                                size='md'
-                                                borderRadius='5px'
-                                                onChange={formik.handleChange}
-                                                onBlur={formik.handleBlur}
-                                                value={formik.values.postalCode}
-                                            />
-                                            <FormErrorMessage fontSize='12px'>{formik.errors.postalCode}</FormErrorMessage>
-                                        </FormControl>
-                                    </HStack>
-                                    <HStack spacing={4} mb={4}>
                                         <FormControl isInvalid={formik.errors.blkNo && formik.touched.blkNo} flex={1}>
                                             <FormLabel fontSize='15px'>Block Number</FormLabel>
                                             <Input
@@ -336,6 +306,36 @@ function CreateAccount() {
                                                 value={formik.values.unitNum}
                                             />
                                             <FormErrorMessage fontSize='12px'>{formik.errors.unitNum}</FormErrorMessage>
+                                        </FormControl>
+                                    </HStack>
+                                    <HStack spacing={4} mb={4}>
+                                        <FormControl isRequired isInvalid={formik.errors.street && formik.touched.street} flex={1}>
+                                            <FormLabel fontSize='15px'>Street </FormLabel>
+                                            <Input
+                                                name="street"
+                                                placeholder='Eg. Madagascar Lane'
+                                                borderColor='black'
+                                                size='md'
+                                                borderRadius='5px'
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.street}
+                                            />
+                                            <FormErrorMessage fontSize='12px'>{formik.errors.street}</FormErrorMessage>
+                                        </FormControl>
+                                        <FormControl isRequired isInvalid={formik.errors.postalCode && formik.touched.postalCode} flex={1}>
+                                            <FormLabel fontSize='15px'>Postal Code</FormLabel>
+                                            <Input
+                                                name="postalCode"
+                                                placeholder='Eg. 542301'
+                                                borderColor='black'
+                                                size='md'
+                                                borderRadius='5px'
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.postalCode}
+                                            />
+                                            <FormErrorMessage fontSize='12px'>{formik.errors.postalCode}</FormErrorMessage>
                                         </FormControl>
                                     </HStack>
                                 </>
