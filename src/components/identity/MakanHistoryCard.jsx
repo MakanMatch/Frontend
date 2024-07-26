@@ -8,8 +8,6 @@ import { useState } from "react";
 function MakanHistoryCard({ reservation, listing }) {
     const [imageLoaded, setImageLoaded] = useState(false);
 
-    console.log("Images: ", listing.images);
-
     const handleClickListingTitle = () => {
         console.log("Clicked on listing title");
     }

@@ -108,7 +108,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
             if (addListingResponse.status == 200) {
                 setDefaultState();
                 setIsSubmitting(false);
-                console.log("Listing ID: ", addListingResponse.data.listingDetails.listingID);
                 if (addListingResponse.data.listingDetails.published === false) {
                     navigate("/expandedListingHost", {
                         state: {
