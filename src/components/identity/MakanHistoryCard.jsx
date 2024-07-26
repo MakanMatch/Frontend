@@ -79,7 +79,8 @@ function MakanHistoryCard({ reservation, listing }) {
                         }
                     },
                     marginBottom: "25px",
-                    borderRadius: "2xl"
+                    borderRadius: "2xl",
+                    minWidth: "645px"
                 }}
                 >
                     <Skeleton isLoaded={imageLoaded} fadeDuration={1} width={"223px"} height={"149px"}>
@@ -103,7 +104,7 @@ function MakanHistoryCard({ reservation, listing }) {
 
                                 <Box display="flex" mr={2}>
                                     <FaMapMarkerAlt size={20}/>
-                                    <Text ml={2}>{listing.approxAddress}</Text>
+                                    <Text ml={2} whiteSpace={"nowrap"} overflow="hidden" textOverflow={"ellipsis"} maxWidth={"200px"} maxHeight={"24px"}>{listing.approxAddress}</Text>
                                 </Box>
                                 
                                 <Box display="flex" ml={1}>
