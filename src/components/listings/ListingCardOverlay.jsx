@@ -6,19 +6,15 @@ import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } fro
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import server from "../../networking";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
+import server from "../../networking";
 
 function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
-    const toast = useToast();
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const [oneStarRatings, setOneStarRatings] = useState(0);
     const [twoStarRatings, setTwoStarRatings] = useState(0);
@@ -26,6 +22,11 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const [fourStarRatings, setFourStarRatings] = useState(0);
     const [fiveStarRatings, setFiveStarRatings] = useState(0);
     const [ratingsLoaded, setRatingsLoaded] = useState(false);
+
+    const { user, authToken } = useSelector((state) => state.auth);
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handlePrevImage = () => {
         if (imageIndex === 0) {
@@ -63,6 +64,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                     }
                 }
             } catch (error) {
+                dispatch(reloadAuthToken(authToken))
                 if (error.response && error.response.data && typeof error.response.data == "string") {
                     console.log("Failed to favourite listing; response: " + error.response)
                     if (error.response.data.startsWith("UERROR")) {
@@ -113,6 +115,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                     }
                 }
             } catch (error) {
+                dispatch(reloadAuthToken(authToken))
                 if (error.response && error.response.data && typeof error.response.data == "string") {
                     console.log("Failed to fetch favourites state; response: " + error.response)
                     if (error.response.data.startsWith("UERROR")) {
@@ -165,6 +168,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                 setRatingsLoaded(true);
             }
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {
                 console.log("Failed to fetch host's food rating; response: " + error.response)
                 if (error.response.data.startsWith("UERROR")) {

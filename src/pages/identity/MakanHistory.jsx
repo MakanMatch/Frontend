@@ -1,22 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/jsx-key */
 import { Box, useToast, Heading, Stack, StackDivider } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { reloadAuthToken } from "../../slices/AuthState";
 import GuestSideNav from "../../components/identity/GuestSideNav";
 import MakanHistoryCard from "../../components/identity/MakanHistoryCard";
-import server from "../../networking";
-import { useEffect, useState } from "react";
 import configureShowToast from '../../components/showToast';
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import server from "../../networking";
 
 const MakanHistory = () => {
-    const [reservations, setReservations] = useState([]); // array of past reservations that the user made
-    const [listings, setListings] = useState([]); // array of listings tied to the past reservations
+    const [reservations, setReservations] = useState([]);
+    const [listings, setListings] = useState([]);
+
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
+
     const toast = useToast();
     const showToast = configureShowToast(toast);
+
     const navigate = useNavigate();
-    const user = useSelector((state) => state.auth.user);
-    const loaded = useSelector((state) => state.auth.loaded);
+    const dispatch = useDispatch();
 
     const fetchMakanHistory = async() => {
         try {
@@ -44,6 +48,7 @@ const MakanHistory = () => {
                 setListings(fetchedListings);
             }
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {
                 console.log("Failed to add listing; response: " + error.response)
                 if (error.response.data.startsWith("UERROR")) {

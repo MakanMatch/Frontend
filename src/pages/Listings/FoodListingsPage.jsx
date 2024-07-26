@@ -1,20 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import server from "../../networking";
-import FoodListingCard from "../../components/listings/FoodListingCard";
-import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import { SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton, Spinner, Center, Fade } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
+import FoodListingCard from "../../components/listings/FoodListingCard";
+import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
+import server from "../../networking";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const [loading, setLoading] = useState(true); 
+
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
+
     const toast = useToast();
     const dispatch = useDispatch();
-    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     function displayToast(title, description, status, duration, isClosable) {
         toast.closeAll();
@@ -39,6 +41,7 @@ const FoodListingsPage = () => {
                 setListings(response.data);
             }
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {
                 console.log("Failed to fetch listings; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {

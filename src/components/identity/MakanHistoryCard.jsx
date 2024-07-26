@@ -4,13 +4,19 @@ import { Card, useToast, Image, Stack, CardBody, Avatar, Text, Box, Skeleton } f
 import { CalendarIcon } from '@chakra-ui/icons';
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import server from "../../networking";
+import { useDispatch, useSelector } from "react-redux";
+import { reloadAuthToken } from "../../slices/AuthState";
 import configureShowToast from '../../components/showToast';
+import server from "../../networking";
 
 function MakanHistoryCard({ reservation, listing }) {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [hostUsername, setHostUsername] = useState(null);
     const [hostFoodRating, setHostFoodRating] = useState(0);
+
+    const dispatch = useDispatch();
+    const authToken = useSelector((state) => state.auth.authToken)
+    
     const toast = useToast();
     const showToast = configureShowToast(toast);
 
@@ -33,11 +39,13 @@ function MakanHistoryCard({ reservation, listing }) {
     const fetchHostDetails = async () => {
         try {
             const response = await server.get(`/cdn/accountInfo?userID=${listing.hostID}`);
+            dispatch(reloadAuthToken(authToken))
             if (response.status === 200) {
                 setHostUsername(response.data.username);
                 setHostFoodRating(response.data.foodRating);
             }
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {
                 console.log("Failed to retrieve host's info; response: " + error.response)
                 if (error.response.data.startsWith("UERROR")) {

@@ -2,12 +2,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from "react";
-import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Switch, useToast } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
 import { useNavigate } from "react-router-dom";
+import server from "../../networking";
 
 const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
     const today = new Date();
@@ -125,6 +125,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
             onClose();
             setDefaultState();
             setIsSubmitting(false);
+            dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {
                 console.log("Failed to add listing; response: " + error.response)
                 if (error.response.data.startsWith("UERROR")) {
