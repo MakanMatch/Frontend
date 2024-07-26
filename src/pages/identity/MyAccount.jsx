@@ -293,6 +293,18 @@ const MyAccount = () => {
                 onSave(fname, lname);
             }
         };
+
+        const handleFnameChange = (e) => {
+            if (e.target.value.length <= 30) {
+                setFname(e.target.value);
+            }
+        };
+    
+        const handleLnameChange = (e) => {
+            if (e.target.value.length <= 30) {
+                setLname(e.target.value);
+            }
+        };
     
         return (
             <Stack spacing={4}>
@@ -301,14 +313,14 @@ const MyAccount = () => {
                     id='first-name'
                     ref={firstFieldRef}
                     value={fname}
-                    onChange={(e) => setFname(e.target.value)}
+                    onChange={handleFnameChange}
                     onKeyDown={handleKeyDown}
                 />
                 <TextInput
                     label='Last name'
                     id='last-name'
                     value={lname}
-                    onChange={(e) => setLname(e.target.value)}
+                    onChange={handleLnameChange}
                     onKeyDown={handleKeyDown}
                 />
                 <ButtonGroup display='flex' justifyContent='flex-end'>
