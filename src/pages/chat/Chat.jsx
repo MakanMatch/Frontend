@@ -115,7 +115,7 @@ function ChatUi() {
 			} else if (receivedMessage.previousMessages) {
 				setMessages(receivedMessage.previousMessages);
 			} else if (receivedMessage.action === "send") {
-				setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+				setMessages((prevMessages) => [...prevMessages, receivedMessage.message]);
 			}
 			else if (receivedMessage.action === "edit") {
 				setMessages((prevMessages) =>
@@ -125,10 +125,9 @@ function ChatUi() {
 							: msg
 					)
 				);
-				console.log(messages);
 			}else if (receivedMessage.action === "delete") {
 				setMessages((prevMessages) =>
-					prevMessages.filter((msg) => msg.messageID !== receivedMessage.id)
+					prevMessages.filter((msg) => msg.messageID !== receivedMessage.messageID)
 				);
 			}
 		};
@@ -203,6 +202,7 @@ function ChatUi() {
 		if (editMessageId && editMessageContent.trim() !== "") {
 			const editedMessage = {
 				id: editMessageId,
+				userID: user.userID,
 				action: "edit",
 				sender: user.username,
 				message: editMessageContent,
@@ -230,6 +230,7 @@ function ChatUi() {
 		if (messageToDelete) {
 			const deleteMessage = {
 				id: messageToDelete,
+				userID: user.userID,
 				action: "delete",
 			};
 			ws.current.send(JSON.stringify(deleteMessage));
