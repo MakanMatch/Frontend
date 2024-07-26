@@ -36,7 +36,8 @@ function Reviews() {
         if (hygieneGrade >= 4) return 'teal';
         if (hygieneGrade >= 3) return 'yellow';
         if (hygieneGrade >= 2) return 'orange';
-        return 'red';
+        if (hygieneGrade >= 1) return 'red';
+        return 'gray';
     };
 
     const handleGoBack = () => {
@@ -71,9 +72,10 @@ function Reviews() {
         }
     };
 
-
     useEffect(() => {
-        if (loaded == true && !error) {
+        if (loaded == true) {
+            setInitialUserLoginToastIgnore(false);
+
             if (location.state.hostID) {
                 setHostID(location.state.hostID);
             } else if (searchParams.has('hostID')) {
@@ -82,12 +84,6 @@ function Reviews() {
                 showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
                 navigate('/');
             }
-        }
-    })
-
-    useEffect(() => {
-        if (loaded == true) {
-            setInitialUserLoginToastIgnore(false);
         }
     }, [loaded])
 
@@ -101,7 +97,7 @@ function Reviews() {
         if (hostID) {
             fetchHostInfo();
         }
-    }, [hostID]);
+    }, [hostID, stateRefresh]);
 
     if (!loaded || !hostID) {
         return <Spinner />

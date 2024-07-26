@@ -32,7 +32,8 @@ const ReviewCard = ({
     posterID,
     isLiked,
     refreshState,
-    stateRefresh
+    stateRefresh,
+    hostID,
 }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -312,11 +313,13 @@ const ReviewCard = ({
                                 reviewImages={images}
                                 refreshState={refreshState}
                                 stateRefresh={stateRefresh}
+                                hostID={hostID}
                             />
                             <DeleteReviewButton
                                 reviewID={reviewID}
                                 refreshState={refreshState}
                                 stateRefresh={stateRefresh}
+                                hostID={hostID}
                             />
                         </Flex>
                     )}
