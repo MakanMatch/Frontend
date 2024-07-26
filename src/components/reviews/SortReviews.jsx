@@ -105,7 +105,6 @@ const SortReviews = ({
                                     isLiked={review.isLiked}
                                     refreshState={refreshState}
                                     stateRefresh={stateRefresh}
-                                    hostID={hostID}
                                 />
                             )) :
                             null}
@@ -129,7 +128,6 @@ const SortReviews = ({
                                     isLiked={review.isLiked}
                                     refreshState={refreshState}
                                     stateRefresh={stateRefresh}
-                                    hostID={hostID}
                                 />
                             )) :
                             null}
@@ -153,7 +151,6 @@ const SortReviews = ({
                                     isLiked={review.isLiked}
                                     refreshState={refreshState}
                                     stateRefresh={stateRefresh}
-                                    hostID={hostID}
                                 />
                             )) :
                             null}
@@ -177,7 +174,6 @@ const SortReviews = ({
                                     isLiked={review.isLiked}
                                     refreshState={refreshState}
                                     stateRefresh={stateRefresh}
-                                    hostID={hostID}
                                 />
                             )) :
                             null}
