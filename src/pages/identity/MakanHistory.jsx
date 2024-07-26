@@ -24,6 +24,7 @@ const MakanHistory = () => {
             if (pastReservationsResponse.status === 200) {
                 const makanHistory = pastReservationsResponse.data;
                 setReservations(makanHistory);
+                
                 const listingIDs = makanHistory.map((reservation) => reservation.listingID);
     
                 const listingPromises = listingIDs.map((listingID) =>
@@ -35,7 +36,7 @@ const MakanHistory = () => {
                     if (response.status === 200) {
                         return response.data;
                     } else {
-                        showToast("Error", "Failed to fetch listings", 3000, true, "error");
+                        showToast("Reservation's listing details couldn't be fetched", "Please try again", 3000, true, "error");
                         return null;
                     }
                 }).filter(listing => listing !== null);
@@ -43,8 +44,35 @@ const MakanHistory = () => {
                 setListings(fetchedListings);
             }
         } catch (error) {
-            console.error("Error fetching makan history:", error);
-            showToast("Error", "Failed to fetch past reservations", 3000, true, "error");
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to add listing; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    showToast(
+                        error.response.data.substring("UERROR: ".length),
+                        "Please try again",
+                        "info",
+                        3500,
+                        true
+                    )
+                } else {
+                    showToast(
+                        "Something went wrong",
+                        "Failed to retrieve Makan History. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when retrieving Makan History; error: " + error)
+                showToast(
+                    "Something went wrong",
+                    "Failed to retrieve Makan History. Please try again",
+                    "error",
+                    3500,
+                    true
+                )
+            }
         }
     };
 
