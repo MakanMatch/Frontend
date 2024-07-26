@@ -112,13 +112,12 @@ const SubmitReviews = ({
                 showToast("Failed to submit review", "Please try again later", 3000, true, "error");
             }
         } catch (error) {
+            dispatch(reloadAuthToken(authToken))
             if (error.response.status === 400 && error.response.data.startsWith("UERROR")) {
-                dispatch(reloadAuthToken(authToken))
                 setIsSubmitting(false);
                 showToast("You cannot submit a review for yourself", "", 3000, true, "error");
             } else {
                 console.log(error)
-                dispatch(reloadAuthToken(authToken))
                 setIsSubmitting(false);
                 showToast("Failed to submit review", "Please try again later", 3000, true, "error");
                 console.log('Failed to submit review:', error);
