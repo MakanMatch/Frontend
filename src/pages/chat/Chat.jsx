@@ -24,7 +24,7 @@ import {
 	ModalCloseButton,
 	Avatar,
 } from "@chakra-ui/react";
-import { FiSmile, FiCamera, FiX } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatHistory from "../../components/chat/ChatHistory";
 import { useSelector, useDispatch } from "react-redux";
@@ -46,6 +46,7 @@ function ChatUi() {
 	const [chatPartnerUsernames, setChatPartnerUsernames] = useState({}); // Object to map chat ID to username
 	const [chatSelected, setChatSelected] = useState(null);
 	const [isChatVisible, setIsChatVisible] = useState(false);
+	const [status, setStatus] = useState(true);
 	const chatBottomRef = useRef(null);
 	const { user, loaded, error } = useSelector((state) => state.auth);
 
@@ -93,7 +94,7 @@ function ChatUi() {
 					console.error("Error parsing message:", error);
 					return;
 				}
-			}  
+			}
 			if (receivedMessage.action === "chat_id") {
 				setChatID(receivedMessage.chatID);
 				setChatHistory((prevChatHistory) => {
@@ -101,7 +102,7 @@ function ChatUi() {
 					chatHistorySet.add(receivedMessage.chatID);
 					return Array.from(chatHistorySet);
 				});
-				if(receivedMessage.username1 === user.username){
+				if (receivedMessage.username1 === user.username) {
 					setChatPartnerUsernames((prevUsernames) => ({
 						...prevUsernames,
 						[receivedMessage.chatID]: receivedMessage.username2,
@@ -110,7 +111,7 @@ function ChatUi() {
 					setChatPartnerUsernames((prevUsernames) => ({
 						...prevUsernames,
 						[receivedMessage.chatID]: receivedMessage.username1,
-					}));	
+					}));
 				}
 			} else if (receivedMessage.previousMessages) {
 				setMessages(receivedMessage.previousMessages);
@@ -125,10 +126,12 @@ function ChatUi() {
 							: msg
 					)
 				);
-			}else if (receivedMessage.action === "delete") {
+			} else if (receivedMessage.action === "delete") {
 				setMessages((prevMessages) =>
 					prevMessages.filter((msg) => msg.messageID !== receivedMessage.messageID)
 				);
+			} else if (receivedMessage.action === "chat_partner_left") {
+				setStatus(false);
 			}
 		};
 
@@ -303,7 +306,7 @@ function ChatUi() {
 						mt={-4}
 					>
 						<Avatar
-							name = {chatPartnerUsernames[chatSelected]}
+							name={chatPartnerUsernames[chatSelected]}
 							borderRadius="full"
 							w={{ base: "20%", md: "10%" }}
 							h="100%"
@@ -314,13 +317,18 @@ function ChatUi() {
 						/>
 						<Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
 							<Text fontSize={20} mt={2} textAlign={"left"}>
-							{chatPartnerUsernames[chatSelected]
-                  ? `Chat with ${chatPartnerUsernames[chatSelected]}`
-                  : "Chat"}
+								{chatPartnerUsernames[chatSelected]
+									? `Chat with ${chatPartnerUsernames[chatSelected]}`
+									: "Chat"}
 							</Text>
 							<Spacer h={3} />
-							<Text fontSize={15} color="green" textAlign={"left"} mb={-8}>
-								Online
+							<Text
+								fontSize={15}
+								color={status ? "green" : "gray"}
+								textAlign={"left"}
+								mb={-8}
+							>
+								{status ? "Online" : "Offline"}
 							</Text>
 						</Box>
 					</Box>
@@ -389,20 +397,7 @@ function ChatUi() {
 							</Flex>
 						)}
 						<Flex mt={4} align="center">
-							<IconButton
-								aria-label="Add emoji"
-								icon={<FiSmile boxSize={8} />}
-								variant="ghost"
-								colorScheme="gray"
-								mr={2}
-							/>
-							<IconButton
-								aria-label="Add photo"
-								icon={<FiCamera boxSize={8} />}
-								variant="ghost"
-								colorScheme="gray"
-								mr={2}
-							/>
+
 							<Input
 								placeholder="Type a message..."
 								flex="1"
@@ -417,7 +412,7 @@ function ChatUi() {
 						</Flex>
 					</Box>
 				</Center>
-			): (
+			) : (
 				<Center flex="1">
 					<Text fontSize="xl" color="gray.500">
 						Select a chat to start messaging or make a reservation.
