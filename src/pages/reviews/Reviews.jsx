@@ -36,7 +36,8 @@ function Reviews() {
         if (hygieneGrade >= 4) return 'teal';
         if (hygieneGrade >= 3) return 'yellow';
         if (hygieneGrade >= 2) return 'orange';
-        return 'red';
+        if (hygieneGrade >= 1) return 'red';
+        return 'gray';
     };
 
     const handleGoBack = () => {
@@ -71,9 +72,10 @@ function Reviews() {
         }
     };
 
-
     useEffect(() => {
-        if (loaded == true && !error) {
+        if (loaded == true) {
+            setInitialUserLoginToastIgnore(false);
+
             if (location.state.hostID) {
                 setHostID(location.state.hostID);
             } else if (searchParams.has('hostID')) {
@@ -83,12 +85,6 @@ function Reviews() {
                 navigate('/');
             }
         }
-    })
-
-    useEffect(() => {
-        if (loaded == true) {
-            setInitialUserLoginToastIgnore(false);
-        }
     }, [loaded])
 
     useEffect(() => {
@@ -97,11 +93,11 @@ function Reviews() {
         }
     }, [user]);
 
-    useEffect(() => {   
+    useEffect(() => {
         if (hostID) {
             fetchHostInfo();
         }
-    }, [hostID]);
+    }, [hostID, stateRefresh]);
 
     if (!loaded || !hostID) {
         return <Spinner />
@@ -144,12 +140,14 @@ function Reviews() {
                                 </Button>
                             </Tooltip>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            <SubmitReviews
-                                hostName={hostName}
-                                hostID={hostID}
-                                refreshState={refreshState}
-                                stateRefresh={stateRefresh}
-                            />
+                            {user && user.userID && user.userID != hostID && (
+                                <SubmitReviews
+                                    hostName={hostName}
+                                    hostID={hostID}
+                                    refreshState={refreshState}
+                                    stateRefresh={stateRefresh}
+                                />
+                            )}
                         </Flex>
                     </Flex>
                 </Box>

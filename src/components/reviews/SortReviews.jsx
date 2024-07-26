@@ -19,11 +19,11 @@ const SortReviews = ({
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
 
-    function getImageLink(listingID, imageName) {
-        if (!listingID || !imageName) {
+    function getImageLink(reviewID, imageName) {
+        if (!reviewID || !imageName) {
             return null;
         }
-        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForReview?reviewID=${listingID}&imageName=${imageName}`;
+        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForReview?reviewID=${reviewID}&imageName=${imageName}`;
     }
 
     const fetchReviews = async (hostID, sortOrder) => {
