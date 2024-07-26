@@ -23,6 +23,7 @@ import {
 	ModalBody,
 	ModalCloseButton,
 	Avatar,
+	useToast,
 } from "@chakra-ui/react";
 import { FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
@@ -31,7 +32,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchUser } from "../../slices/AuthState";
 import configureShowToast from '../../components/showToast';
-import showToast from "../../components/showToast";
 
 function ChatUi() {
 	const navigate = useNavigate();
@@ -48,8 +48,10 @@ function ChatUi() {
 	const [chatPartnerUsernames, setChatPartnerUsernames] = useState({}); // Object to map chat ID to username
 	const [chatSelected, setChatSelected] = useState(null);
 	const [isChatVisible, setIsChatVisible] = useState(false);
-	const [status, setStatus] = useState(true);
+	const [status, setStatus] = useState(false);
 	const chatBottomRef = useRef(null);
+	const toast = useToast();
+	const showToast = configureShowToast(toast);
 	const { user, loaded, error } = useSelector((state) => state.auth);
 
 	const ws = useRef(null);
@@ -136,8 +138,9 @@ function ChatUi() {
 				setStatus(false);
 			} else if (receivedMessage.action === "chat_partner_online") {
 				setStatus(true);
-			} else{
-				showToast("error", "Error", "An error occurred in the server.");
+			}
+			else{
+				("error", "Error", "An error occurred in the server.");
 			}
 		};
 
@@ -149,11 +152,6 @@ function ChatUi() {
 			console.log("Disconnected from WebSocket server");
 		};
 
-		return () => {
-			if (ws.current) {
-				ws.current.close();
-			}
-		};
 	}, [loaded, user, messages]);
 
 	useEffect(() => {
