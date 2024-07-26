@@ -30,6 +30,8 @@ import ChatHistory from "../../components/chat/ChatHistory";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchUser } from "../../slices/AuthState";
+import configureShowToast from '../../components/showToast';
+import showToast from "../../components/showToast";
 
 function ChatUi() {
 	const navigate = useNavigate();
@@ -130,8 +132,12 @@ function ChatUi() {
 				setMessages((prevMessages) =>
 					prevMessages.filter((msg) => msg.messageID !== receivedMessage.messageID)
 				);
-			} else if (receivedMessage.action === "chat_partner_left") {
+			} else if (receivedMessage.action === "chat_partner_offline") {
 				setStatus(false);
+			} else if (receivedMessage.action === "chat_partner_online") {
+				setStatus(true);
+			} else{
+				showToast("error", "Error", "An error occurred in the server.");
 			}
 		};
 
