@@ -4,7 +4,7 @@
 import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
 import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Box, useToast } from "@chakra-ui/react";
+import { Box, useToast, Center, Fade, Spinner } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 
 const GoogleMapsPage = () => {
@@ -38,21 +38,32 @@ const GoogleMapsPage = () => {
             displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, true);
         }, 200);
     }
-    return (
-        <>
-            {loaded && (
+    if (loaded) {
+        return (
+            <>
                 <Box position="relative" height="100%">
-                <ExpandedGoogleMaps title={title} lat={latitude} long={longitude} />
-                <Box
-                    position="absolute"
-                    top="50%"
-                    left="10px"
-                    transform="translateY(-50%)"
-                    zIndex="1">
-                    <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
+                    <ExpandedGoogleMaps title={title} lat={latitude} long={longitude} />
+                    <Box
+                        position="absolute"
+                        top="50%"
+                        left="10px"
+                        transform="translateY(-50%)"
+                        zIndex="1">
+                        <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
+                    </Box>
                 </Box>
-            </Box>)}
-        </>
+            </>
+        );
+    }
+
+    return (
+        <div>
+            <Center height="100vh">
+                <Fade in={!loaded}>
+                    <Spinner size="xl" />
+                </Fade>
+            </Center>
+        </div>
     );
 };
 
