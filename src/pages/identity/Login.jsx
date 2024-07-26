@@ -129,7 +129,7 @@ function Login() {
                         </FormControl>
                         <Box w="100%" display="flex" justifyContent="start">
                             <Link
-                                href='/identity/accountRecovery'
+                                href='/auth/accountRecovery'
                                 fontSize='12px'
                                 color='teal.500'
                                 mb={5}

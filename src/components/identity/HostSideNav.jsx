@@ -31,7 +31,7 @@ const HostSidebar = () => {
     };
 
     return (
-        <Card h="700px" width="310px" borderRadius={15} boxShadow="0 2px 4px 2px rgba(0.2, 0.2, 0.2, 0.2)" p={4}>
+        <Card h="720px" width="310px" borderRadius={15} boxShadow="0 2px 4px 2px rgba(0.2, 0.2, 0.2, 0.2)" p={4}>
             <Button 
                 color="#515F7C" 
                 mb={2} 
