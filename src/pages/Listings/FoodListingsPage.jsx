@@ -34,7 +34,7 @@ const FoodListingsPage = () => {
 
     const fetchListings = async () => {
         try {
-            const response = await server.get("/cdn/listings");
+            const response = await server.get("/cdn/listings?includeHost=true");
             setListings(response.data);
         } catch (error) {
             console.log("Failed to fetch listings: " + error)
