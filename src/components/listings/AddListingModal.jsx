@@ -4,15 +4,16 @@
 import { useState, useEffect, useRef } from "react";
 import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Switch } from "@chakra-ui/react";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Switch, useToast } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
 import { useNavigate } from "react-router-dom";
 
-const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }) => {
+const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
     const today = new Date();
     today.setDate(today.getDate() + 1);
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const toast = useToast();
 
     const [title, setTitle] = useState("");
     const [shortDescription, setShortDescription] = useState("");
@@ -38,6 +39,17 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
         onOpen: onAlertOpen,
         onClose: onAlertClose,
     } = useDisclosure();
+
+    function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
+        toast({
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: isClosable
+        });
+    }
 
     function setDefaultState() {
         setIsSubmitting(false);
@@ -117,8 +129,8 @@ const AddListingModal = ({ isOpen, onOpen, onClose, displayToast, closeSidebar }
                 console.log("Failed to add listing; response: " + error.response)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
+                        "Uh-oh!",
                         error.response.data.substring("UERROR: ".length),
-                        "Please try again",
                         "info",
                         3500,
                         true

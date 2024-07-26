@@ -43,8 +43,8 @@ const FoodListingsPage = () => {
                 console.log("Failed to fetch listings; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
+                        "Uh-oh!",
                         error.response.data.substring("UERROR: ".length),
-                        "Please try again",
                         "info",
                         3500,
                         true

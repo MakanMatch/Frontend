@@ -67,8 +67,8 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                     console.log("Failed to favourite listing; response: " + error.response)
                     if (error.response.data.startsWith("UERROR")) {
                         displayToast(
+                            "Uh-oh!",
                             error.response.data.substring("UERROR: ".length),
-                            "Please try again",
                             "info",
                             3500,
                             true
@@ -117,8 +117,8 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                     console.log("Failed to fetch favourites state; response: " + error.response)
                     if (error.response.data.startsWith("UERROR")) {
                         displayToast(
+                            "Uh-oh!",
                             error.response.data.substring("UERROR: ".length),
-                            "Please try again",
                             "info",
                             3500,
                             true
@@ -169,8 +169,8 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                 console.log("Failed to fetch host's food rating; response: " + error.response)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
+                        "Uh-oh!",
                         error.response.data.substring("UERROR: ".length),
-                        "Please try again",
                         "info",
                         3500,
                         true

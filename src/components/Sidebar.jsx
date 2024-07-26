@@ -6,14 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Logo from '../assets/Logo.png'
 import AddListingModal from './listings/AddListingModal';
+import configureShowToast from "../components/showToast"
 
 
 function Sidebar({ isOpen, onClose }) {
     const navigate = useNavigate();
-    const user = useSelector((state) => state.auth.user);
-    const authToken = useSelector((state) => state.auth.authToken);
+    const { user, authToken } = useSelector(state => state.auth)
 
     const toast = useToast();
+    const showToast = configureShowToast(toast)
     const { isOpen: isAddListingModalOpen, onOpen: onAddListingModalOpen, onClose: onAddListingModalClose } = useDisclosure();
 
     const DrawerHover = {
@@ -32,23 +33,12 @@ function Sidebar({ isOpen, onClose }) {
         onClose()
     };
 
-    function displayToast(title, description, status, duration, isClosable) {
-        toast.closeAll();
-        toast({
-            title: title,
-            description: description,
-            status: status,
-            duration: duration,
-            isClosable: isClosable
-        });
-    }
-
     function handleClickAddListing() {
         onClose();
         if (!authToken || !user) {
             navigate('/auth/login');
             setTimeout(() => {
-                displayToast("You're not logged in", "Please login first", "info", 3000, true);
+                showToast("You're not logged in", "Please login first", "info", 3000, true);
             }, 200);
         } else {
             onAddListingModalOpen();
@@ -115,7 +105,6 @@ function Sidebar({ isOpen, onClose }) {
                 isOpen={isAddListingModalOpen}
                 onClose={onAddListingModalClose}
                 onOpen={onAddListingModalOpen}
-                displayToast={displayToast}
                 closeSidebar={onClose}
             />
         </>
