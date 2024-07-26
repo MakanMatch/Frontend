@@ -102,7 +102,6 @@ const SubmitReviews = ({
             dispatch(reloadAuthToken(authToken))
             if (submitReview.data && submitReview.data.startsWith("SUCCESS")) {
                 showToast("Review submitted successfully", "", 3000, true, "success")
-                console.log('Review submitted successfully!');
                 setIsSubmitting(false);
                 setComments('');
                 setImages([]);
@@ -113,11 +112,10 @@ const SubmitReviews = ({
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
-            if (error.response.status === 400 && error.response.data.startsWith("UERROR")) {
+            if (error.response && error.response.data && error.response.data.startsWith("UERROR")) {
                 setIsSubmitting(false);
-                showToast(error.response.data.substring("UERROR: ".length), "", 3000, true, "error");
+                showToast("Something went wrong", error.response.data.substring("UERROR: ".length), 3000, true, "error");
             } else {
-                console.log(error)
                 setIsSubmitting(false);
                 showToast("Failed to submit review", "Please try again later", 3000, true, "error");
                 console.log('Failed to submit review:', error);
@@ -157,7 +155,6 @@ const SubmitReviews = ({
                             <Avatar
                                 borderRadius='full'
                                 boxSize='100px'
-                                // src='https://bit.ly/dan-abramov'
                                 name={hostName}
                                 alt={hostName}
                             />

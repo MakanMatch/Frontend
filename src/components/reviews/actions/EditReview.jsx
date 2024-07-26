@@ -167,7 +167,6 @@ const EditReview = ({
 							<Avatar
 								borderRadius='full'
 								boxSize='100px'
-								// src='https://bit.ly/dan-abramov'
 								name={user.username}
 								alt={user.username}
 							/>
