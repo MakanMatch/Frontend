@@ -20,7 +20,7 @@ const MakanHistory = () => {
 
     const fetchMakanHistory = async() => {
         try {
-            const pastReservationsResponse = await server.get("/cdn/getGuestPastReservations");
+            const pastReservationsResponse = await server.get("/makanHistory/getGuestPastReservations");
             if (pastReservationsResponse.status === 200) {
                 const makanHistory = pastReservationsResponse.data;
                 setReservations(makanHistory);
@@ -46,7 +46,7 @@ const MakanHistory = () => {
             console.error("Error fetching makan history:", error);
             showToast("Error", "Failed to fetch past reservations", 3000, true, "error");
         }
-    };    
+    };
 
     useEffect(() => {
         if (loaded === true) {
