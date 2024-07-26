@@ -17,8 +17,7 @@ import {
 function DeleteReviewButton({
     reviewID,
     refreshState,
-    stateRefresh,
-    hostID
+    stateRefresh
 }) {
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -32,8 +31,7 @@ function DeleteReviewButton({
         try {
             const deleteReview = await server.delete(`/manageReviews`, {
                 data: {
-                    reviewID: reviewID,
-                    'hostID': hostID
+                    reviewID: reviewID
                 }
             })
             dispatch(reloadAuthToken(authToken))

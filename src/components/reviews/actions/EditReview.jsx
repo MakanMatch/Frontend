@@ -19,8 +19,7 @@ const EditReview = ({
 	reviewComments,
 	reviewImages,
 	refreshState,
-	stateRefresh,
-	hostID
+	stateRefresh
 }) => {
 	const toast = useToast();
 	const showToast = configureShowToast(toast);
@@ -101,7 +100,6 @@ const EditReview = ({
 		images.forEach((file) => {
 			formData.append('images', file);
 		});
-		formData.append('hostID', hostID);
 
 		try {
 			const editReview = await server.put(`/manageReviews`, formData, {

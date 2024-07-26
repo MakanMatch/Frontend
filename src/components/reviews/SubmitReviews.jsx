@@ -137,6 +137,8 @@ const SubmitReviews = ({
     const handleClose = () => {
         setComments('');
         setImages([]);
+        setFoodRating(1);
+        setHygieneRating(1);
         onClose();
         setFileFormatError("")
     };
