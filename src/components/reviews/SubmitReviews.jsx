@@ -115,7 +115,7 @@ const SubmitReviews = ({
             dispatch(reloadAuthToken(authToken))
             if (error.response.status === 400 && error.response.data.startsWith("UERROR")) {
                 setIsSubmitting(false);
-                showToast("You cannot submit a review for yourself", "", 3000, true, "error");
+                showToast(error.response.data.substring("UERROR: ".length), "", 3000, true, "error");
             } else {
                 console.log(error)
                 setIsSubmitting(false);
