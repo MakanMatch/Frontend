@@ -104,6 +104,36 @@ const ChangeAddress = ({ isOpen, onClose, accountInfo, setAccountInfo, setOrigin
                     <Text fontSize="15px" mb={4}>{accountInfo.address}</Text>
                     <form onSubmit={formik.handleSubmit}>
                         <VStack spacing={4} mb={4}>
+                            
+                        <FormControl isInvalid={formik.errors.blkNo && formik.touched.blkNo} flex={1}>
+                                <FormLabel fontSize='15px'>Block Number</FormLabel>
+                                <Input
+                                    name="blkNo"
+                                    placeholder='Eg. 301A'
+                                    borderColor='black'
+                                    size='md'
+                                    borderRadius='5px'
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.blkNo}
+                                />
+                                <FormErrorMessage fontSize='12px'>{formik.errors.blkNo}</FormErrorMessage>
+                            </FormControl>
+                            <FormControl isInvalid={formik.errors.unitNum && formik.touched.unitNum} flex={1}>
+                                <FormLabel fontSize='15px'>Unit Number</FormLabel>
+                                <Input
+                                    name="unitNum"
+                                    placeholder='Eg. 07-15'
+                                    borderColor='black'
+                                    size='md'
+                                    borderRadius='5px'
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.unitNum}
+                                />
+                                <FormErrorMessage fontSize='12px'>{formik.errors.unitNum}</FormErrorMessage>
+                            </FormControl>
+                            
                             <FormControl isRequired isInvalid={formik.errors.street && formik.touched.street} flex={1}>
                                 <FormLabel fontSize='15px'>Street</FormLabel>
                                 <Input
@@ -131,35 +161,6 @@ const ChangeAddress = ({ isOpen, onClose, accountInfo, setAccountInfo, setOrigin
                                     value={formik.values.postalCode}
                                 />
                                 <FormErrorMessage fontSize='12px'>{formik.errors.postalCode}</FormErrorMessage>
-                            </FormControl>
-
-                            <FormControl isInvalid={formik.errors.blkNo && formik.touched.blkNo} flex={1}>
-                                <FormLabel fontSize='15px'>Block Number</FormLabel>
-                                <Input
-                                    name="blkNo"
-                                    placeholder='Eg. 301A'
-                                    borderColor='black'
-                                    size='md'
-                                    borderRadius='5px'
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.blkNo}
-                                />
-                                <FormErrorMessage fontSize='12px'>{formik.errors.blkNo}</FormErrorMessage>
-                            </FormControl>
-                            <FormControl isInvalid={formik.errors.unitNum && formik.touched.unitNum} flex={1}>
-                                <FormLabel fontSize='15px'>Unit Number</FormLabel>
-                                <Input
-                                    name="unitNum"
-                                    placeholder='Eg. 07-15'
-                                    borderColor='black'
-                                    size='md'
-                                    borderRadius='5px'
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.unitNum}
-                                />
-                                <FormErrorMessage fontSize='12px'>{formik.errors.unitNum}</FormErrorMessage>
                             </FormControl>
                         </VStack>
                     </form>
