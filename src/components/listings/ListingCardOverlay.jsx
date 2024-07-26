@@ -69,10 +69,13 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             setFavourite(false);
             return;
         } else {
-            const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
-            const guestFavCuisine = response.data.favCuisine || "";
-            if (guestFavCuisine.includes(listingID)) {
-                setFavourite(true);
+            const fetchFavouritedListingID = await server.get(`/listings/getFavouritedListings`);
+            if (fetchFavouritedListingID.status == 200 && fetchFavouritedListingID.data) {
+                fetchFavouritedListingID.data.forEach((favListingID) => {
+                    if (favListingID === listingID) {
+                        setFavourite(true);
+                    }
+                });
             } else {
                 setFavourite(false);
             }
