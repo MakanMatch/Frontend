@@ -72,8 +72,6 @@ function ChatUi() {
 				JSON.stringify({
 					action: "connect",
 					userID: user.userID,
-					username: user.username,
-					userType: user.userType,
 				})
 			);
 		};
