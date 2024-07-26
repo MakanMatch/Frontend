@@ -202,12 +202,11 @@ const FoodListingsPage = () => {
     
     return (
         <div>
-            
-                <Center height="100vh">
-                    <Fade in={!loaded}>
-                        <Spinner size="xl" />
-                    </Fade>
-                </Center>
+            <Center height="100vh">
+                <Fade in={!loaded}>
+                    <Spinner size="xl" />
+                </Fade>
+            </Center>
         </div>
     );
 };

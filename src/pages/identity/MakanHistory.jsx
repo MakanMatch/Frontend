@@ -26,31 +26,13 @@ const MakanHistory = () => {
         try {
             const pastReservationsResponse = await server.get("/makanHistory/getGuestPastReservations");
             if (pastReservationsResponse.status === 200) {
-                const makanHistory = pastReservationsResponse.data;
-                setReservations(makanHistory);
-                
-                const listingIDs = makanHistory.map((reservation) => reservation.listingID);
-    
-                const listingPromises = listingIDs.map((listingID) =>
-                    server.get(`/cdn/getListing?id=${listingID}`)
-                );
-    
-                const listingResponses = await Promise.all(listingPromises);
-                const fetchedListings = listingResponses.map((response) => {
-                    if (response.status === 200) {
-                        return response.data;
-                    } else {
-                        showToast("Reservation's listing details couldn't be fetched", "Please try again", 3000, true, "error");
-                        return null;
-                    }
-                }).filter(listing => listing !== null);
-    
-                setListings(fetchedListings);
+                setReservations(pastReservationsResponse.data.pastReservations);
+                setListings(pastReservationsResponse.data.foodListings);
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {
-                console.log("Failed to add listing; response: " + error.response)
+                console.log("Failed to fetch listing; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {
                     showToast(
                         error.response.data.substring("UERROR: ".length),
@@ -118,6 +100,7 @@ const MakanHistory = () => {
                         <Box display="flex" flexDir={"column"} padding="20px">
                             {reservations.map((reservation) => (
                                 <MakanHistoryCard
+                                    key={reservation.referenceNum}
                                     reservation={reservation}
                                     listing={listings.find((listing) => listing.listingID === reservation.listingID)}
                                 />

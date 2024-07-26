@@ -1,24 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Card, useToast, Image, Stack, CardBody, Avatar, Text, Box, Skeleton } from "@chakra-ui/react";
+import { Card, Image, Stack, CardBody, Avatar, Text, Box, Skeleton } from "@chakra-ui/react";
 import { CalendarIcon } from '@chakra-ui/icons';
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { reloadAuthToken } from "../../slices/AuthState";
-import configureShowToast from '../../components/showToast';
-import server from "../../networking";
+import { useState } from "react";
 
 function MakanHistoryCard({ reservation, listing }) {
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [hostUsername, setHostUsername] = useState(null);
-    const [hostFoodRating, setHostFoodRating] = useState(0);
 
-    const dispatch = useDispatch();
-    const authToken = useSelector((state) => state.auth.authToken)
-    
-    const toast = useToast();
-    const showToast = configureShowToast(toast);
+    console.log("Images: ", listing.images);
 
     const handleClickListingTitle = () => {
         console.log("Clicked on listing title");
@@ -35,42 +25,6 @@ function MakanHistoryCard({ reservation, listing }) {
 
         return `${day} ${month} ${year}`;
     }
-
-    const fetchHostDetails = async () => {
-        try {
-            const response = await server.get(`/cdn/accountInfo?userID=${listing.hostID}`);
-            dispatch(reloadAuthToken(authToken))
-            if (response.status === 200) {
-                setHostUsername(response.data.username);
-                setHostFoodRating(response.data.foodRating);
-            }
-        } catch (error) {
-            dispatch(reloadAuthToken(authToken))
-            if (error.response && error.response.data && typeof error.response.data == "string") {
-                console.log("Failed to retrieve host's info; response: " + error.response)
-                if (error.response.data.startsWith("UERROR")) {
-                    showToast(
-                        error.response.data.substring("UERROR: ".length),
-                        "Please try again", 3500, true, "info"
-                    )
-                } else {
-                    showToast(
-                        "Something went wrong",
-                        "Failed to retrieve host info. Please try again", 3500, true, "error")
-                }
-            } else {
-                console.log("Unknown error occurred when retrieving host info; error: " + error)
-                showToast("Something went wrong", "Failed to retrieve host info. Please try again", 3000, true, "error")
-            }
-        }
-
-    }
-
-    useEffect(() => {
-        if (listing) {
-            fetchHostDetails(listing.hostID);
-        }
-    }, [listing]);
 
     return (
         <>
@@ -91,16 +45,15 @@ function MakanHistoryCard({ reservation, listing }) {
                     minWidth: "645px"
                 }}
                 >
-                    <Skeleton isLoaded={imageLoaded} fadeDuration={1} width={"223px"} height={"149px"}>
+                    <Skeleton isLoaded={imageLoaded} fadeDuration={0.5} minWidth={"223px"} maxWidth={"223px"} minHeight={"149px"} maxHeight={"149px"} margin="20px" borderRadius="5px">
                         <Image
                         minWidth={"223px"}
                         maxWidth={"223px"}
                         minHeight={"149px"}
                         maxHeight={"149px"}
-                        src={getImageLink(listing.listingID, listing.images)}
+                        src={getImageLink(listing.listingID, listing.images.split("|")[0])}
                         alt='Caffe Latte'
                         borderRadius = "5px"
-                        margin="20px"
                         objectFit={"cover"}
                         onLoad={() => setImageLoaded(true)}
                         />
@@ -122,12 +75,12 @@ function MakanHistoryCard({ reservation, listing }) {
 
                                 <Box display="flex" mt={2}>
                                     <Avatar size={"sm"} mr={2}/>
-                                    <Text textAlign={"left"} ml={2} mt={1}>{hostUsername}</Text>
+                                    <Text textAlign={"left"} ml={2} mt={1}>{listing.Host.username}</Text>
                                 </Box>
                             </Stack>
 
                             <Box display="flex" flexDirection={"column"} justifyContent={"space-between"}>
-                                <Text fontSize="20px" mt={7}>{hostFoodRating} ⭐️</Text>
+                                <Text fontSize="20px" mt={7}>{listing.Host.foodRating} ⭐️</Text>
                                 <Text fontSize="20px" color="green">${listing.portionPrice}</Text>
                             </Box>
                         </Box>
