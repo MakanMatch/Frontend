@@ -101,14 +101,16 @@ const Favourites = () => {
                         </Box>
                         <Box pl={4} pr={4}>
                             {/* Search bar */}
-                            <InputGroup mb={4}>
-                                <Input
-                                    placeholder="Search by title or host name"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                <InputRightElement children={<SearchIcon color="gray.300" />} />
-                            </InputGroup>
+                            {favouritesListingDetails.length > 0 && (
+                                <InputGroup mb={4}>
+                                    <Input
+                                        placeholder="Search by title or host name"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                    <InputRightElement children={<SearchIcon color="gray.300" />} />
+                                </InputGroup>
+                            )}
                             {filteredFavourites.length > 0 ? (
                                 <SimpleGrid
                                     spacing={4}
