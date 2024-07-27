@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useToast, CardBody, Heading, list, Stack, StackDivider, Card, Text, SimpleGrid, SlideFade, Flex, Spacer, Button, Image, HStack, VStack, Divider, Center, useMediaQuery, Spinner } from "@chakra-ui/react";
+import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner } from "@chakra-ui/react";
 import GuestSideNav from "../../components/identity/GuestSideNav";
 import server from '../../networking'
 import configureShowToast from '../../components/showToast';
@@ -15,7 +15,6 @@ const Favourites = () => {
     const [dataLoaded, setDataLoaded] = useState(false);
     const dispatch = useDispatch();
 
-    const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
 
     function getImageLink(listingID, imageName) {
