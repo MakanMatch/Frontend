@@ -135,11 +135,20 @@ function ChatUi() {
 					prevMessages.filter((msg) => msg.messageID !== receivedMessage.messageID)
 				);
 			} else if (receivedMessage.action === "chat_partner_offline") {
-				setStatus(false);
+				console.log("offline")
+				console.log("status", status)
+				setStatus((prevStatus) => ({
+					...prevStatus,
+					[receivedMessage.chatID]: false,
+				}));
 			} else if (receivedMessage.action === "chat_partner_online") {
-				setStatus(true);
+				console.log("online")
+				setStatus((prevStatus) => ({
+					...prevStatus,
+					[receivedMessage.chatID]: true,
+				}));
 			}
-			else{
+			else {
 				("error", "Error", "An error occurred in the server.");
 			}
 		};
@@ -326,13 +335,8 @@ function ChatUi() {
 									: "Chat"}
 							</Text>
 							<Spacer h={3} />
-							<Text
-								fontSize={15}
-								color={status ? "green" : "gray"}
-								textAlign={"left"}
-								mb={-8}
-							>
-								{status ? "Online" : "Offline"}
+							<Text fontSize="sm" mb={-8} textAlign={"left"} color={status[chatSelected] ? "green.500" : "gray.500"}>
+								{status[chatSelected] ? "Online" : "Offline"} {/* Use chatSelected to get the current partner's status */}
 							</Text>
 						</Box>
 					</Box>
