@@ -86,7 +86,7 @@ const Favourites = () => {
                                 My Favourites
                             </Heading>
                         </Box>
-                        <Box>
+                        <Box pl={4} pr={4}>
                             {favouritesListingDetails.length > 0 ? (
                                 <SimpleGrid
                                     spacing={4}
@@ -108,7 +108,7 @@ const Favourites = () => {
                                                     hostName={listing.Host.username || "MakanMatch Host"}
                                                     hostFoodRating={listing.Host.foodRating || 0}
                                                     hostID={listing.Host.userID}
-                                                    images={listing.images.forEach((imageName) =>
+                                                    images={listing.images.map((imageName) =>
                                                         getImageLink(listing.listingID, imageName)
                                                     ) || []}
                                                     shortDescription={listing.shortDescription}
@@ -135,7 +135,7 @@ const Favourites = () => {
                                         color="gray.500"
                                         width="50%"
                                     >
-                                        No listings available
+                                        No favourite listings available
                                     </Text>
                                 </Box>
                             )}
