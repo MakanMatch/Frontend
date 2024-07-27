@@ -186,7 +186,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             zIndex="10"
                             backgroundColor="white"
                             cursor="pointer"
-                            onClick={() => navigate("/")}>
+                            onClick={() => navigate(-1)}>
                             <ArrowBackIcon height="50%" />
                         </Text>
                     </Box>
