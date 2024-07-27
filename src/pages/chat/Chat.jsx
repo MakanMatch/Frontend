@@ -135,14 +135,11 @@ function ChatUi() {
 					prevMessages.filter((msg) => msg.messageID !== receivedMessage.messageID)
 				);
 			} else if (receivedMessage.action === "chat_partner_offline") {
-				console.log("offline")
-				console.log("status", status)
 				setStatus((prevStatus) => ({
 					...prevStatus,
 					[receivedMessage.chatID]: false,
 				}));
 			} else if (receivedMessage.action === "chat_partner_online") {
-				console.log("online")
 				setStatus((prevStatus) => ({
 					...prevStatus,
 					[receivedMessage.chatID]: true,
