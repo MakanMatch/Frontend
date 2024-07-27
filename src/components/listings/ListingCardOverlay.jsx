@@ -69,7 +69,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             setFavourite(false);
             return;
         } else {
-            const fetchFavouritedListingID = await server.get(`/listings/getFavouritedListings`);
+            const fetchFavouritedListingID = await server.get(`/listings/getFavouritedListingsID`);
             if (fetchFavouritedListingID.status == 200 && fetchFavouritedListingID.data) {
                 fetchFavouritedListingID.data.forEach((favListingID) => {
                     if (favListingID === listingID) {
