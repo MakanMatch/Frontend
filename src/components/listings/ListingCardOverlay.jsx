@@ -23,7 +23,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const [fiveStarRatings, setFiveStarRatings] = useState(0);
     const [ratingsLoaded, setRatingsLoaded] = useState(false);
 
-    const { user, authToken } = useSelector((state) => state.auth);
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -313,10 +313,9 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             mb={5}
                         >
                             <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
-                            {user && user.userID !== hostID && (
-                                <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
-                                    {favourite ? "🩷" : "🤍"}
-                                </Text>)}
+                            <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
+                                {(!user || user.userID !== hostID) ? (favourite ? "🩷" : "🤍") : null}
+                            </Text>
                         </Box>
                         <Box className="ratingBox">
                             {ratingsLoaded ? (

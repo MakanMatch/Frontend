@@ -38,32 +38,32 @@ const GoogleMapsPage = () => {
             displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, true);
         }, 200);
     }
-    if (loaded) {
+    if (!loaded) {
         return (
-            <>
-                <Box position="relative" height="100%">
-                    <ExpandedGoogleMaps title={title} lat={latitude} long={longitude} />
-                    <Box
-                        position="absolute"
-                        top="50%"
-                        left="10px"
-                        transform="translateY(-50%)"
-                        zIndex="1">
-                        <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
-                    </Box>
-                </Box>
-            </>
+            <div>
+                <Center height="100vh">
+                    <Fade in={!loaded}>
+                        <Spinner size="xl" />
+                    </Fade>
+                </Center>
+            </div>
         );
     }
 
     return (
-        <div>
-            <Center height="100vh">
-                <Fade in={!loaded}>
-                    <Spinner size="xl" />
-                </Fade>
-            </Center>
-        </div>
+        <>
+            <Box position="relative" height="100%">
+                <ExpandedGoogleMaps title={title} lat={latitude} long={longitude} />
+                <Box
+                    position="absolute"
+                    top="50%"
+                    left="10px"
+                    transform="translateY(-50%)"
+                    zIndex="1">
+                    <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
+                </Box>
+            </Box>
+        </>
     );
 };
 

@@ -25,6 +25,7 @@ const MakanHistory = () => {
     const fetchMakanHistory = async() => {
         try {
             const pastReservationsResponse = await server.get("/makanHistory/getGuestPastReservations");
+            dispatch(reloadAuthToken(authToken));
             if (pastReservationsResponse.status === 200) {
                 setReservations(pastReservationsResponse.data.pastReservations);
                 setListings(pastReservationsResponse.data.foodListings);
@@ -98,7 +99,7 @@ const MakanHistory = () => {
                             </Heading>
                         </Box>
                         <Box display="flex" flexDir={"column"} padding="20px">
-                            {reservations.map((reservation) => (
+                            {reservations && reservations.map((reservation) => (
                                 <MakanHistoryCard
                                     key={reservation.referenceNum}
                                     reservation={reservation}
