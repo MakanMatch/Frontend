@@ -1,33 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner } from "@chakra-ui/react";
+import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
 import GuestSideNav from "../../components/identity/GuestSideNav";
 import server from '../../networking'
 import configureShowToast from '../../components/showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import { useSelector, useDispatch } from 'react-redux';
 import FoodListingCard from '../../components/listings/FoodListingCard';
+import { SearchIcon } from "@chakra-ui/icons";
 
 const Favourites = () => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const [favouritesListingDetails, setFavouritesListingDetails] = useState([]);
+    const [filteredFavourites, setFilteredFavourites] = useState([]);
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const [dataLoaded, setDataLoaded] = useState(false);
     const dispatch = useDispatch();
 
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
+    const [searchQuery, setSearchQuery] = useState("");
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
     }
 
-    // Get all favourites listingID form the user
     const getFavourites = async () => {
         server.get('/favourites/getFavouritedListings')
             .then(res => {
                 dispatch(reloadAuthToken(authToken));
                 if (res.status == 200 && res.data) {
-                    setFavouritesListingDetails(res.data);
+                    setFavouritesListingDetails(res.data); // Set full favourite data for further filtering
+                    setFilteredFavourites(res.data); // Set filtered listings to full data initially
                     console.log("Listings retrieved: ", res.data);
                     setDataLoaded(true);
                 } else {
@@ -56,10 +59,21 @@ const Favourites = () => {
         if (loaded == true) {
             getFavourites();
         }
-    }, [loaded, user])
+    }, [loaded, user]);
+
+    useEffect(() => {
+        // filter favourites based on search query using full favourites data
+        setFilteredFavourites(
+            favouritesListingDetails.filter(
+                listing =>
+                    listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    listing.Host.username.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+        );
+    }, [searchQuery]);
 
     if (!dataLoaded) {
-        return <Spinner />
+        return <Spinner />;
     }
 
     return (
@@ -86,12 +100,21 @@ const Favourites = () => {
                             </Heading>
                         </Box>
                         <Box pl={4} pr={4}>
-                            {favouritesListingDetails.length > 0 ? (
+                            {/* Search bar */}
+                            <InputGroup mb={4}>
+                                <Input
+                                    placeholder="Search by title or host name"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                                <InputRightElement children={<SearchIcon color="gray.300" />} />
+                            </InputGroup>
+                            {filteredFavourites.length > 0 ? (
                                 <SimpleGrid
                                     spacing={4}
                                     templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
                                 >
-                                    {favouritesListingDetails.map((listing) => (
+                                    {filteredFavourites.map((listing) => (
                                         <SlideFade
                                             in={true}
                                             offsetY="20px"
