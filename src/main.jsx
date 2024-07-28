@@ -26,6 +26,11 @@ import ExpandedListingGuest from './pages/orders/ExpandedListingGuest.jsx'
 import VerifyToken from './pages/identity/VerifyToken.jsx';
 import AuthLayout from './AuthLayout.jsx';
 import GoogleMapsPage from './pages/Listings/GoogleMapsPage'
+import Schedule from "./pages/identity/Schedule"
+import MakanHistory from './pages/identity/MakanHistory.jsx';
+import Favourites from './pages/identity/Favourites.jsx';
+import MakanReviews from './pages/identity/MakanReviews.jsx';
+import ConfirmReservation from './pages/orders/ConfirmReservation.jsx';
 
 const store = configureStore({
     reducer: {
@@ -42,11 +47,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path='/' element={<Layout />}>
                         <Route index element={<FoodListingsPage />} />
                         <Route path={'version'} element={<Version />} />
-                        <Route path={"expandedListing"} element={<ExpandedListingHost />} />
+                        <Route path={"expandedListingHost"} element={<ExpandedListingHost />} />
                         <Route path={"expandedListingGuest"} element={<ExpandedListingGuest />} />
                         <Route path={'reviews'} element={<Reviews />} />
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"targetListing"} element={<GoogleMapsPage/>} />
+                        <Route path={"listing"}>
+                            <Route path={"reserve"} element={<ConfirmReservation />} />
+                        </Route>
                         <Route path='*' element={<NotFound />} />
                     </Route>
                     <Route path='/auth' element={<AuthLayout />}>
@@ -55,9 +63,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"emailVerification"} element={<EmailVerification />} />
                         <Route path={"accountRecovery"} element={<AccountRecovery />} />
                         <Route path={"verifyToken"} element={<VerifyToken />} />
+                        <Route path='*' element={<NotFound />} />
                     </Route>
                     <Route path='/identity' element={<Layout />}>
                         <Route path={"myAccount"} element={<MyAccount />} />
+                        <Route path={"makanHistory"} element={<MakanHistory/>} />
+                        <Route path={"favourites"} element={<Favourites/>} />
+                        <Route path={"makanReviews"} element={<MakanReviews/>} />
+                        <Route path={"schedule"} element={<Schedule/>} />
+                        <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>
             </BrowserRouter>

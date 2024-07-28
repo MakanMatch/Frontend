@@ -1,15 +1,16 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip, Badge, ScaleFade, Stack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
 import server from '../../networking';
 import axios from 'axios'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
 import UploadNewImageModal from '../../components/orders/UploadNewImageModal'
 import HostListingImage from '../../components/orders/HostListingImage'
 import configureShowToast from '../../components/showToast'
+import { reloadAuthToken } from '../../slices/AuthState'
 
 function ExpandedListingHost() {
     // const Universal = useSelector(state => state.universal)
@@ -18,6 +19,7 @@ function ExpandedListingHost() {
     const navigate = useNavigate()
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
+    const { state } = useLocation();
     const [searchParams, setSearchParams] = useSearchParams()
     const [listingID, setListingID] = useState(searchParams.get("id"))
     const [pricePerPortion, setPricePerPortion] = useState('0.00')
@@ -45,6 +47,8 @@ function ExpandedListingHost() {
     const [imageToBeDeleted, setImageToBeDeleted] = useState(null)
     const [isUploading, setIsUploading] = useState(false)
     const [file, setFile] = useState(null);
+    const { user, loaded, error, authToken } = useSelector(state => state.auth)
+    const dispatch = useDispatch();
 
     const handleClose = () => {
         onClose()
@@ -84,10 +88,8 @@ function ExpandedListingHost() {
             guestSlots != listingData.totalSlots ||
             pricePerPortion != listingData.portionPrice
         ) {
-            console.log("changes detected")
             setChangesMade(true)
         } else {
-            console.log("no changes detected")
             setChangesMade(false)
         }
     }
@@ -104,20 +106,43 @@ function ExpandedListingHost() {
     }
 
     useEffect(() => {
-        if (!listingID) {
-            navigate("/")
-            return
+        if (loaded == true) {
+            if (!user) {
+                console.log("Unauthenticated user attempting to access user-scoped webpage; redirecting...")
+                showToast("Error", "Please sign in first.", 3000, true, "error")
+                navigate("/")
+                return
+            }
+
+            if (state == null || !state.listingID) {
+                if (!listingID) {
+                    console.log("No listing ID provided to render expanded listing view.")
+                    showToast("Something went wrong", "Insufficient information provided.", 1500, true, "error")
+                    navigate("/")
+                    return
+                }
+            } else {
+                setListingID(state.listingID)
+            }
+
+            fetchListingDetails(listingID || state.listingID)
         }
-        fetchListingDetails()
-    }, [])
+    }, [loaded, user, authToken])
 
     useEffect(checkForChanges, [shortDescription, longDescription, guestSlots, pricePerPortion])
 
-    const fetchListingDetails = () => {
-        server.get(`/cdn/getListing?id=${listingID}`)
+    const fetchListingDetails = (id) => {
+        server.get(`/cdn/getListing?id=${id || listingID}`)
             .then(response => {
+                dispatch(reloadAuthToken(authToken))
                 if (response.status == 200) {
                     const processedData = processData(response.data)
+                    if (user && processedData.hostID != user.userID) {
+                        console.log("Logged in user is unauthorised for listing host view action; redirecting...")
+                        navigate("/expandedListingGuest")
+                        history.pushState({ listingID: (id || listingID) }, "")
+                        return
+                    }
                     setListingData(processedData)
                     setShortDescription(processedData.shortDescription || "")
                     setLongDescription(processedData.longDescription || "")
@@ -139,9 +164,9 @@ function ExpandedListingHost() {
                 }
             })
             .catch(err => {
+                dispatch(reloadAuthToken(authToken))
+                console.log("EXPANDEDLISTINGHOST: Failed to retrieve listing details, redirecting to home. Error: " + err)
                 showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
-                console.log("EXPANDEDLISTINGHOST: Failed to retrieve listing details, redirecting to home. Response below.")
-                console.log(err)
                 navigate("/")
                 return
             })
@@ -168,6 +193,7 @@ function ExpandedListingHost() {
 
         server.post("/uploadListingImage", formData, { headers: config, transformRequest: formData => formData })
             .then(res => {
+                dispatch(reloadAuthToken(authToken))
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Success", "Image uploaded successfully", 2500, true, "success")
                     setIsUploading(false)
@@ -182,8 +208,9 @@ function ExpandedListingHost() {
                 }
             })
             .catch(err => {
+                dispatch(reloadAuthToken(authToken))
+                console.log("Failed to upload image; error: " + err)
                 showToast("Error", "Failed to upload image", 5000, true, "error")
-                console.log(err)
                 setIsUploading(false)
                 return
             })
@@ -203,6 +230,8 @@ function ExpandedListingHost() {
 
         server.post("/updateListing", data)
             .then(res => {
+                dispatch(reloadAuthToken(authToken));
+
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Success", "Changes saved successfully", 2500, true, "success")
                     setChangesMade(false)
@@ -213,6 +242,11 @@ function ExpandedListingHost() {
                     console.log(res.data)
                     return
                 }
+            })
+            .catch(err => {
+                dispatch(reloadAuthToken(authToken))
+                console.log("Failed to update listing; error: " + err);
+                showToast("Something went wrong", "Failed to update the listing. Try again later.", 1500, true, "error")
             })
     }
 

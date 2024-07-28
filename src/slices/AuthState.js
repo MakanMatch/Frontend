@@ -27,7 +27,6 @@ const authSlice = createSlice({
         logout: (state) => {
             state.authToken = null;
             state.user = null;
-            state.loaded = false;
             state.error = null;
         },
     },
@@ -42,16 +41,28 @@ export const fetchUser = () => async (dispatch) => {
         const response = await server.get('/cdn/myAccount', {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('jwt')}`,
-            },
+                Authorization: `Bearer ${localStorage.getItem('jwt')}`
+            }
         });
         dispatch(setUser(response.data));
         dispatch(setLoading(true));
     } catch (err) {
         console.log('Error fetching user:', err);
         dispatch(setError(err.message));
-        dispatch(setLoading(true));
+        // dispatch(setLoading(true));
     }
 };
+
+export const reloadAuthToken = (authToken) => async (dispatch) => {
+    if (localStorage.getItem('tokenRefreshed') == 'true') {
+        console.log("Token refreshed.");
+        dispatch(changeAuthToken(localStorage.getItem('jwt') || null));
+        localStorage.removeItem('tokenRefreshed');
+    } else if (authToken && (localStorage.getItem('jwt') == undefined || localStorage.getItem('jwt') == null)) {
+        console.log("Token detected to be missing/expired; logging out from redux state.")
+        dispatch(logout());
+        return;
+    }
+}
 
 export default authSlice.reducer;

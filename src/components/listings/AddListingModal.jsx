@@ -2,17 +2,18 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from "react";
-import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
-import configureShowToast from "../../components/showToast";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Switch, useToast } from "@chakra-ui/react";
+import { useDispatch, useSelector } from "react-redux";
+import { reloadAuthToken } from "../../slices/AuthState";
+import { useNavigate } from "react-router-dom";
+import server from "../../networking";
 
-const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
-    const toast = useToast();
-    const showToast = configureShowToast(toast);
+const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
     const today = new Date();
     today.setDate(today.getDate() + 1);
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const toast = useToast();
 
     const [title, setTitle] = useState("");
     const [shortDescription, setShortDescription] = useState("");
@@ -20,12 +21,17 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     const [portionPrice, setPortionPrice] = useState(1);
     const [totalSlots, setTotalSlots] = useState(1);
     const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
+    const [isChecked, setIsChecked] = useState(false);
     const [images, setImages] = useState([]);
+    const authToken = useSelector((state) => state.auth.authToken);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
     const [modalError, setModalError] = useState(false);
     const [validListing, setValidListing] = useState(false);
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const cancelRef = useRef();
     const {
@@ -33,6 +39,17 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         onOpen: onAlertOpen,
         onClose: onAlertClose,
     } = useDisclosure();
+
+    function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
+        toast({
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: isClosable
+        });
+    }
 
     function setDefaultState() {
         setIsSubmitting(false);
@@ -46,80 +63,103 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         setTotalSlots(1);
         setDatetime(today.toISOString().slice(0, 16));
         setImages([]);
+        setIsChecked(false);
     }
 
     function checkDate(date) {
         if (new Date(date) > new Date()) {
             setDatetime(date);
         } else {
-            toast.closeAll();
-            showToast(
+            displayToast(
                 "Invalid Date/Time",
                 "Please select a date-time that's greater than today's date-time",
                 "error",
-                3000
+                3000,
+                true
             );
             return;
         }
     }
 
     const handleSubmitListing = async () => {
+        closeSidebar();
         setIsSubmitting(true);
         const formData = new FormData();
-        try {
-            formData.append("title", title);
-            formData.append("shortDescription", shortDescription);
-            formData.append("longDescription", longDescription);
-            formData.append("portionPrice", portionPrice);
-            formData.append("totalSlots", totalSlots);
-            formData.append("datetime", datetime);
-            images.forEach((image, index) => {
-                formData.append("images", image);
-            });
+        formData.append("title", title);
+        formData.append("shortDescription", shortDescription);
+        formData.append("longDescription", longDescription);
+        formData.append("portionPrice", portionPrice);
+        formData.append("totalSlots", totalSlots);
+        formData.append("datetime", new Date(datetime).toISOString());
+        formData.append("publishInstantly", isChecked);
+        images.forEach((image) => {
+            formData.append("images", image);
+        });
 
+        try {
             const addListingResponse = await server.post("/listings/addListing", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
-                transformRequest: formData => formData,
-                timeout: 10000,
-            }
-            )
-            if (addListingResponse.status === 200) {
-                fetchListings();
-                setTimeout(() => {
-                    onClose();
-                    setDefaultState();
-                    setIsSubmitting(false);
-                    toast.closeAll();
-                    showToast(
-                        "Listing published successfully!",
-                        "We'll notify you when all slots have been filled.",
-                        "success",
-                        4000
-                    );
-                }, 1500);
+                transformRequest: formData => formData
+            })
+            dispatch(reloadAuthToken(authToken));
+            if (addListingResponse.status == 200) {
+                setDefaultState();
+                setIsSubmitting(false);
+                if (addListingResponse.data.listingDetails.published === false) {
+                    navigate("/expandedListingHost", {
+                        state: {
+                            listingID: addListingResponse.data.listingDetails.listingID
+                        } 
+                    });
+                    displayToast("Listing created successfully", "You can manage your listing here", "success", 3000, true);
+                } else {
+                    localStorage.setItem("published", "true");
+                    window.location.href = "/";
+                }
             }
         } catch (error) {
-            toast.closeAll();
-            if (error.code === "ECONNABORTED") {
-                showToast(
-                    "Request timed out",
-                    "Please try again later.",
-                    "error",
-                    2500
-                );
-                return;
+            dispatch(reloadAuthToken(authToken));
+            setIsSubmitting(false);
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to add listing; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    displayToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        "info",
+                        3500,
+                        true
+                    )
+                } else {
+                    onClose();
+                    setDefaultState();
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to add listing. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
             } else {
-                showToast(
-                    "Error submitting listing",
-                    "Please try again later.",
+                onClose();
+                setDefaultState();
+                console.log("Unknown error occurred when adding listing; error: " + error)
+                displayToast(
+                    "Something went wrong",
+                    "Failed to add listing. Please try again",
                     "error",
-                    2500
-                );
-                return;
+                    3500,
+                    true
+                )
             }
         }
+    };
+
+    const handlePublishToggle = () => {
+        setIsChecked(!isChecked);
     };
 
     const handleFileChange = (event) => {
@@ -148,12 +188,12 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
         } else {
             setFileFormatError("Invalid file format. Only JPEG, JPG, PNG, and SVG are allowed.");
         }
-    };    
+    };
 
     const handleRemoveImage = (index) => {
         setImages((prevImages) => prevImages.filter((image, imageIndex) => imageIndex !== index));
     };
-    
+
 
     const handleCancelClick = () => {
         onAlertOpen();
@@ -175,11 +215,12 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
             setModalError(true);
             setValidListing(false);
             if (images.length > 5) {
-                showToast(
+                displayToast(
                     "That's too many images!",
                     "You can upload a maximum of 5 images",
                     "error",
-                    2500
+                    2500,
+                    true
                 );
             }
         } else {
@@ -191,32 +232,31 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
     useEffect(() => {
         if (portionPrice > 10) {
             setPortionPrice(10);
-            toast.closeAll();
-            showToast(
+            displayToast(
                 "Woah, that's too expensive!",
                 "Fee cannot exceed $10",
                 "error",
-                2500
+                2500,
+                true
             );
         }
     }, [portionPrice]);
 
     useEffect(() => {
-        if (totalSlots > 5) {
-            setTotalSlots(5);
-            toast.closeAll();
-            showToast(
-                "Too many Guests!",
-                "You can invite a maximum of 5 Guests",
+        if (totalSlots > 10) {
+            setTotalSlots(10);
+            displayToast(
+                "Too many Slots!",
+                "You can prepare for a maximum of 10 slots",
                 "error",
-                2500
+                2500,
+                true
             );
         }
     }, [totalSlots]);
     return (
         <div>
             <Modal
-                blockScrollOnMount={true}
                 isOpen={isOpen}
                 onClose={onClose}
                 size={"lg"}
@@ -227,7 +267,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                 <ModalOverlay
                     backdropFilter="brightness(1)"
                 />
-                <ModalContent overflow={"hidden"} maxH={"90vh"}>
+                <ModalContent>
                     <ModalHeader>Host your next meal!</ModalHeader>
                     <ModalBody>
                         <FormControl mb={5} isRequired>
@@ -303,13 +343,13 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                             </FormControl>
 
                             <FormControl flex="1" ml={2} isRequired>
-                                <FormLabel>No. of Guests (Max: 5)</FormLabel>
+                                <FormLabel>No. of Slots (Max: 10)</FormLabel>
                                 <NumberInput
                                     step={1}
                                     defaultValue={1}
                                     value={totalSlots}
                                     min={1}
-                                    max={5}
+                                    max={10}
                                     mb={4}
                                     onChange={(valueAsString, valueAsNumber) =>
                                         setTotalSlots(valueAsNumber || 1)
@@ -337,7 +377,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                             />
                         </FormControl>
 
-                        <FormControl isRequired>
+                        <FormControl mb={5} isRequired>
                             <FormLabel>Upload photos of your dish (Max: 5 images)</FormLabel>
                             <Input
                                 type="file"
@@ -360,13 +400,19 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings }) => {
                                                     {image.name}
                                                 </Text>
                                                 <Button onClick={() => handleRemoveImage(index)}>
-                                                    <CloseIcon boxSize={3}/>
+                                                    <CloseIcon boxSize={3} />
                                                 </Button>
                                             </Card>
                                         ))}
                                     </>
                                 )}
                             </Box>
+                        </FormControl>
+                        <FormControl display='flex' alignItems='center'>
+                            <FormLabel mb='0'>
+                                Publish instantly?
+                            </FormLabel>
+                            <Switch isChecked={isChecked} onChange={handlePublishToggle} />
                         </FormControl>
                     </ModalBody>
 

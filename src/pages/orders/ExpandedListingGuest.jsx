@@ -1,10 +1,12 @@
 import { Avatar, Box, Center, Divider, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Spinner, Stack, StackDivider, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import server from '../../networking'
 import configureShowToast from '../../components/showToast'
 import placeholderImage from '../../assets/placeholderImage.svg'
 import ReserveCard from '../../components/orders/ReserveCard'
+import { useDispatch, useSelector } from 'react-redux'
+import { reloadAuthToken } from '../../slices/AuthState'
 
 function ExpandedListingGuest() {
     const navigate = useNavigate()
@@ -12,7 +14,8 @@ function ExpandedListingGuest() {
     const showToast = configureShowToast(toast)
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams] = useSearchParams()
+    const { state } = useLocation();
     const [isLargerThan700] = useMediaQuery('(min-width: 700px)')
     const [loading, setLoading] = useState(true)
     const [listingData, setListingData] = useState({
@@ -36,25 +39,42 @@ function ExpandedListingGuest() {
         foodRating: 0.0,
         hygieneGrade: 0.0
     })
+    const { user, loaded, error, authToken } = useSelector(state => state.auth)
+    const dispatch = useDispatch();
 
     const [listingID, setListingID] = useState(searchParams.get("id"))
     const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
 
     useEffect(() => {
-        if (!listingID) {
-            navigate("/")
-            return
+        if (loaded == true) {
+            if (state == null || !state.listingID) {
+                if (!listingID) {
+                    console.log("No listing ID provided to render expanded listing view.")
+                    showToast("Something went wrong", "Insufficient information provided.", 1500, true, "error")
+                    navigate("/")
+                    return
+                }
+            } else {
+                setListingID(state.listingID)
+            }
+
+            fetchListingDetails(listingID || state.listingID)
         }
-        fetchListingDetails()
-    }, [])
+    }, [loaded])
 
     useEffect(() => {
-        if (!listingData.hostID) {
-            return
-        } else {
-            fetchHostData()
+        if (listingData.hostID) {
+            if (user && listingData.hostID == user.userID) {
+                console.log("Logged in user is host of listing; redirecting to host view...")
+                navigate(`/expandedListingHost`, { state: {
+                    listingID: listingData.listingID
+                }})
+                return
+            } else {
+                fetchHostData()
+            }
         }
-    }, [listingData])
+    }, [listingData, user])
 
     const processListingData = (data) => {
         let datetime = new Date(data.datetime)
@@ -64,8 +84,17 @@ function ExpandedListingGuest() {
         data.images = data.images.split("|")
 
         var slotsTaken = 0;
+        var includesUser = false;
         if (data.guests) {
-            data.guests.forEach(guest => { slotsTaken++; })
+            data.guests.forEach((guest) => {
+                if (user && guest.userID == user.userID) {
+                    includesUser = true;
+                }
+                slotsTaken += guest.Reservation.portions
+            })
+        }
+        if (includesUser) {
+            data.alreadyReserved = true;
         }
 
         data.slotsTaken = slotsTaken;
@@ -78,12 +107,13 @@ function ExpandedListingGuest() {
         return { userID, username, foodRating, hygieneGrade }
     }
 
-    const fetchListingDetails = () => {
-        server.get(`/cdn/getListing?id=${listingID}&includeReservations=true`)
+    const fetchListingDetails = (id) => {
+        server.get(`/cdn/getListing?id=${id}&includeReservations=true`)
             .then(response => {
+                dispatch(reloadAuthToken(authToken));
                 if (response.status == 200) {
                     const processedData = processListingData(response.data)
-                    if (processedData.published == false) { console.log("Attempt to access unpublished listing blocked; redirecting..."); navigate("/"); return; }
+                    if (processedData.published == false && processedData.hostID != user.userID) { console.log("Attempt to access unpublished listing blocked; redirecting..."); navigate("/"); return; }
                     setListingData(processedData)
                     return
                 } else if (response.status == 404) {
@@ -99,6 +129,7 @@ function ExpandedListingGuest() {
                 }
             })
             .catch(err => {
+                dispatch(reloadAuthToken(authToken));
                 showToast("Error", "Failed to retrieve listing details", 5000, true, "error")
                 console.log("EXPANDEDLISTINGGUEST: Failed to retrieve listing details, redirecting to home. Response below.")
                 console.log(err)
@@ -110,6 +141,7 @@ function ExpandedListingGuest() {
     const fetchHostData = () => {
         server.get(`/cdn/accountInfo?userID=${listingData.hostID}`)
             .then(response => {
+                dispatch(reloadAuthToken(authToken));
                 if (response.status == 200) {
                     const processedData = processHostData(response.data)
                     setHostData(processedData)
@@ -125,6 +157,7 @@ function ExpandedListingGuest() {
                 }
             })
             .catch(err => {
+                dispatch(reloadAuthToken(authToken));
                 console.log("EXPANDEDLISTINGGUEST: Failed to retrieve host details, redirecting to home. Error: " + err)
                 navigate("/")
                 showToast("Something went wrong", "Couldn't retrieve required information. Try again later.", 5000, true, "error")

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux';
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Flex, Text, Image, Spacer, useToast, Heading, Tooltip } from '@chakra-ui/react';
+import { Button, Box, Flex, Text, Spacer, useToast, Heading, Tooltip, Spinner, Avatar } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
 import { useDisclosure } from '@chakra-ui/react';
+import { reloadAuthToken } from '../../slices/AuthState';
 import {
     Modal,
     ModalOverlay,
@@ -17,32 +19,25 @@ function Reviews() {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
+    const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
     const [stateRefresh, refreshState] = useState(false);
-    const { isOpen, onOpen, onClose } = useDisclosure();   
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const location = useLocation();
     const [searchParams] = useSearchParams();
-    var { userID = '', hostID = '' } = {}
-    if (location.state.userID && location.state.hostID) {
-        userID = location.state.userID;
-        hostID = location.state.hostID;
-    } else if (searchParams.has('userID') && searchParams.has('hostID')) {
-        userID = searchParams.get('userID');
-        hostID = searchParams.get('hostID');
-    } else {
-        showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
-        navigate('/');
-    }
-    
-    
+    const [hostID, setHostID] = useState("");
+    const dispatch = useDispatch();
+    const [initialUserLoginToastIgnore, setInitialUserLoginToastIgnore] = useState(true);
+
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
         if (hygieneGrade >= 4) return 'teal';
         if (hygieneGrade >= 3) return 'yellow';
         if (hygieneGrade >= 2) return 'orange';
-        return 'red';
+        if (hygieneGrade >= 1) return 'red';
+        return 'gray';
     };
 
     const handleGoBack = () => {
@@ -58,8 +53,10 @@ function Reviews() {
     const fetchHostInfo = async () => {
         try {
             const response = await server.get(`/cdn/accountInfo?userID=${hostID}`);
+            dispatch(reloadAuthToken(authToken))
             if (!response.data) {
                 showToast("No host information found", "Please try again later.", 3000, true, "info")
+                navigate('/')
                 return
             } else {
                 setHostName(response.data.username);
@@ -67,61 +64,66 @@ function Reviews() {
                 setHostHygieneGrade(response.data.hygieneGrade);
             }
         } catch (error) {
-            toast.closeAll();
+            dispatch(reloadAuthToken(authToken))
             showToast("Error fetching host information", "Please try again later", 3000, true, "error");
             console.error("Error fetching host info:", error);
+            navigate('/')
             return
         }
     };
 
-    const fetchGuestInfo = async () => {
-        try {
-            const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
-            if (!response.data || response.status !== 200) {
-                showToast("No guest information found", "Directing you back to homepage", 3000, true, "info");
-                setTimeout(() => {
-                    navigate("/")
-                }, 3000);
-                return
+    useEffect(() => {
+        if (loaded == true) {
+            setInitialUserLoginToastIgnore(false);
+
+            if (location.state.hostID) {
+                setHostID(location.state.hostID);
+            } else if (searchParams.has('hostID')) {
+                setHostID(searchParams.get('hostID'));
+            } else {
+                showToast("Error", "Provide a host's information to see their reviews.", 3000, true, "error");
+                navigate('/');
             }
-        } catch (error) {
-            toast.closeAll();
-            showToast("Error fetching guest information", "Directing you back to homepage", 3000, true, "error");
-            console.error("Error fetching guest info:", error);
-            setTimeout(() => {
-                navigate("/")
-            }, 3000);
-            return
         }
-    
-    }
+    }, [loaded])
 
     useEffect(() => {
-        fetchHostInfo();
-        fetchGuestInfo();
-    }, [stateRefresh]);
+        if (!user && !initialUserLoginToastIgnore) {
+            showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (hostID) {
+            fetchHostInfo();
+        }
+    }, [hostID, stateRefresh]);
+
+    if (!loaded || !hostID) {
+        return <Spinner />
+    }
 
     return (
         <Box p={2} position="relative" width="100%">
             <Button
                 onClick={handleGoBack}
                 position='absolute'
-                top={{ md:10, base: 10}}
-                left={{ md: 4, base: 0}}
+                top={{ md: 10, base: 10 }}
+                left={{ md: 4, base: 0 }}
                 zIndex={10}
             >
                 <ArrowBackIcon />
             </Button>
             <Flex direction={{ base: 'column', md: 'row' }} wrap='wrap' align='center' justify='center' >
-                <Spacer display={{ base: 'none', md: 'block' }}  minWidth="50px" maxWidth="50px"/>
+                <Spacer display={{ base: 'none', md: 'block' }} minWidth="50px" maxWidth="50px" />
                 <Box>
                     <Flex direction={{ base: 'column', md: 'row' }} align="center" mb={4} gap={3}>
                         <Spacer display={{ base: 'none', md: 'block' }} />
-                        <Image
-                            borderRadius='full'
+                        <Avatar
+                            name={hostName}
                             boxSize='100px'
-                            src='https://bit.ly/dan-abramov'
-                            alt='Dan Abramov'
+                            // src='https://bit.ly/dan-abramov' // Change this to the actual host image
+                            alt={hostName}
                             onClick={onOpen}
                             cursor="pointer"
                             ml={{ base: 0, md: 4 }}
@@ -133,18 +135,19 @@ function Reviews() {
                         <Flex gap={3}>
                             <Spacer display={{ base: 'none', md: 'block' }} />
                             <Tooltip label={`Hygiene grade for ${hostName}`} aria-label="Hygiene grade tooltip">
-                            <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
-                                {hostHygieneGrade}
-                            </Button>
+                                <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
+                                    {hostHygieneGrade}
+                                </Button>
                             </Tooltip>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            <SubmitReviews 
-                                hostName={hostName}
-                                guestID={userID}
-                                hostID={hostID}
-                                refreshState={refreshState}
-                                stateRefresh={stateRefresh}
-                            />
+                            {user && user.userID && user.userID != hostID && (
+                                <SubmitReviews
+                                    hostName={hostName}
+                                    hostID={hostID}
+                                    refreshState={refreshState}
+                                    stateRefresh={stateRefresh}
+                                />
+                            )}
                         </Flex>
                     </Flex>
                 </Box>
@@ -161,20 +164,20 @@ function Reviews() {
                 </Box>
             </Flex>
             <Heading mt={5} size="lg"><Text>Reviews</Text></Heading>
-            <SortReviews 
+            <SortReviews
                 hostID={hostID}
-                guestID={userID}
+                refreshState={refreshState}
                 stateRefresh={stateRefresh}
             />
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
                 <ModalContent maxW="max-content" background="transparent" boxShadow="none">
-                        <Image
-                            boxSize='500px'
-                            borderRadius='full'
-                            src='https://bit.ly/dan-abramov'
-                            alt='Dan Abramov'
-                        />
+                    <Avatar
+                        name={hostName}
+                        boxSize={{ base: '40vw', md: '30vw' }}  // Responsive size for different screen sizes
+                        // src='https://bit.ly/dan-abramov' // Uncomment and use actual host image URL
+                        alt={hostName}
+                    />
                 </ModalContent>
             </Modal>
         </Box>

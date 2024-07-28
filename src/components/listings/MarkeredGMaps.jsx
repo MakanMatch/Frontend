@@ -1,20 +1,34 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "@googlemaps/js-api-loader";
-import { useToast } from "@chakra-ui/react";
-import configureShowToast from "../../components/showToast";
+import { Skeleton, useToast } from "@chakra-ui/react";
 
 const MarkeredGMaps = ({
     coordinatesList,
     listings,
     isSmallerThan1095
 }) => {
-    const toast = useToast();
-    const showToast = configureShowToast(toast);
     const navigate = useNavigate();
     const mapRef = useRef(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const toast = useToast();
+
+    function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
+        toast({
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: isClosable
+        });
+    }
+
+    function getImageLink(listingID, imageName) {
+        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
+    }
 
     useEffect(() => {
         const InitializeMap = async (validCoordinates) => {
@@ -36,6 +50,7 @@ const MarkeredGMaps = ({
                 });
 
                 if (coordinatesList.length === 0 || validCoordinates.length === 0) {
+                    setMapLoaded(true); // Mark map as loaded if no valid coordinates
                     return map;
                 } else {
                     validCoordinates.forEach(({ lat, lng }, index) => {
@@ -45,12 +60,27 @@ const MarkeredGMaps = ({
                         });
                         marker.addListener("click", () => {
                             const listing = listings[index];
-                            navigate(`/targetListing?listingID=${listing.listingID}`);
+                            navigate("/targetListing", {
+                                state: {
+                                    listingID: listing.listingID,
+                                    hostID: listing.hostID,
+                                    images: listing.images.map((image) => getImageLink(listing.listingID, image)),
+                                    title: listing.title,
+                                    shortDescription: listing.shortDescription,
+                                    approxAddress: listing.address,
+                                    portionPrice: listing.portionPrice,
+                                    totalSlots: listing.totalSlots,
+                                    latitude: lat,
+                                    longitude: lng,
+                                },
+                            });
                         });
                     });
+                    setMapLoaded(true);
                 }
-            } else return;
+            }
         };
+        
         try {
             const validCoordinates = coordinatesList.filter(
                 ({ lat, lng }) =>
@@ -58,20 +88,24 @@ const MarkeredGMaps = ({
             );
             InitializeMap(validCoordinates);
         } catch (error) {
-            showToast("An error occured", "Failed to render Google Maps", 3000, false, "error");
+            displayToast("An error occurred", "Failed to render Google Maps", "error", 3000, false);
             console.error(error);
         }
-    }, [coordinatesList]);
+    }, [coordinatesList, listings, displayToast]);
 
     return (
-        <div
-            ref={mapRef}
-            style={{
-                height: isSmallerThan1095 ? "45vh" : "83vh",
-                width: "100%",
-                borderRadius: "10px",
-            }}
-        />
+        <>
+            <Skeleton isLoaded={mapLoaded} fadeDuration={1} style={{ borderRadius: "10px" }}>
+                <div
+                    ref={mapRef}
+                    style={{
+                        height: isSmallerThan1095 ? "45vh" : "83vh",
+                        width: "100%",
+                        borderRadius: "10px"
+                    }}
+                />
+            </Skeleton>
+        </>
     );
 };
 
