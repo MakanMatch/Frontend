@@ -86,6 +86,7 @@ function ChatUi() {
                 }
             } else if (receivedMessage.action === "chat_history") {
                 setMessages(receivedMessage.previousMessages);
+				setStatus(receivedMessage.currentStatus);
             } else if (receivedMessage.action === "send") {
                 setMessages((prevMessages) => [
                     ...prevMessages,
@@ -106,15 +107,19 @@ function ChatUi() {
                     )
                 );
             } else if (receivedMessage.action === "chat_partner_offline") {
-                setStatus((prevStatus) => ({
-                    ...prevStatus,
-                    [receivedMessage.chatID]: false,
-                }));
+				console.log(`Received chatID ${receivedMessage.chatID}`)
+				console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
+				if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
+                    console.log("Chat partner is offline")
+                	setStatus(false);
+				}
             } else if (receivedMessage.action === "chat_partner_online") {
-                setStatus((prevStatus) => ({
-                    ...prevStatus,
-                    [receivedMessage.chatID]: true,
-                }));
+				console.log(`Received chatID ${receivedMessage.chatID}`)
+				console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
+				if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
+                    console.log("Chat partner is online")
+                	setStatus(true);
+				}
             } else {
                 showToast("Something went wrong", "Unknown response received from server.", 1500, true, "error")
             }
@@ -170,7 +175,15 @@ function ChatUi() {
         }
     }, [loaded]);
 
-
+	useEffect(() => {
+		return () => {
+			try {
+				ws.current.close();
+			} catch (err) {
+				console.log("Couldn't close socket connection; error: ", err)
+			}
+		}
+	}, [])
 
     useEffect(() => {
         scrollToBottom();
@@ -295,13 +308,24 @@ function ChatUi() {
     };
 
     const toggleChatVisibility = () => {
-        setIsChatVisible((prev) => !prev);
+        setIsChatVisible()
     };
 
     const handleChatClick = (clickedChatID) => {
-        setChatSelected(clickedChatID);
+		console.log("Clicked: ", clickedChatID)
+        setChatSelected((prev) => {
+			if (prev == null) {
+				localStorage.setItem("selectedChatID", clickedChatID)
+				return clickedChatID
+			} else if (prev != clickedChatID) {
+				localStorage.setItem("selectedChatID", clickedChatID)
+				return clickedChatID
+			} else {
+				localStorage.removeItem("selectedChatID")
+				return null
+			}
+		});
         fetchChatHistory(clickedChatID);
-        toggleChatVisibility();
     };
     return (
         <Flex>
@@ -311,7 +335,7 @@ function ChatUi() {
                 chatPartnerUsernames={chatPartnerUsernames}
             />
 
-            {isChatVisible ? (
+            {chatSelected != null ? (
                 <Center flexDirection="column" alignItems="center" p={5} flex="1">
                     <Box
                         bg="white"
@@ -347,10 +371,9 @@ function ChatUi() {
                                 fontSize="sm"
                                 mb={-8}
                                 textAlign={"left"}
-                                color={status[chatSelected] ? "green.500" : "gray.500"}
+                                color = {status ? "green.500" : "gray.300"}
                             >
-                                {status[chatSelected] ? "Online" : "Offline"}{" "}
-                                {/* Use chatSelected to get the current partner's status */}
+                                {status ? "Online" : "Offline"}
                             </Text>
                         </Box>
                     </Box>
