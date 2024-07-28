@@ -25,9 +25,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
 
     const { user, authToken, loaded } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
-
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     const handlePrevImage = () => {
         if (imageIndex === 0) {
