@@ -37,7 +37,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const toggleFavourite = async () => {
         if (!user || !authToken) {
             navigate('/auth/login');
-            displayToast("You're not logged in", "Please Login first", "info", 3000, false);
+            displayToast("You're not logged in", "Please login first to favourite a listing", "info", 3000, false);
             return;
         } else {
             const favouriteData = {
@@ -83,9 +83,11 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     }
 
     const proceedToExpandedListing = (id) => {
-        navigate("/expandedListingGuest", { state: {
-            listingID: id
-        }})
+        navigate("/expandedListingGuest", {
+            state: {
+                listingID: id
+            }
+        })
     }
 
     useEffect(() => {
@@ -199,10 +201,9 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             mb={5}
                         >
                             <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
-                            {user && user.userID !== hostID && (
-                                <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
-                                    {favourite ? "🩷" : "🤍"}
-                                </Text>)}
+                            <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
+                                {(!user || user.userID !== hostID) ? (favourite ? "🩷" : "🤍") : null}
+                            </Text>
                         </Box>
                         <Box className="ratingBox">
                             <Box display="flex" alignItems="center" mb={1}>
