@@ -103,8 +103,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                 },
                 transformRequest: formData => formData
             })
-            dispatch(reloadAuthToken(authToken))
-            onClose();
+            dispatch(reloadAuthToken(authToken));
             if (addListingResponse.status == 200) {
                 setDefaultState();
                 setIsSubmitting(false);
@@ -122,7 +121,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
-            onClose();
             setDefaultState();
             setIsSubmitting(false);
             if (error.response && error.response.data && typeof error.response.data == "string") {
@@ -136,6 +134,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                         true
                     )
                 } else {
+                    onClose();
                     displayToast(
                         "Something went wrong",
                         "Failed to add listing. Please try again",
@@ -145,6 +144,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                     )
                 }
             } else {
+                onClose();
                 console.log("Unknown error occurred when adding listing; error: " + error)
                 displayToast(
                     "Something went wrong",
@@ -243,10 +243,10 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
     useEffect(() => {
         if (totalSlots > 10) {
-            setTotalSlots(5);
+            setTotalSlots(10);
             displayToast(
                 "Too many Slots!",
-                "You can prepare for a maximum of 5 slots",
+                "You can prepare for a maximum of 10 slots",
                 "error",
                 2500,
                 true
