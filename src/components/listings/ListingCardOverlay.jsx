@@ -24,6 +24,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const [ratingsLoaded, setRatingsLoaded] = useState(false);
 
     const { user, authToken, loaded } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -47,7 +48,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const toggleFavourite = async () => {
         if (!user || !authToken) {
             navigate('/auth/login');
-            displayToast("You're not logged in", "Please login first", "info", 3000, true);
+            displayToast("You're not logged in", "Please login first to favourite a listing", "info", 3000, false);
             return;
         } else {
             const favouriteData = {
@@ -104,55 +105,47 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             return;
         } else {
             try {
-                const response = await server.get(`/cdn/accountInfo?userID=${user.userID}`);
-                dispatch(reloadAuthToken(authToken))
-                if (response.status == 200) {
-                    const guestFavCuisine = response.data.favCuisine || "";
-                    if (guestFavCuisine.includes(listingID)) {
-                        setFavourite(true);
-                    } else {
-                        setFavourite(false);
-                    }
+                const fetchFavouritedListingID = await server.get(`/listings/getFavouritedListingsID`);
+                dispatch(reloadAuthToken(authToken))    
+                if (fetchFavouritedListingID.status == 200 && fetchFavouritedListingID.data) {
+                    fetchFavouritedListingID.data.forEach((favListingID) => {
+                        if (favListingID === listingID) {
+                            setFavourite(true);
+                        }
+                    });
+                } else {
+                    setFavourite(false);
+                }
+                if (fetchFavouritedListingID.status != 200) {
+                    displayToast("Error", "Failed to fetch favourite state", "error", 3000, false);
+                    console.log("Non-200 status code response received when attempting to retrieve favourite listings; response: ", fetchFavouritedListingID.data);
                 }
             } catch (error) {
                 dispatch(reloadAuthToken(authToken))
-                if (error.response && error.response.data && typeof error.response.data == "string") {
-                    console.log("Failed to fetch favourites state; response: " + error.response)
+                if (error.response && error.response.data) {
                     if (error.response.data.startsWith("UERROR")) {
-                        displayToast(
-                            "Uh-oh!",
-                            error.response.data.substring("UERROR: ".length),
-                            "info",
-                            3500,
-                            true
-                        )
+                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3500, true, "error")
+                        console.log("User error occurred in retrieving favourite listings; error: ", err.response.data);
+                        setFavourite(false);
                     } else {
-                        displayToast(
-                            "Something went wrong",
-                            "Failed to fetch favourites state. Please try again",
-                            "error",
-                            3500,
-                            true
-                        )
+                        displayToast("Error", "Failed to fetch favourite state", "error", 3000, false);
+                        console.log("Unexpected error in retrieving favourited listings; error: ", error.response.data);
+                        setFavourite(false);
                     }
-                } else {
-                    console.log("Unknown error occurred when fetching favourites state; error: " + error)
-                    displayToast(
-                        "Something went wrong",
-                        "Failed to fetch favourites state. Please try again",
-                        "error",
-                        3500,
-                        true
-                    )
                 }
+                console.log("Unexpected error in retrieving favourited listings; error: ", error.message);
+                displayToast("Error", "Failed to fetch favourite state", "error", 3000, false);
+                setFavourite(false);
             }
         }
     }
 
     const proceedToExpandedListing = (id) => {
-        navigate("/expandedListingGuest", { state: {
-            listingID: id
-        }})
+        navigate("/expandedListingGuest", {
+            state: {
+                listingID: id
+            }
+        })
     }
 
     const fetchRatingProgress = async () => {
@@ -301,7 +294,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             zIndex="10"
                             backgroundColor="white"
                             cursor="pointer"
-                            onClick={() => navigate("/")}>
+                            onClick={() => navigate(-1)}>
                             <ArrowBackIcon height="50%" />
                         </Text>
                     </Box>

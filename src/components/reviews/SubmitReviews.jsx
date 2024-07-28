@@ -104,6 +104,8 @@ const SubmitReviews = ({
                 showToast("Review submitted successfully", "", 3000, true, "success")
                 setIsSubmitting(false);
                 setComments('');
+                setFoodRating(1);
+                setHygieneRating(1);
                 setImages([]);
                 onClose();
                 refreshState(!stateRefresh)
