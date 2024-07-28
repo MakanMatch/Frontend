@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Input, Text, Center, Flex, VStack, Spacer, IconButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Avatar, useToast } from "@chakra-ui/react";
+import { Box, Input, Text, Center, Flex, VStack, Spacer, IconButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Avatar, useToast, Spinner } from "@chakra-ui/react";
 import { FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatHistory from "../../components/chat/ChatHistory";
@@ -18,11 +18,9 @@ function ChatUi() {
     const [replyTo, setReplyTo] = useState(null);
     const [editMessageId, setEditMessageId] = useState(null);
     const [editMessageContent, setEditMessageContent] = useState("");
-    const [chatID, setChatID] = useState(null);
     const [chatHistory, setChatHistory] = useState([]); // Array of chat IDs
     const [chatPartnerUsernames, setChatPartnerUsernames] = useState({}); // Object to map chat ID to username
     const [chatSelected, setChatSelected] = useState(null);
-    const [isChatVisible, setIsChatVisible] = useState(false);
     const [status, setStatus] = useState(false);
     const chatBottomRef = useRef(null);
     const toast = useToast();
@@ -65,8 +63,17 @@ function ChatUi() {
                 }
             }
 
+			if (receivedMessage.event && receivedMessage.event == "error") {
+				console.log("Error message from server: " + receivedMessage.message)
+				if (typeof receivedMessage.message == "string" && receivedMessage.message.startsWith("UERROR")) {
+					showToast("Something went wrong", receivedMessage.message.substring("UERROR: ".length), 1500, true, "error")
+				} else {
+					showToast("Something went wrong", "An error occurred. Try refreshing.", 1500, true, "error")
+				}
+				return;
+			}
+
             if (receivedMessage.action === "chat_id") {
-                setChatID(receivedMessage.chatID);
                 setChatHistory((prevChatHistory) => {
                     if (!prevChatHistory.includes(receivedMessage.chatID)) {
                         return [...prevChatHistory, receivedMessage.chatID];
@@ -126,14 +133,14 @@ function ChatUi() {
         };
 
         ws.current.onerror = (error) => {
-            showToast("Something went wrong", "Your connection was interrupted.", 1500, true)
+            showToast("Something went wrong", "Your connection was interrupted. Try refreshing.", 1500, true)
 			console.log("WebSocket error occurred: " + error)
         };
 
         ws.current.onclose = () => {
             localStorage.removeItem("wsConnected")
             console.log("Disconnected from WebSocket server");
-			showToast("Something went wrong", "Your connection was interrupted.", 1500, true, "error")
+			showToast("Something went wrong", "Your connection was interrupted. Try refreshing.", 1500, true, "error")
         };
     }
 
@@ -168,7 +175,6 @@ function ChatUi() {
                 return;
             }
 
-            console.log("Connected:", localStorage.getItem("wsConnected"))
             if (localStorage.getItem("wsConnected") !== "true") {
                 setupWS();
             }
@@ -307,10 +313,6 @@ function ChatUi() {
         return currentDate !== previousDate;
     };
 
-    const toggleChatVisibility = () => {
-        setIsChatVisible()
-    };
-
     const handleChatClick = (clickedChatID) => {
 		console.log("Clicked: ", clickedChatID)
         setChatSelected((prev) => {
@@ -327,6 +329,11 @@ function ChatUi() {
 		});
         fetchChatHistory(clickedChatID);
     };
+
+	if (!loaded || !user) {
+		return <Spinner />
+	}
+
     return (
         <Flex>
             <ChatHistory
