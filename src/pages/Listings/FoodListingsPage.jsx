@@ -35,11 +35,11 @@ const FoodListingsPage = () => {
 
     const fetchListings = async () => {
         try {
-            const response = await server.get("/cdn/listings");
+            const response = await server.get("/cdn/listings?includeHost=true");
             dispatch(reloadAuthToken(authToken));
             if (response.status === 200) {
                 setListings(response.data);
-            }
+            } else { console.log("Unexpected response received; response:", response.data); }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {

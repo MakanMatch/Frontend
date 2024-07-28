@@ -1,6 +1,6 @@
 import { Avatar, Box, Center, Divider, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Spinner, Stack, StackDivider, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import server from '../../networking'
 import configureShowToast from '../../components/showToast'
 import placeholderImage from '../../assets/placeholderImage.svg'
@@ -15,6 +15,7 @@ function ExpandedListingGuest() {
 
     const backendAPIURL = import.meta.env.VITE_BACKEND_URL
     const [searchParams] = useSearchParams()
+    const { state } = useLocation();
     const [isLargerThan700] = useMediaQuery('(min-width: 700px)')
     const [loading, setLoading] = useState(true)
     const [listingData, setListingData] = useState({
@@ -46,7 +47,7 @@ function ExpandedListingGuest() {
 
     useEffect(() => {
         if (loaded == true) {
-            if (!history.state.listingID) {
+            if (state == null || !state.listingID) {
                 if (!listingID) {
                     console.log("No listing ID provided to render expanded listing view.")
                     showToast("Something went wrong", "Insufficient information provided.", 1500, true, "error")
@@ -54,10 +55,10 @@ function ExpandedListingGuest() {
                     return
                 }
             } else {
-                setListingID(history.state.listingID)
+                setListingID(state.listingID)
             }
 
-            fetchListingDetails(listingID || history.state.listingID)
+            fetchListingDetails(listingID || state.listingID)
         }
     }, [loaded])
 
@@ -65,8 +66,9 @@ function ExpandedListingGuest() {
         if (listingData.hostID) {
             if (user && listingData.hostID == user.userID) {
                 console.log("Logged in user is host of listing; redirecting to host view...")
-                navigate(`/expandedListingHost`)
-                history.pushState({ listingID: listingData.listingID }, "")
+                navigate(`/expandedListingHost`, { state: {
+                    listingID: listingData.listingID
+                }})
                 return
             } else {
                 fetchHostData()
@@ -82,10 +84,17 @@ function ExpandedListingGuest() {
         data.images = data.images.split("|")
 
         var slotsTaken = 0;
+        var includesUser = false;
         if (data.guests) {
             data.guests.forEach((guest) => {
+                if (user && guest.userID == user.userID) {
+                    includesUser = true;
+                }
                 slotsTaken += guest.Reservation.portions
             })
+        }
+        if (includesUser) {
+            data.alreadyReserved = true;
         }
 
         data.slotsTaken = slotsTaken;

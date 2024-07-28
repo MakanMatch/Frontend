@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import StarRating from './StarRatings';
-import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast } from '@chakra-ui/react';
+import { Button, Box, Input, Flex, Card, Text, Image, Textarea, Spacer, useToast,Avatar } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 import { useDisclosure } from '@chakra-ui/react'
 import server from '../../networking'
@@ -21,13 +21,14 @@ import {
 } from '@chakra-ui/react'
 import configureShowToast from '../../components/showToast';
 import { useNavigate } from "react-router-dom"
+import { reloadAuthToken } from '../../slices/AuthState';
 
 
 const SubmitReviews = ({
     hostName,
     hostID,
     refreshState,
-    stateRefreshSubmit
+    stateRefresh
 }) => {
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -38,7 +39,8 @@ const SubmitReviews = ({
     const [fileFormatError, setFileFormatError] = useState("");
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { user, loaded } = useSelector((state) => state.auth);
+    const { user, loaded, authToken } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleFileChange = (event) => {
@@ -78,6 +80,11 @@ const SubmitReviews = ({
     };
 
     const handleSubmit = async () => {
+        if (!user) {
+            navigate("/auth/login");
+            showToast("Please log in", "You need to log in before submitting a review", 3000, true, "info");
+            return
+        }
         setIsSubmitting(true);
         const currentDate = new Date().toISOString();
         const formData = new FormData();
@@ -91,24 +98,28 @@ const SubmitReviews = ({
         formData.append('hostID', hostID);
 
         try {
-            await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
-                .then((res) => {
-                    if (res.data && res.data.startsWith("SUCCESS")) {
-                        showToast("Review submitted successfully", "", 3000, true, "success")
-                        console.log('Review submitted successfully!');
-                        setIsSubmitting(false);
-                        setComments('');
-                        setImages([]);
-                        onClose();
-                        refreshState(!stateRefreshSubmit)
-                    } else {
-                        showToast("Failed to submit review", "Please try again later", 3000, true, "error");
-                    }
-                })
+            const submitReview = await server.post('/submitReview', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData })
+            dispatch(reloadAuthToken(authToken))
+            if (submitReview.data && submitReview.data.startsWith("SUCCESS")) {
+                showToast("Review submitted successfully", "", 3000, true, "success")
+                setIsSubmitting(false);
+                setComments('');
+                setImages([]);
+                onClose();
+                refreshState(!stateRefresh)
+            } else {
+                showToast("Failed to submit review", "Please try again later", 3000, true, "error");
+            }
         } catch (error) {
-            setIsSubmitting(false);
-            showToast("Failed to submit review", "Please try again later", 3000, true, "error");
-            console.log('Failed to submit review:', error);
+            dispatch(reloadAuthToken(authToken))
+            if (error.response && error.response.data && error.response.data.startsWith("UERROR")) {
+                setIsSubmitting(false);
+                showToast("Something went wrong", error.response.data.substring("UERROR: ".length), 3000, true, "error");
+            } else {
+                setIsSubmitting(false);
+                showToast("Failed to submit review", "Please try again later", 3000, true, "error");
+                console.log('Failed to submit review:', error);
+            }
         }
     };
 
@@ -124,6 +135,8 @@ const SubmitReviews = ({
     const handleClose = () => {
         setComments('');
         setImages([]);
+        setFoodRating(1);
+        setHygieneRating(1);
         onClose();
         setFileFormatError("")
     };
@@ -139,11 +152,11 @@ const SubmitReviews = ({
                     <ModalCloseButton />
                     <ModalBody>
                         <Flex direction='column' align="center" mb={4}>
-                            <Image
+                            <Avatar
                                 borderRadius='full'
                                 boxSize='100px'
-                                src='https://bit.ly/dan-abramov'
-                                alt='Dan Abramov'
+                                name={hostName}
+                                alt={hostName}
                             />
                             <Text fontSize={{ base: '2xl', md: '3xl' }} textAlign='center' mt={{ base: 2, md: 0 }} ml={{ base: 0, md: 4 }}>
                                 {hostName}
@@ -152,13 +165,13 @@ const SubmitReviews = ({
                         <FormControl>
                             <Flex direction={{ base: 'column', md: 'row' }} align="center">
                                 <Flex direction='column'>
-                                <Text mt='8px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Food Rating</Text>
-                                <StarRating maxStars={5} initialRating={foodRating} onChange={setFoodRating} />
+                                    <Text mt='8px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Food Rating</Text>
+                                    <StarRating maxStars={5} initialRating={foodRating} onChange={setFoodRating} />
                                 </Flex>
                                 <Spacer display={{ base: 'none', md: 'block' }} />
                                 <Flex direction='column'>
-                                <Text mt="8px" mb="8px" textAlign={{ base: 'center', md: 'left' }}>Hygiene Rating</Text>
-                                <StarRating maxStars={5} initialRating={hygieneRating} onChange={setHygieneRating} />
+                                    <Text mt="8px" mb="8px" textAlign={{ base: 'center', md: 'left' }}>Hygiene Rating</Text>
+                                    <StarRating maxStars={5} initialRating={hygieneRating} onChange={setHygieneRating} />
                                 </Flex>
                             </Flex>
                             <Text mt='16px' mb='8px' textAlign={{ base: 'center', md: 'left' }}>Comments</Text>
@@ -205,25 +218,25 @@ const SubmitReviews = ({
                         <Button colorScheme='red' borderRadius='10px' mr={3} onClick={handleClose}>
                             Close
                         </Button>
-                    
-                            <>
-                                {isSubmitting ? (
-                                    <Button
-                                        isLoading
-                                        loadingText="Submitting..."
-                                        borderRadius={"10px"}
-                                    >
-                                        Submitting...
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        onClick={handleSubmit}
-                                        variant="MMPrimary"
-                                    >
-                                        Submit
-                                    </Button>
-                                )}
-                            </>
+
+                        <>
+                            {isSubmitting ? (
+                                <Button
+                                    isLoading
+                                    loadingText="Submitting..."
+                                    borderRadius={"10px"}
+                                >
+                                    Submitting...
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={handleSubmit}
+                                    variant="MMPrimary"
+                                >
+                                    Submit
+                                </Button>
+                            )}
+                        </>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

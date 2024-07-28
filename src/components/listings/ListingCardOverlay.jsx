@@ -150,8 +150,9 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     }
 
     const proceedToExpandedListing = (id) => {
-        navigate("/expandedListingGuest")
-        history.pushState({listingID: id}, "")
+        navigate("/expandedListingGuest", { state: {
+            listingID: id
+        }})
     }
 
     const fetchRatingProgress = async () => {
