@@ -1,23 +1,50 @@
 import { Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text } from "@chakra-ui/react";
 import HostManagementCard from "../../../components/identity/HostManagementCard";
 import server from ".././../../networking"
-import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 
 function HygieneReports() {
     const [hosts, setHosts] = useState([])
+
     const fetchAllHosts = async () => {
-        const response = await server.get('/cdn/fetchAllUsers?fetchHostsOnly=true')
-        if (response.status === 200) {
-            const hostsArray = Object.values(response.data)
-            setHosts(hostsArray)
+        try {
+            const response = await server.get('/cdn/fetchAllUsers?fetchHostsOnly=true');
+            if (response.status === 200) {
+                const hostsArray = Object.values(response.data);
+                setHosts(hostsArray);
+                return hostsArray;
+            }
+        } catch (error) {
+            console.error('Error fetching hosts:', error);
         }
-    }
+        return [];
+    };
+
+    const getAllProfilePictures = async (hostsArray) => {
+        try {
+            const hostsWithPictures = await Promise.all(
+                hostsArray.map(async (host) => {
+                    host.profilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${host.userID}`
+                    return host;
+                })
+            );
+            setHosts(hostsWithPictures);
+        } catch (error) {
+            console.error('Error fetching profile pictures:', error);
+        }
+    };
 
     useEffect(() => {
-        fetchAllHosts()
-        console.log("Hygiene Reports Fetching Ran")
-    }, [])
+        fetchAllHosts().then((hostsArray) => {
+            if (hostsArray && hostsArray.length > 0) {
+                getAllProfilePictures(hostsArray);
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        console.log("Updated hosts: ", hosts);
+    }, [hosts]);
 
     return (
         <>
@@ -63,6 +90,7 @@ function HygieneReports() {
                                     email={host.email}
                                     hygieneGrade={host.hygieneGrade}
                                     hostID={host.userID}
+                                    profilePicture={host.profilePicture}
                                 />
                             ))
                     ) : (

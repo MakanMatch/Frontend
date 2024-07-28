@@ -2,7 +2,7 @@ import { Avatar, Box, HStack, Text, Link } from '@chakra-ui/react'
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 
-function UserManagementCard({ username, email, hygieneGrade, hostID }) {
+function UserManagementCard({ username, email, hygieneGrade, hostID, profilePicture }) {
 	console.log("Received props: ", username, email, hygieneGrade);
 
     const navigate = useNavigate();
@@ -15,7 +15,7 @@ function UserManagementCard({ username, email, hygieneGrade, hostID }) {
 	return (
         <HStack display="flex" justifyContent={"space-between"}>
             <Box display="flex" alignItems="center" width={"40%"} ml={3}>
-                <Avatar />
+                <Avatar src={profilePicture}/>
                     <Box ml={3}>
                         <Link cursor={"pointer"} size='sm' minWidth={"290px"} maxWidth={"290px"} overflow={"hidden"} textOverflow={"ellipsis"} whiteSpace={'nowrap'} textAlign={"left"} onClick={handleClickUsername} fontFamily={"sora"}>
                             {username}

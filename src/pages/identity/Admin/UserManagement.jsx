@@ -10,8 +10,21 @@ function UserManagement() {
         if (response.status === 200) {
             const usersArray = Object.values(response.data)
             setUsers(usersArray)
+            await getAllProfilePictures(usersArray);
         }
     }
+
+    const getAllProfilePictures = async (usersArray) => {
+        const updatedUsers = await Promise.all(usersArray.map(async (user) => {
+            try {
+                user.profilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${user.userID}`;
+            } catch (error) {
+                console.error(`Failed to fetch profile picture for user ${user.userID}`, error);
+            }
+            return user;
+        }));
+        setUsers(updatedUsers);
+    };
 
     useEffect(() => {
         fetchAllUsers()
@@ -60,6 +73,7 @@ function UserManagement() {
                                 email={user.email}
                                 userType={user.userType}
                                 userID={user.userID}
+                                profilePicture={user.profilePicture}
                             />
                         ))
                     ) : (
