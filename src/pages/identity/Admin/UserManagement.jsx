@@ -8,8 +8,8 @@ function UserManagement() {
     const fetchAllUsers = async () => {
         const response = await server.get('/cdn/fetchAllUsers')
         if (response.status === 200) {
-            console.log(response.data)
-            setUsers(response.data)
+            const usersArray = Object.values(response.data)
+            setUsers(usersArray)
         }
     }
 

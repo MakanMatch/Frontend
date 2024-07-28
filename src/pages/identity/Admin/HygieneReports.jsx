@@ -9,8 +9,8 @@ function HygieneReports() {
     const fetchAllHosts = async () => {
         const response = await server.get('/cdn/fetchAllUsers?fetchHostsOnly=true')
         if (response.status === 200) {
-            console.log(response.data)
-            setHosts(response.data)
+            const hostsArray = Object.values(response.data)
+            setHosts(hostsArray)
         }
     }
 
