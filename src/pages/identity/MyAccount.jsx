@@ -37,7 +37,6 @@ const MyAccount = () => {
     const [accountLoaded, setAccountLoaded] = useState(false);
     const [profilePicture, setProfilePicture] = useState(null);
 
-
     useEffect(() => {
         if (loaded == true) {
             const fetchAccountInfo = async () => {
@@ -68,7 +67,6 @@ const MyAccount = () => {
                     navigate('/auth/login');
                 }
             }
-
         }
     }, [loaded, user]);
 
@@ -107,7 +105,7 @@ const MyAccount = () => {
         } else if (!accountInfo.email || !/\S+@\S+\.\S+/.test(accountInfo.email)) {
             showToast("Invalid input", "Enter a valid email address.", 3000, true, "error");
             return false;
-        } else if (!accountInfo.contactNum || !/^\d{8}$/.test(accountInfo.contactNum)) {
+        } else if (accountInfo.contactNum && !/^\d{8}$/.test(accountInfo.contactNum)) {
             showToast("Invalid input", "Contact number must be 8 digits.", 3000, true, "error");
             return false;
         }
@@ -137,7 +135,6 @@ const MyAccount = () => {
                 } else if (res.data.startsWith("UERROR")) {
                     showToast("Invalid input", res.data.substring("UERROR: ".length), 3000, true, "error");
                 } else {
-                    console.log(res.data);
                     showToast("ERROR", "Failed to save changes. Please try again.", 3000, true, "error");
                 }
             })
@@ -178,7 +175,6 @@ const MyAccount = () => {
                 localStorage.removeItem('jwt');
                 navigate("/auth/login");
             } else {
-                console.log(res.data);
                 showToast("ERROR", "Failed to delete account.", 3000, true, "error");
             }
         })
@@ -261,7 +257,7 @@ const MyAccount = () => {
         .catch((err) => {
             dispatch(reloadAuthToken(authToken))
             if (err.response && err.response.status === 400) {
-                showToast("Invalid Input", err.response.data.substring("UERROR: "), 3000, true, "error");
+                showToast("Invalid Input", err.response.data.substring("UERROR: ".length), 3000, true, "error");
             } else {
                 console.error("Error changing name:", err);
                 showToast("ERROR", "Failed to change name.", 3000, true, "error");
@@ -476,7 +472,7 @@ const MyAccount = () => {
                 </Box>
 
                 <PopoverForm />
-
+                
                 <Stack direction={["column", "row"]} p={4} mt={5} justifyContent="space-between" width="100%" spacing={"20px"}>
                     <Box p={2} width={"50%"}>
                         <FormControl mb={2}>
@@ -484,6 +480,10 @@ const MyAccount = () => {
                             <Editable
                                 value={accountInfo.username}
                                 onChange={(value) => setAccountInfo({ ...accountInfo, username: value })}
+                                // onChange={(value) => {           
+                                //     const { username, ...rest } = accountInfo;
+                                //     setAccountInfo({ ...rest, username: value });
+                                // }}
                                 textAlign={"left"}
                                 borderColor={"black"}
                                 borderWidth={1}
@@ -499,6 +499,10 @@ const MyAccount = () => {
                             <Editable
                                 value={accountInfo.email}
                                 onChange={(value) => setAccountInfo({ ...accountInfo, email: value })}
+                                // onChange={(value) => {
+                                //     const { email, ...rest } = accountInfo;
+                                //     setAccountInfo({ ...rest, email: value });
+                                // }}
                                 textAlign={"left"}
                                 borderColor={"black"}
                                 borderWidth={1}
@@ -515,8 +519,13 @@ const MyAccount = () => {
                         <FormControl mb={2}>
                             <FormLabel>Contact</FormLabel>
                             <Editable 
-                                value={accountInfo.contactNum || "Enter your contact number"} 
+                                value={accountInfo.contactNum || ''} 
+                                placeholder="Enter your contact number"
                                 onChange={(value) => setAccountInfo({ ...accountInfo, contactNum: value })}
+                                // onChange={(value) => {
+                                //     const { contactNum, ...rest } = accountInfo;
+                                //     setAccountInfo({ ...rest, contactNum: value });
+                                // }}
                                 textAlign={"left"}
                                 borderColor={"black"}
                                 borderWidth={1}
