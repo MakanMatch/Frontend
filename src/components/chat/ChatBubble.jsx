@@ -18,7 +18,6 @@ function ChatBubble({
   message,
   timestamp,
   isSender,
-  photoUrl,
   onEdit,
   onDelete,
   onReply,
