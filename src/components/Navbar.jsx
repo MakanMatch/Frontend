@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 function Navbar() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const navigate = useNavigate();
-    const { authToken } = useSelector((state) => state.auth);
+    const { user, authToken } = useSelector((state) => state.auth);
 
     const handleAvatarClick = () => {
         if (authToken) {
@@ -28,7 +28,11 @@ function Navbar() {
                     <Text color={"white"} fontFamily={"Short Stack"} fontWeight={"bold"} fontSize={"large"}>MakanMatch</Text>
                 </Link>
                 <Spacer />
-                <Avatar size={"sm"} cursor={'pointer'} onClick={handleAvatarClick}/>
+                {user ? (
+                    <Avatar size={"sm"} cursor={'pointer'} onClick={handleAvatarClick} src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${user.userID}`}/>
+                ) : (
+                    <Avatar size={"sm"} cursor={'pointer'} onClick={handleAvatarClick} />
+                )}
             </Flex>
             <Sidebar isOpen={isOpen} onClose={onClose} />
         </>

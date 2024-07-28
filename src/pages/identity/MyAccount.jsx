@@ -417,6 +417,7 @@ const MyAccount = () => {
     };
 
     const handleRemoveProfilePicture = () => {
+        window.location.reload();
         setProfilePicture(null);
     };
 
