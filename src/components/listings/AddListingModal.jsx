@@ -120,8 +120,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                 }
             }
         } catch (error) {
-            dispatch(reloadAuthToken(authToken))
-            setDefaultState();
+            dispatch(reloadAuthToken(authToken));
             setIsSubmitting(false);
             if (error.response && error.response.data && typeof error.response.data == "string") {
                 console.log("Failed to add listing; response: " + error.response)
@@ -135,6 +134,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                     )
                 } else {
                     onClose();
+                    setDefaultState();
                     displayToast(
                         "Something went wrong",
                         "Failed to add listing. Please try again",
@@ -145,6 +145,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                 }
             } else {
                 onClose();
+                setDefaultState();
                 console.log("Unknown error occurred when adding listing; error: " + error)
                 displayToast(
                     "Something went wrong",
