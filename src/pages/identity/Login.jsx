@@ -129,7 +129,7 @@ function Login() {
                                     <IconButton
                                         h='1.5rem'
                                         size='sm'
-                                        mb={2}
+                                        mb={1.1}
                                         onClick={handleShowPassword}
                                         icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
                                         aria-label={showPassword ? 'Hide password' : 'Show password'}
