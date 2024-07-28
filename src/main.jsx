@@ -29,7 +29,7 @@ import AuthLayout from './AuthLayout.jsx';
 import GoogleMapsPage from './pages/Listings/GoogleMapsPage'
 import Schedule from "./pages/identity/Schedule"
 import MakanHistory from './pages/identity/MakanHistory.jsx';
-import Favourites from './pages/identity/Favourites.jsx';
+import Favourites from './pages/identity/Favourites/Favourites.jsx';
 import MakanReviews from './pages/identity/MakanReviews.jsx';
 import ConfirmReservation from './pages/orders/ConfirmReservation.jsx';
 

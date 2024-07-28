@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
-	Button, Box, Input, Flex, Text, Image, Textarea, Spacer, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormHelperText, Card
+	Button, Box, Input, Flex, Text, Image, Textarea, Spacer, useToast, 
+	Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormHelperText, 
+	Card, Avatar
 } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 import { useDisclosure } from '@chakra-ui/react';
@@ -162,11 +164,11 @@ const EditReview = ({
 					<ModalCloseButton />
 					<ModalBody>
 						<Flex direction='column' align="center" mb={4}>
-							<Image
+							<Avatar
 								borderRadius='full'
 								boxSize='100px'
-								src='https://bit.ly/dan-abramov'
-								alt='Reviewer'
+								name={user.username}
+								alt={user.username}
 							/>
 							<Text fontSize={{ base: '2xl', md: '3xl' }} textAlign='center' mt={{ base: 2, md: 0 }} ml={{ base: 0, md: 4 }}>
 								Edit Your Review
