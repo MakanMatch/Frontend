@@ -180,8 +180,7 @@ function ChatUi() {
         if (ws.current && messageInput.trim() !== "") {
             const newMessage = {
                 action: "send",
-                sender: user.username,
-                userID: user.userID,
+                senderID: user.userID,
                 chatID: chatSelected,
                 message: messageInput,
                 datetime: new Date().toISOString(),
@@ -384,8 +383,8 @@ function ChatUi() {
                                             hour: "2-digit",
                                             minute: "2-digit",
                                         })}
-                                        isSender={msg.sender === user.username}
-                                        sender={user.username}
+                                        isSender={msg.senderID === user.userID}
+                                        sender={msg.sender}
                                         reciever={chatPartnerUsernames[chatSelected]}
                                         onEdit={() => openEditModal(msg.messageID, msg.message)}
                                         onDelete={() => handleDeletePrompt(msg.messageID)}
