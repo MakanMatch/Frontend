@@ -32,6 +32,10 @@ import MakanHistory from './pages/identity/MakanHistory.jsx';
 import Favourites from './pages/identity/Favourites/Favourites.jsx';
 import MakanReviews from './pages/identity/MakanReviews.jsx';
 import ConfirmReservation from './pages/orders/ConfirmReservation.jsx';
+import AdminHomepage from './pages/identity/Admin/AdminHomepage.jsx';
+import HygieneReports from './pages/identity/Admin/HygieneReports.jsx';
+import UserManagement from './pages/identity/Admin/UserManagement.jsx';
+import AdminAccount from './pages/identity/Admin/AdminAccount.jsx';
 
 const store = configureStore({
     reducer: {
@@ -74,6 +78,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"makanReviews"} element={<MakanReviews/>} />
                         <Route path={"schedule"} element={<Schedule/>} />
                         <Route path='*' element={<NotFound />} />
+                    </Route>
+                    <Route path='/admin' element={<Layout />}>
+                        <Route path={"home"} element={<AdminHomepage />} />
+                        <Route path={"hygieneReports"} element={<HygieneReports />} />
+                        <Route path={"userManagement"} element={<UserManagement />} />
+                        <Route path={"adminAccount"} element={<AdminAccount />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
