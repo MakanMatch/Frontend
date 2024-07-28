@@ -32,6 +32,7 @@ import MakanHistory from './pages/identity/MakanHistory.jsx';
 import Favourites from './pages/identity/Favourites/Favourites.jsx';
 import MakanReviews from './pages/identity/MakanReviews.jsx';
 import ConfirmReservation from './pages/orders/ConfirmReservation.jsx';
+import UpcomingReservation from './pages/orders/UpcomingReservation.jsx';
 
 const store = configureStore({
     reducer: {
@@ -54,8 +55,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"chat2"} element={<Chat2 />}></Route>
                         <Route path={"targetListing"} element={<GoogleMapsPage/>} />
-                        <Route path={"listing"}>
-                            <Route path={"reserve"} element={<ConfirmReservation />} />
+                        <Route path={"reservations"}>
+                            <Route path={"new"} element={<ConfirmReservation />} />
+                            <Route path={"upcoming"} element={<UpcomingReservation />} />
                         </Route>
                         <Route path='*' element={<NotFound />} />
                     </Route>

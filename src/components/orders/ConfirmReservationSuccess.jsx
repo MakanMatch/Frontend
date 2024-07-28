@@ -5,6 +5,7 @@ import { BiCheckCircle } from 'react-icons/bi'
 import { BsClock, BsFillCheckCircleFill } from 'react-icons/bs'
 import { useSelector } from 'react-redux'
 import configureShowToast from '../showToast';
+import { Link } from 'react-router-dom'
 
 function ConfirmReservationSuccess({
     listingData,
@@ -75,6 +76,8 @@ function ConfirmReservationSuccess({
                         <Heading fontFamily={'Sora'} fontWeight={'bold'} fontSize={{ 'base': 'x-large', 'lg': 'xx-large' }} mt={'30px'}>Reservation Successful!</Heading>
                         <Text mt={'10px'}>Thank you for reserving with <strong>{hostData.username}</strong>. Bon Appetit!</Text>
                         <Text mt={'15px'} fontSize={'small'}>Reference Num: {reservation.Reservation.referenceNum}</Text>
+                        <br />
+                        <Link to={"/reservations/upcoming"}><Text color={"primaryColour"} textDecoration={"underline"}>View Reservation</Text></Link>
                     </Box>
                 </Box>
 
