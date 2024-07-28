@@ -6,18 +6,27 @@ import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } fro
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { reloadAuthToken } from "../../slices/AuthState";
 import server from "../../networking";
-import { useSelector, useDispatch } from "react-redux";
-import { reloadAuthToken } from '../../slices/AuthState';
 
 function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
-    const toast = useToast();
-    const navigate = useNavigate();
+
+    const [oneStarRatings, setOneStarRatings] = useState(0);
+    const [twoStarRatings, setTwoStarRatings] = useState(0);
+    const [threeStarRatings, setThreeStarRatings] = useState(0);
+    const [fourStarRatings, setFourStarRatings] = useState(0);
+    const [fiveStarRatings, setFiveStarRatings] = useState(0);
+    const [ratingsLoaded, setRatingsLoaded] = useState(false);
+
     const { user, authToken, loaded } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handlePrevImage = () => {
@@ -45,24 +54,48 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             const favouriteData = {
                 listingID: listingID
             }
-            await server.put("/listings/toggleFavouriteListing", favouriteData)
-                .then((response) => {
-                    if (response.status == 200 && response.data.favourite != undefined) {
-                        if (response.data.favourite === true) {
-                            setFavourite(true);
-                        } else {
-                            setFavourite(false);
-                        }
+            try {
+                const toggleResponse = await server.put("/listings/toggleFavouriteListing", favouriteData)
+                dispatch(reloadAuthToken(authToken))
+                if (toggleResponse.status == 200 && toggleResponse.data.favourite != undefined) {
+                    if (toggleResponse.data.favourite === true) {
+                        setFavourite(true);
                     } else {
-                        console.log("Unknown response received when toggling favourite status; response: " + response.data)
-                        toast.closeAll();
-                        displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
+                        setFavourite(false);
                     }
-                })
-                .catch(() => {
-                    toast.closeAll();
-                    displayToast("Error", "Failed to add/remove listing from favourites", "error", 3000, false);
-                });
+                }
+            } catch (error) {
+                dispatch(reloadAuthToken(authToken))
+                if (error.response && error.response.data && typeof error.response.data == "string") {
+                    console.log("Failed to favourite listing; response: " + error.response)
+                    if (error.response.data.startsWith("UERROR")) {
+                        displayToast(
+                            "Uh-oh!",
+                            error.response.data.substring("UERROR: ".length),
+                            "info",
+                            3500,
+                            true
+                        )
+                    } else {
+                        displayToast(
+                            "Something went wrong",
+                            "Failed to favourite listing. Please try again",
+                            "error",
+                            3500,
+                            true
+                        )
+                    }
+                } else {
+                    console.log("Unknown error occurred when adding listing to favourites; error: " + error)
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to favourite listing. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
+            }
         }
     };
 
@@ -115,8 +148,56 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
         })
     }
 
+    const fetchRatingProgress = async () => {
+        try {
+            const response = await server.get(`/cdn/consolidateReviewsStatistics?hostID=${hostID}`);
+            dispatch(reloadAuthToken(authToken))
+            if (response.status === 200) {
+                const data = response.data;
+                setOneStarRatings(data.oneStar);
+                setTwoStarRatings(data.twoStar);
+                setThreeStarRatings(data.threeStar);
+                setFourStarRatings(data.fourStar);
+                setFiveStarRatings(data.fiveStar);
+                setRatingsLoaded(true);
+            }
+        } catch (error) {
+            dispatch(reloadAuthToken(authToken))
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to fetch host's food rating; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    displayToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        "info",
+                        3500,
+                        true
+                    )
+                } else {
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to fetch host's food rating. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when fetching host's food rating; error: " + error)
+                displayToast(
+                    "Something went wrong",
+                    "Failed to fetch host's food rating. Please try again",
+                    "error",
+                    3500,
+                    true
+                )
+            }
+        }
+    }
+
     useEffect(() => {
         fetchFavouriteState();
+        fetchRatingProgress();
     }, []);
 
     const renderDescription = () => {
@@ -231,60 +312,66 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             </Text>
                         </Box>
                         <Box className="ratingBox">
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} ml={0.5} mt={-2}>1⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={70}
-                                    mb={2}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} mt={-2}>2⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={90}
-                                    mb={2}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} mt={-2}>3⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={30}
-                                    mb={2}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} mt={-2}>4⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={10}
-                                    mb={2}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <Text fontSize={"10px"} mr={1} mt={-1}>5⭐️</Text>
-                                <Progress
-                                    colorScheme="green"
-                                    size="sm"
-                                    value={20}
-                                    borderRadius="5px"
-                                    flex={1}
-                                />
-                            </Box>
+                            {ratingsLoaded ? (
+                                <>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} ml={0.5} mt={-2}>1⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={oneStarRatings}
+                                            mb={2}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} mt={-2}>2⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={twoStarRatings}
+                                            mb={2}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} mt={-2}>3⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={threeStarRatings}
+                                            mb={2}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} mt={-2}>4⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={fourStarRatings}
+                                            mb={2}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                    <Box display="flex" alignItems="center" mb={1}>
+                                        <Text fontSize={"10px"} mr={1} mt={-1}>5⭐️</Text>
+                                        <Progress
+                                            colorScheme="green"
+                                            size="sm"
+                                            value={fiveStarRatings}
+                                            borderRadius="5px"
+                                            flex={1}
+                                        />
+                                    </Box>
+                                </>
+                            ) : (
+                                <Skeleton height="100px" width="100%" borderRadius={"10px"} />
+                            )}
                         </Box>
                         <Link to={'/reviews'} state={{ hostID }}>
                             <Text mt={2} mb={-4} textAlign="left" color="blue" fontSize={"13px"} textDecoration={"underline"} cursor={"pointer"}>View Host Reviews</Text>

@@ -16,6 +16,7 @@ const MarkeredGMaps = ({
     const toast = useToast();
 
     function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
         toast({
             title: title,
             description: description,
