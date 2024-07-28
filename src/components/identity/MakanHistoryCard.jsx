@@ -4,6 +4,7 @@ import { Card, Image, Stack, CardBody, Avatar, Text, Box, Skeleton } from "@chak
 import { CalendarIcon } from '@chakra-ui/icons';
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useState } from "react";
+import placeholderImage from "../../assets/placeholderImage.svg";
 
 function MakanHistoryCard({ reservation, listing }) {
     const [imageLoaded, setImageLoaded] = useState(false);
@@ -43,19 +44,19 @@ function MakanHistoryCard({ reservation, listing }) {
                     minWidth: "645px"
                 }}
                 >
-                    <Skeleton isLoaded={imageLoaded} fadeDuration={0.5} minWidth={"223px"} maxWidth={"223px"} minHeight={"149px"} maxHeight={"149px"} margin="20px" borderRadius="5px">
-                        <Image
-                        minWidth={"223px"}
-                        maxWidth={"223px"}
-                        minHeight={"149px"}
-                        maxHeight={"149px"}
-                        src={getImageLink(listing.listingID, listing.images.split("|")[0])}
-                        alt='Caffe Latte'
-                        borderRadius = "5px"
-                        objectFit={"cover"}
-                        onLoad={() => setImageLoaded(true)}
-                        />
-                    </Skeleton>
+                    <Image
+                    minWidth={"223px"}
+                    maxWidth={"223px"}
+                    minHeight={"149px"}
+                    maxHeight={"149px"}
+                    src={getImageLink(listing.listingID, listing.images.split("|")[0])}
+                    alt='Caffe Latte'
+                    borderRadius = "5px"
+                    objectFit={"cover"}
+                    onLoad={() => setImageLoaded(true)}
+                    fallbackSrc={placeholderImage}
+                    margin="20px 0px 20px 20px"
+                    />
                     <CardBody ml={8}>
                         <Box display="flex" justifyContent={"space-between"} width={"100%"} mt={3}>
                             <Stack mr={20}>
