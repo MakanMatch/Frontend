@@ -6,6 +6,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { useSelector } from 'react-redux';
 import server from '../../networking';
 import configureShowToast from '../../components/showToast';
 
@@ -19,10 +20,18 @@ function AccountRecovery() {
     const toast = useToast()
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
+    const authToken = useSelector((state) => state.auth.authToken);
 
     const handleShowNewPassword = () => setShowNewPassword(!showNewPassword);
     const handleShowConfirmNewPassword = () => setShowConfirmNewPassword(!showConfirmNewPassword);
 
+    useEffect(() => {
+        if (authToken) {
+            showToast("Logged In", "You are already logged in!", 3000, true, 'success')
+            navigate('/');
+        }
+    }, []);
+    
     useEffect(() => {
         let timer;
         if (cooldown > 0) {

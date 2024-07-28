@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box, Heading, Input, Button, Text, VStack, useToast, Checkbox, InputGroup, InputRightElement,
     FormControl, FormLabel, FormErrorMessage, Link, IconButton, HStack, useMediaQuery
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import server from '../../networking';
@@ -17,12 +18,20 @@ function CreateAccount() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isHostAccount, setIsHostAccount] = useState(false);
+    const authToken = useSelector((state) => state.auth.authToken);
 
     const [isSmallerThan944] = useMediaQuery("(max-width: 944px)");
     const [isSmallerThan766] = useMediaQuery("(max-width: 766px)");
 
     const handleShowPassword = () => setShowPassword(!showPassword);
     const handleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+
+    useEffect(() => {
+        if (authToken) {
+            showToast("Logged In", "You are already logged in!", 3000, true, 'success')
+            navigate('/');
+        }
+    }, []);
 
     // Validation schema
     const validationSchema = Yup.object().shape({

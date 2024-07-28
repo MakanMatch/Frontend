@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Heading, Input, Button, Text, VStack, useToast, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link, IconButton } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +16,13 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const dispatch = useDispatch();
     const authToken = useSelector((state) => state.auth.authToken);
+
+    useEffect(() => {
+        if (authToken) {
+            showToast("Logged In", "You are already logged in!", 3000, true, 'success')
+            navigate('/');
+        }
+    }, []);
 
     const handleShowPassword = () => setShowPassword(!showPassword);
 
