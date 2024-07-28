@@ -4,16 +4,17 @@
 import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
 import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Box, useToast } from "@chakra-ui/react";
+import { Box, useToast, Center, Fade, Spinner } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 
 const GoogleMapsPage = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const location = useLocation();
-    const { user, authToken, loaded } = useSelector((state) => state.auth);
+    const loaded = useSelector((state) => state.auth.loaded);
 
     function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
         toast({
             title: title,
             description: description,
@@ -34,13 +35,24 @@ const GoogleMapsPage = () => {
     if (!listingID || !hostID || !images || !title || !shortDescription || !approxAddress || !portionPrice || !totalSlots || !latitude || !longitude) {
         navigate("/");
         setTimeout(() => {
-            displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, false);
+            displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, true);
         }, 200);
     }
+    if (!loaded) {
+        return (
+            <div>
+                <Center height="100vh">
+                    <Fade in={!loaded}>
+                        <Spinner size="xl" />
+                    </Fade>
+                </Center>
+            </div>
+        );
+    }
+
     return (
         <>
-            {loaded && (
-                <Box position="relative" height="100%">
+            <Box position="relative" height="100%">
                 <ExpandedGoogleMaps title={title} lat={latitude} long={longitude} />
                 <Box
                     position="absolute"
@@ -50,7 +62,7 @@ const GoogleMapsPage = () => {
                     zIndex="1">
                     <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
                 </Box>
-            </Box>)}
+            </Box>
         </>
     );
 };
