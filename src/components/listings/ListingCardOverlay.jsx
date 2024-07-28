@@ -7,7 +7,8 @@ import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import server from "../../networking";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { reloadAuthToken } from '../../slices/AuthState';
 
 function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
     const [imageIndex, setImageIndex] = useState(0);
@@ -17,6 +18,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     const toast = useToast();
     const navigate = useNavigate();
     const { user, authToken, loaded } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
     const handlePrevImage = () => {
         if (imageIndex === 0) {
@@ -69,14 +71,37 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             setFavourite(false);
             return;
         } else {
-            const fetchFavouritedListingID = await server.get(`/listings/getFavouritedListingsID`);
-            if (fetchFavouritedListingID.status == 200 && fetchFavouritedListingID.data) {
-                fetchFavouritedListingID.data.forEach((favListingID) => {
-                    if (favListingID === listingID) {
-                        setFavourite(true);
+            try {
+                const fetchFavouritedListingID = await server.get(`/listings/getFavouritedListingsID`);
+                dispatch(reloadAuthToken(authToken))    
+                if (fetchFavouritedListingID.status == 200 && fetchFavouritedListingID.data) {
+                    fetchFavouritedListingID.data.forEach((favListingID) => {
+                        if (favListingID === listingID) {
+                            setFavourite(true);
+                        }
+                    });
+                } else {
+                    setFavourite(false);
+                }
+                if (fetchFavouritedListingID.status != 200) {
+                    displayToast("Error", "Failed to fetch favourite state", "error", 3000, false);
+                    console.log("Non-200 status code response received when attempting to retrieve favourite listings; response: ", fetchFavouritedListingID.data);
+                }
+            } catch (error) {
+                dispatch(reloadAuthToken(authToken))
+                if (error.response && error.response.data) {
+                    if (error.response.data.startsWith("UERROR")) {
+                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3500, true, "error")
+                        console.log("User error occurred in retrieving favourite listings; error: ", err.response.data);
+                        setFavourite(false);
+                    } else {
+                        displayToast("Error", "Failed to fetch favourite state", "error", 3000, false);
+                        console.log("Unexpected error in retrieving favourited listings; error: ", error.response.data);
+                        setFavourite(false);
                     }
-                });
-            } else {
+                }
+                console.log("Unexpected error in retrieving favourited listings; error: ", error.message);
+                displayToast("Error", "Failed to fetch favourite state", "error", 3000, false);
                 setFavourite(false);
             }
         }
