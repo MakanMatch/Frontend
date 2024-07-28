@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Input, Button, Text, VStack, useToast, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link, IconButton } from '@chakra-ui/react';
+import { Box, Heading, Input, Button, Text, VStack, useToast, InputGroup, InputRightElement, FormControl, FormLabel, FormErrorMessage, Link, IconButton, useMediaQuery } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
@@ -16,6 +16,9 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const dispatch = useDispatch();
     const authToken = useSelector((state) => state.auth.authToken);
+
+    const [isSmallerThan800] = useMediaQuery("(max-width: 800px)");
+    const [isSmallerThan323] = useMediaQuery("(max-width: 323px)");
 
     useEffect(() => {
         if (authToken) {
@@ -77,9 +80,10 @@ function Login() {
         <Box
             bgPosition="center"
             display="flex"
+            justifyContent="center"
         >
             <Box
-                w="50%"
+                w={isSmallerThan800 ? (isSmallerThan323 ? "100%" : "80%") : "45%"}
                 h="100%"
                 bg="rgba(255, 255, 255, 0.85)"
                 display="flex"
@@ -87,23 +91,23 @@ function Login() {
                 justifyContent="center"
                 borderRadius={15}
             >
-                <VStack spacing={4} w="full">
-                    <Heading as="h1" size="xl" mb={4} mt={20} textAlign="center">
+                <VStack spacing={4} w="full" overflow="hidden">
+                    <Heading as="h1" size="xl" mb={4} mt={20} textAlign="center" padding={5}>
                         Sign in to MakanMatch
                     </Heading>
-                    <Box as="form" onSubmit={formik.handleSubmit}>
+                    <Box as="form" onSubmit={formik.handleSubmit} marginLeft={10} marginRight={10}>
                         <FormControl isInvalid={formik.errors.usernameOrEmail && formik.touched.usernameOrEmail} mb={4}>
                             <FormLabel fontSize='15px'>Username or Email</FormLabel>
                             <Input
                                 name="usernameOrEmail"
                                 placeholder='Username or Email'
                                 borderColor='black'
-                                size='sm'
+                                size='md'
                                 borderRadius='5px'
-                                w='400px'
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 value={formik.values.usernameOrEmail}
+                                width={!isSmallerThan800 ? "300px" : "100%"}
                             />
                             <FormErrorMessage fontSize='12px'>{formik.errors.usernameOrEmail}</FormErrorMessage>
                         </FormControl>
@@ -115,7 +119,7 @@ function Login() {
                                     placeholder='Password'
                                     type={showPassword ? 'text' : 'password'}
                                     borderColor='black'
-                                    size='sm'
+                                    size='md'
                                     borderRadius='5px'
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
