@@ -1,14 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Card, Image, Stack, CardBody, Avatar, Text, Box, Skeleton } from "@chakra-ui/react";
+import { Card, Image, Stack, CardBody, Avatar, Text, Box } from "@chakra-ui/react";
 import { CalendarIcon } from '@chakra-ui/icons';
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { useState } from "react";
 import placeholderImage from "../../assets/placeholderImage.svg";
 
 function MakanHistoryCard({ reservation, listing }) {
-    const [imageLoaded, setImageLoaded] = useState(false);
-
     const handleClickListingTitle = () => {
         console.log("Clicked on listing title");
     }
