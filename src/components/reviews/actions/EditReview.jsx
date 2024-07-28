@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import {Button, Box, Input, Flex, Text, Image, Textarea, Spacer, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormHelperText, Card
+import { useState, useEffect } from 'react';
+import {
+	Button, Box, Input, Flex, Text, Image, Textarea, Spacer, useToast, 
+	Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormHelperText, 
+	Card, Avatar
 } from '@chakra-ui/react';
 import { EditIcon, CloseIcon } from '@chakra-ui/icons';
 import { useDisclosure } from '@chakra-ui/react';
-import StarRating from './StarRatings';
-import server from '../../networking';
-import configureShowToast from '../../components/showToast';
+import StarRating from '../StarRatings';
+import server from '../../../networking';
+import configureShowToast from '../../showToast';
+import { useSelector, useDispatch } from 'react-redux';
+import { reloadAuthToken } from '../../../slices/AuthState';
 
 const EditReview = ({
 	reviewID,
@@ -14,7 +19,7 @@ const EditReview = ({
 	reviewComments,
 	reviewImages,
 	refreshState,
-    stateRefreshReview
+	stateRefresh
 }) => {
 	const toast = useToast();
 	const showToast = configureShowToast(toast);
@@ -26,6 +31,8 @@ const EditReview = ({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [hasChanges, setHasChanges] = useState(false);
+	const { user, authToken } = useSelector((state) => state.auth);
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		setFoodRating(reviewFoodRating);
@@ -50,9 +57,9 @@ const EditReview = ({
 	const handleFileChange = (event) => {
 		const files = Array.from(event.target.files);
 		if (images.length + files.length > 6) {
-            setFileFormatError("You can upload a maximum of 6 images.");
-            return;
-        }
+			setFileFormatError("You can upload a maximum of 6 images.");
+			return;
+		}
 		let filesAccepted = false;
 		for (const file of files) {
 			const allowedTypes = [
@@ -91,23 +98,25 @@ const EditReview = ({
 		formData.append('hygieneRating', hygieneRating);
 		formData.append('comments', comments);
 		images.forEach((file) => {
-            formData.append('images', file);
-        });
+			formData.append('images', file);
+		});
 
 		try {
 			const editReview = await server.put(`/manageReviews`, formData, {
 				headers: { 'Content-Type': 'multipart/form-data' },
 				transformRequest: formData => formData
-			});
+			})
+			dispatch(reloadAuthToken(authToken))
 			if (editReview.status === 200) {
 				showToast("Review edited successfully", "", 3000, true, "success");
 				setIsSubmitting(false);
-				refreshState(!stateRefreshReview)
+				refreshState(!stateRefresh)
 				onClose();
 			} else {
 				showToast("Failed to edit review", "Please try again later", 3000, true, "error");
 			}
 		} catch (error) {
+			dispatch(reloadAuthToken(authToken))
 			setIsSubmitting(false);
 			showToast("Failed to edit review", "Please try again later", 3000, true, "error");
 			console.log('Failed to edit review:', error);
@@ -155,11 +164,11 @@ const EditReview = ({
 					<ModalCloseButton />
 					<ModalBody>
 						<Flex direction='column' align="center" mb={4}>
-							<Image
+							<Avatar
 								borderRadius='full'
 								boxSize='100px'
-								src='https://bit.ly/dan-abramov'
-								alt='Reviewer'
+								name={user.username}
+								alt={user.username}
 							/>
 							<Text fontSize={{ base: '2xl', md: '3xl' }} textAlign='center' mt={{ base: 2, md: 0 }} ml={{ base: 0, md: 4 }}>
 								Edit Your Review
@@ -232,6 +241,9 @@ const EditReview = ({
 								onClick={handleEdit}
 								variant="MMPrimary"
 								isDisabled={!hasChanges}
+								_hover={{
+									color: 'white'
+								}}
 							>
 								Save
 							</Button>
