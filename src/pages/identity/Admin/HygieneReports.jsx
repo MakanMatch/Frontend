@@ -62,6 +62,7 @@ function HygieneReports() {
                                     username={host.username}
                                     email={host.email}
                                     hygieneGrade={host.hygieneGrade}
+                                    hostID={host.userID}
                                 />
                             ))
                     ) : (

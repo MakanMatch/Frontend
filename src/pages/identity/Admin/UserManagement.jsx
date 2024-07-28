@@ -1,7 +1,6 @@
 import { Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text } from "@chakra-ui/react";
 import UserManagementCard from "../../../components/identity/UserManagementCard";
 import server from ".././../../networking"
-import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 
 function UserManagement() {
@@ -60,6 +59,7 @@ function UserManagement() {
                                 username={user.username}
                                 email={user.email}
                                 userType={user.userType}
+                                userID={user.userID}
                             />
                         ))
                     ) : (
