@@ -31,7 +31,6 @@ const Favourites = () => {
                 if (res.status == 200 && res.data) {
                     setFavouritesListingDetails(res.data); // Set full favourite data for further filtering
                     setFilteredFavourites(res.data); // Set filtered listings to full data initially
-                    console.log("Listings retrieved: ", res.data);
                     setDataLoaded(true);
                 } else {
                     console.log("Non-200 status code response received when attempting to retrieve favourite listings; response: ", res.data);
