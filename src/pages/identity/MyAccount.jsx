@@ -16,6 +16,7 @@ import configureShowToast from '../../components/showToast';
 import ChangePassword from "../../components/identity/ChangePassword";
 import EditPicture from "../../components/identity/EditPicture";
 import ChangeAddress from "../../components/identity/ChangeAddress";
+import { reloadAuthToken } from '../../slices/AuthState';
 
 const MyAccount = () => {
     const navigate = useNavigate();
@@ -29,23 +30,25 @@ const MyAccount = () => {
     const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
     const [passwordChangeInProgress, setPasswordChangeInProgress] = useState(false);
     const [deleteInProgress, setDeleteInProgress] = useState(false);
-
     const [isChangeAddressModalOpen, setChangeAddressModalOpen] = useState(false);
-
     const [accountInfo, setAccountInfo] = useState({});
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
-    const { user, loaded, error } = useSelector((state) => state.auth);
+    const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const [accountLoaded, setAccountLoaded] = useState(false);
+    const [profilePicture, setProfilePicture] = useState(null);
+
 
     useEffect(() => {
         if (loaded == true) {
             const fetchAccountInfo = async () => {
                 try {
                     const userID = user.userID;
-                    const response = await server.get(`/cdn/accountInfo?userID=${userID}`);                    
+                    const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
+                    dispatch(reloadAuthToken(authToken))              
                     setAccountInfo(response.data);
                     setOriginalAccountInfo(response.data);
                     setAccountLoaded(true);
+                    setProfilePicture(`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`);
                 } catch (err) {
                     console.log("Error fetching account info:", err);
                     if (err && err.response && err.response.status && err.response.status == 404) {
@@ -65,6 +68,7 @@ const MyAccount = () => {
                     navigate('/auth/login');
                 }
             }
+
         }
     }, [loaded, user]);
 
@@ -126,6 +130,7 @@ const MyAccount = () => {
                 }
             })
             .then((res) => {
+                dispatch(reloadAuthToken(authToken))
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Changes saved", "Your account details have been updated.", 3000, true, "success");
                     setOriginalAccountInfo({ ...accountInfo });
@@ -137,6 +142,7 @@ const MyAccount = () => {
                 }
             })
             .catch((err) => {
+                dispatch(reloadAuthToken(authToken))
                 console.log(err);
                 showToast("ERROR", "Failed to save changes. Please try again.", "error");
             });
@@ -164,6 +170,7 @@ const MyAccount = () => {
             }
         })
         .then((res) => {
+            dispatch(reloadAuthToken(authToken))
             if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                 showToast("We're sorry to see you go! :(", "See you again next time!", 3000, true, "success");
                 // Remove the jwt
@@ -176,6 +183,7 @@ const MyAccount = () => {
             }
         })
         .catch((err) => {
+            dispatch(reloadAuthToken(authToken))
             console.error("Error deleting account:", err);
             showToast("ERROR", "Failed to delete account.", 3000, true, "error");
         })
@@ -202,6 +210,7 @@ const MyAccount = () => {
                 newPassword: values.newPassword
             })
             .then((res) => {
+                dispatch(reloadAuthToken(authToken))
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     setPasswordModalOpen(false);
                     showToast("Password changed", "Please log in with your new password.", 3000, true, "success");
@@ -214,6 +223,7 @@ const MyAccount = () => {
                 }
             })
             .catch((err) => {
+                dispatch(reloadAuthToken(authToken))
                 console.error("Error changing password:", err);
                 showToast("ERROR", "Your password cannot be changed. Please try again.", 3000, true, "error");
             })
@@ -221,18 +231,6 @@ const MyAccount = () => {
                 setSubmitting(false);
                 setPasswordChangeInProgress(false);
             });
-    };
-
-    const toggleEditPicture = () => {
-        setEditPictureModalOpen(!isEditPictureModalOpen);
-    };
-
-    const handleEditPictureCloseModal = () => {
-        setEditPictureModalOpen(false);
-    };
-
-    const handleEditPicture = () => {
-        console.log("Edit picture clicked");
     };
 
     const toggleChangeAddress = () => {
@@ -249,6 +247,7 @@ const MyAccount = () => {
             lname: lname
         })
         .then((res) => {
+            dispatch(reloadAuthToken(authToken))
             if (res.status === 200 && res.data === "SUCCESS: Nothing to update.") {
                 showToast("No changes made", "You are good to go!", 3000, true, "success");
                 onClose();
@@ -260,6 +259,7 @@ const MyAccount = () => {
             }
         })
         .catch((err) => {
+            dispatch(reloadAuthToken(authToken))
             if (err.response && err.response.status === 400) {
                 showToast("Invalid Input", err.response.data.substring("UERROR: "), 3000, true, "error");
             } else {
@@ -408,6 +408,22 @@ const MyAccount = () => {
         );
     };
 
+    const toggleEditPicture = () => {
+        setEditPictureModalOpen(!isEditPictureModalOpen);
+    };
+
+    const handleEditPictureCloseModal = () => {
+        setEditPictureModalOpen(false);
+    };
+
+    const handleProfilePictureChange = () => {
+        window.location.reload();
+    };
+
+    const handleRemoveProfilePicture = () => {
+        setProfilePicture(null);
+    };
+
     return (
         <Flex>
             {/* Conditionally render the sidebar based on user type */}
@@ -440,15 +456,22 @@ const MyAccount = () => {
                         overflow="visible"
                     >
                         <Avatar
-                            size="3xl"
-                            src="https://via.placeholder.com/150"
+                            size="2xl"
+                            src={profilePicture}
                             position="relative"
                             bg="white"
                             border="4px solid white"
                             onClick={(toggleEditPicture)}
+                            icon={<Avatar size='2xl'/>}
                         />
 
-                        <EditPicture isOpen={isEditPictureModalOpen} onClose={handleEditPictureCloseModal} onSubmit={handleEditPicture} />
+                        <EditPicture 
+                            isOpen={isEditPictureModalOpen} 
+                            onClose={handleEditPictureCloseModal} 
+                            onSubmit={handleProfilePictureChange} 
+                            onRemove={handleRemoveProfilePicture}
+                            currentProfilePicture={profilePicture}
+                        />
                     </Box>
                 </Box>
 

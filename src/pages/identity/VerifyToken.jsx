@@ -19,7 +19,7 @@ function VerifyToken() {
         if (token && userID) {
             server.post('/identity/emailVerification/verify', { userID, token })
                 .then((res) => {
-                    // console.log(res.data)
+                    dispatch(reloadAuthToken(authToken))
                     if (res.data.startsWith('SUCCESS')) {
                         showToast('Email Verified', 'Please log in to continue', 3000, true, 'success');
                         navigate('/auth/login');
@@ -32,6 +32,7 @@ function VerifyToken() {
                     }
                 })
                 .catch((err) => {
+                    dispatch(reloadAuthToken(authToken))
                     console.error('Error verifying token:', err);
                     setMessage("Something went wrong, please try again!");
                 });

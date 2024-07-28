@@ -87,14 +87,14 @@ function CreateAccount() {
                 }
             })
             .catch((err) => {
-                if (err.response.data === "UERROR: Username already exists.") {
+                if (err.response.data === "Username already exists.") {
                     actions.setFieldError('username', 'Username already exists.');
-                } else if (err.response.data === "UERROR: Email already exists.") {
+                } else if (err.response.data === "Email already exists.") {
                     actions.setFieldError('email', 'Email already exists.');
-                } else if (err.response.data === "UERROR: Contact number already exists.") {
+                } else if (err.response.data === "Contact number already exists.") {
                     actions.setFieldError('contactNum', 'Contact number already in use.');
                 }
-                showToast('Account creation failed.', err.response.data.substring("UERROR: "), 3000, true, 'error');
+                showToast('Account creation failed.', err.response.data.substring("UERROR: ".length), 3000, true, 'error');
                 actions.setSubmitting(false);
             });
     };
