@@ -9,6 +9,8 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
 import UploadNewImageModal from '../../components/orders/UploadNewImageModal'
 import HostListingImage from '../../components/orders/HostListingImage'
+import HostPaymentQR from '../../components/orders/HostPaymentQR'
+import GuestManagement from '../../components/orders/GuestManagement'
 import configureShowToast from '../../components/showToast'
 import { reloadAuthToken } from '../../slices/AuthState'
 
@@ -352,32 +354,11 @@ function ExpandedListingHost() {
                 ) : (
                     <>
                         <GridItem colSpan={2}>
-                            <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
-                                <VStack alignItems={"flex-start"} width={"100%"}>
-                                    <Text fontWeight={"bold"} mb={"10px"}>Short Description (shown on Home page)</Text>
-                                    <Input placeholder='Briefly describe your dish' value={shortDescription} onChange={handleShortDescriptionChange} />
-
-                                    <Text fontWeight={"bold"} mb={"10px"} mt={5}>Description</Text>
-                                    <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleLongDescriptionChange} />
-                                </VStack>
-
-                                {/* <Spacer /> */}
-
-                                <VStack alignItems={"flex-start"} width={"100%"}>
-                                    <Heading size={"md"}>Listing Statistics</Heading>
-
-                                    <HStack spacing={"30px"} wrap={"wrap"}>
-                                        <Statistic value={"2/5"} description={"Reservations"} />
-                                        <Statistic value={"1000"} description={"Impressions"} />
-                                        <Statistic value={"45%"} description={"Click-Through Rate"} />
-                                        <Statistic value={"$7.00"} description={"Revenue"} />
-                                    </HStack>
-                                </VStack>
-                            </VStack>
+                            <GuestManagement />
                         </GridItem>
-                        
+
                         <GridItem colSpan={1}>
-                            <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
+                            <HostPaymentQR />
                         </GridItem>
 
                     </>
