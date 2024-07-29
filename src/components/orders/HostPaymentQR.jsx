@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react';
 import { Image, Spinner, Text, useToast, Box, Input } from '@chakra-ui/react';
 import { PiUploadSimpleBold } from "react-icons/pi";
 import server from '../../networking';
 import { useSelector, useDispatch } from 'react-redux';
 import { reloadAuthToken } from '../../slices/AuthState';
 import configureShowToast from '../../components/showToast';
-import placeholderImage from '../../assets/placeholderImage.svg'
+import placeholderImage from '../../assets/placeholderImage.svg';
 
-function HostPaymentQR({
-    hostID
+function HostPaymentQR({ 
+    hostID 
 }) {
     const dispatch = useDispatch();
     const { user, loaded, authToken } = useSelector((state) => state.auth);
@@ -74,7 +74,7 @@ function HostPaymentQR({
                 cursor="pointer"
                 position="relative"
                 display="flex"
-                alignItems="flex-start"
+                alignItems="center" // Align image in center
                 justifyContent="center"
                 width="100%"
                 height="400px"
@@ -90,7 +90,7 @@ function HostPaymentQR({
             >
                 <Image
                     width="80%"
-                    height="auto"
+                    height="400px"
                     className="qr-code-image"
                     src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getHostPaymentQR?hostID=${hostID}&something=${Date.now()}`}
                     fallbackSrc={placeholderImage}
@@ -120,4 +120,4 @@ function HostPaymentQR({
     )
 }
 
-export default HostPaymentQR
+export default HostPaymentQR;
