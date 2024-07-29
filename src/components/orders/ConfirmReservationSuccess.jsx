@@ -77,7 +77,7 @@ function ConfirmReservationSuccess({
                         <Text mt={'10px'}>Thank you for reserving with <strong>{hostData.username}</strong>. Bon Appetit!</Text>
                         <Text mt={'15px'} fontSize={'small'}>Reference Num: {reservation.Reservation.referenceNum}</Text>
                         <br />
-                        <Link to={"/reservations/upcoming"}><Text color={"primaryColour"} textDecoration={"underline"}>View Reservation</Text></Link>
+                        <Link to={"/reservations/upcoming"}><Text color={"primaryColour"} textDecoration={"underline"}>View Reservations</Text></Link>
                     </Box>
                 </Box>
 
