@@ -6,7 +6,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { reloadAuthToken } from '../../slices/AuthState';
 import configureShowToast from '../../components/showToast';
 import placeholderImage from '../../assets/placeholderImage.svg'
-import { transform } from 'framer-motion';
 
 function HostPaymentQR({
     hostID
@@ -14,8 +13,8 @@ function HostPaymentQR({
     const dispatch = useDispatch();
     const { user, loaded, authToken } = useSelector((state) => state.auth);
     const toast = useToast();
-    const showToast = configureShowToast(toast);
-    const [imageUpload, setImageUpload] = useState(false); 
+    const showToast = configureShowToast(toast); 
+    const [refresh, setRefresh] = useState(false);
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
@@ -33,16 +32,15 @@ function HostPaymentQR({
             formData.append('hostID', hostID);
             
             try {
-                // Uupload QR Code image
+                // upload QR Code image
                 const response = await server.post('/orders/uploadPaymentQR', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData });
                 dispatch(reloadAuthToken(authToken));
                 if (response.status === 200) {
                     showToast('Image Uploaded', 'QR Code uploaded successfully', 3000, false, 'success');
-                    setImageUpload(true);
+                    setRefresh(!refresh);
                 } else {
                     console.error('Error uploading QR Code:', response.data);
                     showToast('Something went wrong', 'An error occurred while uploading the QR Code', 3000, false, 'error');
-                    setImageUpload(false);
                 }
             } catch (error) {
                 dispatch(reloadAuthToken(authToken));
@@ -50,21 +48,18 @@ function HostPaymentQR({
                     if (error.response.data.startsWith("UERROR")) {
                         showToast('Something went wrong', error.response.data.substring("UERROR: ".length), 3000, false, 'error');
                         console.log('User error occurred in uploading QR Code:', error.response.data);
-                        setImageUpload(false);
                     } else {
                         showToast('Something went wrong', 'An error occurred while uploading the QR Code', 3000, false, 'error');
                         console.error('Error uploading QR Code:', error.response.data);
-                        setImageUpload(false);
                     }
                 } else {
                     showToast('Something went wrong', 'An error occurred while uploading the QR Code', 3000, false, 'error');
                     console.error('Error uploading QR Code:', error);
-                    setImageUpload(false);
                 }
             }
         } else {
             showToast('Invalid file type', 'Please upload a valid image file', 3000, false, 'error');
-            setImageUpload(false);
+            console.log('Invalid file type:', file.type);
         }
     };
 
@@ -97,7 +92,7 @@ function HostPaymentQR({
                     width="80%"
                     height="400px"
                     className="qr-code-image"
-                    src={import.meta.env.VITE_BACKEND_URL + `/cdn/getHostPaymentQR?hostID=${hostID}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getHostPaymentQR?hostID=${hostID}&something=${Date.now()}`}
                     fallbackSrc={placeholderImage}
                     transition="filter 0.3s ease"
                     objectFit="contain"
