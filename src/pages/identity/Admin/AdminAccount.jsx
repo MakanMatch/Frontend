@@ -1,28 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Box, Text, Flex, Heading, useToast, Spinner, Avatar, FormControl, FormLabel, 
-    Editable, EditablePreview, EditableInput, Button, Stack, useDisclosure,
-    Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, IconButton, Input, ButtonGroup, useMediaQuery
+import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormControl, FormLabel, Stack, 
+    Editable, EditableInput, EditablePreview, AlertDialog, AlertDialogOverlay, AlertDialogHeader, AlertDialogBody,
+    AlertDialogFooter, AlertDialogContent, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, 
+    PopoverCloseButton, IconButton, Input, ButtonGroup, useMediaQuery
 } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
 import { FocusLock } from "@chakra-ui/react";
+import { logout } from "../../../slices/AuthState";
 import configureShowToast from '../../../components/showToast';
 import server from "../../../networking";
 import { reloadAuthToken } from "../../../slices/AuthState";
+import ChangeAddress from "../../../components/identity/ChangeAddress";
+import EditPicture from "../../../components/identity/EditPicture";
+import ChangePassword from "../../../components/identity/ChangePassword";
 
 function AdminAccount() {
     const navigate = useNavigate();
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const dispatch = useDispatch();
+    const cancelRef = React.useRef()
     const { user, authToken, loaded } = useSelector((state) => state.auth);
     const [profilePicture, setProfilePicture] = useState(null);
     const [accountLoaded, setAccountLoaded] = useState(false);
     const [accountInfo, setAccountInfo] = useState({});
     const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
-    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const { isOpen: isDiscardOpen, onOpen: onDiscardOpen, onClose: onDiscardClose } = useDisclosure();
+    const [isEditPictureModalOpen, setEditPictureModalOpen] = useState(false);
+    const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
+    const [passwordChangeInProgress, setPasswordChangeInProgress] = useState(false);
+    const [isChangeAddressModalOpen, setChangeAddressModalOpen] = useState(false);
 
     const [isSmallerThan560] = useMediaQuery("(max-width: 560px)"); // for linkedin card design (optional)
 
@@ -53,10 +62,10 @@ function AdminAccount() {
             if (user && user.userID) {
                 fetchAccountInfo();
             } else {
-                // if (!passwordChangeInProgress && !deleteInProgress) {
-                //     showToast("Redirecting to login", "Please log in first.", 3000, true, "error");
-                //     navigate('/auth/login');
-                // }
+                if (!passwordChangeInProgress) {
+                    showToast("Redirecting to login", "Please log in first.", 3000, true, "error");
+                    navigate('/auth/login');
+                }
             }
         }
     }, [loaded, user]);
@@ -64,6 +73,10 @@ function AdminAccount() {
     if (!loaded || !user) {
         return <Spinner />
     }
+
+    const hasChanges = () => {
+        return JSON.stringify(accountInfo) !== JSON.stringify(originalAccountInfo);
+    };
 
     const TextInput = React.forwardRef((props, ref) => {
         return (
@@ -73,6 +86,143 @@ function AdminAccount() {
             </FormControl>
         );
     });
+
+    const validateFields = () => {
+        if (!accountInfo.username || accountInfo.username.trim() === "") {
+            showToast("Invalid input", "Username cannot be empty.", 3000, true, "error");
+            return false;
+        } else if (/\s/.test(accountInfo.username)) {
+            showToast("Invalid input", "Username cannot contain spaces.", 3000, true, "error");
+            return false;
+        } else if (!accountInfo.email || !/\S+@\S+\.\S+/.test(accountInfo.email)) {
+            showToast("Invalid input", "Enter a valid email address.", 3000, true, "error");
+            return false;
+        } else if (accountInfo.contactNum && !/^\d{8}$/.test(accountInfo.contactNum)) {
+            showToast("Invalid input", "Contact number must be 8 digits.", 3000, true, "error");
+            return false;
+        }
+        return true;
+    };
+
+    const handleSaveChanges = () => {
+        if (!validateFields()) {
+            return;
+        }
+
+        server.put("/identity/myAccount/updateAccountDetails", {
+                userID: user.userID,
+                username: accountInfo.username,
+                email: accountInfo.email,
+                contactNum: accountInfo.contactNum,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((res) => {
+                dispatch(reloadAuthToken(authToken))
+                if (res.status == 200 && res.data.startsWith("SUCCESS")) {
+                    showToast("Changes saved", "Your account details have been updated.", 3000, true, "success");
+                    setOriginalAccountInfo({ ...accountInfo });
+                } else if (res.data.startsWith("UERROR")) {
+                    showToast("Invalid input", res.data.substring("UERROR: ".length), 3000, true, "error");
+                } else {
+                    showToast("ERROR", "Failed to save changes. Please try again.", 3000, true, "error");
+                }
+            })
+            .catch((err) => {
+                dispatch(reloadAuthToken(authToken))
+                console.log(err);
+                showToast("ERROR", "Failed to save changes. Please try again.", "error");
+            });
+    };
+
+    const handleCancelChanges = () => {
+        onDiscardOpen();
+    };
+
+    const confirmDiscardChanges = () => {
+        setAccountInfo({ ...originalAccountInfo });
+        onDiscardClose();
+        showToast("Changes not saved", "All changes made have been discarded.", 3000, true, "warning");
+    };
+
+    const toggleChangePassword = () => {
+        setPasswordModalOpen(!isPasswordModalOpen);
+    };
+
+    const handlePasswordCloseModal = () => {
+        setPasswordModalOpen(false);
+    };
+
+    const handleChangePassword = (values, { setSubmitting, setFieldError }) => {
+        setPasswordChangeInProgress(true);
+        server.put("/identity/myAccount/changePassword", {
+                userID: user.userID,
+                userType: user.userType,
+                currentPassword: values.currentPassword,
+                newPassword: values.newPassword
+            })
+            .then((res) => {
+                dispatch(reloadAuthToken(authToken))
+                if (res.status == 200 && res.data.startsWith("SUCCESS")) {
+                    setPasswordModalOpen(false);
+                    showToast("Password changed", "Please log in with your new password.", 3000, true, "success");
+                    dispatch(logout());
+                    localStorage.removeItem('jwt');
+                    navigate("/auth/login");
+                } else if (res.data.startsWith("UERROR")) {
+                    setFieldError("currentPassword", "Incorrect current password")
+                    showToast("ERROR", res.data.substring("UERROR: ".length), 3000, true, "error");
+                }
+            })
+            .catch((err) => {
+                dispatch(reloadAuthToken(authToken))
+                console.error("Error changing password:", err);
+                showToast("ERROR", "Your password cannot be changed. Please try again.", 3000, true, "error");
+            })
+            .finally(() => {
+                setSubmitting(false);
+                setPasswordChangeInProgress(false);
+            });
+    };
+
+    const toggleChangeAddress = () => {
+        setChangeAddressModalOpen(!isChangeAddressModalOpen)
+    };
+
+    const handleChangeAddressCloseModal = () => {
+        setChangeAddressModalOpen(false);
+    };
+
+    const handleChangeName = (fname, lname, onClose) => {
+        server.put("/identity/myAccount/changeName", {
+            fname: fname,
+            lname: lname
+        })
+        .then((res) => {
+            dispatch(reloadAuthToken(authToken))
+            if (res.status === 200 && res.data === "SUCCESS: Nothing to update.") {
+                showToast("No changes made", "You are good to go!", 3000, true, "success");
+                onClose();
+            } else if (res.status === 200 && res.data.startsWith("SUCCESS")) {
+                showToast("Name changed", "Your name has been updated!", 3000, true, "success");
+                onClose();
+            } else {
+                showToast("Something went wrong", "Please try again later.", 3000, true, "error");
+            }
+        })
+        .catch((err) => {
+            dispatch(reloadAuthToken(authToken))
+            if (err.response && err.response.status === 400) {
+                showToast("Invalid Input", err.response.data.substring("UERROR: ".length), 3000, true, "error");
+            } else {
+                console.error("Error changing name:", err);
+                showToast("ERROR", "Failed to change name.", 3000, true, "error");
+            }
+        });
+    };
+
     
     const Form = ({ firstFieldRef, onCancel, onSave, fname, setFname, lname, setLname }) => {
         const handleKeyDown = (e) => {
@@ -195,13 +345,36 @@ function AdminAccount() {
         );
     };
 
+    const toggleEditPicture = () => {
+        setEditPictureModalOpen(!isEditPictureModalOpen);
+    };
+
+    const handleEditPictureCloseModal = () => {
+        setEditPictureModalOpen(false);
+    };
+
+    const handleProfilePictureChange = () => {
+        window.location.reload();
+    };
+
+    const handleRemoveProfilePicture = () => {
+        window.location.reload();
+        setProfilePicture(null);
+    };
+
+    const handleLogout = () => {
+        dispatch(logout());
+        localStorage.removeItem('jwt');
+        navigate("/auth/login");
+    };
+
     return (
         <>
             <Box justifyContent={'center'} display={'flex'}>
                 <Box 
                     backgroundImage={'/src/assets/AdminBanner.jpg'}
                     width="65vw"
-                    height="20vh"
+                    height="25vh"
                     position="relative"
                     borderRadius={15}
                     backgroundSize="cover"
@@ -215,7 +388,7 @@ function AdminAccount() {
 
                     <Box
                         position="absolute"
-                        bottom="-50px"
+                        bottom="-70px"
                         left={isSmallerThan560 ? "50%" : "16%"}
                         transform="translateX(-50%)"
                         zIndex={1}
@@ -223,12 +396,21 @@ function AdminAccount() {
                         overflow="visible"
                     >
                         <Avatar
-                            size="xl"
+                            size="2xl"
+                            src={profilePicture}
                             position="relative"
                             bg="white"
                             border="4px solid white"
-                            // onClick={(toggleEditPicture)}
-                            icon={<Avatar size='xl'/>}
+                            onClick={(toggleEditPicture)}
+                            icon={<Avatar size='2xl'/>}
+                        />
+
+                        <EditPicture 
+                            isOpen={isEditPictureModalOpen} 
+                            onClose={handleEditPictureCloseModal} 
+                            onSubmit={handleProfilePictureChange} 
+                            onRemove={handleRemoveProfilePicture}
+                            currentProfilePicture={profilePicture}
                         />
                     </Box>
                 </Box>
@@ -237,7 +419,7 @@ function AdminAccount() {
             <PopoverForm />
 
             <Box justifyContent={'center'} display={'flex'}>
-                <Stack direction={["column", "row"]} p={4} spacing={"20px"} width={"65vw"}>
+                <Stack direction={["column", "row"]} p={4} spacing={"12%"} width={"65vw"}>
                     <Box p={2} width={"70%"} justifyContent={"flex"}>
                         <FormControl mb={2}>
                             <FormLabel>Username</FormLabel>
@@ -315,43 +497,69 @@ function AdminAccount() {
                                     <Text p={2} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{accountInfo.address || "Enter your address"}</Text>
                                 </Box>
 
-                                <Button width="15%">Edit</Button>
+                                <Button width="15%" onClick={toggleChangeAddress}>Edit</Button>
 
-                                {/* <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} accountInfo={accountInfo} setAccountInfo={setAccountInfo} setOriginalAccountInfo={setOriginalAccountInfo}/> */}
+                                <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} accountInfo={accountInfo} setAccountInfo={setAccountInfo} setOriginalAccountInfo={setOriginalAccountInfo}/>
                             </Flex>
                         </FormControl>
 
                         <Box display="flex" justifyContent={"left"}>
-                            <Button variant={"MMPrimary"} mt={6}>
+                            <Button variant={"MMPrimary"} mt={6} onClick={(toggleChangePassword)}>
                                 Change Password
                             </Button>
                         </Box>
 
-                        {/* <ChangePassword isOpen={isPasswordModalOpen} onClose={handlePasswordCloseModal} onSubmit={handleChangePassword} /> */}
-
+                        <ChangePassword isOpen={isPasswordModalOpen} onClose={handlePasswordCloseModal} onSubmit={handleChangePassword} />
                     </Box>
 
-                    <Box width={"30%"} display="flex" justifyContent={"right"} mr={-4}>
-                        {/* <Flex justifyContent={"flex-end"} flexDirection={"column"}> */}
-                            {/* {hasChanges() && (
+                    <Box width={"18%"} display="flex" justifyContent={"right"} flexDirection="column" alignItems="flex-end" mr={-4}>
+                            {hasChanges() && (
                                 <>
-                                    <Button p={6} variant={"MMPrimary"} width="full" mb={5}>
+                                    <Button p={4} variant={"MMPrimary"} onClick={handleSaveChanges} width={'full'} mb={5}>
                                         Save Changes
                                     </Button>
 
-                                    <Button p={6} colorScheme="red" borderRadius={10} width="full" mb={4}>
+                                    <Button p={4} colorScheme="red" borderRadius={10} onClick={handleCancelChanges} width={'full'} mb={4}>
                                         Cancel
                                     </Button>
                                 </>
-                            )} */}
+                            )}
 
-                            <Button colorScheme="red" borderRadius={10} position="absolute" bottom={"7.5%"}>
-                                Delete Account
+                            <Button colorScheme="red" borderRadius={10} width={'11%'} position="absolute" bottom={"7.5%"} onClick={handleLogout}>
+                                Logout
                             </Button>
-                        {/* </Flex> */}
                     </Box>
                 </Stack>
             </Box>
+
+            {/* Discard Changes Confirmation Modal */}
+            <AlertDialog
+                isOpen={isDiscardOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onDiscardClose}
+                size="sm"
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Discard Changes
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Are you sure you want to discard all changes?
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onDiscardClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme="red" onClick={confirmDiscardChanges} ml={3}>
+                                Discard
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </>
         
     )
