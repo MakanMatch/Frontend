@@ -299,53 +299,90 @@ function ExpandedListingHost() {
                     </VStack>
                 </GridItem>
                 {/*Edit Listing*/}
-                <GridItem colSpan={3} mb={"20px"}>
-                    <VStack alignItems={"flex-start"}>
-                        <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
-                            {listingData.images.map((imgName, index) => {
-                                if (imgName) {
-                                    return (
-                                        <HostListingImage key={index} index={index} listingImages={listingData.images} imgURL={imgBackendURL(imgName)} imgName={imgName} handleDeleteImage={handleDeleteImage} />
-                                    )
-                                }
-                            })}
-                            <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={onOpen} rounded={"10px"}>
-                                <SmallAddIcon boxSize={"10"} />
-                            </Center>
-                        </HStack>
-                    </VStack>
-                </GridItem>
-                <GridItem colSpan={2}>
-                    <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
-                        <VStack alignItems={"flex-start"} width={"100%"}>
-                            <Text fontWeight={"bold"} mb={"10px"}>Short Description (shown on Home page)</Text>
-                            <Input placeholder='Briefly describe your dish' value={shortDescription} onChange={handleShortDescriptionChange} />
+                {editListing ? (
+                    <>
+                        <GridItem colSpan={3} mb={"20px"}>
+                            <VStack alignItems={"flex-start"}>
+                                <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
+                                    {listingData.images.map((imgName, index) => {
+                                        if (imgName) {
+                                            return (
+                                                <HostListingImage key={index} index={index} listingImages={listingData.images} imgURL={imgBackendURL(imgName)} imgName={imgName} handleDeleteImage={handleDeleteImage} />
+                                            )
+                                        }
+                                    })}
+                                    <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={onOpen} rounded={"10px"}>
+                                        <SmallAddIcon boxSize={"10"} />
+                                    </Center>
+                                </HStack>
+                            </VStack>
+                        </GridItem>
+                        <GridItem colSpan={2}>
+                            <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
+                                <VStack alignItems={"flex-start"} width={"100%"}>
+                                    <Text fontWeight={"bold"} mb={"10px"}>Short Description (shown on Home page)</Text>
+                                    <Input placeholder='Briefly describe your dish' value={shortDescription} onChange={handleShortDescriptionChange} />
 
-                            <Text fontWeight={"bold"} mb={"10px"} mt={5}>Description</Text>
-                            <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleLongDescriptionChange} />
-                        </VStack>
+                                    <Text fontWeight={"bold"} mb={"10px"} mt={5}>Description</Text>
+                                    <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleLongDescriptionChange} />
+                                </VStack>
 
-                        {/* <Spacer /> */}
+                                {/* <Spacer /> */}
 
-                        <VStack alignItems={"flex-start"} width={"100%"}>
-                            <Heading size={"md"}>Listing Statistics</Heading>
+                                <VStack alignItems={"flex-start"} width={"100%"}>
+                                    <Heading size={"md"}>Listing Statistics</Heading>
 
-                            <HStack spacing={"30px"} wrap={"wrap"}>
-                                <Statistic value={"2/5"} description={"Reservations"} />
-                                <Statistic value={"1000"} description={"Impressions"} />
-                                <Statistic value={"45%"} description={"Click-Through Rate"} />
-                                <Statistic value={"$7.00"} description={"Revenue"} />
-                            </HStack>
-                        </VStack>
-                    </VStack>
-                </GridItem>
+                                    <HStack spacing={"30px"} wrap={"wrap"}>
+                                        <Statistic value={"2/5"} description={"Reservations"} />
+                                        <Statistic value={"1000"} description={"Impressions"} />
+                                        <Statistic value={"45%"} description={"Click-Through Rate"} />
+                                        <Statistic value={"$7.00"} description={"Revenue"} />
+                                    </HStack>
+                                </VStack>
+                            </VStack>
+                        </GridItem>
 
-                <GridItem colSpan={1}>
-                    <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
-                </GridItem>
+                        <GridItem colSpan={1}>
+                            <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
+                        </GridItem>
+
+                        <UploadNewImageModal isOpen={isOpen} handleClose={handleClose} handleFileSubmission={handleFileSubmission} isUploading={isUploading} uploadImage={uploadImage} />
+                        <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} showToast={showToast} refreshPage={fetchListingDetails} />
+                    </>
+                ) : (
+                    <>
+                        <GridItem colSpan={2}>
+                            <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
+                                <VStack alignItems={"flex-start"} width={"100%"}>
+                                    <Text fontWeight={"bold"} mb={"10px"}>Short Description (shown on Home page)</Text>
+                                    <Input placeholder='Briefly describe your dish' value={shortDescription} onChange={handleShortDescriptionChange} />
+
+                                    <Text fontWeight={"bold"} mb={"10px"} mt={5}>Description</Text>
+                                    <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleLongDescriptionChange} />
+                                </VStack>
+
+                                {/* <Spacer /> */}
+
+                                <VStack alignItems={"flex-start"} width={"100%"}>
+                                    <Heading size={"md"}>Listing Statistics</Heading>
+
+                                    <HStack spacing={"30px"} wrap={"wrap"}>
+                                        <Statistic value={"2/5"} description={"Reservations"} />
+                                        <Statistic value={"1000"} description={"Impressions"} />
+                                        <Statistic value={"45%"} description={"Click-Through Rate"} />
+                                        <Statistic value={"$7.00"} description={"Revenue"} />
+                                    </HStack>
+                                </VStack>
+                            </VStack>
+                        </GridItem>
+                        
+                        <GridItem colSpan={1}>
+                            <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
+                        </GridItem>
+
+                    </>
+                )}
             </Grid>
-            <UploadNewImageModal isOpen={isOpen} handleClose={handleClose} handleFileSubmission={handleFileSubmission} isUploading={isUploading} uploadImage={uploadImage} />
-            <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} showToast={showToast} refreshPage={fetchListingDetails} />
         </>
     )
 }
