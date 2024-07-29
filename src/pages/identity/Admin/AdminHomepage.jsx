@@ -16,7 +16,6 @@ function AdminHomepage() {
 
     useEffect(() => {
         if (loaded == true) {
-            console.log(user);
             if (!user) {
                 navigate("/auth/login")
                 showToast("Please login first.", "")

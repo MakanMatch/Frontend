@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormControl, FormLabel, Stack, 
     Editable, EditableInput, EditablePreview, AlertDialog, AlertDialogOverlay, AlertDialogHeader, AlertDialogBody,
     AlertDialogFooter, AlertDialogContent, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, 
-    PopoverCloseButton, IconButton, Input, ButtonGroup
+    PopoverCloseButton, IconButton, Input, ButtonGroup, useMediaQuery
 } from "@chakra-ui/react";
 import { EditIcon, } from "@chakra-ui/icons";
 import  FocusLock from "react-focus-lock"
@@ -423,7 +423,6 @@ const MyAccount = () => {
 
     return (
         <Flex>
-            {/* Conditionally render the sidebar based on user type */}
             {accountInfo.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
 
             {/* Right side content */}
