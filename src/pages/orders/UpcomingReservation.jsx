@@ -1,13 +1,11 @@
-import { Box, Button, Card, CardBody, CardFooter, Center, Heading, HStack, Image, Spinner, Stack, Text, useMediaQuery, useToast, VStack } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, Center, Heading, HStack, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Stack, Text, useDisclosure, useMediaQuery, useToast, VStack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import server from '../../networking';
 import { useDispatch, useSelector } from 'react-redux';
 import configureShowToast from '../../components/showToast';
 import { Link, useNavigate } from 'react-router-dom';
 import { reloadAuthToken } from '../../slices/AuthState';
-import { ChatIcon, StarIcon } from '@chakra-ui/icons';
-import { BsFillPeopleFill } from 'react-icons/bs';
-import { FaClock } from 'react-icons/fa';
+import UpcomingReservationCard from '../../components/orders/UpcomingReservationCard';
 
 let SGDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -25,6 +23,7 @@ function UpcomingReservation() {
     const [currentReservation, setCurrentReservation] = useState(null);
     const [dataLoaded, setDataLoaded] = useState(false);
     const { user, loaded, authToken } = useSelector(state => state.auth)
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const processReservationData = (reservations) => {
         var processedReservations = reservations.map(reservation => {
@@ -48,11 +47,11 @@ function UpcomingReservation() {
         return processedReservations;
     }
 
-    const getFirstImageURL = () => {
-        if (!currentReservation || !currentReservation.listing || !currentReservation.listing.images || currentReservation.listing.images.length == 0) {
+    const getFirstImageURL = (reservation) => {
+        if (!reservation || !reservation.listing || !reservation.listing.images || reservation.listing.images.length == 0) {
             return ""
         } else {
-            return `${backendURL}/cdn/getImageForListing?listingID=${currentReservation.listingID}&imageName=${currentReservation.listing.images[0]}`
+            return `${backendURL}/cdn/getImageForListing?listingID=${reservation.listingID}&imageName=${reservation.listing.images[0]}`
         }
     }
 
@@ -163,35 +162,16 @@ function UpcomingReservation() {
     }
 
     return (
-        <Box p={isSmallerThan800 ? "5px": "20px"}>
+        <Box p={isSmallerThan800 ? "5px" : "20px"}>
             <Box mt={"30px"} display={"flex"} justifyContent={"space-between"} flexDirection={"row"} maxW={"100%"}>
                 <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} textAlign={"left"} width={!isSmallerThan800 ? "50%" : "100%"}>
                     <Heading fontFamily={'Sora'} fontWeight={'bold'} fontSize={{ 'base': 'x-large', 'lg': 'xx-large' }}>Your Upcoming Reservation</Heading>
+                    {reservations.length > 0 && (
+                        <Button justifyContent={"left"} variant={'link'} onClick={onOpen} color={'primaryColour'} mt={"10px"}>View another</Button>
+                    )}
 
                     <Box mt={"5%"}>
-                        <Card direction={{ base: 'column', sm: 'row' }} overflow='hidden' variant='outline' maxW={"650px"}>
-                            <Image objectFit='cover' maxW={{ base: '100%', sm: '200px' }} src={getFirstImageURL()} alt={currentReservation.listing.title} />
-                            <Stack>
-                                <CardBody>
-                                    <Heading size='md'>{currentReservation.listing.title}</Heading>
-
-                                    <Text py='2'>
-                                        By <strong>{currentReservation.listing.Host.username}</strong>
-                                        <ChatIcon ml={"10px"} />
-                                    </Text>
-
-                                    <Text>{currentReservation.listing.longDescription}</Text>
-                                </CardBody>
-
-                                <CardFooter>
-                                    <HStack display={'flex'} justifyContent={'space-between'}>
-                                        <StarIcon /><Text>{currentReservation.listing.Host.foodRating}</Text>
-                                        <BsFillPeopleFill /><Text>{currentReservation.listing.slotsTaken}/{currentReservation.listing.totalSlots}</Text>
-                                        <FaClock /><Text>{new Date(currentReservation.listing.fullDatetime).toLocaleString('en-US', { dateStyle: "short", timeStyle: 'short' })}</Text>
-                                    </HStack>
-                                </CardFooter>
-                            </Stack>
-                        </Card>
+                        <UpcomingReservationCard currentReservation={currentReservation} getFirstImageURL={getFirstImageURL} />
                     </Box>
 
                     <Box display={"flex"} flexDirection={"row"} justifyContent={"space-between"} mt={"30px"}>
@@ -219,6 +199,26 @@ function UpcomingReservation() {
             </Box>
 
             {isSmallerThan800 && ManageReservationSection("small")}
+
+            <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Choose a reservation</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody pb={6}>
+                        {reservations.map(reservation => (
+                            <UpcomingReservationCard currentReservation={reservation} getFirstImageURL={getFirstImageURL} onClick={() => {
+                                setCurrentReservation(reservation);
+                                onClose();
+                            }} />
+                        ))}
+                    </ModalBody>
+
+                    <ModalFooter>
+                        <Button onClick={onClose}>Cancel</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Box>
     )
 }
