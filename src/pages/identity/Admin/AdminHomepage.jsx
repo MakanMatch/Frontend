@@ -1,20 +1,37 @@
 import { Heading, Text, Grid, Box, Image, Stack, Card, CardBody, Divider, 
-CardFooter, ButtonGroup, Button,
+CardFooter, ButtonGroup, Button, useToast,
+Spinner
 } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
-import { useSelector } from "react-redux"
-import { reloadAuthToken } from "../../../slices/AuthState";
+import { useSelector, useDispatch } from "react-redux"
+import { useEffect, useState } from "react";
+import configureShowToast from '../../../components/showToast';
 
 
 function AdminHomepage() {
     const navigate = useNavigate();
-    const { user, loaded, error, authToken } = useSelector((state) => state.auth);
+    const toast = useToast();
+    const showToast = configureShowToast(toast);
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
-    
+    useEffect(() => {
+        if (loaded == true) {
+            console.log(user);
+            if (!user) {
+                navigate("/auth/login")
+                showToast("Please login first.", "")
+                return;
+            }
+        }
+    }, [loaded, user])
+
+    if (!loaded || !user) {
+        return <Spinner />
+    }
 
     return (
         <>
-            <Heading mt={10} mb={5}>Hi, John Appleseed!</Heading>
+            <Heading mt={10} mb={5}>Hi, {user.username}!</Heading>
             <Text size={'md'}>Welcome Back to MakanMatch!</Text>
             <Box display="flex" justifyContent="space-between">
                 <Card width="32%">

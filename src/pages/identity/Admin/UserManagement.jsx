@@ -1,10 +1,18 @@
-import { Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text } from "@chakra-ui/react";
+import { Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text, 
+    useToast, 
+} from "@chakra-ui/react";
 import UserManagementCard from "../../../components/identity/UserManagementCard";
+import { useSelector } from "react-redux";
 import server from ".././../../networking"
 import { useState, useEffect } from "react";
+import configureShowToast from '../../../components/showToast';
 
 function UserManagement() {
     const [users, setUsers] = useState([])
+    const toast = useToast();
+    const showToast = configureShowToast(toast)
+    const { user, authToken } = useSelector((state) => state.auth);
+
     const fetchAllUsers = async () => {
         const response = await server.get('/cdn/fetchAllUsers')
         if (response.status === 200) {

@@ -23,14 +23,24 @@ function Navbar() {
         onClose()
     };
 
+    const handleLogoClick = () => {
+        if (authToken) {
+            if (user.userType == "Admin") {
+                navigate('/admin');
+            }
+        } else {
+            navigate('/');
+        }
+    }
+
     return (
         <>
             <Flex as={"nav"} alignItems={"center"} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} rounded={"10px"} mb={"20px"} p={"10px"} overflow="hidden">
                 <Button variant={"link"} onClick={onOpen}><HamburgerIcon color={"white"} /></Button>
                 <Spacer />
-                <Link to={"/"}>
-                    <Text color={"white"} fontFamily={"Short Stack"} fontWeight={"bold"} fontSize={"large"}>MakanMatch</Text>
-                </Link>
+                <Box>
+                    <Text color={"white"} fontFamily={"Short Stack"} fontWeight={"bold"} fontSize={"large"} onClick={handleLogoClick} cursor={"pointer"}>MakanMatch</Text>
+                </Box>
                 <Spacer />
                 {user ? (
                     <Avatar size={"sm"} cursor={'pointer'} onClick={handleAvatarClick} src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${user.userID}`}/>

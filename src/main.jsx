@@ -80,7 +80,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path='*' element={<NotFound />} />
                     </Route>
                     <Route path='/admin' element={<Layout />}>
-                        <Route path={""} element={<AdminHomepage />} />
+                        <Route index element={<AdminHomepage />} />
                         <Route path={"hygieneReports"} element={<HygieneReports />} />
                         <Route path={"userManagement"} element={<UserManagement />} />
                         <Route path={"adminAccount"} element={<AdminAccount />} />

@@ -45,7 +45,8 @@ function Login() {
                     dispatch(changeAuthToken(res.data.accessToken));
                     const authStateData = { userID: res.data.user.userID, username: res.data.user.username, userType: res.data.user.userType }
                     dispatch(setUser(authStateData));
-                    if (res.data.user.userType === "Admin"){
+                    console.log(res.data.user);
+                    if (res.data.user.userType == "Admin"){
                         navigate('/admin');
                     } else {
                         navigate('/');

@@ -31,17 +31,21 @@ function AuthRoot() {
     }, []);
 
     useEffect(() => {
-        const urlPath = location.pathname;
-        if (user) {
-            if (user.userType == "Admin" && !urlPath.startsWith("/admin")) {
-                navigate("/admin");
-            }
-        } else {
-            if (urlPath.startsWith("/admin")) {
-                navigate("/");
+        if (loaded == true) {
+            const urlPath = location.pathname;
+            if (user) {
+                if (user.userType == "Admin" && !urlPath.startsWith("/admin")) {
+                    navigate("/admin");
+                } else if (user.userType != "Admin" && urlPath.startsWith("/admin")) {
+                    navigate("/");
+                }
+            } else {
+                if (urlPath.startsWith("/admin")) {
+                    navigate("/");
+                }
             }
         }
-    }, [user])
+    }, [loaded, user])
 
     useEffect(() => {
         if (error) {
