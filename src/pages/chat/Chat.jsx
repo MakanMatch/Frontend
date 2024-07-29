@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { changeAuthToken, fetchUser, logout } from "../../slices/AuthState";
 import configureShowToast from "../../components/showToast";
+import { FaCamera } from "react-icons/fa";
+import server from '../../networking';
 
 function ChatUi() {
     const navigate = useNavigate();
@@ -22,6 +24,7 @@ function ChatUi() {
     const [chatPartnerUsernames, setChatPartnerUsernames] = useState({}); // Object to map chat ID to username
     const [chatSelected, setChatSelected] = useState(null);
     const [status, setStatus] = useState(false);
+    const [image, setImage] = useState(null);
     const chatBottomRef = useRef(null);
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -218,19 +221,40 @@ function ChatUi() {
         scrollToBottom();
     }, [messages]);
 
-    const sendMessage = () => {
-        if (ws.current && messageInput.trim() !== "") {
+    const sendMessage = async () => {
+        console.log(image)
+        if (ws.current && (messageInput.trim() !== "" || (messageInput.trim() === "" && image !== null))) {
             const newMessage = {
                 action: "send",
                 senderID: user.userID,
                 chatID: chatSelected,
                 message: messageInput,
+                imagesToBeSubmitted: image !== null ? true : false,
                 datetime: new Date().toISOString(),
                 replyToID: replyTo ? replyTo.messageID : null,
             };
 
-            ws.current.send(JSON.stringify(newMessage));
+            const response = ws.current.send(JSON.stringify(newMessage));
 
+            const formData = new FormData();
+            formData.append("image", image)
+
+            await server.post("/chat/uploadImage", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                transformRequest: formData => formData
+            })
+            .then((response) => {
+                if (response.status == 200) {
+                    console.log("Image uploaded successfully")
+                    setImage(null)
+                }
+            }).catch((error) => {
+                console.error("Error uploading image: ", error)
+                showToast("Something went wrong", "Error uploading image. Try again.", 1500, true, "error")
+            });
+            
             setMessageInput("");
             setReplyTo(null);
         }
@@ -320,7 +344,7 @@ function ChatUi() {
 
     const scrollToBottom = () => {
         if (chatBottomRef.current) {
-            chatBottomRef.current.scrollIntoView({ behavior: "smooth" });
+            chatBottomRef.current.scrollIntoView();
         }
     };
 
@@ -352,6 +376,24 @@ function ChatUi() {
         });
         fetchChatHistory(clickedChatID);
     };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        const allowedTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/svg+xml",
+            "image/heic"
+        ]
+        if (allowedTypes.includes(file.type)) {
+            setImage(file);
+        } else {
+            setImage(null);
+            showToast("Invalid file type", "Please upload an image file.", 3000, true, "error")
+        }
+    }
+
 
     if (!loaded || !user) {
         return <Spinner />
@@ -472,6 +514,16 @@ function ChatUi() {
                             </Flex>
                         )}
                         <Flex mt={4} align="center">
+                            <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange}/>
+                            <IconButton
+                                aria-label="Attach image"
+                                icon={<FaCamera />}
+                                variant="ghost"
+                                colorScheme="gray"
+                                size="md"
+                                onClick={() => document.getElementById("file").click()}
+                                mr={2}
+                            />
                             <Input
                                 placeholder="Type a message..."
                                 flex="1"
