@@ -27,6 +27,11 @@ function Sidebar({ isOpen, onClose }) {
         onClose()
     };
 
+    const handleNavigationClick = (path) => {
+        navigate(path);
+        onClose()
+    }
+
     return (
         <Drawer
             isOpen={isOpen}
@@ -43,12 +48,12 @@ function Sidebar({ isOpen, onClose }) {
                 </DrawerHeader>
 
                 <DrawerBody display={"flex"} flexDirection={"column"}>
-                    <Button color={"#515F7C"} mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => window.location.href="/"}>
+                    <Button color={"#515F7C"} mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => handleNavigationClick("/")}>
                         <Icon viewBox="0 0 24 24" boxSize={6}><path fill="#515F7C" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></Icon>
                         <Text ml={2}>Home</Text>
                     </Button>
 
-                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => window.location.href="#"}>
+                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => handleNavigationClick("/reservations/upcoming")}>
                         <CalendarIcon ml={1}/>
                         <Text ml={3}>Upcoming Reservations</Text>
                     </Button>
@@ -58,12 +63,12 @@ function Sidebar({ isOpen, onClose }) {
                         <Text ml={2}>My Account</Text>
                     </Button>
 
-                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => window.location.href="/chat"}>
+                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => handleNavigationClick("/chat")}>
                         <ChatIcon ml={1}/>
                         <Text ml={3}>Chats</Text>
                     </Button>
 
-                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => window.location.href="#"}>
+                    <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => handleNavigationClick("#")}>
                         <Text as={BsQuestionCircle} fontSize="20px" color="#515F7C" ml={0.5} />
                         <Text ml={3}>Customer Support</Text>
                     </Button>

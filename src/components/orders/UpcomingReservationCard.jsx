@@ -2,6 +2,7 @@ import { Box, Button, Card, CardBody, CardFooter, Center, Heading, HStack, Image
 import { ChatIcon, StarIcon } from '@chakra-ui/icons';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { FaClock } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 function UpcomingReservationCard({ currentReservation, getFirstImageURL, onClick }) {
     return (
@@ -13,7 +14,9 @@ function UpcomingReservationCard({ currentReservation, getFirstImageURL, onClick
 
                     <Text py='2'>
                         By <strong>{currentReservation.listing.Host.username}</strong>
-                        <ChatIcon ml={"10px"} />
+                        <Link to={"/chat"}>
+                            <ChatIcon ml={"10px"} />
+                        </Link>
                     </Text>
 
                     <Text>{currentReservation.listing.longDescription}</Text>

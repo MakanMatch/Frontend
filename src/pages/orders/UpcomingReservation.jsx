@@ -171,7 +171,7 @@ function UpcomingReservation() {
                     )}
 
                     <Box mt={"5%"}>
-                        <UpcomingReservationCard currentReservation={currentReservation} getFirstImageURL={getFirstImageURL} />
+                        <UpcomingReservationCard currentReservation={currentReservation} getFirstImageURL={getFirstImageURL} onClick={onOpen} />
                     </Box>
 
                     <Box display={"flex"} flexDirection={"row"} justifyContent={"space-between"} mt={"30px"}>
@@ -200,18 +200,20 @@ function UpcomingReservation() {
 
             {isSmallerThan800 && ManageReservationSection("small")}
 
-            <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
+            <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Choose a reservation</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={6}>
-                        {reservations.map(reservation => (
-                            <UpcomingReservationCard currentReservation={reservation} getFirstImageURL={getFirstImageURL} onClick={() => {
-                                setCurrentReservation(reservation);
-                                onClose();
-                            }} />
-                        ))}
+                        <VStack spacing={"20px"}>
+                            {reservations.map(reservation => (
+                                <UpcomingReservationCard currentReservation={reservation} getFirstImageURL={getFirstImageURL} onClick={() => {
+                                    setCurrentReservation(reservation);
+                                    onClose();
+                                }} />
+                            ))}
+                        </VStack>
                     </ModalBody>
 
                     <ModalFooter>
