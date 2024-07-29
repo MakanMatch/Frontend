@@ -55,6 +55,7 @@ function UpcomingReservation() {
     }
 
     const fetchReservations = () => {
+        setDataLoaded(false);
         server.get('/getReservations?includeListing=true&includeListingHost=true&includeListingReservations=true')
             .then(response => {
                 dispatch(reloadAuthToken(authToken));
@@ -64,6 +65,8 @@ function UpcomingReservation() {
                         setReservations(processedReservations);
                         if (processedReservations.length > 0) {
                             setCurrentReservation(processedReservations[0]);
+                        } else {
+                            setCurrentReservation(null);
                         }
                         setDataLoaded(true);
                     } else {
@@ -159,10 +162,10 @@ function UpcomingReservation() {
                     </Box>
                 </Box>
 
-                {!isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} />}
+                {!isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} />}
             </Box>
 
-            {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} mode='small' />}
+            {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} mode='small' />}
 
             <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
                 <ModalOverlay />

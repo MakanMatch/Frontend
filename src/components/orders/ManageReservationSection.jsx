@@ -1,19 +1,64 @@
-import { Box, Button, Fade, Heading, HStack, Spacer, Text, VStack } from '@chakra-ui/react'
+import { Box, Button, Fade, Heading, HStack, Spacer, Text, useToast, VStack } from '@chakra-ui/react'
 import { useState } from 'react'
 import Extensions from '../../extensions'
+import server from '../../networking';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import configureShowToast from '../showToast';
+import { reloadAuthToken } from '../../slices/AuthState';
 
-function ManageReservationSection({ currentReservation, mode = "full" }) {
+function ManageReservationSection({ currentReservation, refreshReservations, mode = "full" }) {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const toast = useToast();
+    const showToast = configureShowToast(toast);
+    const { user, authToken } = useSelector(state => state.auth);
+
     const [showingCancelConfirmation, setShowingCancelConfirmation] = useState(false);
     const [cancelling, setCancelling] = useState(false);
     const inSixHourWindow = Extensions.timeDiffInSeconds(new Date(), new Date(currentReservation.listing.fullDatetime)) < 21600;
 
     function cancelReservation() {
-        console.log("Cancelling!")
         setCancelling(true);
+        server.post("/cancelReservation", {
+            referenceNum: currentReservation.referenceNum,
+            listingID: currentReservation.listing.listingID
+        })
+            .then(res => {
+                dispatch(reloadAuthToken(authToken))
+                setTimeout(() => {
+                    setCancelling(false)
+                    if (res.status == 200 && res.data && typeof res.data == "string" && res.data.startsWith("SUCCESS")) {
+                        showToast("Reservation cancelled successfully!", "You have successfully cancelled your reservation. We're sorry to see you go! 😢", 5000, true, "success")
+                        refreshReservations();
+                    } else {
+                        console.log("Unknown response received when cancelling reservation: ", res.data);
+                        showToast("Something went wrong", "We couldn't cancel your reservation. Please try again later.", 3000, true, "error")
+                    }
+                }, 500)
+            })
+            .catch(err => {
+                dispatch(reloadAuthToken(authToken))
+                setTimeout(() => {
+                    setCancelling(false)
+                    if (err.response && err.response.data && typeof err.response.data == "string") {
+                        if (err.response.data.startsWith("UERROR")) {
+                            console.log("User error occurred in cancelling reservation; response: " + err.response.data)
+                            showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3000, true, "error")
+                        } else {
+                            console.log("Error occurred in cancelling reservation: ", err.response.data);
+                            showToast("Something went wrong", "We couldn't cancel your reservation. Please try again later.", 3000, true, "error")
+                        }
+                    } else {
+                        console.log("Error occurred in cancelling reservation: ", err);
+                        showToast("Something went wrong", "We couldn't cancel your reservation. Please try again later.", 3000, true, "error")
+                    }
+                }, 500)
+            })
     }
 
     return (
-        <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} mt={"60px"} alignItems={"flex-start"} ml={mode == "full" ? "30px": ""}>
+        <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} mt={"60px"} alignItems={"flex-start"} ml={mode == "full" ? "30px" : ""}>
             {showingCancelConfirmation ? (
                 <Box>
                     <Fade in={showingCancelConfirmation}>
