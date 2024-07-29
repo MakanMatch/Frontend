@@ -55,7 +55,7 @@ function UpcomingReservation() {
     useEffect(() => {
         if (loaded == true) {
             if (!user) {
-                navigate('/login');
+                navigate('/auth/login');
                 showToast("Sign in first", "Login to your account to view reservations.", 2000, true, "error");
                 return;
             }
