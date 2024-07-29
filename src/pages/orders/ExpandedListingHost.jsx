@@ -52,6 +52,7 @@ function ExpandedListingHost() {
     const { user, loaded, error, authToken } = useSelector(state => state.auth)
     const dispatch = useDispatch();
     const [editListing, setEditListing] = useState(false)
+    const [hostID, setHostID] = useState("")
 
     const handleClose = () => {
         onClose()
@@ -155,6 +156,7 @@ function ExpandedListingHost() {
                     setListingPublished(processedData.published || false)
                     setGuestSlots(processedData.totalSlots || 1)
                     setPricePerPortion(processedData.portionPrice || 0.00)
+                    setHostID(processedData.hostID)
                     setLoading(false)
                     return
                 } else if (response.status == 404) {
@@ -355,10 +357,13 @@ function ExpandedListingHost() {
                     <>
                         <GridItem colSpan={2}>
                             <GuestManagement />
+                            <Text></Text>
                         </GridItem>
 
                         <GridItem colSpan={1}>
-                            <HostPaymentQR />
+                            <HostPaymentQR
+                            hostID={hostID}
+                            />
                         </GridItem>
 
                     </>
