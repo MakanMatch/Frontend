@@ -69,15 +69,15 @@ function HostPaymentQR({
 
     return (
         <>
-            <Text fontWeight={"bold"} fontSize="larger" >Your PayNow QR Code</Text>
+            <Text fontWeight="bold" fontSize="large" mb="4" >Your PayNow QR Code</Text>
             <Box
                 cursor="pointer"
                 position="relative"
                 display="flex"
-                alignItems="center"
+                alignItems="flex-start"
                 justifyContent="center"
                 width="100%"
-                height="100%"
+                height="400px"
                 onClick={() => document.getElementById('file-upload').click()}
                 _hover={{
                     '& .qr-code-image': {
@@ -90,7 +90,7 @@ function HostPaymentQR({
             >
                 <Image
                     width="80%"
-                    height="400px"
+                    height="auto"
                     className="qr-code-image"
                     src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getHostPaymentQR?hostID=${hostID}&something=${Date.now()}`}
                     fallbackSrc={placeholderImage}
