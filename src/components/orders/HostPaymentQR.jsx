@@ -74,14 +74,16 @@ function HostPaymentQR({
 
     return (
         <>
-            <Text fontWeight={"bold"}>Your PayNow QR Code</Text>
+            <Text fontWeight={"bold"} fontSize="larger" >Your PayNow QR Code</Text>
             <Box
+                cursor="pointer"
                 position="relative"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
                 width="100%"
                 height="100%"
+                onClick={() => document.getElementById('file-upload').click()}
                 _hover={{
                     '& .qr-code-image': {
                         filter: "grayscale(100%)",
@@ -109,18 +111,16 @@ function HostPaymentQR({
                     opacity={0}
                     transition="opacity 0.3s ease"
                 >
-                    <label htmlFor="file-upload" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: "pointer", }}>
-                        <PiUploadSimpleBold size="60px" color="gray" />
-                    </label>
-                    <Input
-                        id="file-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileUpload}
-                        display="none"
-                    />
+                    <PiUploadSimpleBold size="60px" color="gray" />
                 </Box>
             </Box>
+            <Input
+                id="file-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                display="none"
+            />
         </>
     )
 }
