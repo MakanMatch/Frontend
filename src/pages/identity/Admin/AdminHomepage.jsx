@@ -2,15 +2,22 @@ import { Heading, Text, Grid, Box, Image, Stack, Card, CardBody, Divider,
 CardFooter, ButtonGroup, Button,
 } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
+import { useSelector } from "react-redux"
+import { reloadAuthToken } from "../../../slices/AuthState";
+
 
 function AdminHomepage() {
     const navigate = useNavigate();
+    const { user, loaded, error, authToken } = useSelector((state) => state.auth);
+
+    
+
     return (
         <>
             <Heading mt={10} mb={5}>Hi, John Appleseed!</Heading>
             <Text size={'md'}>Welcome Back to MakanMatch!</Text>
-            <Grid templateColumns="repeat(3, 1fr)" gap={6} mt={5}>
-                <Card maxW='sm'>
+            <Box display="flex" justifyContent="space-between">
+                <Card width="32%">
                     <CardBody>
                         <Stack mt='6' spacing='3'>
                             <Heading size='md' textAlign={"left"} mt={-5}>User Management</Heading>
@@ -29,7 +36,7 @@ function AdminHomepage() {
                     </CardFooter>
                 </Card>
                 
-                <Card maxW='sm'>
+                <Card width="32%">
                     <CardBody>
                         <Stack mt='6' spacing='3'>
                             <Heading size='md' textAlign={"left"} mt={-5}>Hygiene Reports</Heading>
@@ -48,7 +55,7 @@ function AdminHomepage() {
                     </CardFooter>
                 </Card>
                 
-                <Card maxW='sm'>
+                <Card width="32%">
                     <CardBody>
                         <Stack mt='6' spacing='3'>
                             <Heading size='md' textAlign={"left"} mt={-5}>My Account</Heading>
@@ -66,7 +73,7 @@ function AdminHomepage() {
                         </ButtonGroup>
                     </CardFooter>
                 </Card>
-            </Grid>
+            </Box>
         </>
     )
 }

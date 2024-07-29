@@ -361,7 +361,7 @@ const MyAccount = () => {
             onClose();
         };
     
-        React.useEffect(() => {
+        useEffect(() => {
             if (!isOpen) {
                 setFname(localAccountInfo.fname);
                 setLname(localAccountInfo.lname);

@@ -89,5 +89,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             </BrowserRouter>
         </ChakraProvider>
     </Provider>
-
 )

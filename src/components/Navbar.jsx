@@ -12,7 +12,11 @@ function Navbar() {
 
     const handleAvatarClick = () => {
         if (authToken) {
-            navigate('/identity/myAccount');
+            if (user.userType == "Admin") {
+                navigate('/admin/adminAccount');
+            } else {
+                navigate('/identity/myAccount');
+            }
         } else {
             navigate('/auth/login');
         }
