@@ -114,7 +114,7 @@ function UpcomingReservation() {
 
     function ManageReservationSection(mode = "full") {
         return (
-            <Box display={"flex"} justifyContent={"flex-start"} flexDirection={"column"} mt={"60px"} alignItems={"flex-start"}>
+            <Box display={"flex"} justifyContent={"flex-start"} flexDirection={"column"} mt={"60px"} alignItems={"flex-start"} ml={"30px"}>
                 <Heading fontFamily={"Sora"} fontSize={{ 'base': 'large', 'md': 'larger' }}>Meal Details</Heading>
                 <Box display={"flex"} flexDirection={"row"} justifyContent={"space-between"} mt={"20px"} alignItems={"flex-start"} textAlign={"left"}>
                     <HStack spacing={"30px"}>
@@ -142,6 +142,8 @@ function UpcomingReservation() {
                 <br />
                 <br />
                 <Text>6 hours prior to the reservation, return here to make your payment to the host.</Text>
+                <Text>Keep a lookout in your inbox for the notification from us!</Text>
+                <Button mt={"20px"} colorScheme='red' fontWeight={"bold"}>Cancel Reservation</Button>
             </Box>
         )
     }
