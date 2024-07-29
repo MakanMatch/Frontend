@@ -5,7 +5,7 @@ import ChatBubble from "../../components/chat/ChatBubble";
 import ChatHistory from "../../components/chat/ChatHistory";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchUser } from "../../slices/AuthState";
+import { changeAuthToken, fetchUser, logout } from "../../slices/AuthState";
 import configureShowToast from "../../components/showToast";
 
 function ChatUi() {
@@ -38,7 +38,6 @@ function ChatUi() {
             ws.current.send(
                 JSON.stringify({
                     action: "connect",
-                    userID: user.userID,
                     authToken: authToken,
                 })
             );
@@ -63,15 +62,33 @@ function ChatUi() {
                 }
             }
 
-			if (receivedMessage.event && receivedMessage.event == "error") {
-				console.log("Error message from server: " + receivedMessage.message)
-				if (typeof receivedMessage.message == "string" && receivedMessage.message.startsWith("UERROR")) {
-					showToast("Something went wrong", receivedMessage.message.substring("UERROR: ".length), 1500, true, "error")
-				} else {
-					showToast("Something went wrong", "An error occurred. Try refreshing.", 1500, true, "error")
-				}
-				return;
-			}
+            if (receivedMessage.event && typeof receivedMessage.event == "string") {
+                if (receivedMessage.event == "error") {
+                    console.log("Error message from server: " + receivedMessage.message)
+                    if (typeof receivedMessage.message == "string") {
+                        if (receivedMessage.message == "ERROR: TokenExpiredError") {
+                            dispatch(logout());
+                            localStorage.removeItem('jwt')
+                            localStorage.setItem("intentionalWSClose", "true")
+                            navigate("/auth/login");
+                            showToast("Please login first", "Your session has expired. Please login again.", 3500, true, "error")
+                        } else if (receivedMessage.message.startsWith("UERROR")) {
+                            showToast("Something went wrong", receivedMessage.message.substring("UERROR: ".length), 1500, true, "error")
+                        } else {
+                            showToast("Something went wrong", "An error occurred. Try refreshing.", 1500, true, "error")
+                        }
+                    } else {
+                        showToast("Something went wrong", "An error occurred. Try refreshing.", 1500, true, "error")
+                    }
+                    return;
+                } else if (receivedMessage.event == "refreshToken") {
+                    if (receivedMessage.token) {
+                        console.log(receivedMessage.message)
+                        dispatch(changeAuthToken(receivedMessage.token))
+                        localStorage.setItem('jwt', receivedMessage.token);
+                    }
+                }
+            }
 
             if (receivedMessage.action === "chat_id") {
                 setChatHistory((prevChatHistory) => {
@@ -93,7 +110,7 @@ function ChatUi() {
                 }
             } else if (receivedMessage.action === "chat_history") {
                 setMessages(receivedMessage.previousMessages);
-				setStatus(receivedMessage.currentStatus);
+                setStatus(receivedMessage.currentStatus);
             } else if (receivedMessage.action === "send") {
                 setMessages((prevMessages) => [
                     ...prevMessages,
@@ -114,19 +131,19 @@ function ChatUi() {
                     )
                 );
             } else if (receivedMessage.action === "chat_partner_offline") {
-				console.log(`Received chatID ${receivedMessage.chatID}`)
-				console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
-				if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
+                console.log(`Received chatID ${receivedMessage.chatID}`)
+                console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
+                if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
                     console.log("Chat partner is offline")
-                	setStatus(false);
-				}
+                    setStatus(false);
+                }
             } else if (receivedMessage.action === "chat_partner_online") {
-				console.log(`Received chatID ${receivedMessage.chatID}`)
-				console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
-				if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
+                console.log(`Received chatID ${receivedMessage.chatID}`)
+                console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
+                if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
                     console.log("Chat partner is online")
-                	setStatus(true);
-				}
+                    setStatus(true);
+                }
             } else {
                 showToast("Something went wrong", "Unknown response received from server.", 1500, true, "error")
             }
@@ -134,13 +151,18 @@ function ChatUi() {
 
         ws.current.onerror = (error) => {
             showToast("Something went wrong", "Your connection was interrupted. Try refreshing.", 1500, true)
-			console.log("WebSocket error occurred: " + error)
+            console.log("WebSocket error occurred: " + error)
         };
 
         ws.current.onclose = () => {
             localStorage.removeItem("wsConnected")
             console.log("Disconnected from WebSocket server");
-			showToast("Something went wrong", "Your connection was interrupted. Try refreshing.", 1500, true, "error")
+            if (localStorage.getItem("intentionalWSClose") == "true") {
+                console.log("WebSocket connection closed intentionally.")
+                localStorage.removeItem("intentionalWSClose")
+            } else {
+                showToast("Something went wrong", "Your connection was interrupted. Try refreshing.", 1500, true, "error")
+            }
         };
     }
 
@@ -181,15 +203,16 @@ function ChatUi() {
         }
     }, [loaded]);
 
-	useEffect(() => {
-		return () => {
-			try {
-				ws.current.close();
-			} catch (err) {
-				console.log("Couldn't close socket connection; error: ", err)
-			}
-		}
-	}, [])
+    useEffect(() => {
+        return () => {
+            try {
+                localStorage.setItem("intentionalWSClose", "true")
+                ws.current.close();
+            } catch (err) {
+                console.log("Couldn't close socket connection; error: ", err)
+            }
+        }
+    }, [])
 
     useEffect(() => {
         scrollToBottom();
@@ -314,25 +337,25 @@ function ChatUi() {
     };
 
     const handleChatClick = (clickedChatID) => {
-		console.log("Clicked: ", clickedChatID)
+        console.log("Clicked: ", clickedChatID)
         setChatSelected((prev) => {
-			if (prev == null) {
-				localStorage.setItem("selectedChatID", clickedChatID)
-				return clickedChatID
-			} else if (prev != clickedChatID) {
-				localStorage.setItem("selectedChatID", clickedChatID)
-				return clickedChatID
-			} else {
-				localStorage.removeItem("selectedChatID")
-				return null
-			}
-		});
+            if (prev == null) {
+                localStorage.setItem("selectedChatID", clickedChatID)
+                return clickedChatID
+            } else if (prev != clickedChatID) {
+                localStorage.setItem("selectedChatID", clickedChatID)
+                return clickedChatID
+            } else {
+                localStorage.removeItem("selectedChatID")
+                return null
+            }
+        });
         fetchChatHistory(clickedChatID);
     };
 
-	if (!loaded || !user) {
-		return <Spinner />
-	}
+    if (!loaded || !user) {
+        return <Spinner />
+    }
 
     return (
         <Flex>
@@ -378,7 +401,7 @@ function ChatUi() {
                                 fontSize="sm"
                                 mb={-8}
                                 textAlign={"left"}
-                                color = {status ? "green.500" : "gray.300"}
+                                color={status ? "green.500" : "gray.300"}
                             >
                                 {status ? "Online" : "Offline"}
                             </Text>
