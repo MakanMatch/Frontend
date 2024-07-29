@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardBody, CardFooter, Center, Heading, HStack, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Stack, Text, useDisclosure, useMediaQuery, useToast, VStack } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, Center, Heading, HStack, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spacer, Spinner, Stack, Text, useDisclosure, useMediaQuery, useToast, VStack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import server from '../../networking';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,11 +6,7 @@ import configureShowToast from '../../components/showToast';
 import { Link, useNavigate } from 'react-router-dom';
 import { reloadAuthToken } from '../../slices/AuthState';
 import UpcomingReservationCard from '../../components/orders/UpcomingReservationCard';
-
-let SGDollar = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'SGD',
-});
+import ManageReservationSection from '../../components/orders/ManageReservationSection';
 
 function UpcomingReservation() {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
@@ -38,6 +34,9 @@ function UpcomingReservation() {
             let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
             reservation.listing.fullDatetime = before;
             reservation.listing.datetime = formattedString
+
+            const currentGuest = structuredClone(reservation.listing.guests.find(guest => guest.userID == user.userID));
+            reservation.currentGuest = currentGuest;
 
             return reservation;
         })
@@ -111,42 +110,6 @@ function UpcomingReservation() {
         return <Spinner />;
     }
 
-    function ManageReservationSection(mode = "full") {
-        return (
-            <Box display={"flex"} justifyContent={"flex-start"} flexDirection={"column"} mt={"60px"} alignItems={"flex-start"} ml={"30px"}>
-                <Heading fontFamily={"Sora"} fontSize={{ 'base': 'large', 'md': 'larger' }}>Meal Details</Heading>
-                <Box display={"flex"} flexDirection={"row"} justifyContent={"space-between"} mt={"20px"} alignItems={"flex-start"} textAlign={"left"}>
-                    <HStack spacing={"30px"}>
-                        <Box>
-                            <Text>Name</Text>
-                            <Text><strong>{currentReservation.listing.title}</strong></Text>
-                        </Box>
-
-                        <Box>
-                            <Text>Unit Price</Text>
-                            <Text><strong>{SGDollar.format(currentReservation.listing.portionPrice)}</strong></Text>
-                        </Box>
-
-                        <Box>
-                            <Text>Portions Reserved</Text>
-                            <Text><strong>{currentReservation.portions}</strong></Text>
-                        </Box>
-
-                        <Box>
-                            <Text>Total Price</Text>
-                            <Text><strong>{SGDollar.format(currentReservation.totalPrice)}</strong></Text>
-                        </Box>
-                    </HStack>
-                </Box>
-                <br />
-                <br />
-                <Text>6 hours prior to the reservation, return here to make your payment to the host.</Text>
-                <Text>Keep a lookout in your inbox for the notification from us!</Text>
-                <Button mt={"20px"} colorScheme='red' fontWeight={"bold"}>Cancel Reservation</Button>
-            </Box>
-        )
-    }
-
     if (!currentReservation) {
         return (
             <Box mt={{ base: "150px", md: "250px", lg: "350px" }}>
@@ -188,17 +151,18 @@ function UpcomingReservation() {
 
                         <Box ml={"5%"}>
                             <Text><strong>Guests</strong></Text>
-                            {currentReservation.listing.guests.map(guest => (
-                                <Text>{guest.fname + " " + guest.lname}</Text>
+                            <Text>{`${currentReservation.currentGuest.fname} ${currentReservation.currentGuest.lname} (You)`}</Text>
+                            {currentReservation.listing.guests.map(guest => guest.userID != user.userID && (
+                                <Text key={guest.username}>{`${guest.fname} ${guest.lname}`}</Text>
                             ))}
                         </Box>
                     </Box>
                 </Box>
 
-                {!isSmallerThan800 && ManageReservationSection()}
+                {!isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} />}
             </Box>
 
-            {isSmallerThan800 && ManageReservationSection("small")}
+            {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} mode='small' />}
 
             <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
                 <ModalOverlay />
@@ -208,7 +172,7 @@ function UpcomingReservation() {
                     <ModalBody pb={6}>
                         <VStack spacing={"20px"}>
                             {reservations.map(reservation => (
-                                <UpcomingReservationCard currentReservation={reservation} getFirstImageURL={getFirstImageURL} onClick={() => {
+                                <UpcomingReservationCard key={reservation.referenceNum} currentReservation={reservation} getFirstImageURL={getFirstImageURL} onClick={() => {
                                     setCurrentReservation(reservation);
                                     onClose();
                                 }} />
