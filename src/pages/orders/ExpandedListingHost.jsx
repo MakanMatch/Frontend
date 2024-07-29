@@ -49,10 +49,14 @@ function ExpandedListingHost() {
     const [file, setFile] = useState(null);
     const { user, loaded, error, authToken } = useSelector(state => state.auth)
     const dispatch = useDispatch();
+    const [editListing, setEditListing] = useState(false)
 
     const handleClose = () => {
         onClose()
         setFile(null)
+    }
+    const handleEditListing = () => {
+        setEditListing(!editListing)
     }
     const handleDeleteImageDialogClosure = () => {
         closeDeleteImageDialog()
@@ -282,16 +286,19 @@ function ExpandedListingHost() {
                         </HStack>
                     </VStack>
                 </GridItem>
-                <GridItem colSpan={1} alignContent={"flex-end"}>
-                    {changesMade && (
-                        <SlideFade in={true}>
-                            <HStack>
-                                <Spacer />
-                                <Button variant={"MMPrimary"} onClick={handleSaveChanges}>Save Changes</Button>
-                            </HStack>
-                        </SlideFade>
-                    )}
+                <GridItem colSpan={1}>
+                    <VStack h="92%" justify="flex-end" alignItems="flex-end" spacing={4}>
+                        {changesMade && (
+                            <SlideFade in={true}>
+                                <Button variant="MMPrimary" onClick={handleSaveChanges}>Save Changes</Button>
+                            </SlideFade>
+                        )}
+                        <Button variant="link" onClick={handleEditListing} color="blue" textDecoration="underline">
+                            {editListing ? "Edit Listing" : "Manage Guests"}
+                        </Button>
+                    </VStack>
                 </GridItem>
+                {/*Edit Listing*/}
                 <GridItem colSpan={3} mb={"20px"}>
                     <VStack alignItems={"flex-start"}>
                         <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
