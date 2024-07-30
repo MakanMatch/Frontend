@@ -122,7 +122,7 @@ function GuestManagement({
                                         <Text fontWeight="bold" fontSize="lg" textAlign="right">{guest.fname} {guest.lname}</Text>
                                     </Box>
                                     <Box>
-                                        <ScaleFade initialScale={0.5} in={guest.Reservation.paidAndPresent}>
+                                        <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
                                             <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>PAID</Badge>
                                         </ScaleFade>
                                     </Box>
