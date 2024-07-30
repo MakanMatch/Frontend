@@ -357,7 +357,6 @@ function ExpandedListingHost() {
                     <>
                         <GridItem colSpan={2}>
                             <GuestManagement 
-                            hostID={hostID}
                             listingID={listingData.listingID}
                             guests={listingData.guests}
                             />

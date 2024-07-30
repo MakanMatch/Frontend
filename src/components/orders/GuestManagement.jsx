@@ -9,7 +9,6 @@ import configureShowToast from '../../components/showToast'
 import { FaCommentDots, FaCheck } from "react-icons/fa";
 
 function GuestManagement({
-    hostID,
     listingID,
     guests
 }) {
@@ -18,48 +17,30 @@ function GuestManagement({
     const { user, loaded, authToken } = useSelector((state) => state.auth);
     const toast = useToast();
     const showToast = configureShowToast(toast);
-    const [paidAndPresent, setPaidAndPresent] = useState(false);
     const navigate = useNavigate();
-
-    const fetchReservationGuests = async () => {
-        try {
-            const response = await server.get(`/getGuests?hostID=${hostID}&listingID=${listingID}`);
-            dispatch(reloadAuthToken(authToken))
-            if (response.status === 200) {
-                console.log(response.data);
-                setGuestsList(response.data);
-            } else {
-                showToast('Something went wrong', 'An error occurred while fetching guest information', 3000, false, 'error');
-                console.error('Error fetching guest information:', response.data);
-            }
-        } catch (error) {
-            dispatch(reloadAuthToken(authToken))
-            if (error.response && error.response.data) {
-                if (error.response.data.startsWith("UERROR")) {
-                    showToast('Something went wrong', error.response.data.substring("UERROR: ".length), 3000, false, 'error');
-                    console.log('User error occurred in fetching guest information:', error.response.data);
-                } else {
-                    showToast('Something went wrong', 'An error occurred while fetching guest information', 3000, false, 'error');
-                    console.error('Error fetching guest information:', error.response.data);
-                }
-            } else {
-                showToast('Something went wrong', 'An error occurred while fetching guest information', 3000, false, 'error');
-                console.error('Error fetching guest information:', error);
-            }
-        }
-    }
+    const [refresh, setRefresh] = useState(false);
 
     const handlePaidAndPresent = async ({ referenceNum, listingID }) => {
         try {
             const response = await server.put(`/orders/manageGuests/togglePaidAndPresent`, { referenceNum, listingID });
             dispatch(reloadAuthToken(authToken))
             if (response.status === 200) {
-                if (paidAndPresent) {
-                    showToast('Guest marked as unpaid & absent', '', 3000, false, 'success');
-                    setPaidAndPresent(!paidAndPresent);
+                if (response.data.paidAndPresent == true) {
+                    showToast('Guest marked as paid & present', 'Guest has been marked as paid & present', 3000, false, 'success');
+                    guestsList.forEach((guest) => {
+                        if (guest.Reservation.referenceNum === referenceNum) {
+                            guest.Reservation.paidAndPresent = true;
+                        }
+                    })
+                    setRefresh(!refresh);
                 } else {
-                    showToast('Guest marked as paid & present', '', 3000, false, 'success');
-                    setPaidAndPresent(!paidAndPresent);
+                    showToast('Guest marked as not paid & present', 'Guest has been marked as not paid & present', 3000, false, 'success');
+                    guestsList.forEach((guest) => {
+                        if (guest.Reservation.referenceNum === referenceNum) {
+                            guest.Reservation.paidAndPresent = false;
+                        }
+                    })
+                    setRefresh(!refresh);
                 }
             } else {
                 showToast('Something went wrong', 'An error occurred while marking guest as paid & present', 3000, false, 'error');
@@ -83,10 +64,8 @@ function GuestManagement({
     }
 
     useEffect(() => {
-        if (loaded == true) {
-            setGuestsList(guests);
-        }
-    }, [paidAndPresent])
+        setGuestsList(guests);
+    }, [guestsList, refresh])
 
     if (!loaded) {
         return (
