@@ -162,10 +162,10 @@ function UpcomingReservation() {
                     </Box>
                 </Box>
 
-                {!isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} />}
+                {!isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} dataLoaded={dataLoaded} />}
             </Box>
 
-            {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} mode='small' />}
+            {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} dataLoaded={dataLoaded} mode='small' />}
 
             {reservations.length > 1 && (
                 <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
