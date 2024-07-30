@@ -134,6 +134,7 @@ function GuestManagement({
                                 variant="ghost"
                                 colorScheme="blackAlpha"
                                 size="lg"
+                                onClick={() => navigate(`/chat`)}
                             />
                             <Button
                                 colorScheme="purple"
