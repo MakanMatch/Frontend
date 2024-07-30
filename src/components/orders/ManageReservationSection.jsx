@@ -147,7 +147,7 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, r
                                 <Box>
                                     <Box display={"flex"} justifyContent={"left"} flexDirection={mode == "full" ? "row" : "column"} mt={"20px"} alignItems={"center"}>
                                         <VStack>
-                                            <Image src={hostPaymentURL(currentReservation)} objectFit={"contain"} fallbackSrc={placeholderImage} alt='Host Payment QR Code' width={"200px"} height={"200px"} />
+                                            <Image src={hostPaymentURL(currentReservation)} objectFit={"contain"} fallbackSrc={placeholderImage} alt='Host Payment QR Code' width={"250px"} height={"250px"} />
                                             {!currentReservation.listing.Host.paymentImage && (
                                                 <>
                                                     <Text fontSize={'small'}>Host hasn't uploaded<br /> PayNow QR code yet.</Text>
