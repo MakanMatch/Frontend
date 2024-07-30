@@ -47,6 +47,7 @@ function ChatUi() {
         };
 
         ws.current.onmessage = async (event) => {
+            console.log("image:", image);
             let receivedMessage;
             if (event.data instanceof Blob) {
                 const text = await event.data.text();
@@ -93,34 +94,34 @@ function ChatUi() {
                 }
             }
 
-            if (receivedMessage.action === "upload_image" ) {
-                console.log('congrats')
-                const formData = new FormData();
-                formData.append("image", image)
-
-                await server.post("/chat/uploadImage", formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                    transformRequest: formData => formData
-                })
+            if (receivedMessage.action === "upload_image") {
+                console.log('Received upload_image action');
+                console.log('Current image state:', image);
+            
+                if (image) {
+                    const formData = new FormData();
+                    formData.append("image", image);
+            
+                    console.log('FormData content:', formData.get('image'));
+            
+                    await server.post("/chat/uploadImage", formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        }
+                    })
                     .then((response) => {
-                        if (response.status == 200) {
-                            const imageUrl = server.get(`/cdn/getImageForChat?userID=${receivedMessage.message.senderID}&messageID=${receivedMessage.message.messageID}&imageName=${image.name}`);
-                            const newMessage = {
-                                action: "finalise_send",
-                                imageUrl: imageUrl,
-                                message: receivedMessage.message,
-                            }
-
-                            ws.current.send(JSON.stringify(newMessage));
+                        if (response.status === 200) {
+                            // Handle success
                         }
                     }).catch((error) => {
-                        console.error("Error uploading image: ", error)
-                        showToast("Something went wrong", "Error uploading image. Try again.", 1500, true, "error")
+                        console.error("Error uploading image: ", error);
+                        showToast("Something went wrong", "Error uploading image. Try again.", 1500, true, "error");
                     });
-
+                } else {
+                    console.log('No image selected');
+                }
             }
+            
 
             if (receivedMessage.action === "chat_id") {
                 setChatHistory((prevChatHistory) => {
@@ -251,13 +252,13 @@ function ChatUi() {
     }, [messages]);
 
     const sendMessage = async () => {
-        if (ws.current && (messageInput.trim() !== "" || (messageInput.trim() === "" && image !== null))) {
+        if (ws.current && (messageInput.trim() !== "" || (messageInput.trim() !== "" && image !== null))) {
             const newMessage = {
                 action: "send",
                 senderID: user.userID,
                 chatID: chatSelected,
                 message: messageInput,
-                imagesToBeSubmitted: image ,
+                imagesToBeSubmitted: image ? true : false,
                 datetime: new Date().toISOString(),
                 replyToID: replyTo ? replyTo.messageID : null,
             };
@@ -393,13 +394,22 @@ function ChatUi() {
             "image/png",
             "image/svg+xml",
             "image/heic"
-        ]
-        if (allowedTypes.includes(file.type)) {
-            setImage(true);
+        ];
+        if (file && allowedTypes.includes(file.type)) {
+            setImage(file);
+            console.log("Selected file:", file);
         } else {
-            showToast("Invalid file type", "Please upload an image file.", 3000, true, "error")
+            showToast("Invalid file type", "Please upload an image file.", 3000, true, "error");
         }
-    }
+    };
+    
+
+    useEffect(() => {
+        if (image) {
+            console.log("Image in useEffect:", image);
+        }
+    }, [image]);
+    
 
 
     if (!loaded || !user) {
