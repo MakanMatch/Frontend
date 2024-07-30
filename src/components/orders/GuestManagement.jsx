@@ -10,7 +10,8 @@ import { FaCommentDots, FaCheck } from "react-icons/fa";
 
 function GuestManagement({
     hostID,
-    listingID
+    listingID,
+    guests
 }) {
     const [guestsList, setGuestsList] = useState([]);
     const dispatch = useDispatch();
@@ -83,7 +84,7 @@ function GuestManagement({
 
     useEffect(() => {
         if (loaded == true) {
-            fetchReservationGuests();
+            setGuestsList(guests);
         }
     }, [paidAndPresent])
 
@@ -106,6 +107,7 @@ function GuestManagement({
                     <Box
                         key={guest.userID}
                         display="flex"
+                        flexDirection={{ base: 'column', md: 'row' }}
                         alignItems="center"
                         justifyContent="space-between"
                         borderWidth="1px"
@@ -114,7 +116,7 @@ function GuestManagement({
                         p={4}
                         mb={4}
                     >
-                        <Box display="flex" alignItems="center">
+                        <Box display="flex" alignItems="center" mb={{base:4, md:0}}>
                             <Avatar name={guest.username} size="lg" mr={4} />
                             <Box>
                                 <Flex gap={3} width="100%">

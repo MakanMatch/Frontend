@@ -139,7 +139,7 @@ function ExpandedListingHost() {
     useEffect(checkForChanges, [shortDescription, longDescription, guestSlots, pricePerPortion])
 
     const fetchListingDetails = (id) => {
-        server.get(`/cdn/getListing?id=${id || listingID}`)
+        server.get(`/cdn/getListing?id=${id || listingID}&includeReservations=true`)
             .then(response => {
                 dispatch(reloadAuthToken(authToken))
                 if (response.status == 200) {
@@ -359,6 +359,7 @@ function ExpandedListingHost() {
                             <GuestManagement 
                             hostID={hostID}
                             listingID={listingData.listingID}
+                            guests={listingData.guests}
                             />
                         </GridItem>
 
