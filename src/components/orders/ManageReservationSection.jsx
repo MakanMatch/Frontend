@@ -82,7 +82,7 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, r
                         showToast("Payment status updated!", "Your payment status has been updated.", 3000, true, "success")
                         setCurrentReservation(prevReservation => {
                             var newReservation = structuredClone(prevReservation);
-                            newReservation.markedPaid = res.data;
+                            newReservation.markedPaid = res.data.markedPaid;
                             newReservation.totalPrice = res.data.totalPrice;
                             newReservation.portions = res.data.portions;
 
@@ -120,7 +120,7 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, r
     }
 
     return (
-        <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} mt={"60px"} alignItems={"flex-start"} ml={mode == "full" ? "30px" : ""}>
+        <Box display={"flex"} justifyContent={"center"} flexDirection={"column"} mt={"60px"} alignItems={"flex-start"} ml={mode == "full" ? "30px" : ""}>
             {showingCancelConfirmation ? (
                 <Box>
                     <Fade in={showingCancelConfirmation}>
@@ -143,37 +143,49 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, r
                 <Fade in>
                     {inSixHourWindow ? (
                         <>
-                            <Box display={"flex"} justifyContent={"left"} flexDirection={mode == "full" ? "row" : "column"} mt={"20px"} alignItems={"center"}>
-                                <VStack>
-                                    <Image src={hostPaymentURL(currentReservation)} objectFit={"contain"} fallbackSrc={placeholderImage} alt='Host Payment QR Code' width={"200px"} height={"200px"} />
-                                    {!currentReservation.listing.Host.paymentImage && (
-                                        <>
-                                            <Text fontSize={'small'}>Host hasn't uploaded<br /> PayNow QR code yet.</Text>
-                                            <Button variant={'link'} color={'primaryColour'} fontSize={'small'} onClick={() => navigate("/chat")}>Inform them here.</Button>
-                                        </>
-                                    )}
-                                </VStack>
-                                <VStack spacing={4} ml={"20px"} maxW={"300px"} textAlign={"left"} mt={"15px"}>
-                                    <Text>
-                                        Host receives payments directly.<br /><br />
+                            {!currentReservation.markedPaid ? (
+                                <Box>
+                                    <Box display={"flex"} justifyContent={"left"} flexDirection={mode == "full" ? "row" : "column"} mt={"20px"} alignItems={"center"}>
+                                        <VStack>
+                                            <Image src={hostPaymentURL(currentReservation)} objectFit={"contain"} fallbackSrc={placeholderImage} alt='Host Payment QR Code' width={"200px"} height={"200px"} />
+                                            {!currentReservation.listing.Host.paymentImage && (
+                                                <>
+                                                    <Text fontSize={'small'}>Host hasn't uploaded<br /> PayNow QR code yet.</Text>
+                                                    <Button variant={'link'} color={'primaryColour'} fontSize={'small'} onClick={() => navigate("/chat")}>Inform them here.</Button>
+                                                </>
+                                            )}
+                                        </VStack>
+                                        <VStack spacing={4} ml={"20px"} maxW={"300px"} textAlign={"left"} mt={"15px"}>
+                                            <Text>
+                                                Host receives payments directly.<br /><br />
 
-                                        Click “I have paid” to notify your host about the payment.<br /><br />
+                                                Click “I have paid” to notify your host about the payment.<br /><br />
 
-                                        Payment will be checked when you reach the address.<br />
-                                    </Text>
-                                    <Text fontSize={'large'}>Send <strong>{Extensions.formatCurrency(currentReservation.totalPrice)}</strong> to {currentReservation.listing.Host.fname} via PayNow.</Text>
-                                </VStack>
-                            </Box>
-                            <VStack>
-                                {currentReservation.markedPaid ? (
-                                    <BsFillCheckCircleFill onClick={toggleMarkedPaid} color={'lime'} size={'50px'} />
-                                ) : (
-                                    <>
-                                        <Button mt={"20px"} width={"100%"} variant={"MMPrimary"} onClick={toggleMarkedPaid} isLoading={markingPaid} loadingText="Updating...">I have paid</Button>
-                                        <Button mt={"10px"} width={"100%"} variant={"link"} color={"red"} fontWeight={"bold"} isDisabled={markingPaid}>Cancel</Button>
-                                    </>
-                                )}
-                            </VStack>
+                                                Payment will be checked when you reach the address.<br />
+                                            </Text>
+                                            <Text fontSize={'large'}>Send <strong>{Extensions.formatCurrency(currentReservation.totalPrice)}</strong> to {currentReservation.listing.Host.fname} via PayNow.</Text>
+                                        </VStack>
+                                    </Box>
+
+                                    <VStack>
+                                        <Button mt={"10%"} width={"100%"} variant={"MMPrimary"} onClick={toggleMarkedPaid} isLoading={markingPaid} loadingText="Updating..." _hover={"none"}>I have paid</Button>
+                                        <Button mt={"10px"} width={"100%"} variant={"link"} color={"red"} fontWeight={"bold"} isDisabled={markingPaid}>Cancel (Chargeable)</Button>
+                                    </VStack>
+                                </Box>
+                            ) : (
+                                <Box mr={"10vh"}>
+                                    <Box display={"flex"} justifyContent={"center"} flexDir={"column"} mt={"20px"} alignItems={"center"}>
+                                        <BsFillCheckCircleFill color={'lime'} size={'50px'} onClick={toggleMarkedPaid} />
+                                        <Heading size={"lg"} mt={"20px"}>Payment Complete</Heading>
+                                        <Text mt={"10px"}>{currentReservation.listing.Host.fname} has been notified of your payment.</Text>
+                                        <Text>Thank you for paying promptly!</Text>
+                                    </Box>
+
+                                    <VStack>
+                                        <Button mt={"10%"} width={"100%"} variant={"MMPrimary"} onClick={toggleMarkedPaid} isLoading={markingPaid} loadingText="Showing..." _hover={"none"}>Show QR Code Again</Button>
+                                    </VStack>
+                                </Box>
+                            )}
                         </>
                     ) : (
                         <>
