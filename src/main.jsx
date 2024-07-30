@@ -33,6 +33,7 @@ import Favourites from './pages/identity/Favourites/Favourites.jsx';
 import MakanReviews from './pages/identity/MakanReviews.jsx';
 import ConfirmReservation from './pages/orders/ConfirmReservation.jsx';
 import UpcomingReservation from './pages/orders/UpcomingReservation.jsx';
+import ChargeableCancellation from './pages/orders/ChargeableCancellation.jsx';
 
 const store = configureStore({
     reducer: {
@@ -58,6 +59,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"reservations"}>
                             <Route path={"new"} element={<ConfirmReservation />} />
                             <Route path={"upcoming"} element={<UpcomingReservation />} />
+                            <Route path={"chargeableCancel"} element={<ChargeableCancellation />} />
                         </Route>
                         <Route path='*' element={<NotFound />} />
                     </Route>

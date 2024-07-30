@@ -27,6 +27,20 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, r
         return `${backendURL}/cdn/getHostPaymentQR?token=${authToken}&listingID=${currentReservation.listing.listingID}`
     }
 
+    const handleChargeableCancellationClick = () => {
+        if (!currentReservation) {
+            showToast("Something went wrong", "Please select a reservation first.", 2000, true, "error")
+            return;
+        }
+
+        navigate("/reservations/chargeableCancel", {
+            state: {
+                currentReservation: currentReservation
+            }
+        })
+        return;
+    }
+
     function nonChargeableCancelReservation() {
         setCancelling(true);
         server.post("/cancelReservation", {
@@ -169,7 +183,7 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, r
 
                                     <VStack>
                                         <Button mt={"10%"} width={"100%"} variant={"MMPrimary"} onClick={toggleMarkedPaid} isLoading={markingPaid} loadingText="Updating..." _hover={"none"}>I have paid</Button>
-                                        <Button mt={"10px"} width={"100%"} variant={"link"} color={"red"} fontWeight={"bold"} isDisabled={markingPaid}>Cancel (Chargeable)</Button>
+                                        <Button mt={"10px"} width={"100%"} variant={"link"} color={"red"} fontWeight={"bold"} isDisabled={markingPaid} onClick={handleChargeableCancellationClick}>Cancel (Chargeable)</Button>
                                     </VStack>
                                 </Box>
                             ) : (

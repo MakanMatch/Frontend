@@ -19,7 +19,6 @@ function ConfirmReservationLayout({
     const { user, loaded, authToken } = useSelector(state => state.auth)
 
     const handleGoBack = () => {
-        console.log("hello")
         if (window.history.length > 1) {
             navigate(-1);
         } else {
