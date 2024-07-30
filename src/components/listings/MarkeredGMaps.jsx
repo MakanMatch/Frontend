@@ -67,7 +67,7 @@ const MarkeredGMaps = ({
                                     images: listing.images.map((image) => getImageLink(listing.listingID, image)),
                                     title: listing.title,
                                     shortDescription: listing.shortDescription,
-                                    approxAddress: listing.address,
+                                    approxAddress: listing.approxAddress,
                                     portionPrice: listing.portionPrice,
                                     totalSlots: listing.totalSlots,
                                     latitude: lat,
