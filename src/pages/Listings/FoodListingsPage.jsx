@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton, Spinner, Center, Fade } from "@chakra-ui/react";
+import { SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton, Spinner, Center, Fade, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Button } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
 import FoodListingCard from "../../components/listings/FoodListingCard";
@@ -11,7 +12,9 @@ const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
+    const [activeMarker, setActiveMarker] = useState(null);
     const [loading, setLoading] = useState(true); 
+    const navigate = useNavigate();
 
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
@@ -74,6 +77,23 @@ const FoodListingsPage = () => {
         }
     };
 
+    const navigateToListing = (listing, lat, lng) => {
+        navigate("/targetListing", {
+            state: {
+                listingID: listing.listingID,
+                hostID: listing.hostID,
+                images: listing.images.map((image) => getImageLink(listing.listingID, image)),
+                title: listing.title,
+                shortDescription: listing.shortDescription,
+                approxAddress: listing.approxAddress,
+                portionPrice: listing.portionPrice,
+                totalSlots: listing.totalSlots,
+                latitude: lat,
+                longitude: lng,
+            },
+        });
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             await fetchListings();
@@ -116,6 +136,8 @@ const FoodListingsPage = () => {
                         })}
                         listings={listings}
                         isSmallerThan1095={true}
+                        setActiveMarker={setActiveMarker}
+                        navigateToListing={navigateToListing}
                     />
                 </Box>
             )}
@@ -199,12 +221,44 @@ const FoodListingsPage = () => {
                                     })}
                                     listings={listings}
                                     isSmallerThan1095={false}
+                                    setActiveMarker={setActiveMarker}
+                                    navigateToListing={navigateToListing}
                                 />
                             </SlideFade>
                         </Box>
                     )}
                 </Flex>
             </Skeleton>
+            {activeMarker && (
+                <Modal isOpen={true} onClose={() => setActiveMarker(null)} size="xl">
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader color="#323437">This address has multiple listings! Select one to view</ModalHeader>
+                        <ModalBody>
+                            {activeMarker.listings.map((listing, idx) => (
+                                <Card
+                                mb={3}
+                                key={idx}
+                                sx={{ cursor: "pointer" }}
+                                onClick={() => {
+                                    navigateToListing(listing, activeMarker.lat, activeMarker.lng);
+                                    setActiveMarker(null);
+                                }}>
+                                    <CardBody>
+                                        <Text>{listing.title}</Text>
+                                        <Text>{listing.approxAddress}</Text>
+                                    </CardBody>
+                                </Card>
+                            ))}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme='red' mr={3} onClick={() => setActiveMarker(null)}>
+                                Close
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
         </>
     );
 };

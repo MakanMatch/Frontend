@@ -1,19 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Loader } from "@googlemaps/js-api-loader";
-import { Skeleton, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Text, Button } from "@chakra-ui/react";
+import { Skeleton, useToast } from "@chakra-ui/react";
 
 const MarkeredGMaps = ({
     coordinatesList,
     listings,
-    isSmallerThan1095
+    isSmallerThan1095,
+    setActiveMarker,
+    navigateToListing
 }) => {
-    const navigate = useNavigate();
     const mapRef = useRef(null);
     const [mapLoaded, setMapLoaded] = useState(false);
-    const [activeMarker, setActiveMarker] = useState(null);
     const toast = useToast();
 
     function displayToast(title, description, status, duration, isClosable) {
@@ -26,27 +25,6 @@ const MarkeredGMaps = ({
             isClosable: isClosable
         });
     }
-
-    function getImageLink(listingID, imageName) {
-        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
-    }
-
-    const navigateToListing = (listing, lat, lng) => {
-        navigate("/targetListing", {
-            state: {
-                listingID: listing.listingID,
-                hostID: listing.hostID,
-                images: listing.images.map((image) => getImageLink(listing.listingID, image)),
-                title: listing.title,
-                shortDescription: listing.shortDescription,
-                approxAddress: listing.approxAddress,
-                portionPrice: listing.portionPrice,
-                totalSlots: listing.totalSlots,
-                latitude: lat,
-                longitude: lng,
-            },
-        });
-    };
 
     useEffect(() => {
         const InitializeMap = async (validCoordinates) => {
@@ -94,7 +72,6 @@ const MarkeredGMaps = ({
                                     const listing = listings[index];
                                     navigateToListing(listing, lat, lng);
                                 } else {
-                                    // Set active marker state for the modal
                                     setActiveMarker({ listings: markerGroup.map(({ index }) => listings[index]), lat, lng });
                                 }
                             });
@@ -130,36 +107,6 @@ const MarkeredGMaps = ({
                     }}
                 />
             </Skeleton>
-            {activeMarker && (
-                <Modal isOpen={true} onClose={() => setActiveMarker(null)} size="xl">
-                    <ModalOverlay />
-                    <ModalContent>
-                        <ModalHeader color="#323437">This address has multiple listings! Select one to view</ModalHeader>
-                        <ModalBody>
-                            {activeMarker.listings.map((listing, idx) => (
-                                <Card
-                                mb={3}
-                                key={idx}
-                                sx={{ cursor: "pointer" }}
-                                onClick={() => {
-                                    navigateToListing(listing, activeMarker.lat, activeMarker.lng);
-                                    setActiveMarker(null);
-                                }}>
-                                    <CardBody>
-                                        <Text>{listing.title}</Text>
-                                        <Text>{listing.approxAddress}</Text>
-                                    </CardBody>
-                                </Card>
-                            ))}
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button colorScheme='red' mr={3} onClick={() => setActiveMarker(null)}>
-                                Close
-                            </Button>
-                        </ModalFooter>
-                    </ModalContent>
-                </Modal>
-            )}
         </>
     );
 };
