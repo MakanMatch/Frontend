@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
 import { motion } from "framer-motion";
+import { FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import server from "../../networking";
@@ -275,9 +276,21 @@ const FoodListingsPage = () => {
                                     navigateToListing(listing, activeMarker.lat, activeMarker.lng);
                                     setActiveMarker(null);
                                 }}>
-                                    <CardBody>
-                                        <Text>{listing.title}</Text>
-                                        <Text>{listing.approxAddress}</Text>
+                                    <CardBody display="flex" justifyContent={"space-between"}>
+                                        <Box mt={1}>
+                                            <Text fontWeight="bold" mt={-3}>{listing.title}</Text>
+                                            <Box display="flex" mb={2}>
+                                                <Text mr={2} mt={3.5}><FaMapMarkerAlt fill="#515F7C" /></Text>
+                                                <Text mt={3}>{listing.approxAddress}</Text>
+                                            </Box>
+                                            <Box display="flex">
+                                                <Text mr={2} mt={1}><FaUser fill="#515F7C" /></Text>
+                                                <Text>{listing.Host.username || "MakanMatch Host"}</Text>
+                                            </Box>
+                                        </Box>
+                                        <Box display="flex" flexDirection="column" justifyContent={"center"}>
+                                            <Text mt={2} fontSize="md">${listing.portionPrice} / portion</Text>
+                                        </Box>
                                     </CardBody>
                                 </Card>
                             ))}
