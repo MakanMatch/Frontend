@@ -94,6 +94,11 @@ const FoodListingsPage = () => {
         });
     };
 
+    const handleCloseMapModal = () => {
+        setActiveMarker(null);
+        localStorage.setItem("mapRemountDenyOnModalClose", true);
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             await fetchListings();
@@ -230,7 +235,7 @@ const FoodListingsPage = () => {
                 </Flex>
             </Skeleton>
             {activeMarker && (
-                <Modal isOpen={true} onClose={() => setActiveMarker(null)} size="xl">
+                <Modal isOpen={true} closeOnOverlayClick={false} onClose={() => setActiveMarker(null)} size="xl">
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader color="#323437">This address has multiple listings! Select one to view</ModalHeader>
@@ -252,7 +257,7 @@ const FoodListingsPage = () => {
                             ))}
                         </ModalBody>
                         <ModalFooter>
-                            <Button colorScheme='red' mr={3} onClick={() => setActiveMarker(null)}>
+                            <Button colorScheme='red' mr={3} onClick={handleCloseMapModal}>
                                 Close
                             </Button>
                         </ModalFooter>

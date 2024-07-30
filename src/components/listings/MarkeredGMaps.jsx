@@ -28,7 +28,13 @@ const MarkeredGMaps = ({
 
     useEffect(() => {
         const InitializeMap = async (validCoordinates) => {
-            console.log("Map initialised");
+            const skipRemount = localStorage.getItem("mapRemountDenyOnModalOpen") ? "mapRemountDenyOnModalOpen" : localStorage.getItem("mapRemountDenyOnModalClose") ? "mapRemountDenyOnModalClose" : null;
+            if (skipRemount) {
+                localStorage.removeItem(skipRemount);
+                console.log("Skipped map remount");
+                return;
+            }
+            console.log("Initialised map");
             const loader = new Loader({
                 apiKey: import.meta.env.VITE_GMAPS_API_KEY,
                 version: "weekly",
@@ -69,6 +75,7 @@ const MarkeredGMaps = ({
                     Object.values(markers).forEach((markerGroup) => {
                         markerGroup.forEach(({ marker, index, lat, lng }) => {
                             marker.addListener("click", () => {
+                                localStorage.setItem("mapRemountDenyOnModalOpen", true)
                                 if (markerGroup.length === 1) {
                                     const listing = listings[index];
                                     navigateToListing(listing, lat, lng);
