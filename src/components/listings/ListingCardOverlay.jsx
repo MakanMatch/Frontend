@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
+import { motion } from "framer-motion";
 import server from "../../networking";
 
 function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
@@ -269,23 +270,33 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             </Box>
                         )}
                         <Skeleton isLoaded={imageLoaded} height="150px" width="310px" borderRadius="5px" fadeDuration={1}>
-                            <Image
-                                key={images[imageIndex]}
-                                src={images[imageIndex]}
-                                onError={(e) => {
-                                    e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
-                                    e.target.src = "/placeholderImage.png";
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ rotate: 0, scale: 1 }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 260,
+                                    damping: 20
                                 }}
-                                onLoad={() => setImageLoaded(true)}
-                                borderRadius="5px"
-                                minWidth="310px"
-                                maxWidth="310px"
-                                minHeight="150px"
-                                maxHeight="150px"
-                                objectFit="cover"
-                                style={{ pointerEvents: "none" }}
-                                className="image"
-                            />
+                            >
+                                <Image
+                                    key={images[imageIndex]}
+                                    src={images[imageIndex]}
+                                    onError={(e) => {
+                                        e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
+                                        e.target.src = "/placeholderImage.png";
+                                    }}
+                                    onLoad={() => setImageLoaded(true)}
+                                    borderRadius="5px"
+                                    minWidth="310px"
+                                    maxWidth="310px"
+                                    minHeight="150px"
+                                    maxHeight="150px"
+                                    objectFit="cover"
+                                    style={{ pointerEvents: "none" }}
+                                    className="image"
+                                />
+                            </motion.div>
                         </Skeleton>
                         <Text
                             borderRadius="50%"

@@ -208,6 +208,7 @@ const FoodListingsPage = () => {
                                                     totalSlots={listing.totalSlots}
                                                     latitude={parseFloat(listing.coordinates.split(',')[0])}
                                                     longitude={parseFloat(listing.coordinates.split(',')[1])}
+                                                    sx={{ cursor: "pointer" }}
                                                 />
                                             </motion.div>
                                         </Box>

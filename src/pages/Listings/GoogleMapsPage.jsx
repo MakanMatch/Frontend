@@ -4,8 +4,9 @@
 import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
 import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Box, useToast, Center, Fade, Spinner } from "@chakra-ui/react";
+import { Box, useToast, Center, Fade, Spinner, useMediaQuery } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
 
 const GoogleMapsPage = () => {
     const navigate = useNavigate();
@@ -60,7 +61,17 @@ const GoogleMapsPage = () => {
                     left="10px"
                     transform="translateY(-50%)"
                     zIndex="1">
-                    <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
+                    <motion.div
+                        initial={{ x: -100 }}
+                        animate={{ x: 0 }}
+                        transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 20
+                        }}
+                    >
+                        <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
+                    </motion.div>
                 </Box>
             </Box>
         </>
