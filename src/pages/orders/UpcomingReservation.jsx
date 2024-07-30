@@ -178,10 +178,10 @@ function UpcomingReservation() {
                     )}
                 </Box>
 
-                {!isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} setCurrentReservation={setCurrentReservation} refreshReservations={fetchReservations} inSixHourWindow={inSixHourWindow} dataLoaded={dataLoaded} />}
+                {!isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} setCurrentReservation={setCurrentReservation} setReservations={setReservations} refreshReservations={fetchReservations} inSixHourWindow={inSixHourWindow} dataLoaded={dataLoaded} />}
             </Box>
 
-            {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} setCurrentReservation={setCurrentReservation} refreshReservations={fetchReservations} inSixHourWindow={inSixHourWindow} dataLoaded={dataLoaded} mode='small' />}
+            {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} setCurrentReservation={setCurrentReservation} setReservations={setReservations} refreshReservations={fetchReservations} inSixHourWindow={inSixHourWindow} dataLoaded={dataLoaded} mode='small' />}
 
             {reservations.length > 1 && (
                 <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>

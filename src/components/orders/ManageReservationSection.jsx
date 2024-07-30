@@ -11,7 +11,7 @@ import placeholderImage from '../../assets/placeholderImage.svg';
 import { CheckCircleIcon, CheckIcon } from '@chakra-ui/icons';
 import { BsFillCheckCircleFill } from 'react-icons/bs';
 
-function ManageReservationSection({ currentReservation, setCurrentReservation, refreshReservations, inSixHourWindow, dataLoaded, mode = "full" }) {
+function ManageReservationSection({ currentReservation, setCurrentReservation, setReservations, refreshReservations, inSixHourWindow, dataLoaded, mode = "full" }) {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -94,13 +94,25 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, r
                         showToast("Payment status updated!", "Your payment status has been updated.", 3000, true, "success")
                     } else if (res.data && res.data.message && typeof res.data.message == "string" && res.data.message.startsWith("SUCCESS")) {
                         showToast("Payment status updated!", "Your payment status has been updated.", 3000, true, "success")
+                        var newReservation;
                         setCurrentReservation(prevReservation => {
-                            var newReservation = structuredClone(prevReservation);
+                            newReservation = structuredClone(prevReservation);
                             newReservation.markedPaid = res.data.markedPaid;
                             newReservation.totalPrice = res.data.totalPrice;
                             newReservation.portions = res.data.portions;
 
                             return newReservation;
+                        })
+
+                        setReservations(prevReservations => {
+                            console.log("Current reservation updated! Updating reservations list.")
+                            var newReservations = prevReservations.map(reservation => {
+                                if (reservation.referenceNum == newReservation.referenceNum) {
+                                    return newReservation;
+                                }
+                                return reservation;
+                            })
+                            return newReservations;
                         })
                     } else {
                         console.log("Unknown response received when updating reservation: ", res.data);
