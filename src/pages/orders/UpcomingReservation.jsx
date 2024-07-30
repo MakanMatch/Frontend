@@ -7,6 +7,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { reloadAuthToken } from '../../slices/AuthState';
 import UpcomingReservationCard from '../../components/orders/UpcomingReservationCard';
 import ManageReservationSection from '../../components/orders/ManageReservationSection';
+import MealDetailsSection from '../../components/orders/MealDetailsSection';
+import Extensions from '../../extensions';
 
 function UpcomingReservation() {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
@@ -17,6 +19,7 @@ function UpcomingReservation() {
     const navigate = useNavigate();
     const [reservations, setReservations] = useState([]);
     const [currentReservation, setCurrentReservation] = useState(null);
+    const [inSixHourWindow, setInSixHourWindow] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const { user, loaded, authToken } = useSelector(state => state.auth)
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -98,6 +101,12 @@ function UpcomingReservation() {
     }
 
     useEffect(() => {
+        if (loaded == true && currentReservation) {
+            setInSixHourWindow(Extensions.timeDiffInSeconds(new Date(), new Date(currentReservation.listing.fullDatetime)) < 21600);
+        }
+    }, [loaded, currentReservation])
+
+    useEffect(() => {
         if (loaded == true) {
             if (!user) {
                 navigate('/auth/login');
@@ -160,12 +169,18 @@ function UpcomingReservation() {
                             ))}
                         </Box>
                     </Box>
+
+                    {inSixHourWindow && (
+                        <Box mt={"50px"}>
+                            <MealDetailsSection currentReservation={currentReservation} dataLoaded={dataLoaded} />
+                        </Box>
+                    )}
                 </Box>
 
-                {!isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} dataLoaded={dataLoaded} />}
+                {!isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} inSixHourWindow={inSixHourWindow} dataLoaded={dataLoaded} />}
             </Box>
 
-            {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} dataLoaded={dataLoaded} mode='small' />}
+            {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} inSixHourWindow={inSixHourWindow} dataLoaded={dataLoaded} mode='small' />}
 
             {reservations.length > 1 && (
                 <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>

@@ -7,8 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import configureShowToast from '../showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import MealDetailsSection from './MealDetailsSection';
+import placeholderImage from '../../assets/placeholderImage.svg';
 
-function ManageReservationSection({ currentReservation, refreshReservations, dataLoaded, mode = "full" }) {
+function ManageReservationSection({ currentReservation, refreshReservations, inSixHourWindow, dataLoaded, mode = "full" }) {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -17,16 +18,11 @@ function ManageReservationSection({ currentReservation, refreshReservations, dat
     const { user, authToken, loaded } = useSelector(state => state.auth);
 
     const [showingCancelConfirmation, setShowingCancelConfirmation] = useState(false);
-    const [inSixHourWindow, setInSixHourWindow] = useState(false);
     const [cancelling, setCancelling] = useState(false);
 
     const hostPaymentURL = (currentReservation) => {
         return `${backendURL}/cdn/getHostPaymentQR?token=${authToken}&listingID=${currentReservation.listing.listingID}`
     }
-
-    useEffect(() => {
-        setInSixHourWindow(Extensions.timeDiffInSeconds(new Date(), new Date(currentReservation.listing.fullDatetime)) < 21600);
-    }, [currentReservation])
 
     function cancelReservation() {
         setCancelling(true);
@@ -71,6 +67,8 @@ function ManageReservationSection({ currentReservation, refreshReservations, dat
         return <Spinner />;
     }
 
+    console.log("Payment Image: ", currentReservation.listing.Host);
+
     return (
         <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} mt={"60px"} alignItems={"flex-start"} ml={mode == "full" ? "30px" : ""}>
             {showingCancelConfirmation ? (
@@ -95,13 +93,31 @@ function ManageReservationSection({ currentReservation, refreshReservations, dat
                 <Fade in>
                     {inSixHourWindow ? (
                         <>
-                            <Box display={"flex"} justifyContent={"left"} flexDirection={"row"} mt={"20px"}>
-                                <Image src={hostPaymentURL(currentReservation)} alt='Host Payment QR Code' width={"200px"} height={"200px"} />
+                            <Box display={"flex"} justifyContent={"left"} flexDirection={mode == "full" ? "row": "column"} mt={"20px"} alignItems={"center"}>
+                                <VStack>
+                                    <Image src={hostPaymentURL(currentReservation)} objectFit={"contain"} fallbackSrc={placeholderImage} alt='Host Payment QR Code' width={"200px"} height={"200px"} />
+                                    {!currentReservation.listing.Host.paymentImage && (
+                                        <>
+                                            <Text fontSize={'small'}>Host hasn't uploaded<br /> PayNow QR code yet.</Text>
+                                            <Button variant={'link'} color={'primaryColour'} fontSize={'small'} onClick={() => navigate("/chat")}>Inform them here.</Button>
+                                        </>
+                                    )}
+                                </VStack>
+                                <VStack spacing={4} ml={"20px"} maxW={"300px"} textAlign={"left"} mt={"15px"}>
+                                    <Text>
+                                        Host receives payments directly.<br /><br />
+
+                                        Click “I have paid” to notify your host about the payment.<br /><br />
+
+                                        Payment will be checked when you reach the address.<br />
+                                    </Text>
+                                    <Text fontSize={'large'}>Send <strong>{Extensions.formatCurrency(currentReservation.totalPrice)}</strong> to {currentReservation.listing.Host.fname} via PayNow.</Text>
+                                </VStack>
                             </Box>
                         </>
                     ) : (
                         <>
-                            <MealDetailsSection currentReservation={currentReservation} />
+                            <MealDetailsSection currentReservation={currentReservation} dataLoaded={dataLoaded} />
                             <br />
                             <br />
                             <Text textAlign={"left"}>6 hours prior to the reservation, return here to make your payment to the host.</Text>

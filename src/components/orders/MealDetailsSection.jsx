@@ -1,8 +1,12 @@
-import { Box, Heading, HStack, Text } from '@chakra-ui/react'
+import { Box, Heading, HStack, Spinner, Text } from '@chakra-ui/react'
 import React from 'react'
 import Extensions from '../../extensions'
 
-function MealDetailsSection({ currentReservation }) {
+function MealDetailsSection({ currentReservation, dataLoaded }) {
+    if (!dataLoaded || !currentReservation) {
+        return <Spinner />
+    }
+
     return (
         <>
             <Heading fontFamily={"Sora"} fontSize={{ 'base': 'large', 'md': 'larger' }} textAlign={"left"}>Meal Details</Heading>
