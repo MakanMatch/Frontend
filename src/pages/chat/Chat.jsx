@@ -509,7 +509,7 @@ function ChatUi() {
                                         })}
                                         isSender={msg.senderID === user.userID}
                                         sender={msg.sender}
-                                        reciever={chatPartnerUsernames[chatSelected]}
+                                        receiver={chatPartnerUsernames[chatSelected]}
                                         onEdit={() => openEditModal(msg.messageID, msg.message)}
                                         onDelete={() => handleDeletePrompt(msg.messageID)}
                                         onReply={() => handleReply(msg)}

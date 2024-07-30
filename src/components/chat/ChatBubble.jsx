@@ -25,7 +25,7 @@ function ChatBubble({
   repliedMessage,
   edited,
   sender,
-  reciever,
+  receiver, // Corrected spelling from "reciever"
   image,
 }) {
   const menuItemColor = useColorModeValue("teal.500", "teal.200");
@@ -42,7 +42,7 @@ function ChatBubble({
       <Flex alignItems="center">
         {!isSender && (
           <Avatar
-            name={reciever}
+            name={receiver} // Corrected spelling from "reciever"
             alt="Profile"
             boxSize="40px"
             borderRadius="full"
@@ -59,6 +59,8 @@ function ChatBubble({
             pb={4} // Adding bottom padding
             pt={6} // Adding top padding to accommodate the menu button
             position="relative"
+            wordBreak="break-word" // Ensure words break properly
+            overflowWrap="break-word" // Ensure long words wrap
           >
             <Box position="absolute" top={1} right={1}>
               <Menu>
@@ -104,10 +106,11 @@ function ChatBubble({
             </Box>
             {repliedMessage && (
               <Box
-                bg={isSender ? "blue.300" : "gray.100"}
-                p={2}
-                borderRadius="md"
-                mb={2}
+                p={3}
+                pb={4}
+                pt={6}
+                position="relative"
+                maxW={{ base: "90%", sm: "75%", md: "60%" }} // Adjust based on screen size
               >
                 <Text fontSize="sm" color={isSender ? "white" : "black"}>
                   {repliedMessage}
