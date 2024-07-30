@@ -298,7 +298,7 @@ function ExpandedListingHost() {
                             </SlideFade>
                         )}
                         <Button variant="link" onClick={handleEditListing} color="blue" textDecoration="underline">
-                            {editListing ? "Edit Listing" : "Manage Guests"}
+                            {editListing ? "Manage Guests" : "Edit Listing"}
                         </Button>
                     </VStack>
                 </GridItem>
