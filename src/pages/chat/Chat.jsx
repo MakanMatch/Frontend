@@ -427,13 +427,15 @@ function ChatUi() {
     }
 
     return (
-        <Flex>
+        <Flex direction = "row" overflowX={"hidden"} w="100%" h="100%">
             <ChatHistory
                 onUserClick={handleChatClick}
                 chatHistory={chatHistory}
                 chatPartnerUsernames={chatPartnerUsernames}
+                w = "25%"
+                h = "100%"
             />
-
+            <Flex flex="1" direction={"column"} overflow={"hidden"}>
             {chatSelected != null ? (
                 <Center flexDirection="column" alignItems="center" p={5} flex="1">
                     <Box
@@ -486,7 +488,7 @@ function ChatUi() {
                         borderRadius={20}
                         boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
                     >
-                        <VStack spacing={4} align="stretch" flex="1" overflowY="auto">
+                        <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX={"hidden"}>
                             {messages.map((msg, index) => (
                                 <React.Fragment key={msg.messageID}>
                                     {shouldDisplayDate(msg, messages[index - 1]) && (
@@ -661,6 +663,7 @@ function ChatUi() {
                     </AlertDialogContent>
                 </AlertDialogOverlay>
             </AlertDialog>
+        </Flex>
         </Flex>
     );
 }
