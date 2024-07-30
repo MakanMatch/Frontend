@@ -33,7 +33,7 @@ function HostPaymentQR({
             
             try {
                 // upload QR Code image
-                const response = await server.post('/orders/uploadPaymentQR', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData });
+                const response = await server.post('/orders/manageGuests/uploadPaymentQR', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData });
                 dispatch(reloadAuthToken(authToken));
                 if (response.status === 200) {
                     showToast('Image Uploaded', 'QR Code uploaded successfully', 3000, false, 'success');
