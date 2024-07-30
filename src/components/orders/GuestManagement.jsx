@@ -44,7 +44,7 @@ function GuestManagement({
                 }
             } else {
                 showToast('Something went wrong', 'An error occurred while marking guest as paid & present', 3000, false, 'error');
-                console.error('Error marking guest as paid & present:', response.data);
+                console.log('Error marking guest as paid & present:', response.data);
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
@@ -54,11 +54,11 @@ function GuestManagement({
                     console.log('User error occurred in marking guest as paid & present:', error.response.data);
                 } else {
                     showToast('Something went wrong', 'An error occurred while marking guest as paid & present', 3000, false, 'error');
-                    console.error('Error marking guest as paid & present:', error.response.data);
+                    console.log('Error marking guest as paid & present:', error.response.data);
                 }
             } else {
                 showToast('Something went wrong', 'An error occurred while marking guest as paid & present', 3000, false, 'error');
-                console.error('Error marking guest as paid & present:', error);
+                console.log('Error marking guest as paid & present:', error);
             }
         }
     }

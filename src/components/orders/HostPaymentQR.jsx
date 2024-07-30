@@ -25,7 +25,6 @@ function HostPaymentQR({
             "image/svg+xml",
             "image/heic"
         ];        
-        console.log(file);
         if (file && allowedTypes.includes(file.type)) {
             const formData = new FormData();
             formData.append('file', file);
@@ -39,7 +38,7 @@ function HostPaymentQR({
                     showToast('Image Uploaded', 'QR Code uploaded successfully', 3000, false, 'success');
                     setRefresh(!refresh);
                 } else {
-                    console.error('Error uploading QR Code:', response.data);
+                    console.log('Error uploading QR Code:', response.data);
                     showToast('Something went wrong', 'An error occurred while uploading the QR Code', 3000, false, 'error');
                 }
             } catch (error) {
@@ -50,11 +49,11 @@ function HostPaymentQR({
                         console.log('User error occurred in uploading QR Code:', error.response.data);
                     } else {
                         showToast('Something went wrong', 'An error occurred while uploading the QR Code', 3000, false, 'error');
-                        console.error('Error uploading QR Code:', error.response.data);
+                        console.log('Error uploading QR Code:', error.response.data);
                     }
                 } else {
                     showToast('Something went wrong', 'An error occurred while uploading the QR Code', 3000, false, 'error');
-                    console.error('Error uploading QR Code:', error);
+                    console.log('Error uploading QR Code:', error);
                 }
             }
         } else {
