@@ -276,6 +276,8 @@ function ChatUi() {
     
             setMessageInput("");
             setReplyTo(null);
+            setImage(null);
+            setConfirmedImage("");
         }
     };
     
@@ -539,7 +541,7 @@ function ChatUi() {
                                 />
                             </Flex>
                         )}
-                        {confirmedImage && (
+                        {confirmedImage!=="" && (
                             <Flex
                                 bg="gray.200"
                                 p={2}
@@ -557,10 +559,6 @@ function ChatUi() {
                                     variant="ghost"
                                     colorScheme="red"
                                     size="sm"
-                                    onClick={() => {
-                                        setImage(null);
-                                        setConfirmedImage("");
-                                    }}
                                 />
                             </Flex>
                         )}
