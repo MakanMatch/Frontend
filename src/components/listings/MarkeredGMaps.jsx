@@ -28,6 +28,7 @@ const MarkeredGMaps = ({
 
     useEffect(() => {
         const InitializeMap = async (validCoordinates) => {
+            console.log("Map initialised");
             const loader = new Loader({
                 apiKey: import.meta.env.VITE_GMAPS_API_KEY,
                 version: "weekly",
@@ -46,7 +47,7 @@ const MarkeredGMaps = ({
                 });
 
                 if (coordinatesList.length === 0 || validCoordinates.length === 0) {
-                    setMapLoaded(true); // Mark map as loaded if no valid coordinates
+                    setMapLoaded(true);
                     return map;
                 } else {
                     const markers = {};
@@ -77,7 +78,6 @@ const MarkeredGMaps = ({
                             });
                         });
                     });
-
                     setMapLoaded(true);
                 }
             }
