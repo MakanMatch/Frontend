@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import server from '../../networking'
-import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, Spacer } from '@chakra-ui/react'
+import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, Spacer, ScaleFade, Badge } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -115,9 +115,14 @@ function GuestManagement({
                         <Box display="flex" alignItems="center">
                             <Avatar name={guest.username} size="lg" mr={4} />
                             <Box>
-                                <Flex justify="space-between" width="100%">
+                                <Flex gap={3} width="100%">
                                     <Box>
                                         <Text fontWeight="bold" fontSize="lg" textAlign="right">{guest.fname} {guest.lname}</Text>
+                                    </Box>
+                                    <Box>
+                                        <ScaleFade initialScale={0.5} in={guest.Reservation.paidAndPresent}>
+                                            <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>PAID</Badge>
+                                        </ScaleFade>
                                     </Box>
                                 </Flex>
                                 <Flex mt={2} wrap="wrap" justify="space-between" width="100%" gap={3}>
