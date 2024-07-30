@@ -312,7 +312,11 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             zIndex="10"
                             backgroundColor="white"
                             cursor="pointer"
-                            onClick={() => navigate("/")}>
+                            onClick={() => {
+                                localStorage.removeItem("mapRemountDenyOnModalOpen");
+                                localStorage.removeItem("mapRemountDenyOnModalClose");
+                                navigate("/")
+                            }}>
                             <ArrowBackIcon height="50%" />
                         </Text>
                     </Box>

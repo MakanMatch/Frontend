@@ -116,6 +116,12 @@ const FoodListingsPage = () => {
                 true
             );
         }
+        if (localStorage.getItem("mapRemountDenyOnModalOpen")) {
+            localStorage.removeItem("mapRemountDenyOnModalOpen");
+            if (localStorage.getItem("mapRemountDenyOnModalClose")) {
+                localStorage.removeItem("mapRemountDenyOnModalClose");
+            }
+        }
     }, []);
 
     if (!loaded) {
