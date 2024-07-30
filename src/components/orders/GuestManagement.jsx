@@ -158,7 +158,7 @@ function GuestManagement({
                     </Box>
                 ))
             ) : (
-                <Text textAlign="left" color="grey" fontSize="large" display="flex">No reservations made.</Text>
+                <Text textAlign="left" color="grey" fontSize="large" display="flex" mt={6}>Oops, there are no reservation made yet!</Text>
             )}
         </>
     )
