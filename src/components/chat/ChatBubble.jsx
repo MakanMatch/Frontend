@@ -106,11 +106,10 @@ function ChatBubble({
             </Box>
             {repliedMessage && (
               <Box
-                p={3}
-                pb={4}
-                pt={6}
-                position="relative"
-                maxW={{ base: "90%", sm: "75%", md: "60%" }} // Adjust based on screen size
+                bg={isSender ? "blue.300" : "gray.100"}
+                p={2}
+                borderRadius="md"
+                mb={2}
               >
                 <Text fontSize="sm" color={isSender ? "white" : "black"}>
                   {repliedMessage}
