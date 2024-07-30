@@ -232,7 +232,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
     useEffect(() => {
         if (portionPrice > 10) {
-            setPortionPrice(10);
             displayToast(
                 "Woah, that's too expensive!",
                 "Fee cannot exceed $10",
@@ -245,7 +244,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
     useEffect(() => {
         if (totalSlots > 10) {
-            setTotalSlots(10);
             displayToast(
                 "Too many Slots!",
                 "You can prepare for a maximum of 10 slots",
@@ -320,8 +318,15 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                     <InputLeftAddon>$</InputLeftAddon>
                                     <NumberInput
                                         step={1}
+                                        min={1}
+                                        max={10}
                                         value={portionPrice}
+                                        inputMode="numeric"
                                         onChange={(valueAsString, valueAsNumber) => {
+                                            const isValid = /^[0-9]*$/.test(valueAsString);
+                                            if (!isValid) {
+                                                return;
+                                            }
                                             if (valueAsString === "") {
                                                 setPortionPrice("");
                                             } else {
@@ -351,8 +356,15 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                 <FormLabel>No. of Slots (Max: 10)</FormLabel>
                                     <NumberInput
                                         step={1}
+                                        min={1}
+                                        max={10}
                                         value={totalSlots}
+                                        inputMode="numeric"
                                         onChange={(valueAsString, valueAsNumber) => {
+                                            const isValid = /^[0-9]*$/.test(valueAsString);
+                                            if (!isValid) {
+                                                return;
+                                            }
                                             if (valueAsString === "") {
                                                 setTotalSlots("");
                                             } else {
