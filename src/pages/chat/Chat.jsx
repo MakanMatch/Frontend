@@ -25,6 +25,10 @@ function ChatUi() {
     const [chatSelected, setChatSelected] = useState(null);
     const [status, setStatus] = useState(false);
     const [image, setImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null); // New state for image preview
+    const [imagePreviewOpen, setImagePreviewOpen] = useState(false); // New state for image preview modal
+    const [imageName, setImageName] = useState(""); // New state for image name
+    const [confirmedImage, setConfirmedImage] = useState(""); // New state for confirmed image
     const chatBottomRef = useRef(null);
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -393,21 +397,28 @@ function ChatUi() {
         fetchChatHistory(clickedChatID);
     };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        const allowedTypes = [
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/svg+xml",
-            "image/heic"
-        ];
-        if (file && allowedTypes.includes(file.type)) {
+    function handleFileChange(event) {
+        const file = event.target.files[0];
+        if (file) {
             setImage(file);
-        } else {
-            showToast("Invalid file type", "Please upload an image file.", 3000, true, "error");
+            setImageName(file.name);
+            const reader = new FileReader();
+            reader.onload = () => {
+                setImagePreview(reader.result);
+                setImagePreviewOpen(true); // Open the preview popup
+            };
+            reader.readAsDataURL(file);
         }
-    };
+    }
+
+    function handleImagePreviewClose() {
+        setImagePreviewOpen(false);
+    }
+
+    function handleConfirmImage() {
+        setConfirmedImage(imageName); // Set confirmed image
+        setImagePreviewOpen(false);
+    }
 
     if (!loaded || !user) {
         return <Spinner />
@@ -581,7 +592,28 @@ function ChatUi() {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-
+            {/* Image Preview Modal */}
+            <Modal isOpen={imagePreviewOpen} onClose={handleImagePreviewClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Image Preview</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Flex direction="column" align="center">
+                            <Avatar size="2xl" src={imagePreview} alt={imageName} mb={4} />
+                            <Text>{imageName}</Text>
+                        </Flex>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button colorScheme="blue" mr={3} onClick={handleConfirmImage}>
+                            Confirm
+                        </Button>
+                        <Button variant="outline" onClick={handleImagePreviewClose}>
+                            Cancel
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
             {/* Delete Message AlertDialog */}
             <AlertDialog
                 isOpen={deleteDialogOpen}

@@ -26,7 +26,7 @@ function ChatBubble({
   edited,
   sender,
   reciever,
-  image,  // Add image prop here
+  image,
 }) {
   const menuItemColor = useColorModeValue("teal.500", "teal.200");
   const menuItemHoverBg = useColorModeValue("teal.100", "teal.600");
@@ -37,6 +37,7 @@ function ChatBubble({
       marginY={2}
       maxW="70%"
       alignSelf={isSender ? "flex-end" : "flex-start"}
+      borderRadius={image ? "10px" : "lg"} // Apply borderRadius conditionally
     >
       <Flex alignItems="center">
         {!isSender && (
@@ -53,7 +54,7 @@ function ChatBubble({
           <Box
             bg={isSender ? "blue.500" : "gray.200"}
             color={isSender ? "white" : "black"}
-            borderRadius="lg"
+            borderRadius={image ? "10px" : "lg"} // Apply borderRadius conditionally
             p={3}
             pb={4} // Adding bottom padding
             pt={6} // Adding top padding to accommodate the menu button
@@ -114,11 +115,18 @@ function ChatBubble({
               </Box>
             )}
             {image && (
-              <Box mb={2}>
-                <Image src={image} alt="Message Image" borderRadius="md" />
+              <Box mb={2} textAlign="left">
+                <Image
+                  src={image}
+                  alt="Message Image"
+                  borderRadius="md"
+                  h="200px"
+                  w="200px"
+                  objectFit="contain"
+                />
               </Box>
             )}
-            <Text>
+            <Text textAlign={image ? "left" : "center"}>
               {message}
               {edited && (
                 <Text
