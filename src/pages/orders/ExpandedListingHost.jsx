@@ -51,7 +51,7 @@ function ExpandedListingHost() {
     const [file, setFile] = useState(null);
     const { user, loaded, error, authToken } = useSelector(state => state.auth)
     const dispatch = useDispatch();
-    const [editListing, setEditListing] = useState(false)
+    const [editListing, setEditListing] = useState(true)
     const [hostID, setHostID] = useState("")
 
     const handleClose = () => {
