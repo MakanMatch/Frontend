@@ -539,6 +539,31 @@ function ChatUi() {
                                 />
                             </Flex>
                         )}
+                        {confirmedImage && (
+                            <Flex
+                                bg="gray.200"
+                                p={2}
+                                borderRadius="md"
+                                mb={2}
+                                align="center"
+                                justify="space-between"
+                            >
+                                <Text fontSize="sm" fontStyle="italic">
+                                    {confirmedImage}
+                                </Text>
+                                <IconButton
+                                    aria-label="Cancel image"
+                                    icon={<FiX />}
+                                    variant="ghost"
+                                    colorScheme="red"
+                                    size="sm"
+                                    onClick={() => {
+                                        setImage(null);
+                                        setConfirmedImage("");
+                                    }}
+                                />
+                            </Flex>
+                        )}
                         <Flex mt={4} align="center">
                             <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange} />
                             <IconButton
