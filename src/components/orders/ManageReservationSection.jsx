@@ -105,7 +105,6 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, s
                         })
 
                         setReservations(prevReservations => {
-                            console.log("Current reservation updated! Updating reservations list.")
                             var newReservations = prevReservations.map(reservation => {
                                 if (reservation.referenceNum == newReservation.referenceNum) {
                                     return newReservation;
