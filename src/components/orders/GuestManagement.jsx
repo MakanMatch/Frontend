@@ -148,7 +148,7 @@ function GuestManagement({
                                 />
                             ) : (
                                 <Button
-                                    colorScheme="purple"
+                                    variant="MMPrimary"
                                     style={{ transition: 'all 1s ease' }}
                                     onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID })}
                                 >
