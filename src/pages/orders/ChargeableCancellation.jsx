@@ -6,6 +6,8 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Extensions from '../../extensions';
 import placeholderImage from '../../assets/placeholderImage.svg';
+import { reloadAuthToken } from '../../slices/AuthState';
+import server from '../../networking';
 
 function ChargeableCancellation() {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
@@ -15,6 +17,7 @@ function ChargeableCancellation() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isSmallerThan800] = useMediaQuery("(max-width: 800px)");
+    const [cancelling, setCancelling] = useState(false);
     const { user, loaded, authToken } = useSelector(state => state.auth);
 
     const [currentReservation, setCurrentReservation] = useState(null);
@@ -29,6 +32,47 @@ function ChargeableCancellation() {
 
     const hostPaymentURL = (currentReservation) => {
         return `${backendURL}/cdn/getHostPaymentQR?token=${authToken}&listingID=${currentReservation.listing.listingID}`
+    }
+
+    function chargeableCancelReservation() {
+        setCancelling(true);
+        server.post("/cancelReservation", {
+            referenceNum: currentReservation.referenceNum,
+            listingID: currentReservation.listing.listingID,
+            cancellationFeeAcknowledged: true
+        })
+            .then(res => {
+                dispatch(reloadAuthToken(authToken))
+                setTimeout(() => {
+                    setCancelling(false)
+                    if (res.status == 200 && res.data && typeof res.data == "string" && res.data.startsWith("SUCCESS")) {
+                        showToast("Reservation cancelled successfully!", "You have successfully cancelled your reservation. We're sorry to see you go! 😢", 5000, true, "success")
+                        navigate("/reservations/upcoming")
+                        return;
+                    } else {
+                        console.log("Unknown response received when cancelling reservation: ", res.data);
+                        showToast("Something went wrong", "We couldn't cancel your reservation. Please try again later.", 3000, true, "error")
+                    }
+                }, 500)
+            })
+            .catch(err => {
+                dispatch(reloadAuthToken(authToken))
+                setTimeout(() => {
+                    setCancelling(false)
+                    if (err.response && err.response.data && typeof err.response.data == "string") {
+                        if (err.response.data.startsWith("UERROR")) {
+                            console.log("User error occurred in cancelling reservation; response: " + err.response.data)
+                            showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3000, true, "error")
+                        } else {
+                            console.log("Error occurred in cancelling reservation: ", err.response.data);
+                            showToast("Something went wrong", "We couldn't cancel your reservation. Please try again later.", 3000, true, "error")
+                        }
+                    } else {
+                        console.log("Error occurred in cancelling reservation: ", err);
+                        showToast("Something went wrong", "We couldn't cancel your reservation. Please try again later.", 3000, true, "error")
+                    }
+                }, 500)
+            })
     }
 
     useEffect(() => {
@@ -65,9 +109,9 @@ function ChargeableCancellation() {
                 )}
 
                 <VStack mt={"10%"} spacing={"20px"}>
-                    <Button variant={"MMPrimary"} width={"100%"}>I have paid the fee</Button>
+                    <Button colorScheme='yellow' width={"100%"} onClick={chargeableCancelReservation} isLoading={cancelling} loadingText={"Cancelling..."}>I have paid the fee</Button>
                     <Text fontSize={"smaller"}>- OR -</Text>
-                    <Button variant={"link"} color={"primaryColour"}>Go back</Button>
+                    <Button variant={"link"} color={"primaryColour"} onClick={handleGoBack}>Go back</Button>
                 </VStack>
             </Box>
         )
@@ -107,9 +151,8 @@ function ChargeableCancellation() {
                             </div>
 
                             <div>
-                                <Text fontWeight={"bold"} mt={"20px"}>
-                                    Make a payment for the cancellation fee. The host will be notified of your cancellation.
-                                </Text>
+                                <Text fontWeight={"bold"} mt={"20px"}>How?</Text>
+                                <Text>Make a payment for the cancellation fee. The host will be notified of your cancellation.</Text>
                                 <Text>The host will check that you have paid and then confirm your cancellation.</Text>
                             </div>
 
