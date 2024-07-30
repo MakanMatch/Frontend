@@ -132,7 +132,7 @@ function UpcomingReservation() {
             <Box mt={"30px"} display={"flex"} justifyContent={"space-between"} flexDirection={"row"} maxW={"100%"}>
                 <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} textAlign={"left"} width={!isSmallerThan800 ? "50%" : "100%"}>
                     <Heading fontFamily={'Sora'} fontWeight={'bold'} fontSize={{ 'base': 'x-large', 'lg': 'xx-large' }}>Your Upcoming Reservation</Heading>
-                    {reservations.length > 0 && (
+                    {reservations.length > 1 && (
                         <Button justifyContent={"left"} variant={'link'} onClick={onOpen} color={'primaryColour'} mt={"10px"}>View another</Button>
                     )}
 
@@ -167,27 +167,29 @@ function UpcomingReservation() {
 
             {isSmallerThan800 && <ManageReservationSection currentReservation={currentReservation} refreshReservations={fetchReservations} mode='small' />}
 
-            <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Choose a reservation</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody pb={6}>
-                        <VStack spacing={"20px"}>
-                            {reservations.map(reservation => (
-                                <UpcomingReservationCard key={reservation.referenceNum} currentReservation={reservation} getFirstImageURL={getFirstImageURL} onClick={() => {
-                                    setCurrentReservation(reservation);
-                                    onClose();
-                                }} />
-                            ))}
-                        </VStack>
-                    </ModalBody>
+            {reservations.length > 1 && (
+                <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Choose a reservation</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody pb={6}>
+                            <VStack spacing={"20px"}>
+                                {reservations.map(reservation => (
+                                    <UpcomingReservationCard key={reservation.referenceNum} currentReservation={reservation} getFirstImageURL={getFirstImageURL} onClick={() => {
+                                        setCurrentReservation(reservation);
+                                        onClose();
+                                    }} />
+                                ))}
+                            </VStack>
+                        </ModalBody>
 
-                    <ModalFooter>
-                        <Button onClick={onClose}>Cancel</Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+                        <ModalFooter>
+                            <Button onClick={onClose}>Cancel</Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
         </Box>
     )
 }
