@@ -27,8 +27,11 @@ function Navbar() {
         if (authToken) {
             if (user.userType == "Admin") {
                 navigate('/admin');
+            } else {
+                navigate('/')
             }
-        } else {
+
+        } else{
             navigate('/');
         }
     }
