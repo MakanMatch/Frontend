@@ -36,7 +36,6 @@ function UserManagement() {
 
     useEffect(() => {
         fetchAllUsers()
-        console.log("Ran")
     }, [])
     
     return (

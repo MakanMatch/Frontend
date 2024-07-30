@@ -2,7 +2,6 @@ import { Avatar, Box, HStack, Text } from '@chakra-ui/react'
 import { BsThreeDotsVertical } from 'react-icons/bs';
 
 function UserManagementCard({ username, email, userType, userID, profilePicture }) {
-	console.log("Received props: ", username, email, userType);
 
 	return (
         <HStack display="flex" justifyContent={"space-between"}>

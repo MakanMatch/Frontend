@@ -42,10 +42,6 @@ function HygieneReports() {
         });
     }, []);
 
-    useEffect(() => {
-        console.log("Updated hosts: ", hosts);
-    }, [hosts]);
-
     return (
         <>
             <Heading size='lg' textAlign={"center"} mt={10} mb={5}>Hygiene Reports</Heading>

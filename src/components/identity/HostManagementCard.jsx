@@ -3,12 +3,10 @@ import { BsThreeDotsVertical } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 
 function UserManagementCard({ username, email, hygieneGrade, hostID, profilePicture }) {
-	console.log("Received props: ", username, email, hygieneGrade);
 
     const navigate = useNavigate();
 
     const handleClickUsername = () => {
-        console.log("CLICKEDDDDD")
         navigate("/reviews", { state: { hostID: hostID } });
     }
 

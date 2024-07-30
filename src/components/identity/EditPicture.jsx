@@ -57,7 +57,6 @@ const EditPicture = ({ isOpen, onClose, onSubmit, onRemove, currentProfilePictur
                     return
                 } else {
                     showToast("Error", "Failed to upload image", 5000, true, "error");
-                    console.log(res.data);
                     setIsUploading(false);
                     return
                 }
@@ -82,11 +81,11 @@ const EditPicture = ({ isOpen, onClose, onSubmit, onRemove, currentProfilePictur
                     return
                 } else {
                     showToast("Error", "Failed to remove image", 5000, true, "error")
-                    console.log(res.data)
                     return
                 }
             })
             .catch (err => {
+                dispatch(reloadAuthToken(authToken))
                 console.log("Failed to remove image; error: " + err);
                 showToast("Error", "Failed to remove image", 5000, true, "error");
                 return
