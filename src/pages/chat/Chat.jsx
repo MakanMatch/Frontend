@@ -94,33 +94,35 @@ function ChatUi() {
                 }
             }
 
-            if (receivedMessage.action === "upload_image") {
-                console.log('Received upload_image action');
-                console.log('Current image state:', image);
-            
-                if (image) {
-                    const formData = new FormData();
-                    formData.append("image", image);
-            
-                    console.log('FormData content:', formData.get('image'));
-            
-                    await server.post("/chat/uploadImage", formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        }
-                    })
+            if (receivedMessage.action === "upload_image" ) {
+                console.log('congrats')
+                const formData = new FormData();
+                formData.append("image", image)
+
+                await server.post("/chat/uploadImage", formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                    transformRequest: formData => formData
+                })
                     .then((response) => {
-                        if (response.status === 200) {
-                            // Handle success
+                        if (response.status == 200) {
+                            const imageUrl = server.get(`/cdn/getImageForChat?userID=${receivedMessage.message.senderID}&messageID=${receivedMessage.message.messageID}&imageName=${image.name}`);
+                            const newMessage = {
+                                action: "finalise_send",
+                                imageUrl: imageUrl,
+                                message: receivedMessage.message,
+                            }
+
+                            ws.current.send(JSON.stringify(newMessage));
                         }
                     }).catch((error) => {
-                        console.error("Error uploading image: ", error);
-                        showToast("Something went wrong", "Error uploading image. Try again.", 1500, true, "error");
+                        console.error("Error uploading image: ", error)
+                        showToast("Something went wrong", "Error uploading image. Try again.", 1500, true, "error")
                     });
-                } else {
-                    console.log('No image selected');
-                }
+
             }
+
             
 
             if (receivedMessage.action === "chat_id") {
