@@ -31,6 +31,12 @@ function ChatUi() {
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const ws = useRef(null);
 
+    function getImageLink (userID, imageName) {
+        if (!userID || !imageName) {
+            return null;
+        }
+        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForChat?userID=${userID}&imageName=${imageName}`;
+    }
     function setupWS() {
         const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
         ws.current = new WebSocket(wsUrl);
@@ -93,38 +99,7 @@ function ChatUi() {
                     }
                 }
             }
-
-            if (receivedMessage.action === "upload_image" ) {
-                console.log('congrats')
-                const formData = new FormData();
-                formData.append("image", image)
-
-                await server.post("/chat/uploadImage", formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                    transformRequest: formData => formData
-                })
-                    .then((response) => {
-                        if (response.status == 200) {
-                            const imageUrl = server.get(`/cdn/getImageForChat?userID=${receivedMessage.message.senderID}&messageID=${receivedMessage.message.messageID}&imageName=${image.name}`);
-                            const newMessage = {
-                                action: "finalise_send",
-                                imageUrl: imageUrl,
-                                message: receivedMessage.message,
-                            }
-
-                            ws.current.send(JSON.stringify(newMessage));
-                        }
-                    }).catch((error) => {
-                        console.error("Error uploading image: ", error)
-                        showToast("Something went wrong", "Error uploading image. Try again.", 1500, true, "error")
-                    });
-
-            }
-
-            
-
+        
             if (receivedMessage.action === "chat_id") {
                 setChatHistory((prevChatHistory) => {
                     if (!prevChatHistory.includes(receivedMessage.chatID)) {
@@ -255,21 +230,55 @@ function ChatUi() {
 
     const sendMessage = async () => {
         if (ws.current && (messageInput.trim() !== "" || (messageInput.trim() !== "" && image !== null))) {
+            console.log(image);
+            const imagesToBeSubmitted = image ? true : false;
             const newMessage = {
                 action: "send",
                 senderID: user.userID,
                 chatID: chatSelected,
                 message: messageInput,
-                imagesToBeSubmitted: image ? true : false,
                 datetime: new Date().toISOString(),
                 replyToID: replyTo ? replyTo.messageID : null,
             };
-
-            ws.current.send(JSON.stringify(newMessage));
+    
+            if (imagesToBeSubmitted) {
+                console.log('congrats');
+                console.log(image);
+                const formData = new FormData();
+                formData.append("image", image);
+    
+                try {
+                    const response = await server.post("/chat/uploadImage", formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                        transformRequest: formData => formData
+                    });
+    
+                    console.log(response);
+                    if (response.status === 200) {
+                        const imageName = response.data.imageName;
+                        const messageWithImage = {  
+                            action: "finalise_send",
+                            imageName: imageName,
+                            message: newMessage,
+                        };
+    
+                        ws.current.send(JSON.stringify(messageWithImage));
+                    }
+                } catch (error) {
+                    console.error("Error uploading image: ", error);
+                    showToast("Something went wrong", "Error uploading image. Try again.", 1500, true, "error");
+                }
+            } else {
+                ws.current.send(JSON.stringify(newMessage));
+            }
+    
             setMessageInput("");
             setReplyTo(null);
         }
     };
+    
 
     const fetchChatHistory = (chatID) => {
         if (ws.current) {
