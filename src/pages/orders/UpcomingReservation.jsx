@@ -68,6 +68,7 @@ function UpcomingReservation() {
                         setReservations(processedReservations);
                         if (processedReservations.length > 0) {
                             setCurrentReservation(processedReservations[0]);
+                            setInSixHourWindow(Extensions.timeDiffInSeconds(new Date(), new Date(processedReservations[0].listing.fullDatetime)) < 21600);
                         } else {
                             setCurrentReservation(null);
                         }
@@ -140,7 +141,7 @@ function UpcomingReservation() {
         <Box p={isSmallerThan800 ? "5px" : "20px"}>
             <Box mt={"30px"} display={"flex"} justifyContent={"space-between"} flexDirection={"row"} maxW={"100%"}>
                 <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} textAlign={"left"} width={!isSmallerThan800 ? "50%" : "100%"}>
-                    <Heading fontFamily={'Sora'} fontWeight={'bold'} fontSize={{ 'base': 'x-large', 'lg': 'xx-large' }}>Your Upcoming Reservation</Heading>
+                    <Heading fontFamily={'Sora'} fontWeight={'bold'} fontSize={{ 'base': 'x-large', 'lg': 'xx-large' }}>{inSixHourWindow ? "Your reservation is soon.": "Your Upcoming Reservation"}</Heading>
                     {reservations.length > 1 && (
                         <Button justifyContent={"left"} variant={'link'} onClick={onOpen} color={'primaryColour'} mt={"10px"}>View another</Button>
                     )}

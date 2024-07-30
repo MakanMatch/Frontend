@@ -67,8 +67,6 @@ function ManageReservationSection({ currentReservation, refreshReservations, inS
         return <Spinner />;
     }
 
-    console.log("Payment Image: ", currentReservation.listing.Host);
-
     return (
         <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} mt={"60px"} alignItems={"flex-start"} ml={mode == "full" ? "30px" : ""}>
             {showingCancelConfirmation ? (
