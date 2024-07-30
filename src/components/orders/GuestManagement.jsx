@@ -6,7 +6,7 @@ import { useToast } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux'
 import { reloadAuthToken } from '../../slices/AuthState'
 import configureShowToast from '../../components/showToast'
-import { FaCommentDots } from "react-icons/fa";
+import { FaCommentDots, FaCheck } from "react-icons/fa";
 
 function GuestManagement({
     hostID,
@@ -26,6 +26,7 @@ function GuestManagement({
             dispatch(reloadAuthToken(authToken))
             if (response.status === 200) {
                 setGuestsList(response.data);
+                setPaidAndPresent(response.data[0].Reservation.paidAndPresent);
             } else {
                 showToast('Something went wrong', 'An error occurred while fetching guest information', 3000, false, 'error');
                 console.error('Error fetching guest information:', response.data);
@@ -53,10 +54,10 @@ function GuestManagement({
             dispatch(reloadAuthToken(authToken))
             if (response.status === 200) {
                 if (paidAndPresent) {
-                    showToast('Guest marked as unpaid & absent', 'Guest has been marked as unpaid & absent', 3000, false, 'success');
+                    showToast('Guest marked as unpaid & absent', '', 3000, false, 'success');
                     setPaidAndPresent(!paidAndPresent);
                 } else {
-                    showToast('Guest marked as paid & present', 'Guest has been marked as paid & present', 3000, false, 'success');
+                    showToast('Guest marked as paid & present', '', 3000, false, 'success');
                     setPaidAndPresent(!paidAndPresent);
                 }
             } else {
@@ -136,12 +137,24 @@ function GuestManagement({
                                 size="lg"
                                 onClick={() => navigate(`/chat`)}
                             />
-                            <Button
-                                colorScheme="purple"
-                                onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID: listingID })}
-                            >
-                                Paid & Present
-                            </Button>
+                            {guest.Reservation.paidAndPresent ? (
+                                <IconButton
+                                    icon={<FaCheck />}
+                                    aria-label="Paid & Present"
+                                    colorScheme="green"
+                                    size="lg"
+                                    style={{ transition: 'all 1s ease' }}
+                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID })}
+                                />
+                            ) : (
+                                <Button
+                                    colorScheme="purple"
+                                    style={{ transition: 'all 1s ease' }}
+                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID })}
+                                >
+                                    Paid & Present
+                                </Button>
+                            )}
                         </Box>
                     </Box>
                 ))
