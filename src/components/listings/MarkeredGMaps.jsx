@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "@googlemaps/js-api-loader";
-import { Skeleton, useToast } from "@chakra-ui/react";
+import { Skeleton, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Text, Button } from "@chakra-ui/react";
 
 const MarkeredGMaps = ({
     coordinatesList,
@@ -13,6 +13,7 @@ const MarkeredGMaps = ({
     const navigate = useNavigate();
     const mapRef = useRef(null);
     const [mapLoaded, setMapLoaded] = useState(false);
+    const [activeMarker, setActiveMarker] = useState(null);
     const toast = useToast();
 
     function displayToast(title, description, status, duration, isClosable) {
@@ -29,6 +30,23 @@ const MarkeredGMaps = ({
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
     }
+
+    const navigateToListing = (listing, lat, lng) => {
+        navigate("/targetListing", {
+            state: {
+                listingID: listing.listingID,
+                hostID: listing.hostID,
+                images: listing.images.map((image) => getImageLink(listing.listingID, image)),
+                title: listing.title,
+                shortDescription: listing.shortDescription,
+                approxAddress: listing.approxAddress,
+                portionPrice: listing.portionPrice,
+                totalSlots: listing.totalSlots,
+                latitude: lat,
+                longitude: lng,
+            },
+        });
+    };
 
     useEffect(() => {
         const InitializeMap = async (validCoordinates) => {
@@ -53,34 +71,41 @@ const MarkeredGMaps = ({
                     setMapLoaded(true); // Mark map as loaded if no valid coordinates
                     return map;
                 } else {
+                    const markers = {};
+
                     validCoordinates.forEach(({ lat, lng }, index) => {
                         const marker = new AdvancedMarkerElement({
                             position: { lat, lng },
                             map: map,
                         });
-                        marker.addListener("click", () => {
-                            const listing = listings[index];
-                            navigate("/targetListing", {
-                                state: {
-                                    listingID: listing.listingID,
-                                    hostID: listing.hostID,
-                                    images: listing.images.map((image) => getImageLink(listing.listingID, image)),
-                                    title: listing.title,
-                                    shortDescription: listing.shortDescription,
-                                    approxAddress: listing.approxAddress,
-                                    portionPrice: listing.portionPrice,
-                                    totalSlots: listing.totalSlots,
-                                    latitude: lat,
-                                    longitude: lng,
-                                },
+
+                        const key = `${lat},${lng}`;
+                        if (!markers[key]) {
+                            markers[key] = [];
+                        }
+
+                        markers[key].push({ marker, index, lat, lng });
+                    });
+
+                    Object.values(markers).forEach((markerGroup) => {
+                        markerGroup.forEach(({ marker, index, lat, lng }) => {
+                            marker.addListener("click", () => {
+                                if (markerGroup.length === 1) {
+                                    const listing = listings[index];
+                                    navigateToListing(listing, lat, lng);
+                                } else {
+                                    // Set active marker state for the modal
+                                    setActiveMarker({ listings: markerGroup.map(({ index }) => listings[index]), lat, lng });
+                                }
                             });
                         });
                     });
+
                     setMapLoaded(true);
                 }
             }
         };
-        
+
         try {
             const validCoordinates = coordinatesList.filter(
                 ({ lat, lng }) =>
@@ -105,6 +130,36 @@ const MarkeredGMaps = ({
                     }}
                 />
             </Skeleton>
+            {activeMarker && (
+                <Modal isOpen={true} onClose={() => setActiveMarker(null)} size="xl">
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader color="#323437">This address has multiple listings! Select one to view</ModalHeader>
+                        <ModalBody>
+                            {activeMarker.listings.map((listing, idx) => (
+                                <Card
+                                mb={3}
+                                key={idx}
+                                sx={{ cursor: "pointer" }}
+                                onClick={() => {
+                                    navigateToListing(listing, activeMarker.lat, activeMarker.lng);
+                                    setActiveMarker(null);
+                                }}>
+                                    <CardBody>
+                                        <Text>{listing.title}</Text>
+                                        <Text>{listing.approxAddress}</Text>
+                                    </CardBody>
+                                </Card>
+                            ))}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme='red' mr={3} onClick={() => setActiveMarker(null)}>
+                                Close
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
         </>
     );
 };
