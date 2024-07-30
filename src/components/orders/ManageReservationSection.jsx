@@ -8,8 +8,10 @@ import configureShowToast from '../showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import MealDetailsSection from './MealDetailsSection';
 import placeholderImage from '../../assets/placeholderImage.svg';
+import { CheckCircleIcon, CheckIcon } from '@chakra-ui/icons';
+import { BsFillCheckCircleFill } from 'react-icons/bs';
 
-function ManageReservationSection({ currentReservation, refreshReservations, inSixHourWindow, dataLoaded, mode = "full" }) {
+function ManageReservationSection({ currentReservation, setCurrentReservation, refreshReservations, inSixHourWindow, dataLoaded, mode = "full" }) {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -19,12 +21,13 @@ function ManageReservationSection({ currentReservation, refreshReservations, inS
 
     const [showingCancelConfirmation, setShowingCancelConfirmation] = useState(false);
     const [cancelling, setCancelling] = useState(false);
+    const [markingPaid, setMarkingPaid] = useState(false);
 
     const hostPaymentURL = (currentReservation) => {
         return `${backendURL}/cdn/getHostPaymentQR?token=${authToken}&listingID=${currentReservation.listing.listingID}`
     }
 
-    function cancelReservation() {
+    function nonChargeableCancelReservation() {
         setCancelling(true);
         server.post("/cancelReservation", {
             referenceNum: currentReservation.referenceNum,
@@ -63,6 +66,55 @@ function ManageReservationSection({ currentReservation, refreshReservations, inS
             })
     }
 
+    function toggleMarkedPaid() {
+        setMarkingPaid(true);
+        server.put("/updateReservation", {
+            referenceNum: currentReservation.referenceNum,
+            markedPaid: !currentReservation.markedPaid
+        })
+            .then(res => {
+                dispatch(reloadAuthToken(authToken))
+                setMarkingPaid(false);
+                if (res.status == 200) {
+                    if (res.data && typeof res.data == "string" && res.data.startsWith("SUCCESS")) {
+                        showToast("Payment status updated!", "Your payment status has been updated.", 3000, true, "success")
+                    } else if (res.data && res.data.message && typeof res.data.message == "string" && res.data.message.startsWith("SUCCESS")) {
+                        showToast("Payment status updated!", "Your payment status has been updated.", 3000, true, "success")
+                        setCurrentReservation(prevReservation => {
+                            var newReservation = structuredClone(prevReservation);
+                            newReservation.markedPaid = res.data;
+                            newReservation.totalPrice = res.data.totalPrice;
+                            newReservation.portions = res.data.portions;
+
+                            return newReservation;
+                        })
+                    } else {
+                        console.log("Unknown response received when updating reservation: ", res.data);
+                        showToast("Something went wrong", "We couldn't update your reservation. Please try again later.", 3000, true, "error")
+                    }
+                } else {
+                    console.log("Unknown response (Non-200) received when updating reservation: ", res.data);
+                    showToast("Something went wrong", "We couldn't update your reservation. Please try again later.", 3000, true, "error")
+                }
+            })
+            .catch(err => {
+                dispatch(reloadAuthToken(authToken))
+                setMarkingPaid(false);
+                if (err.response && err.response.data && typeof err.response.data == "string") {
+                    if (err.response.data.startsWith("UERROR")) {
+                        console.log("User error occurred in updating reservation; response: " + err.response.data)
+                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3000, true, "error")
+                    } else {
+                        console.log("Error occurred in updating reservation: ", err.response.data);
+                        showToast("Something went wrong", "We couldn't update your reservation. Please try again later.", 3000, true, "error")
+                    }
+                } else {
+                    console.log("Error occurred in updating reservation: ", err);
+                    showToast("Something went wrong", "We couldn't update your reservation. Please try again later.", 3000, true, "error")
+                }
+            })
+    }
+
     if (!dataLoaded) {
         return <Spinner />;
     }
@@ -80,7 +132,7 @@ function ManageReservationSection({ currentReservation, refreshReservations, inS
                         </Text>
                         <Text mt={"30px"}>Please note that this action is irreversible. Continue with care.</Text>
                         <HStack width={"100%"}>
-                            <Button mt={"20px"} colorScheme='red' borderRadius={"10px"} fontWeight={"bold"} onClick={cancelReservation} w={"100%"} isLoading={cancelling} loadingText="Cancelling...">Cancel Reservation</Button>
+                            <Button mt={"20px"} colorScheme='red' borderRadius={"10px"} fontWeight={"bold"} onClick={nonChargeableCancelReservation} w={"100%"} isLoading={cancelling} loadingText="Cancelling...">Cancel Reservation</Button>
                             {!cancelling && (
                                 <Button mt={"20px"} variant={"MMPrimary"} onClick={() => setShowingCancelConfirmation(false)} w={"100%"} isDisabled={cancelling} _hover={'none'}>Nevermind</Button>
                             )}
@@ -91,7 +143,7 @@ function ManageReservationSection({ currentReservation, refreshReservations, inS
                 <Fade in>
                     {inSixHourWindow ? (
                         <>
-                            <Box display={"flex"} justifyContent={"left"} flexDirection={mode == "full" ? "row": "column"} mt={"20px"} alignItems={"center"}>
+                            <Box display={"flex"} justifyContent={"left"} flexDirection={mode == "full" ? "row" : "column"} mt={"20px"} alignItems={"center"}>
                                 <VStack>
                                     <Image src={hostPaymentURL(currentReservation)} objectFit={"contain"} fallbackSrc={placeholderImage} alt='Host Payment QR Code' width={"200px"} height={"200px"} />
                                     {!currentReservation.listing.Host.paymentImage && (
@@ -112,6 +164,16 @@ function ManageReservationSection({ currentReservation, refreshReservations, inS
                                     <Text fontSize={'large'}>Send <strong>{Extensions.formatCurrency(currentReservation.totalPrice)}</strong> to {currentReservation.listing.Host.fname} via PayNow.</Text>
                                 </VStack>
                             </Box>
+                            <VStack>
+                                {currentReservation.markedPaid ? (
+                                    <BsFillCheckCircleFill onClick={toggleMarkedPaid} color={'lime'} size={'50px'} />
+                                ) : (
+                                    <>
+                                        <Button mt={"20px"} width={"100%"} variant={"MMPrimary"} onClick={toggleMarkedPaid} isLoading={markingPaid} loadingText="Updating...">I have paid</Button>
+                                        <Button mt={"10px"} width={"100%"} variant={"link"} color={"red"} fontWeight={"bold"} isDisabled={markingPaid}>Cancel</Button>
+                                    </>
+                                )}
+                            </VStack>
                         </>
                     ) : (
                         <>
