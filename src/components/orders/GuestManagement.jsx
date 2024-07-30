@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import server from '../../networking'
-import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, Spacer, ScaleFade, Badge } from '@chakra-ui/react'
+import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, ScaleFade, Badge } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux'
