@@ -46,9 +46,9 @@ function GuestManagement({
         }
     }
 
-    const handlePaidAndPresent = async ({referenceNum, listingID}) => {
+    const handlePaidAndPresent = async ({ referenceNum, listingID }) => {
         try {
-            const response = await server.put(`/orders/manageGuests/togglePaidAndPresent`, {referenceNum, listingID});
+            const response = await server.put(`/orders/manageGuests/togglePaidAndPresent`, { referenceNum, listingID });
             dispatch(reloadAuthToken(authToken))
             if (response.status === 200) {
                 if (paidAndPresent) {
@@ -81,7 +81,7 @@ function GuestManagement({
 
     useEffect(() => {
         fetchReservationGuests();
-    }, [loaded, paidAndPresent ])
+    }, [loaded, paidAndPresent])
 
     if (!loaded) {
         return (
@@ -91,8 +91,12 @@ function GuestManagement({
 
     return (
         <>
-            <Text fontWeight="bold" fontSize="large" display="flex" mb={4} >Guests</Text>
-            <Text textAlign="left" color="grey" fontSize="large" display="flex" >When guests arrive, check that they have paid and click "Paid & Present" below to let us know.</Text>
+            {guestsList.length > 0 && (
+                <>
+                    <Text fontWeight="bold" fontSize="large" display="flex" mb={4} >Guests</Text>
+                    <Text textAlign="left" color="grey" fontSize="large" display="flex" >When guests arrive, check that they have paid and click "Paid & Present" below to let us know.</Text>
+                </>
+            )}
             {guestsList.length > 0 ? (
                 guestsList.map((guest) => (
                     <Box key={guest.userID} borderWidth="1px" borderRadius="lg" overflow="hidden" p={4} mb={4}>
@@ -103,14 +107,14 @@ function GuestManagement({
                         <Button
                             mt={2}
                             colorScheme="green"
-                            onClick={() => handlePaidAndPresent({referenceNum: guest.Reservation.referenceNum, listingID: listingID})}
+                            onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID: listingID })}
                         >
                             Mark as Paid & Present
                         </Button>
                     </Box>
                 ))
             ) : (
-                <Text>No guests found for this listing.</Text>
+                <Text textAlign="left" color="grey" fontSize="large" display="flex">No reservations made.</Text>
             )}
         </>
     )
