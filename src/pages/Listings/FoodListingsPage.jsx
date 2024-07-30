@@ -4,6 +4,7 @@ import { SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skelet
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
+import { motion } from "framer-motion";
 import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import server from "../../networking";
@@ -177,28 +178,38 @@ const FoodListingsPage = () => {
                                 spacing={4}
                                 templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
                             >
-                                {listings.map((listing) => (
+                                {listings && listings.map((listing) => (
                                     <SlideFade in={true} offsetY="20px" key={listing.listingID}>
                                         <Box 
                                             display={isBetween701And739 ? "flex" : "initial"}
                                             justifyContent={isBetween701And739 ? "center" : "initial"}
                                         >
-                                            <FoodListingCard
-                                                listingID={listing.listingID}
-                                                title={listing.title}
-                                                portionPrice={listing.portionPrice}
-                                                hostName={listing.Host.username || "MakanMatch Host"}
-                                                hostFoodRating={listing.Host.foodRating || 0}
-                                                hostID={listing.Host.userID}
-                                                images={listing.images.map((imageName) =>
-                                                    getImageLink(listing.listingID, imageName)
-                                                )}
-                                                shortDescription={listing.shortDescription}
-                                                approxAddress={listing.approxAddress}
-                                                totalSlots={listing.totalSlots}
-                                                latitude={parseFloat(listing.coordinates.split(',')[0])}
-                                                longitude={parseFloat(listing.coordinates.split(',')[1])}
-                                            />
+                                            <motion.div
+                                                initial={{ scale: 0 }}
+                                                animate={{ rotate: 0, scale: 1 }}
+                                                transition={{
+                                                    type: "spring",
+                                                    stiffness: 260,
+                                                    damping: 20
+                                                }}
+                                            >
+                                                <FoodListingCard
+                                                    listingID={listing.listingID}
+                                                    title={listing.title}
+                                                    portionPrice={listing.portionPrice}
+                                                    hostName={listing.Host.username || "MakanMatch Host"}
+                                                    hostFoodRating={listing.Host.foodRating || 0}
+                                                    hostID={listing.Host.userID}
+                                                    images={listing.images.map((imageName) =>
+                                                        getImageLink(listing.listingID, imageName)
+                                                    )}
+                                                    shortDescription={listing.shortDescription}
+                                                    approxAddress={listing.approxAddress}
+                                                    totalSlots={listing.totalSlots}
+                                                    latitude={parseFloat(listing.coordinates.split(',')[0])}
+                                                    longitude={parseFloat(listing.coordinates.split(',')[1])}
+                                                />
+                                            </motion.div>
                                         </Box>
                                     </SlideFade>
                                 ))}
@@ -218,7 +229,15 @@ const FoodListingsPage = () => {
                     </Box>
                     {!isSmallerThan1095 && listings.length > 0 && (
                         <Box flex="1" ml={5}>
-                            <SlideFade in={true} offsetY="20px">
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ rotate: 0, scale: 1 }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 260,
+                                    damping: 20
+                                }}
+                            >
                                 <MarkeredGMaps
                                     coordinatesList={listings.map((listing) => {
                                         const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
@@ -229,7 +248,7 @@ const FoodListingsPage = () => {
                                     setActiveMarker={setActiveMarker}
                                     navigateToListing={navigateToListing}
                                 />
-                            </SlideFade>
+                            </motion.div>
                         </Box>
                     )}
                 </Flex>
