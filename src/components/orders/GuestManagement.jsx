@@ -16,6 +16,7 @@ function GuestManagement({
     const { user, loaded, authToken } = useSelector((state) => state.auth);
     const toast = useToast();
     const showToast = configureShowToast(toast);
+    const [paidAndPresent, setPaidAndPresent] = useState(false);
     const navigate = useNavigate();
 
     const fetchReservationGuests = async () => {
@@ -45,9 +46,42 @@ function GuestManagement({
         }
     }
 
+    const handlePaidAndPresent = async ({referenceNum, listingID}) => {
+        try {
+            const response = await server.put(`/orders/manageGuests/togglePaidAndPresent`, {referenceNum, listingID});
+            dispatch(reloadAuthToken(authToken))
+            if (response.status === 200) {
+                if (paidAndPresent) {
+                    showToast('Guest marked as unpaid & absent', 'Guest has been marked as unpaid & absent', 3000, false, 'success');
+                    setPaidAndPresent(!paidAndPresent);
+                } else {
+                    showToast('Guest marked as paid & present', 'Guest has been marked as paid & present', 3000, false, 'success');
+                    setPaidAndPresent(!paidAndPresent);
+                }
+            } else {
+                showToast('Something went wrong', 'An error occurred while marking guest as paid & present', 3000, false, 'error');
+                console.error('Error marking guest as paid & present:', response.data);
+            }
+        } catch (error) {
+            dispatch(reloadAuthToken(authToken))
+            if (error.response && error.response.data) {
+                if (error.response.data.startsWith("UERROR")) {
+                    showToast('Something went wrong', error.response.data.substring("UERROR: ".length), 3000, false, 'error');
+                    console.log('User error occurred in marking guest as paid & present:', error.response.data);
+                } else {
+                    showToast('Something went wrong', 'An error occurred while marking guest as paid & present', 3000, false, 'error');
+                    console.error('Error marking guest as paid & present:', error.response.data);
+                }
+            } else {
+                showToast('Something went wrong', 'An error occurred while marking guest as paid & present', 3000, false, 'error');
+                console.error('Error marking guest as paid & present:', error);
+            }
+        }
+    }
+
     useEffect(() => {
         fetchReservationGuests();
-    }, [loaded])
+    }, [loaded, paidAndPresent ])
 
     if (!loaded) {
         return (
@@ -63,19 +97,13 @@ function GuestManagement({
                 guestsList.map((guest) => (
                     <Box key={guest.userID} borderWidth="1px" borderRadius="lg" overflow="hidden" p={4} mb={4}>
                         <Text fontWeight="bold" fontSize="lg">{guest.fname} {guest.lname}</Text>
-                        <Text>Username: {guest.username}</Text>
-                        <Text>Email: {guest.email}</Text>
-                        <Text>Contact Number: {guest.contactNum || 'N/A'}</Text>
-                        <Text>Address: {guest.address || 'N/A'}</Text>
-                        <Text>Reference Number: {guest.Reservation.referenceNum}</Text>
                         <Text>Portions: {guest.Reservation.portions}</Text>
                         <Text>Total Price: ${guest.Reservation.totalPrice}</Text>
                         <Text>Paid & Present: {guest.Reservation.paidAndPresent ? 'Yes' : 'No'}</Text>
                         <Button
                             mt={2}
                             colorScheme="green"
-                            onClick={() => handlePaidAndPresent(guest.userID)}
-                            isDisabled={guest.Reservation.paidAndPresent}
+                            onClick={() => handlePaidAndPresent({referenceNum: guest.Reservation.referenceNum, listingID: listingID})}
                         >
                             Mark as Paid & Present
                         </Button>

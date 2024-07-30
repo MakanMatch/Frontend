@@ -92,7 +92,7 @@ function HostPaymentQR({
                     width="80%"
                     height="400px"
                     className="qr-code-image"
-                    src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getHostPaymentQR?hostID=${hostID}&something=${Date.now()}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getHostPaymentQR?token=${authToken}&something=${Date.now()}`}
                     fallbackSrc={placeholderImage}
                     transition="filter 0.3s ease"
                     objectFit="contain"
