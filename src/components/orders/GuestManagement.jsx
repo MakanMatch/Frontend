@@ -25,8 +25,8 @@ function GuestManagement({
             const response = await server.get(`/getGuests?hostID=${hostID}&listingID=${listingID}`);
             dispatch(reloadAuthToken(authToken))
             if (response.status === 200) {
+                console.log(response.data);
                 setGuestsList(response.data);
-                setPaidAndPresent(response.data[0].Reservation.paidAndPresent);
             } else {
                 showToast('Something went wrong', 'An error occurred while fetching guest information', 3000, false, 'error');
                 console.error('Error fetching guest information:', response.data);
@@ -82,8 +82,10 @@ function GuestManagement({
     }
 
     useEffect(() => {
-        fetchReservationGuests();
-    }, [loaded, paidAndPresent])
+        if (loaded == true) {
+            fetchReservationGuests();
+        }
+    }, [paidAndPresent])
 
     if (!loaded) {
         return (
