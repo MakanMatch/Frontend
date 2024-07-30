@@ -95,34 +95,46 @@ function GuestManagement({
                         p={4}
                         mb={4}
                     >
-                        <Box display="flex" alignItems="center" mb={{base:4, md:0}}>
-                            <Avatar name={guest.username} size="lg" mr={4} />
+                        <Box display="flex" alignItems="center" mb={{ base: 4, md: 0 }}>
+                            <Avatar name={guest.username} size={{ base: "md", md: "lg" }} mr={4} />
                             <Box>
-                                <Flex gap={3} width="100%">
+                                <Flex
+                                    gap={{ base: 2, md: 3 }}
+                                    width="100%"
+                                    alignItems={{ base: 'flex-start', md: 'center' }}
+                                    flexWrap="wrap"
+                                >
                                     <Box>
-                                        <Text fontWeight="bold" fontSize="lg" textAlign="right">{guest.fname} {guest.lname}</Text>
+                                        <Text
+                                            fontWeight="bold"
+                                            fontSize={{ base: "md", md: "lg" }}
+                                            textAlign={{ base: "left", md: "right" }}
+                                        >
+                                            {guest.fname} {guest.lname}
+                                        </Text>
                                     </Box>
-                                    <Box>
-                                        <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
-                                            <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>PAID</Badge>
-                                        </ScaleFade>
-                                    </Box>
+                                    {guest.Reservation.markedPaid && (
+                                        <Box>
+                                            <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
+                                                <Badge colorScheme="purple" variant="solid" px={3} py={1}>PAID</Badge>
+                                            </ScaleFade>
+                                        </Box>
+                                    )}
                                 </Flex>
-                                <Flex mt={2} wrap="wrap" justify="space-between" width="100%" gap={3}>
-                                    <Text color="grey" fontSize="large">Total portion: {guest.Reservation.portions}</Text>
-                                    <Spacer />
-                                    <Text color="grey" fontSize="large">Total price: ${guest.Reservation.totalPrice}</Text>
+                                <Flex mt={2} wrap="wrap" justify={{ base: "flex-start", md: "space-between" }} width="100%" gap={3}>
+                                    <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total portion: {guest.Reservation.portions}</Text>
+                                    <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total price: ${guest.Reservation.totalPrice}</Text>
                                 </Flex>
                             </Box>
                         </Box>
-                        <Box display="flex" alignItems="center">
+                        <Box display="flex" alignItems="center" >
                             <IconButton
                                 icon={<FaCommentDots />}
                                 aria-label="Message Guest"
                                 mr={4}
                                 variant="ghost"
                                 colorScheme="blackAlpha"
-                                size="lg"
+                                size={{ base: "sm", md: "lg" }}
                                 onClick={() => navigate(`/chat`)}
                             />
                             {guest.Reservation.paidAndPresent ? (
@@ -130,14 +142,13 @@ function GuestManagement({
                                     icon={<FaCheck />}
                                     aria-label="Paid & Present"
                                     colorScheme="green"
-                                    size="lg"
-                                    style={{ transition: 'all 1s ease' }}
+                                    size={{ base: "sm", md: "lg" }}
                                     onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID })}
                                 />
                             ) : (
                                 <Button
                                     variant="MMPrimary"
-                                    style={{ transition: 'all 1s ease' }}
+                                    size={{ base: "sm", md: "md" }}
                                     onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID })}
                                 >
                                     Paid & Present
