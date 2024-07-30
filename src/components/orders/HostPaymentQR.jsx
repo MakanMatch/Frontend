@@ -69,7 +69,7 @@ function HostPaymentQR({
 
     return (
         <>
-            <Text fontWeight="bold" fontSize="large" mb="4" >Your PayNow QR Code</Text>
+            <Text fontWeight="bold" fontSize="large" mb={4} mt={4} >Your PayNow QR Code</Text>
             <Box
                 cursor="pointer"
                 position="relative"
