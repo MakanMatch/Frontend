@@ -53,7 +53,6 @@ function ChatUi() {
         };
 
         ws.current.onmessage = async (event) => {
-            console.log("image:", image);
             let receivedMessage;
             if (event.data instanceof Blob) {
                 const text = await event.data.text();
@@ -122,10 +121,10 @@ function ChatUi() {
                 setMessages(receivedMessage.previousMessages);
                 setStatus(receivedMessage.currentStatus);
             } else if (receivedMessage.action === "send") {
+                console.log("Received message: ", receivedMessage)
                 setMessages((prevMessages) => [
                     ...prevMessages,
-                    receivedMessage.message,
-                ]);
+                    receivedMessage.message,]);
             } else if (receivedMessage.action === "edit") {
                 setMessages((prevMessages) =>
                     prevMessages.map((msg) =>
@@ -229,8 +228,7 @@ function ChatUi() {
     }, [messages]);
 
     const sendMessage = async () => {
-        if (ws.current && (messageInput.trim() !== "" || (messageInput.trim() !== "" && image !== null))) {
-            console.log(image);
+        if (ws.current && messageInput.trim() !== "" && (image === null || (image !== null && messageInput.trim() !== ""))) {
             const imagesToBeSubmitted = image ? true : false;
             const newMessage = {
                 action: "send",
@@ -242,8 +240,6 @@ function ChatUi() {
             };
     
             if (imagesToBeSubmitted) {
-                console.log('congrats');
-                console.log(image);
                 const formData = new FormData();
                 formData.append("image", image);
     
@@ -408,20 +404,10 @@ function ChatUi() {
         ];
         if (file && allowedTypes.includes(file.type)) {
             setImage(file);
-            console.log("Selected file:", file);
         } else {
             showToast("Invalid file type", "Please upload an image file.", 3000, true, "error");
         }
     };
-    
-
-    useEffect(() => {
-        if (image) {
-            console.log("Image in useEffect:", image);
-        }
-    }, [image]);
-    
-
 
     if (!loaded || !user) {
         return <Spinner />
@@ -514,6 +500,7 @@ function ChatUi() {
                                         onReply={() => handleReply(msg)}
                                         repliedMessage={msg.replyTo}
                                         edited={msg.edited}
+                                        image={msg.image ? getImageLink(msg.senderID, msg.image) : null}
                                     />
                                 </React.Fragment>
                             ))}

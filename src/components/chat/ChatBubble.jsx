@@ -10,6 +10,7 @@ import {
   MenuItem,
   useColorModeValue,
   Avatar,
+  Image,
 } from "@chakra-ui/react";
 import { FiEdit, FiTrash2, FiMoreVertical } from "react-icons/fi";
 import { FaReply } from "react-icons/fa";
@@ -25,6 +26,7 @@ function ChatBubble({
   edited,
   sender,
   reciever,
+  image,  // Add image prop here
 }) {
   const menuItemColor = useColorModeValue("teal.500", "teal.200");
   const menuItemHoverBg = useColorModeValue("teal.100", "teal.600");
@@ -109,6 +111,11 @@ function ChatBubble({
                 <Text fontSize="sm" color={isSender ? "white" : "black"}>
                   {repliedMessage}
                 </Text>
+              </Box>
+            )}
+            {image && (
+              <Box mb={2}>
+                <Image src={image} alt="Message Image" borderRadius="md" />
               </Box>
             )}
             <Text>
