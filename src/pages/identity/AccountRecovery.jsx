@@ -21,7 +21,7 @@ function AccountRecovery() {
     const toast = useToast()
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
-    const authToken = useSelector((state) => state.auth.authToken);
+    const { loaded, authToken } = useSelector((state) => state.auth);
 
     const [isSmallerThan755] = useMediaQuery("(max-width: 755px)");
     const [isSmallerThan560] = useMediaQuery("(max-width: 560px)");
@@ -30,11 +30,13 @@ function AccountRecovery() {
     const handleShowConfirmNewPassword = () => setShowConfirmNewPassword(!showConfirmNewPassword);
 
     useEffect(() => {
-        if (authToken) {
-            showToast("Logged In", "You are already logged in!", 3000, true, 'success')
-            navigate('/');
+        if (loaded == true) {
+            if (authToken) {
+                showToast("Logged In", "You are already logged in!", 3000, true, 'success')
+                navigate('/');
+            }
         }
-    }, []);
+    }, [loaded]);
     
     useEffect(() => {
         let timer;
@@ -114,7 +116,7 @@ function AccountRecovery() {
                 w={isSmallerThan755 ? "90%" : "50%"}
                 minW="380px"
                 h="100%"
-                bg="rgba(255, 255, 255, 0.85)"
+                bg="rgba(255, 255, 255, 0.80)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"

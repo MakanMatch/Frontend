@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormControl, FormLabel, Stack, 
@@ -21,7 +21,7 @@ function AdminAccount() {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const dispatch = useDispatch();
-    const cancelRef = React.useRef()
+    const cancelRef = useRef()
     const { user, authToken, loaded } = useSelector((state) => state.auth);
     const [profilePicture, setProfilePicture] = useState(null);
     const [accountLoaded, setAccountLoaded] = useState(false);
@@ -36,9 +36,7 @@ function AdminAccount() {
     const [isSmallerThan560] = useMediaQuery("(max-width: 560px)"); // for linkedin card design (optional)
 
     useEffect(() => {
-        console.log("ran")
         if (loaded == true) {
-            console.log("passed")
             const fetchAccountInfo = async () => {
                 try {
                     const userID = user.userID;
@@ -50,7 +48,7 @@ function AdminAccount() {
                     setProfilePicture(`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`);
                 } catch (err) {
                     console.log("Error fetching account info:", err);
-                    if (err && err.response && err.response.status && err.response.status == 404) {
+                    if (err.response && err.response.status && err.response.status == 404) {
                         dispatch(logout());
                         localStorage.removeItem('jwt');
                     }
@@ -110,31 +108,54 @@ function AdminAccount() {
         }
 
         server.put("/identity/myAccount/updateAccountDetails", {
-                userID: user.userID,
-                username: accountInfo.username,
-                email: accountInfo.email,
-                contactNum: accountInfo.contactNum,
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((res) => {
-                dispatch(reloadAuthToken(authToken))
-                if (res.status == 200 && res.data.startsWith("SUCCESS")) {
-                    showToast("Changes saved", "Your account details have been updated.", 3000, true, "success");
-                    setOriginalAccountInfo({ ...accountInfo });
-                } else if (res.data.startsWith("UERROR")) {
-                    showToast("Invalid input", res.data.substring("UERROR: ".length), 3000, true, "error");
+            username: accountInfo.username,
+            email: accountInfo.email,
+            contactNum: accountInfo.contactNum,
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((res) => {
+            dispatch(reloadAuthToken(authToken))
+            if (res.status == 200 && res.data.startsWith("SUCCESS")) {
+                showToast("Changes saved", "Your account details have been updated.", 3000, true, "success");
+                setOriginalAccountInfo({ ...accountInfo });
+            }
+        })
+        .catch((err) => {
+            dispatch(reloadAuthToken(authToken))
+                console.log("Error: ", error)
+                if (error.response && error.response.data && typeof error.response.data == "string") {
+                    console.log("Failed to update account details; response: " + error.response.data)
+                    if (error.response.data.startsWith("UERROR")) {
+                        showToast(
+                            "Uh-oh!",
+                            error.response.data.substring("UERROR: ".length),
+                            3500,
+                            true,
+                            "info",
+                        )
+                    } else {
+                        showToast(
+                            "Something went wrong",
+                            "Failed to update account details. Please try again",
+                            3500,
+                            true,
+                            "error",
+                        )
+                    }
                 } else {
-                    showToast("ERROR", "Failed to save changes. Please try again.", 3000, true, "error");
+                    console.log("Unknown error occurred when fetching users; error: " + error)
+                    showToast(
+                        "Something went wrong",
+                        "Failed to update account details. Please try again",
+                        3500,
+                        true,
+                        "error",
+                    )
                 }
-            })
-            .catch((err) => {
-                dispatch(reloadAuthToken(authToken))
-                console.log(err);
-                showToast("ERROR", "Failed to save changes. Please try again.", "error");
-            });
+        });
     };
 
     const handleCancelChanges = () => {
@@ -208,13 +229,11 @@ function AdminAccount() {
             } else if (res.status === 200 && res.data.startsWith("SUCCESS")) {
                 showToast("Name changed", "Your name has been updated!", 3000, true, "success");
                 onClose();
-            } else {
-                showToast("Something went wrong", "Please try again later.", 3000, true, "error");
             }
         })
         .catch((err) => {
             dispatch(reloadAuthToken(authToken))
-            if (err.response && err.response.status === 400) {
+            if (err.response && err.response.status !== 200) {
                 showToast("Invalid Input", err.response.data.substring("UERROR: ".length), 3000, true, "error");
             } else {
                 console.error("Error changing name:", err);
@@ -278,7 +297,7 @@ function AdminAccount() {
 
     const PopoverForm = () => {
         const { onOpen, onClose, isOpen } = useDisclosure();
-        const firstFieldRef = React.useRef(null);
+        const firstFieldRef = useRef(null);
         const [fname, setFname] = useState(accountInfo.fname);
         const [lname, setLname] = useState(accountInfo.lname);
         const [localAccountInfo, setLocalAccountInfo] = useState(accountInfo);

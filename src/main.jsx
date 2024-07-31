@@ -83,7 +83,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route index element={<AdminHomepage />} />
                         <Route path={"hygieneReports"} element={<HygieneReports />} />
                         <Route path={"userManagement"} element={<UserManagement />} />
-                        <Route path={"adminAccount"} element={<AdminAccount />} />
+                        <Route path={"myAccount"} element={<AdminAccount />} />
                     </Route>
                 </Routes>
             </BrowserRouter>

@@ -132,16 +132,40 @@ const MyAccount = () => {
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
                     showToast("Changes saved", "Your account details have been updated.", 3000, true, "success");
                     setOriginalAccountInfo({ ...accountInfo });
-                } else if (res.data.startsWith("UERROR")) {
-                    showToast("Invalid input", res.data.substring("UERROR: ".length), 3000, true, "error");
-                } else {
-                    showToast("ERROR", "Failed to save changes. Please try again.", 3000, true, "error");
                 }
             })
-            .catch((err) => {
+            .catch((error) => {
                 dispatch(reloadAuthToken(authToken))
-                console.log(err);
-                showToast("ERROR", "Failed to save changes. Please try again.", "error");
+                console.log("Error: ", error)
+                if (error.response && error.response.data && typeof error.response.data == "string") {
+                    console.log("Failed to update account details; response: " + error.response.data)
+                    if (error.response.data.startsWith("UERROR")) {
+                        showToast(
+                            "Uh-oh!",
+                            error.response.data.substring("UERROR: ".length),
+                            3500,
+                            true,
+                            "info",
+                        )
+                    } else {
+                        showToast(
+                            "Something went wrong",
+                            "Failed to update account details. Please try again",
+                            3500,
+                            true,
+                            "error",
+                        )
+                    }
+                } else {
+                    console.log("Unknown error occurred when fetching users; error: " + error)
+                    showToast(
+                        "Something went wrong",
+                        "Failed to update account details. Please try again",
+                        3500,
+                        true,
+                        "error",
+                    )
+                }
             });
     };
 

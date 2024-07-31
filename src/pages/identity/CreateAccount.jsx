@@ -31,7 +31,7 @@ function CreateAccount() {
             showToast("Logged In", "You are already logged in!", 3000, true, 'success')
             navigate('/');
         }
-    }, []);
+    }, [authToken]);
 
     // Validation schema
     const validationSchema = Yup.object().shape({
@@ -99,12 +99,14 @@ function CreateAccount() {
                 }
             })
             .catch((err) => {
-                if (err.response.data === "Username already exists.") {
+                if (err.response.data === "UERROR: Username already exists.") {
                     actions.setFieldError('username', 'Username already exists.');
-                } else if (err.response.data === "Email already exists.") {
+                } else if (err.response.data === "UERROR: Email already exists.") {
                     actions.setFieldError('email', 'Email already exists.');
-                } else if (err.response.data === "Contact number already exists.") {
+                } else if (err.response.data === "UERROR: Contact number already exists.") {
                     actions.setFieldError('contactNum', 'Contact number already in use.');
+                } else if (err.response.data.startsWith("ERROR")) {
+                    showToast('Account creation failed', err.response.data.substring("ERROR: ".length), 3000, true, 'error');
                 }
                 showToast('Account creation failed.', err.response.data.substring("UERROR: ".length), 3000, true, 'error');
                 actions.setSubmitting(false);
@@ -136,7 +138,7 @@ function CreateAccount() {
                     <Box
                         w={isSmallerThan944 ? (isSmallerThan766 ? "95%" : "70%") : "50%"}
                         h="100%"
-                        bg="rgba(255, 255, 255, 0.85)"
+                        bg="rgba(255, 255, 255, 0.80)"
                         display="flex"
                         alignItems="center"
                         justifyContent="center"

@@ -12,8 +12,8 @@ function Navbar() {
 
     const handleAvatarClick = () => {
         if (authToken) {
-            if (user.userType == "Admin") {
-                navigate('/admin/adminAccount');
+            if (user && user.userType == "Admin") {
+                navigate('/admin/myAccount');
             } else {
                 navigate('/identity/myAccount');
             }
@@ -25,7 +25,7 @@ function Navbar() {
 
     const handleLogoClick = () => {
         if (authToken) {
-            if (user.userType == "Admin") {
+            if (user && user.userType == "Admin") {
                 navigate('/admin');
             } else {
                 navigate('/')

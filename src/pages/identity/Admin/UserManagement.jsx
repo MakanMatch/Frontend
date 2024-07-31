@@ -11,32 +11,57 @@ function UserManagement() {
     const [users, setUsers] = useState([])
     const toast = useToast();
     const showToast = configureShowToast(toast)
-    const { user, authToken } = useSelector((state) => state.auth);
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const fetchAllUsers = async () => {
-        const response = await server.get('/cdn/fetchAllUsers')
-        if (response.status === 200) {
-            const usersArray = Object.values(response.data)
-            setUsers(usersArray)
-            await getAllProfilePictures(usersArray);
+        try {
+            const response = await server.get('/cdn/fetchAllUsers')
+            if (response.status === 200) {
+                console.log(response.data)
+                setUsers(response.data)
+                await getAllProfilePictures(response.data);
+            }
+        }
+        catch (error) {
+            dispatch(reloadAuthToken(authToken))
+            console.log("Error: ", error)
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to fetch users; response: " + error.response.data)
+                if (error.response.data.startsWith("UERROR")) {
+                    showToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        3500,
+                        true,
+                        "info",
+                    )
+                } else {
+                    showToast(
+                        "Something went wrong",
+                        "Failed to fetch users. Please try again",
+                        3500,
+                        true,
+                        "error",
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when fetching users; error: " + error)
+                showToast(
+                    "Something went wrong",
+                    "Failed to fetch users. Please try again",
+                    3500,
+                    true,
+                    "error",
+                )
+            }
         }
     }
 
-    const getAllProfilePictures = async (usersArray) => {
-        const updatedUsers = await Promise.all(usersArray.map(async (user) => {
-            try {
-                user.profilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${user.userID}`;
-            } catch (error) {
-                console.error(`Failed to fetch profile picture for user ${user.userID}`, error);
-            }
-            return user;
-        }));
-        setUsers(updatedUsers);
-    };
-
     useEffect(() => {
-        fetchAllUsers()
-    }, [])
+        if (loaded == true) {
+            fetchAllUsers()
+        }
+    }, [loaded])
     
     return (
         <>
@@ -80,7 +105,6 @@ function UserManagement() {
                                 email={user.email}
                                 userType={user.userType}
                                 userID={user.userID}
-                                profilePicture={user.profilePicture}
                             />
                         ))
                     ) : (

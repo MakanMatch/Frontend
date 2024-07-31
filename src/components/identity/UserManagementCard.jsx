@@ -1,7 +1,9 @@
 import { Avatar, Box, HStack, Text } from '@chakra-ui/react'
 import { BsThreeDotsVertical } from 'react-icons/bs';
 
-function UserManagementCard({ username, email, userType, userID, profilePicture }) {
+function UserManagementCard({ username, email, userType, userID }) {
+
+    const profilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`
 
 	return (
         <HStack display="flex" justifyContent={"space-between"}>

@@ -55,7 +55,7 @@ function EmailVerification() {
         >
             <Box
                 w={isSmallerThan1040 ? '100%' : '65%'}
-                bg="rgba(255, 255, 255, 0.85)"
+                bg="rgba(255, 255, 255, 0.80)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"

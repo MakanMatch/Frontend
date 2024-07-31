@@ -30,13 +30,13 @@ const EditPicture = ({ isOpen, onClose, onSubmit, onRemove, currentProfilePictur
 
     const handleChangePicture = (e) => {
         e.preventDefault();
-        setIsUploading(true)
 
         if (file == null) {
             showToast("Error", "No file selected", 2500, true, "error")
             setIsUploading(false)
             return
         }
+        setIsUploading(true)
 
         const formData = new FormData()
 
@@ -50,32 +50,53 @@ const EditPicture = ({ isOpen, onClose, onSubmit, onRemove, currentProfilePictur
             .then(res => {
                 dispatch(reloadAuthToken(authToken))
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
-                    showToast("Success", "Profile picture uploaded successfully", 2500, true, "success");
+                    showToast("Success", "Profile picture uploaded successfully", 3000, true, "success");
                     setIsUploading(false);
                     onSubmit();
                     handleClose();
                     return
-                } else {
-                    showToast("Error", "Failed to upload image", 5000, true, "error");
-                    setIsUploading(false);
-                    return
                 }
             })
-            .catch(err => {
+            .catch(error => {
                 dispatch(reloadAuthToken(authToken))
-                console.log("Failed to upload image; error: " + err);
-                showToast("Error", "Failed to upload image", 5000, true, "error");
                 setIsUploading(false)
-                return
+                if (error.response && error.response.data && typeof error.response.data == "string") {
+                    console.log("Failed to fetch listings; response: " + error.response.data)
+                    if (error.response.data.startsWith("UERROR")) {
+                        showToast(
+                            "Uh-oh!",
+                            error.response.data.substring("UERROR: ".length),
+                            3500,
+                            true,
+                            "info",
+                        )
+                    } else {
+                        showToast(
+                            "Something went wrong",
+                            "Failed to upload profile picture. Please try again",
+                            3500,
+                            true,
+                            "error",
+                        )
+                    }
+                } else {
+                    console.log("Unknown error occurred when uploading profile picture; error: " + error)
+                    showToast(
+                        "Something went wrong",
+                        "Failed to upload profile picture. Please try again",
+                        3500,
+                        true,
+                        "error",
+                    )
+                }
             })
     }
 
     const handleRemovePicture = () => {
         server.post("/identity/myAccount/removeProfilePicture")
             .then(res => {
+                dispatch(reloadAuthToken(authToken));
                 if (res.status == 200 && res.data.startsWith("SUCCESS")) {
-                    showToast("Success", "Image removed successfully", 2500, true, "success");
-                    dispatch(reloadAuthToken(authToken));
                     onRemove();
                     handleClose();
                     return

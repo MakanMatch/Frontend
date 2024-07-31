@@ -2,13 +2,15 @@ import { Avatar, Box, HStack, Text, Link } from '@chakra-ui/react'
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 
-function UserManagementCard({ username, email, hygieneGrade, hostID, profilePicture }) {
+function HostHygieneManagementCard({ username, email, hygieneGrade, hostID }) {
 
     const navigate = useNavigate();
 
     const handleClickUsername = () => {
         navigate("/reviews", { state: { hostID: hostID } });
     }
+
+    const profilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${hostID}`;
 
 	return (
         <HStack display="flex" justifyContent={"space-between"}>
@@ -43,4 +45,4 @@ function UserManagementCard({ username, email, hygieneGrade, hostID, profilePict
     );
 }
 
-export default UserManagementCard
+export default HostHygieneManagementCard;

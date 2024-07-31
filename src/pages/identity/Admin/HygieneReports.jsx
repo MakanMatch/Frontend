@@ -1,46 +1,35 @@
-import { Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text } from "@chakra-ui/react";
-import HostManagementCard from "../../../components/identity/HostManagementCard";
+import { useToast, Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text } from "@chakra-ui/react";
+import HostManagementCard from "../../../components/identity/HostHygieneManagementCard";
 import server from ".././../../networking"
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import configureShowToast from '../../../components/showToast';
 
 function HygieneReports() {
     const [hosts, setHosts] = useState([])
+    const toast = useToast();
+    const showToast = configureShowToast(toast);
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const fetchAllHosts = async () => {
         try {
             const response = await server.get('/cdn/fetchAllUsers?fetchHostsOnly=true');
             if (response.status === 200) {
-                const hostsArray = Object.values(response.data);
-                setHosts(hostsArray);
-                return hostsArray;
+                setHosts(response.data);
+                return response.data;
             }
         } catch (error) {
             console.error('Error fetching hosts:', error);
+            showToast("Unable to retrieve hosts", "Please try again later", 3000, true, "error")
         }
         return [];
     };
 
-    const getAllProfilePictures = async (hostsArray) => {
-        try {
-            const hostsWithPictures = await Promise.all(
-                hostsArray.map(async (host) => {
-                    host.profilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${host.userID}`
-                    return host;
-                })
-            );
-            setHosts(hostsWithPictures);
-        } catch (error) {
-            console.error('Error fetching profile pictures:', error);
-        }
-    };
-
     useEffect(() => {
-        fetchAllHosts().then((hostsArray) => {
-            if (hostsArray && hostsArray.length > 0) {
-                getAllProfilePictures(hostsArray);
-            }
-        });
-    }, []);
+        if (loaded == true) {
+            fetchAllHosts();
+        }
+    }, [loaded]);
 
     return (
         <>
@@ -77,18 +66,15 @@ function HygieneReports() {
                 <CardBody>
                     <Stack divider={<StackDivider />} spacing='4'>
                     {hosts.length > 0 ? (
-                        hosts
-                            .filter((host) => host.hygieneGrade > 0 && host.hygieneGrade <= 2.5)
-                            .map((host) => (
-                                <HostManagementCard
-                                    key={host.userID}
-                                    username={host.username}
-                                    email={host.email}
-                                    hygieneGrade={host.hygieneGrade}
-                                    hostID={host.userID}
-                                    profilePicture={host.profilePicture}
-                                />
-                            ))
+                        hosts.map((host) => (
+                            <HostManagementCard
+                                key={host.userID}
+                                username={host.username}
+                                email={host.email}
+                                hygieneGrade={host.hygieneGrade}
+                                hostID={host.userID}
+                            />
+                        ))
                     ) : (
                         <Text>No hosts flagged.</Text>
                     )}

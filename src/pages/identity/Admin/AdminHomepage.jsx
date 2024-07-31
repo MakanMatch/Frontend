@@ -83,7 +83,7 @@ function AdminHomepage() {
                     <Divider />
                     <CardFooter>
                         <ButtonGroup spacing='2'>
-                            <Button variant={"MMPrimary"} colorScheme='blue' onClick={() => navigate('/admin/adminAccount')}>
+                            <Button variant={"MMPrimary"} colorScheme='blue' onClick={() => navigate('/admin/myAccount')}>
                                 View More
                             </Button>
                         </ButtonGroup>

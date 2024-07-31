@@ -14,6 +14,7 @@ function Login() {
     const toast = useToast()
     const showToast = configureShowToast(toast);
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const authToken = useSelector((state) => state.auth.authToken);
 
@@ -25,18 +26,20 @@ function Login() {
             showToast("Logged In", "You are already logged in!", 3000, true, 'success')
             navigate('/');
         }
-    }, []);
+    }, [authToken]);
 
     const handleShowPassword = () => setShowPassword(!showPassword);
 
     // Submit function
     const handleSubmit = (values, actions) => {
+        setIsLoading(true);
         server.post("/loginAccount", values, {
             headers: {
                 'Content-Type': 'application/json'
             }
         })
             .then((res) => {
+                setIsLoading(false);
                 if (res && res.data) {
                     console.log("Account logged in successfully.");
                     showToast('Login successful', 'Welcome back to MakanMatch!', 3000, true, 'success')
@@ -56,6 +59,7 @@ function Login() {
                 }
             })
             .catch((err) => {
+                setIsLoading(false);
                 console.log(err)
                 if (err.response.data === "UERROR: Invalid username or email or password.") {
                     formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
@@ -89,7 +93,7 @@ function Login() {
             <Box
                 w={isSmallerThan800 ? (isSmallerThan323 ? "100%" : "80%") : "45%"}
                 h="100%"
-                bg="rgba(255, 255, 255, 0.85)"
+                bg="rgba(255, 255, 255, 0.80)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -156,10 +160,11 @@ function Login() {
                         </Box>
                         <Button
                             variant={"MMPrimary"}
-                            isLoading={formik.isSubmitting}
+                            isLoading={isLoading}
                             type='submit'
                             width='150px'
                             mb={5}
+                            loadingText="Logging in..."
                         >
                             Login
                         </Button>
