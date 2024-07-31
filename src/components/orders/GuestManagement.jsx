@@ -20,11 +20,11 @@ function GuestManagement({
     const navigate = useNavigate();
     const [refresh, setRefresh] = useState(false);
 
-    const handlePaidAndPresent = async ({ referenceNum, listingID }) => {
+    const handlePaidAndPresent = async ({ referenceNum, listingID, guestID }) => {
         try {
-            const response = await server.put(`/orders/manageGuests/togglePaidAndPresent`, { referenceNum, listingID });
+            const response = await server.put(`/orders/manageGuests/togglePaidAndPresent`, { referenceNum, listingID, guestID });
             dispatch(reloadAuthToken(authToken))
-            if (response.status === 200) {
+            if (response.status === 200) {  
                 if (response.data.paidAndPresent == true) {
                     showToast('Guest marked as paid & present', 'Guest has been marked as paid & present', 3000, false, 'success');
                     guestsList.forEach((guest) => {
@@ -84,7 +84,7 @@ function GuestManagement({
             {guestsList.length > 0 ? (
                 guestsList.map((guest) => (
                     <Box
-                        key={guest.userID}
+                        key={guest.Reservation.userID}
                         display="flex"
                         flexDirection={{ base: 'column', md: 'row' }}
                         alignItems="center"
@@ -143,13 +143,13 @@ function GuestManagement({
                                     aria-label="Paid & Present"
                                     colorScheme="green"
                                     size={{ base: "sm", md: "lg" }}
-                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID })}
+                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
                                 />
                             ) : (
                                 <Button
                                     variant="MMPrimary"
                                     size={{ base: "sm", md: "md" }}
-                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID })}
+                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })} 
                                 >
                                     Paid & Present
                                 </Button>
