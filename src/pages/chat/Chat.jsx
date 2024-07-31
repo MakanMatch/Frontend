@@ -183,16 +183,10 @@ function ChatUi() {
     }, [loaded]);
 
     useEffect(() => {
-        // window.onbeforeunload = (event) => {
-        //     const e = event || window.event;
-        //     e.preventDefault();
-        //     if (e) {
-        //         e.returnValue = ''
-        //     }
-
-        //     localStorage.removeItem("wsConnected")
-        //     return ''
-        // }
+        window.onbeforeunload = () => {
+            localStorage.removeItem("wsConnected");
+        };
+        
 
         if (loaded == true) {
             if (!user) {
