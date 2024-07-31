@@ -1,10 +1,77 @@
-import { Box, Card, CardBody, Heading, Text, Image, CardFooter, FormControl, Input, useMediaQuery } from '@chakra-ui/react'
+import { Box, Card, CardBody, Heading, Text, Image, CardFooter, FormControl, Input, useMediaQuery, useToast } from '@chakra-ui/react'
 import Logo from '../../assets/Logo.png'
 import { AddIcon } from '@chakra-ui/icons'
 import { FaPaperPlane } from 'react-icons/fa'
+import { useDispatch, useSelector } from 'react-redux'
+import { reloadAuthToken } from '../../slices/AuthState'
+import server from "../../networking"
 
 function MakanBot() {
     const [isSmallerThan845] = useMediaQuery("(max-width: 845px)");
+
+    const toast = useToast();
+    const dispatch = useDispatch();
+
+    const authToken = useSelector((state) => state.auth.authToken);
+
+    function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
+        toast({
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: isClosable
+        });
+    }
+
+    const handleSubmitPrompt = async () => {
+        const messagePrompt = document.getElementById("promptInput").value;
+        if (messagePrompt.trim() === "") {
+            displayToast("Prompt cannot be empty", "Please enter a valid prompt", "error", 3000, true);
+            return;
+        } else {
+            document.getElementById("promptInput").value = "";
+            try {
+                const response = await server.post("/makanBot/queryMakanBotWithUserPrompt", { messagePrompt: messagePrompt });
+                dispatch(reloadAuthToken(authToken));
+                if (response.status === 200) {
+                    document.getElementById("promptResult").innerHTML = response.data.message;
+                }
+            } catch (error) {
+                dispatch(reloadAuthToken(authToken));
+                if (error.response && error.response.data && typeof error.response.data == "string") {
+                    console.log("Failed to add listing; response: " + error.response)
+                    if (error.response.data.startsWith("UERROR")) {
+                        displayToast(
+                            "Uh-oh!",
+                            error.response.data.substring("UERROR: ".length),
+                            "info",
+                            3500,
+                            true
+                        )
+                    } else {
+                        displayToast(
+                            "Something went wrong",
+                            "Failed to add listing. Please try again",
+                            "error",
+                            3500,
+                            true
+                        )
+                    }
+                } else {
+                    console.log("Unknown error occurred when adding listing; error: " + error)
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to add listing. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
+            }
+        }
+    }
     return (
         <Box
             boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
@@ -47,12 +114,15 @@ function MakanBot() {
                 <CardBody>
                     <Heading as="h1" size="lg" textAlign="center">MakanBot</Heading>
                     <Text textAlign="center" fontSize="xl">MakanBot is here to help you with any questions you may have!</Text>
+                    <Box>
+                        <Text id="promptResult"></Text>
+                    </Box>
                 </CardBody>
                 <CardFooter>
                     <Box display="flex" justifyContent={"space-between"} width="100%">
                         <Box width="100%">
                             <FormControl>
-                                <Input type='text' borderRadius={"3xl"} width="95%" placeholder="Enter a prompt here" />
+                                <Input id="promptInput" type='text' borderRadius={"3xl"} width="95%" placeholder="Enter a prompt here" />
                             </FormControl>
                         </Box>
                         <Box
@@ -67,7 +137,7 @@ function MakanBot() {
                                 } 
                             }}
                         >
-                            <FaPaperPlane fontSize={"25px"} color="#515F7C" />
+                            <FaPaperPlane fontSize={"25px"} color="#515F7C" onClick={handleSubmitPrompt} />
                         </Box>
                     </Box>
                 </CardFooter>
