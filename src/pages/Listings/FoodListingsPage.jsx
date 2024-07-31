@@ -1,8 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton, Spinner, Center, Fade } from "@chakra-ui/react";
+import { SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton, Spinner, Center, Fade, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Button } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
+import { motion } from "framer-motion";
+import { FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
 import server from "../../networking";
@@ -11,7 +14,9 @@ const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
+    const [activeMarker, setActiveMarker] = useState(null);
     const [loading, setLoading] = useState(true); 
+    const navigate = useNavigate();
 
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
@@ -74,6 +79,28 @@ const FoodListingsPage = () => {
         }
     };
 
+    const navigateToListing = (listing, lat, lng) => {
+        navigate("/targetListing", {
+            state: {
+                listingID: listing.listingID,
+                hostID: listing.hostID,
+                images: listing.images.map((image) => getImageLink(listing.listingID, image)),
+                title: listing.title,
+                shortDescription: listing.shortDescription,
+                approxAddress: listing.approxAddress,
+                portionPrice: listing.portionPrice,
+                totalSlots: listing.totalSlots,
+                latitude: lat,
+                longitude: lng,
+            },
+        });
+    };
+
+    const handleCloseMapModal = () => {
+        setActiveMarker(null);
+        localStorage.setItem("mapRemountDenyOnModalClose", true);
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             await fetchListings();
@@ -89,6 +116,12 @@ const FoodListingsPage = () => {
                 4000,
                 true
             );
+        }
+        if (localStorage.getItem("mapRemountDenyOnModalOpen")) {
+            localStorage.removeItem("mapRemountDenyOnModalOpen");
+            if (localStorage.getItem("mapRemountDenyOnModalClose")) {
+                localStorage.removeItem("mapRemountDenyOnModalClose");
+            }
         }
     }, []);
 
@@ -116,6 +149,8 @@ const FoodListingsPage = () => {
                         })}
                         listings={listings}
                         isSmallerThan1095={true}
+                        setActiveMarker={setActiveMarker}
+                        navigateToListing={navigateToListing}
                     />
                 </Box>
             )}
@@ -150,28 +185,39 @@ const FoodListingsPage = () => {
                                 spacing={4}
                                 templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
                             >
-                                {listings.map((listing) => (
+                                {listings && listings.map((listing) => (
                                     <SlideFade in={true} offsetY="20px" key={listing.listingID}>
                                         <Box 
                                             display={isBetween701And739 ? "flex" : "initial"}
                                             justifyContent={isBetween701And739 ? "center" : "initial"}
                                         >
-                                            <FoodListingCard
-                                                listingID={listing.listingID}
-                                                title={listing.title}
-                                                portionPrice={listing.portionPrice}
-                                                hostName={listing.Host.username || "MakanMatch Host"}
-                                                hostFoodRating={listing.Host.foodRating || 0}
-                                                hostID={listing.Host.userID}
-                                                images={listing.images.map((imageName) =>
-                                                    getImageLink(listing.listingID, imageName)
-                                                )}
-                                                shortDescription={listing.shortDescription}
-                                                approxAddress={listing.approxAddress}
-                                                totalSlots={listing.totalSlots}
-                                                latitude={parseFloat(listing.coordinates.split(',')[0])}
-                                                longitude={parseFloat(listing.coordinates.split(',')[1])}
-                                            />
+                                            <motion.div
+                                                initial={{ scale: 0 }}
+                                                animate={{ rotate: 0, scale: 1 }}
+                                                transition={{
+                                                    type: "spring",
+                                                    stiffness: 260,
+                                                    damping: 20
+                                                }}
+                                            >
+                                                <FoodListingCard
+                                                    listingID={listing.listingID}
+                                                    title={listing.title}
+                                                    portionPrice={listing.portionPrice}
+                                                    hostName={listing.Host.username || "MakanMatch Host"}
+                                                    hostFoodRating={listing.Host.foodRating || 0}
+                                                    hostID={listing.Host.userID}
+                                                    images={listing.images.map((imageName) =>
+                                                        getImageLink(listing.listingID, imageName)
+                                                    )}
+                                                    shortDescription={listing.shortDescription}
+                                                    approxAddress={listing.approxAddress}
+                                                    totalSlots={listing.totalSlots}
+                                                    latitude={parseFloat(listing.coordinates.split(',')[0])}
+                                                    longitude={parseFloat(listing.coordinates.split(',')[1])}
+                                                    sx={{ cursor: "pointer" }}
+                                                />
+                                            </motion.div>
                                         </Box>
                                     </SlideFade>
                                 ))}
@@ -191,7 +237,15 @@ const FoodListingsPage = () => {
                     </Box>
                     {!isSmallerThan1095 && listings.length > 0 && (
                         <Box flex="1" ml={5}>
-                            <SlideFade in={true} offsetY="20px">
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ rotate: 0, scale: 1 }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 260,
+                                    damping: 20
+                                }}
+                            >
                                 <MarkeredGMaps
                                     coordinatesList={listings.map((listing) => {
                                         const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
@@ -199,12 +253,56 @@ const FoodListingsPage = () => {
                                     })}
                                     listings={listings}
                                     isSmallerThan1095={false}
+                                    setActiveMarker={setActiveMarker}
+                                    navigateToListing={navigateToListing}
                                 />
-                            </SlideFade>
+                            </motion.div>
                         </Box>
                     )}
                 </Flex>
             </Skeleton>
+            {activeMarker && (
+                <Modal isOpen={true} closeOnOverlayClick={false} onClose={() => setActiveMarker(null)} size="xl">
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader color="#323437">This address has multiple listings! Select one to view</ModalHeader>
+                        <ModalBody>
+                            {activeMarker.listings.map((listing, idx) => (
+                                <Card
+                                mb={3}
+                                key={idx}
+                                sx={{ cursor: "pointer" }}
+                                onClick={() => {
+                                    navigateToListing(listing, activeMarker.lat, activeMarker.lng);
+                                    setActiveMarker(null);
+                                }}>
+                                    <CardBody display="flex" justifyContent={"space-between"}>
+                                        <Box mt={1}>
+                                            <Text fontWeight="bold" mt={-3}>{listing.title}</Text>
+                                            <Box display="flex" mb={2}>
+                                                <Text mr={2} mt={3.5}><FaMapMarkerAlt fill="#515F7C" /></Text>
+                                                <Text mt={3}>{listing.approxAddress}</Text>
+                                            </Box>
+                                            <Box display="flex">
+                                                <Text mr={2} mt={1}><FaUser fill="#515F7C" /></Text>
+                                                <Text>{listing.Host.username || "MakanMatch Host"}</Text>
+                                            </Box>
+                                        </Box>
+                                        <Box display="flex" flexDirection="column" justifyContent={"center"}>
+                                            <Text mt={2} fontSize="md">${listing.portionPrice} / portion</Text>
+                                        </Box>
+                                    </CardBody>
+                                </Card>
+                            ))}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme='red' mr={3} onClick={handleCloseMapModal}>
+                                Close
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
         </>
     );
 };

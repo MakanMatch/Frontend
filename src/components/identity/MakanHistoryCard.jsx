@@ -50,7 +50,6 @@ function MakanHistoryCard({ reservation, listing }) {
                     alt='Caffe Latte'
                     borderRadius = "5px"
                     objectFit={"cover"}
-                    onLoad={() => setImageLoaded(true)}
                     fallbackSrc={placeholderImage}
                     margin="20px 0px 20px 20px"
                     />

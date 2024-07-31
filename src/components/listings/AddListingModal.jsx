@@ -105,6 +105,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
             })
             dispatch(reloadAuthToken(authToken));
             if (addListingResponse.status == 200) {
+                onClose();
                 setDefaultState();
                 setIsSubmitting(false);
                 if (addListingResponse.data.listingDetails.published === false) {
@@ -231,7 +232,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
     useEffect(() => {
         if (portionPrice > 10) {
-            setPortionPrice(10);
             displayToast(
                 "Woah, that's too expensive!",
                 "Fee cannot exceed $10",
@@ -244,7 +244,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
     useEffect(() => {
         if (totalSlots > 10) {
-            setTotalSlots(10);
             displayToast(
                 "Too many Slots!",
                 "You can prepare for a maximum of 10 slots",
@@ -319,21 +318,32 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                     <InputLeftAddon>$</InputLeftAddon>
                                     <NumberInput
                                         step={1}
-                                        defaultValue={1}
-                                        value={portionPrice}
                                         min={1}
                                         max={10}
-                                        mb={4}
-                                        onChange={(
-                                            valueAsString,
-                                            valueAsNumber
-                                        ) =>
-                                            setPortionPrice(valueAsNumber || 1)
-                                        }
+                                        value={portionPrice}
+                                        inputMode="numeric"
+                                        onChange={(valueAsString, valueAsNumber) => {
+                                            const isValid = /^[0-9]*$/.test(valueAsString);
+                                            if (!isValid) {
+                                                return;
+                                            }
+                                            if (valueAsString === "") {
+                                                setPortionPrice("");
+                                            } else {
+                                                setPortionPrice(valueAsNumber);
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if (portionPrice === "") {
+                                                setPortionPrice(0);
+                                            } else if (portionPrice < 0) {
+                                                setPortionPrice(0);
+                                            } else if (portionPrice > 10) {
+                                                setPortionPrice(10);
+                                            }
+                                        }}
                                     >
-                                        <NumberInputField
-                                            borderRadius={"0px 6px 6px 0px"}
-                                        />
+                                        <NumberInputField borderRadius={"0px 6px 6px 0px"} />
                                         <NumberInputStepper>
                                             <NumberIncrementStepper />
                                             <NumberDecrementStepper />
@@ -344,17 +354,33 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
                             <FormControl flex="1" ml={2} isRequired>
                                 <FormLabel>No. of Slots (Max: 10)</FormLabel>
-                                <NumberInput
-                                    step={1}
-                                    defaultValue={1}
-                                    value={totalSlots}
-                                    min={1}
-                                    max={10}
-                                    mb={4}
-                                    onChange={(valueAsString, valueAsNumber) =>
-                                        setTotalSlots(valueAsNumber || 1)
-                                    }
-                                >
+                                    <NumberInput
+                                        step={1}
+                                        min={1}
+                                        max={10}
+                                        value={totalSlots}
+                                        inputMode="numeric"
+                                        onChange={(valueAsString, valueAsNumber) => {
+                                            const isValid = /^[0-9]*$/.test(valueAsString);
+                                            if (!isValid) {
+                                                return;
+                                            }
+                                            if (valueAsString === "") {
+                                                setTotalSlots("");
+                                            } else {
+                                                setTotalSlots(valueAsNumber);
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if (totalSlots === "") {
+                                                setTotalSlots(0);
+                                            } else if (totalSlots < 0) {
+                                                setTotalSlots(0);
+                                            } else if (totalSlots > 10) {
+                                                setTotalSlots(10);
+                                            }
+                                        }}
+                                    >
                                     <NumberInputField />
                                     <NumberInputStepper>
                                         <NumberIncrementStepper />
@@ -380,6 +406,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                         <FormControl mb={5} isRequired>
                             <FormLabel>Upload photos of your dish (Max: 5 images)</FormLabel>
                             <Input
+                                key={Date.now()}
                                 type="file"
                                 size="sm"
                                 onChange={handleFileChange}
