@@ -3,13 +3,13 @@ import {
   Box,
   Text,
   Flex,
-  Image,
   IconButton,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
   useColorModeValue,
+  Avatar,
 } from "@chakra-ui/react";
 import { FiEdit, FiTrash2, FiMoreVertical } from "react-icons/fi";
 import { FaReply } from "react-icons/fa";
@@ -18,12 +18,13 @@ function ChatBubble({
   message,
   timestamp,
   isSender,
-  photoUrl,
   onEdit,
   onDelete,
   onReply,
   repliedMessage,
   edited,
+  sender,
+  reciever,
 }) {
   const menuItemColor = useColorModeValue("teal.500", "teal.200");
   const menuItemHoverBg = useColorModeValue("teal.100", "teal.600");
@@ -37,8 +38,8 @@ function ChatBubble({
     >
       <Flex alignItems="center">
         {!isSender && (
-          <Image
-            src={photoUrl}
+          <Avatar
+            name={reciever}
             alt="Profile"
             boxSize="40px"
             borderRadius="full"
@@ -137,8 +138,8 @@ function ChatBubble({
           </Box>
         </Box>
         {isSender && (
-          <Image
-            src={photoUrl}
+          <Avatar
+            name={sender}
             alt="Profile"
             boxSize="40px"
             borderRadius="full"
