@@ -95,8 +95,8 @@ function ConfirmReservation() {
             .then(res => {
                 dispatch(reloadAuthToken(authToken));
                 if (res.status == 200) {
-                    const { userID, username, email } = res.data;
-                    setUserData({ userID, username, email })
+                    const { userID, username, email, contactNum } = res.data;
+                    setUserData({ userID, username, email, contactNum })
                 } else if (res.status == 404) {
                     console.log("User not found, re-directing to home.")
                     navigate("/auth/login")
