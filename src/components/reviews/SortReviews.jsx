@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, useToast, SimpleGrid } from '@chakra-ui/react';
+import { Text, useToast, SimpleGrid, filter } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import server from '../../networking';
 import ReviewCard from './ReviewCard';
@@ -73,7 +73,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
         }
     }, [loaded, user, activeTab, stateRefresh]);
 
-    const filteredReviews = reviews.filter(review => 
+    const filteredReviews = reviews.filter(review =>
         review.comments.toLowerCase().includes(searchQuery.toLowerCase()) ||
         review.reviewPoster.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -89,7 +89,9 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                 </TabList>
                 <TabPanels>
                     <TabPanel>
-                        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        {reviews.length > 0 && (
+                            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        )}
                         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
                             {filteredReviews.length > 0 ?
                                 filteredReviews.map((review) => (
@@ -114,8 +116,9 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                     </TabPanel>
                     {/* Repeat the same for other TabPanels */}
                     <TabPanel>
-                        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
+                        {reviews.length > 0 && (
+                            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        )}                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
                             {filteredReviews.length > 0 ?
                                 filteredReviews.map((review) => (
                                     <ReviewCard
@@ -138,8 +141,9 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                         </SimpleGrid>
                     </TabPanel>
                     <TabPanel>
-                        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
+                        {reviews.length > 0 && (
+                            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        )}                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
                             {filteredReviews.length > 0 ?
                                 filteredReviews.map((review) => (
                                     <ReviewCard
@@ -162,8 +166,9 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                         </SimpleGrid>
                     </TabPanel>
                     <TabPanel>
-                        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
+                        {reviews.length > 0 && (
+                            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        )}                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
                             {filteredReviews.length > 0 ?
                                 filteredReviews.map((review) => (
                                     <ReviewCard
