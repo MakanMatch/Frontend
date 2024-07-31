@@ -2,16 +2,18 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from "react";
-import server from "../../networking";
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, useToast, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Show } from "@chakra-ui/react";
-import { useSelector } from "react-redux";
+import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, Input, useDisclosure, FormControl, FormLabel, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, FormHelperText, Text, Box, InputGroup, InputLeftAddon, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Card, Switch, useToast } from "@chakra-ui/react";
+import { useDispatch, useSelector } from "react-redux";
+import { reloadAuthToken } from "../../slices/AuthState";
+import { useNavigate } from "react-router-dom";
+import server from "../../networking";
 
-const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast }) => {
-    const toast = useToast();
+const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
     const today = new Date();
     today.setDate(today.getDate() + 1);
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const toast = useToast();
 
     const [title, setTitle] = useState("");
     const [shortDescription, setShortDescription] = useState("");
@@ -19,14 +21,17 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
     const [portionPrice, setPortionPrice] = useState(1);
     const [totalSlots, setTotalSlots] = useState(1);
     const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
+    const [isChecked, setIsChecked] = useState(false);
     const [images, setImages] = useState([]);
-    const [hostID, setHostID] = useState("");
-    const { user, authToken, loaded } = useSelector((state) => state.auth);
+    const authToken = useSelector((state) => state.auth.authToken);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileFormatError, setFileFormatError] = useState("");
     const [modalError, setModalError] = useState(false);
     const [validListing, setValidListing] = useState(false);
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const cancelRef = useRef();
     const {
@@ -34,6 +39,17 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
         onOpen: onAlertOpen,
         onClose: onAlertClose,
     } = useDisclosure();
+
+    function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
+        toast({
+            title: title,
+            description: description,
+            status: status,
+            duration: duration,
+            isClosable: isClosable
+        });
+    }
 
     function setDefaultState() {
         setIsSubmitting(false);
@@ -47,6 +63,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
         setTotalSlots(1);
         setDatetime(today.toISOString().slice(0, 16));
         setImages([]);
+        setIsChecked(false);
     }
 
     function checkDate(date) {
@@ -58,72 +75,92 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                 "Please select a date-time that's greater than today's date-time",
                 "error",
                 3000,
-                false
+                true
             );
             return;
         }
     }
 
-    const fetchHostID = async () => {
-        if (loaded && user) {
-            const hostInfo = await server.get(`/cdn/accountInfo?userID=${user.userID}`)
-            if (hostInfo.status === 200) {
-                setHostID(hostInfo.data.userID)
-            } else {
-                console.error("Failed to fetch hostID", hostInfo.data)
-                displayToast("Failed to fetch your hosting details", "Please try again later", "error", 3000, false)
-                return;
-            }
-        }
-    }
-
-
     const handleSubmitListing = async () => {
+        closeSidebar();
         setIsSubmitting(true);
         const formData = new FormData();
-        try {
-            formData.append("title", title);
-            formData.append("shortDescription", shortDescription);
-            formData.append("longDescription", longDescription);
-            formData.append("portionPrice", portionPrice);
-            formData.append("totalSlots", totalSlots);
-            formData.append("datetime", new Date(datetime).toISOString());
-            images.forEach((image) => {
-                formData.append("images", image);
-            });
+        formData.append("title", title);
+        formData.append("shortDescription", shortDescription);
+        formData.append("longDescription", longDescription);
+        formData.append("portionPrice", portionPrice);
+        formData.append("totalSlots", totalSlots);
+        formData.append("datetime", new Date(datetime).toISOString());
+        formData.append("publishInstantly", isChecked);
+        images.forEach((image) => {
+            formData.append("images", image);
+        });
 
+        try {
             const addListingResponse = await server.post("/listings/addListing", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
-                transformRequest: formData => formData,
-                timeout: 10000,
-            }
-            )
+                transformRequest: formData => formData
+            })
+            dispatch(reloadAuthToken(authToken));
             if (addListingResponse.status == 200) {
-                fetchListings();
                 onClose();
                 setDefaultState();
                 setIsSubmitting(false);
-                displayToast(
-                    "Listing published successfully!",
-                    "We'll notify you when all slots have been filled.",
-                    "success",
-                    4000,
-                    false
-                );
+                if (addListingResponse.data.listingDetails.published === false) {
+                    navigate("/expandedListingHost", {
+                        state: {
+                            listingID: addListingResponse.data.listingDetails.listingID
+                        } 
+                    });
+                    displayToast("Listing created successfully", "You can manage your listing here", "success", 3000, true);
+                } else {
+                    localStorage.setItem("published", "true");
+                    window.location.href = "/";
+                }
             }
         } catch (error) {
-            console.log("Failed to submit listing; error: " + error)
-            onClose();
-            displayToast(
-                "Error submitting listing",
-                "Please try again later.",
-                "error",
-                2500,
-                false
-            );
+            dispatch(reloadAuthToken(authToken));
+            setIsSubmitting(false);
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to add listing; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    displayToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        "info",
+                        3500,
+                        true
+                    )
+                } else {
+                    onClose();
+                    setDefaultState();
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to add listing. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
+            } else {
+                onClose();
+                setDefaultState();
+                console.log("Unknown error occurred when adding listing; error: " + error)
+                displayToast(
+                    "Something went wrong",
+                    "Failed to add listing. Please try again",
+                    "error",
+                    3500,
+                    true
+                )
+            }
         }
+    };
+
+    const handlePublishToggle = () => {
+        setIsChecked(!isChecked);
     };
 
     const handleFileChange = (event) => {
@@ -152,12 +189,12 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
         } else {
             setFileFormatError("Invalid file format. Only JPEG, JPG, PNG, and SVG are allowed.");
         }
-    };    
+    };
 
     const handleRemoveImage = (index) => {
         setImages((prevImages) => prevImages.filter((image, imageIndex) => imageIndex !== index));
     };
-    
+
 
     const handleCancelClick = () => {
         onAlertOpen();
@@ -184,7 +221,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                     "You can upload a maximum of 5 images",
                     "error",
                     2500,
-                    false
+                    true
                 );
             }
         } else {
@@ -195,37 +232,30 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
 
     useEffect(() => {
         if (portionPrice > 10) {
-            setPortionPrice(10);
             displayToast(
                 "Woah, that's too expensive!",
                 "Fee cannot exceed $10",
                 "error",
                 2500,
-                false
+                true
             );
         }
     }, [portionPrice]);
 
     useEffect(() => {
-        if (totalSlots > 5) {
-            setTotalSlots(5);
+        if (totalSlots > 10) {
             displayToast(
-                "Too many Guests!",
-                "You can invite a maximum of 5 Guests",
+                "Too many Slots!",
+                "You can prepare for a maximum of 10 slots",
                 "error",
                 2500,
-                false
+                true
             );
         }
     }, [totalSlots]);
-
-    useEffect(() => {
-        fetchHostID();
-    }, [loaded]);
     return (
         <div>
             <Modal
-                blockScrollOnMount={true}
                 isOpen={isOpen}
                 onClose={onClose}
                 size={"lg"}
@@ -236,7 +266,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                 <ModalOverlay
                     backdropFilter="brightness(1)"
                 />
-                <ModalContent overflow={"hidden"} maxH={"90vh"}>
+                <ModalContent>
                     <ModalHeader>Host your next meal!</ModalHeader>
                     <ModalBody>
                         <FormControl mb={5} isRequired>
@@ -288,21 +318,32 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                                     <InputLeftAddon>$</InputLeftAddon>
                                     <NumberInput
                                         step={1}
-                                        defaultValue={1}
-                                        value={portionPrice}
                                         min={1}
                                         max={10}
-                                        mb={4}
-                                        onChange={(
-                                            valueAsString,
-                                            valueAsNumber
-                                        ) =>
-                                            setPortionPrice(valueAsNumber || 1)
-                                        }
+                                        value={portionPrice}
+                                        inputMode="numeric"
+                                        onChange={(valueAsString, valueAsNumber) => {
+                                            const isValid = /^[0-9]*$/.test(valueAsString);
+                                            if (!isValid) {
+                                                return;
+                                            }
+                                            if (valueAsString === "") {
+                                                setPortionPrice("");
+                                            } else {
+                                                setPortionPrice(valueAsNumber);
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if (portionPrice === "") {
+                                                setPortionPrice(0);
+                                            } else if (portionPrice < 0) {
+                                                setPortionPrice(0);
+                                            } else if (portionPrice > 10) {
+                                                setPortionPrice(10);
+                                            }
+                                        }}
                                     >
-                                        <NumberInputField
-                                            borderRadius={"0px 6px 6px 0px"}
-                                        />
+                                        <NumberInputField borderRadius={"0px 6px 6px 0px"} />
                                         <NumberInputStepper>
                                             <NumberIncrementStepper />
                                             <NumberDecrementStepper />
@@ -312,18 +353,34 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                             </FormControl>
 
                             <FormControl flex="1" ml={2} isRequired>
-                                <FormLabel>No. of Guests (Max: 5)</FormLabel>
-                                <NumberInput
-                                    step={1}
-                                    defaultValue={1}
-                                    value={totalSlots}
-                                    min={1}
-                                    max={5}
-                                    mb={4}
-                                    onChange={(valueAsString, valueAsNumber) =>
-                                        setTotalSlots(valueAsNumber || 1)
-                                    }
-                                >
+                                <FormLabel>No. of Slots (Max: 10)</FormLabel>
+                                    <NumberInput
+                                        step={1}
+                                        min={1}
+                                        max={10}
+                                        value={totalSlots}
+                                        inputMode="numeric"
+                                        onChange={(valueAsString, valueAsNumber) => {
+                                            const isValid = /^[0-9]*$/.test(valueAsString);
+                                            if (!isValid) {
+                                                return;
+                                            }
+                                            if (valueAsString === "") {
+                                                setTotalSlots("");
+                                            } else {
+                                                setTotalSlots(valueAsNumber);
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if (totalSlots === "") {
+                                                setTotalSlots(0);
+                                            } else if (totalSlots < 0) {
+                                                setTotalSlots(0);
+                                            } else if (totalSlots > 10) {
+                                                setTotalSlots(10);
+                                            }
+                                        }}
+                                    >
                                     <NumberInputField />
                                     <NumberInputStepper>
                                         <NumberIncrementStepper />
@@ -346,9 +403,10 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                             />
                         </FormControl>
 
-                        <FormControl isRequired>
+                        <FormControl mb={5} isRequired>
                             <FormLabel>Upload photos of your dish (Max: 5 images)</FormLabel>
                             <Input
+                                key={Date.now()}
                                 type="file"
                                 size="sm"
                                 onChange={handleFileChange}
@@ -369,13 +427,19 @@ const AddListingModal = ({ isOpen, onOpen, onClose, fetchListings, displayToast 
                                                     {image.name}
                                                 </Text>
                                                 <Button onClick={() => handleRemoveImage(index)}>
-                                                    <CloseIcon boxSize={3}/>
+                                                    <CloseIcon boxSize={3} />
                                                 </Button>
                                             </Card>
                                         ))}
                                     </>
                                 )}
                             </Box>
+                        </FormControl>
+                        <FormControl display='flex' alignItems='center'>
+                            <FormLabel mb='0'>
+                                Publish instantly?
+                            </FormLabel>
+                            <Switch isChecked={isChecked} onChange={handlePublishToggle} />
                         </FormControl>
                     </ModalBody>
 

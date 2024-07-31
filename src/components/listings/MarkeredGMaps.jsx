@@ -1,21 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Skeleton, useToast } from "@chakra-ui/react";
 
 const MarkeredGMaps = ({
     coordinatesList,
     listings,
-    isSmallerThan1095
+    isSmallerThan1095,
+    setActiveMarker,
+    navigateToListing
 }) => {
-    const navigate = useNavigate();
     const mapRef = useRef(null);
     const [mapLoaded, setMapLoaded] = useState(false);
     const toast = useToast();
 
     function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
         toast({
             title: title,
             description: description,
@@ -25,12 +26,15 @@ const MarkeredGMaps = ({
         });
     }
 
-    function getImageLink(listingID, imageName) {
-        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
-    }
-
     useEffect(() => {
         const InitializeMap = async (validCoordinates) => {
+            const skipRemount = localStorage.getItem("mapRemountDenyOnModalOpen") ? "mapRemountDenyOnModalOpen" : localStorage.getItem("mapRemountDenyOnModalClose") ? "mapRemountDenyOnModalClose" : null;
+            if (skipRemount) {
+                localStorage.removeItem(skipRemount);
+                console.log("Skipped map remount");
+                return;
+            }
+            console.log("Initialised map");
             const loader = new Loader({
                 apiKey: import.meta.env.VITE_GMAPS_API_KEY,
                 version: "weekly",
@@ -49,29 +53,35 @@ const MarkeredGMaps = ({
                 });
 
                 if (coordinatesList.length === 0 || validCoordinates.length === 0) {
-                    setMapLoaded(true); // Mark map as loaded if no valid coordinates
+                    setMapLoaded(true);
                     return map;
                 } else {
+                    const markers = {};
+
                     validCoordinates.forEach(({ lat, lng }, index) => {
                         const marker = new AdvancedMarkerElement({
                             position: { lat, lng },
                             map: map,
                         });
-                        marker.addListener("click", () => {
-                            const listing = listings[index];
-                            navigate("/targetListing", {
-                                state: {
-                                    listingID: listing.listingID,
-                                    hostID: listing.hostID,
-                                    images: listing.images.map((image) => getImageLink(listing.listingID, image)),
-                                    title: listing.title,
-                                    shortDescription: listing.shortDescription,
-                                    approxAddress: listing.address,
-                                    portionPrice: listing.portionPrice,
-                                    totalSlots: listing.totalSlots,
-                                    latitude: lat,
-                                    longitude: lng,
-                                },
+
+                        const key = `${lat},${lng}`;
+                        if (!markers[key]) {
+                            markers[key] = [];
+                        }
+
+                        markers[key].push({ marker, index, lat, lng });
+                    });
+
+                    Object.values(markers).forEach((markerGroup) => {
+                        markerGroup.forEach(({ marker, index, lat, lng }) => {
+                            marker.addListener("click", () => {
+                                localStorage.setItem("mapRemountDenyOnModalOpen", true)
+                                if (markerGroup.length === 1) {
+                                    const listing = listings[index];
+                                    navigateToListing(listing, lat, lng);
+                                } else {
+                                    setActiveMarker({ listings: markerGroup.map(({ index }) => listings[index]), lat, lng });
+                                }
                             });
                         });
                     });
@@ -79,7 +89,7 @@ const MarkeredGMaps = ({
                 }
             }
         };
-        
+
         try {
             const validCoordinates = coordinatesList.filter(
                 ({ lat, lng }) =>

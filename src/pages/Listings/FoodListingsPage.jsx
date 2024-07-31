@@ -1,24 +1,30 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import server from "../../networking";
+import { SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton, Spinner, Center, Fade, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Button } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { reloadAuthToken } from "../../slices/AuthState";
+import { motion } from "framer-motion";
+import { FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import FoodListingCard from "../../components/listings/FoodListingCard";
 import MarkeredGMaps from "../../components/listings/MarkeredGMaps";
-import AddListingModal from "../../components/listings/AddListingModal";
-import { Button, useDisclosure, SimpleGrid, Text, Box, useToast, Flex, SlideFade, useMediaQuery, Skeleton } from "@chakra-ui/react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import server from "../../networking";
 
 const FoodListingsPage = () => {
     const [listings, setListings] = useState([]);
-    const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSmallerThan1095] = useMediaQuery("(max-width: 1095px)");
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
+    const [activeMarker, setActiveMarker] = useState(null);
     const [loading, setLoading] = useState(true); 
-    const toast = useToast();
     const navigate = useNavigate();
+
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
+    const toast = useToast();
+    const dispatch = useDispatch();
+
     function displayToast(title, description, status, duration, isClosable) {
+        toast.closeAll();
         toast({
             title: title,
             description: description,
@@ -35,22 +41,64 @@ const FoodListingsPage = () => {
     const fetchListings = async () => {
         try {
             const response = await server.get("/cdn/listings?includeHost=true");
-            setListings(response.data);
+            dispatch(reloadAuthToken(authToken));
+            if (response.status === 200) {
+                setListings(response.data);
+            } else { console.log("Unexpected response received; response:", response.data); }
         } catch (error) {
-            console.log("Failed to fetch listings: " + error)
-            displayToast("Error fetching food listings", "Please try again later.", "error", 2500, false);
+            dispatch(reloadAuthToken(authToken))
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to fetch listings; response: " + error.response.data)
+                if (error.response.data.startsWith("UERROR")) {
+                    displayToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        "info",
+                        3500,
+                        true
+                    )
+                } else {
+                    displayToast(
+                        "Something went wrong",
+                        "Failed to fetch listings. Please try again",
+                        "error",
+                        3500,
+                        true
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when fetching listings; error: " + error)
+                displayToast(
+                    "Something went wrong",
+                    "Failed to fetch listings. Please try again",
+                    "error",
+                    3500,
+                    true
+                )
+            }
         }
     };
 
-    function handleClickAddListing() {
-        if (!authToken || !user) {
-            navigate('/auth/login');
-            setTimeout(() => {
-                displayToast("You're not logged in", "Please Login first", "info", 3000, false);
-            }, 200);
-        } else {
-            onOpen();
-        }
+    const navigateToListing = (listing, lat, lng) => {
+        navigate("/targetListing", {
+            state: {
+                listingID: listing.listingID,
+                hostID: listing.hostID,
+                images: listing.images.map((image) => getImageLink(listing.listingID, image)),
+                title: listing.title,
+                shortDescription: listing.shortDescription,
+                approxAddress: listing.approxAddress,
+                portionPrice: listing.portionPrice,
+                totalSlots: listing.totalSlots,
+                latitude: lat,
+                longitude: lng,
+            },
+        });
+    };
+
+    const handleCloseMapModal = () => {
+        setActiveMarker(null);
+        localStorage.setItem("mapRemountDenyOnModalClose", true);
     }
 
     useEffect(() => {
@@ -59,27 +107,51 @@ const FoodListingsPage = () => {
             setLoading(false);
         }
         fetchData();
+        if (localStorage.getItem("published") === "true") {
+            localStorage.removeItem("published");
+            displayToast(
+                "Listing published successfully!",
+                "We'll notify you when all slots have been filled",
+                "success",
+                4000,
+                true
+            );
+        }
+        if (localStorage.getItem("mapRemountDenyOnModalOpen")) {
+            localStorage.removeItem("mapRemountDenyOnModalOpen");
+            if (localStorage.getItem("mapRemountDenyOnModalClose")) {
+                localStorage.removeItem("mapRemountDenyOnModalClose");
+            }
+        }
     }, []);
 
+    if (!loaded) {
+        return (
+            <Center height="100vh">
+                <Fade in={!loaded}>
+                    <Spinner size="xl" />
+                </Fade>
+            </Center>
+        );
+    } 
+    
     return (
-        <div>
+        <>
             <Text fontSize={"30px"} mb={4}>
-                {loaded && user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
+                {user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
             </Text>
-            <Box display="flex" justifyContent="center" mb={4}>
-                <Button onClick={() => handleClickAddListing()} variant="MMPrimary">
-                    Host a meal
-                </Button>
-            </Box>
             {isSmallerThan1095 && listings.length > 0 && (
                 <Box mb={4}>
                     <MarkeredGMaps
-                    coordinatesList={listings.map((listing) => {
-                        const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
-                        return { lat, lng };
-                    })}
-                    listings={listings}
-                    isSmallerThan1095={true}/>
+                        coordinatesList={listings.map((listing) => {
+                            const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
+                            return { lat, lng };
+                        })}
+                        listings={listings}
+                        isSmallerThan1095={true}
+                        setActiveMarker={setActiveMarker}
+                        navigateToListing={navigateToListing}
+                    />
                 </Box>
             )}
             <Skeleton isLoaded={!loading} style={{ borderRadius: "10px" }}>
@@ -113,33 +185,39 @@ const FoodListingsPage = () => {
                                 spacing={4}
                                 templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
                             >
-                                {listings.map((listing) => (
-                                    <SlideFade
-                                        in={true}
-                                        offsetY="20px"
-                                        key={listing.listingID}
-                                    >
+                                {listings && listings.map((listing) => (
+                                    <SlideFade in={true} offsetY="20px" key={listing.listingID}>
                                         <Box 
                                             display={isBetween701And739 ? "flex" : "initial"}
-                                            justifyContent={isBetween701And739 ? "center" : "initial"}>
-                                            <FoodListingCard
-                                                listingID={listing.listingID}
-                                                title={listing.title}
-                                                portionPrice={listing.portionPrice}
-                                                hostName={listing.Host.username || "MakanMatch Host"}
-                                                hostFoodRating={listing.Host.foodRating || 0}
-                                                hostID={listing.Host.userID}
-                                                images={listing.images.map((imageName) =>
-                                                    getImageLink(listing.listingID, imageName)
-                                                )}
-                                                fetchListings={fetchListings}
-                                                shortDescription={listing.shortDescription}
-                                                address={listing.address}
-                                                approxAddress={listing.approxAddress}
-                                                totalSlots={listing.totalSlots}
-                                                latitude={parseFloat(listing.coordinates.split(',')[0])}
-                                                longitude={parseFloat(listing.coordinates.split(',')[1])}
-                                            />
+                                            justifyContent={isBetween701And739 ? "center" : "initial"}
+                                        >
+                                            <motion.div
+                                                initial={{ scale: 0 }}
+                                                animate={{ rotate: 0, scale: 1 }}
+                                                transition={{
+                                                    type: "spring",
+                                                    stiffness: 260,
+                                                    damping: 20
+                                                }}
+                                            >
+                                                <FoodListingCard
+                                                    listingID={listing.listingID}
+                                                    title={listing.title}
+                                                    portionPrice={listing.portionPrice}
+                                                    hostName={listing.Host.username || "MakanMatch Host"}
+                                                    hostFoodRating={listing.Host.foodRating || 0}
+                                                    hostID={listing.Host.userID}
+                                                    images={listing.images.map((imageName) =>
+                                                        getImageLink(listing.listingID, imageName)
+                                                    )}
+                                                    shortDescription={listing.shortDescription}
+                                                    approxAddress={listing.approxAddress}
+                                                    totalSlots={listing.totalSlots}
+                                                    latitude={parseFloat(listing.coordinates.split(',')[0])}
+                                                    longitude={parseFloat(listing.coordinates.split(',')[1])}
+                                                    sx={{ cursor: "pointer" }}
+                                                />
+                                            </motion.div>
                                         </Box>
                                     </SlideFade>
                                 ))}
@@ -151,12 +229,7 @@ const FoodListingsPage = () => {
                                 alignItems="center"
                                 height="70vh"
                             >
-                                <Text
-                                    textAlign="center"
-                                    fontSize="lg"
-                                    color="gray.500"
-                                    width="50%"
-                                >
+                                <Text textAlign="center" fontSize="lg" color="gray.500" width="50%">
                                     No listings available
                                 </Text>
                             </Box>
@@ -164,27 +237,73 @@ const FoodListingsPage = () => {
                     </Box>
                     {!isSmallerThan1095 && listings.length > 0 && (
                         <Box flex="1" ml={5}>
-                            <SlideFade in={true} offsetY="20px">
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ rotate: 0, scale: 1 }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 260,
+                                    damping: 20
+                                }}
+                            >
                                 <MarkeredGMaps
-                                coordinatesList={listings.map((listing) => {
-                                    const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
-                                    return { lat, lng };
-                                })}
-                                listings={listings}
-                                isSmallerThan1095={false}/>
-                            </SlideFade>
+                                    coordinatesList={listings.map((listing) => {
+                                        const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
+                                        return { lat, lng };
+                                    })}
+                                    listings={listings}
+                                    isSmallerThan1095={false}
+                                    setActiveMarker={setActiveMarker}
+                                    navigateToListing={navigateToListing}
+                                />
+                            </motion.div>
                         </Box>
                     )}
                 </Flex>
             </Skeleton>
-            <AddListingModal
-                isOpen={isOpen}
-                onClose={onClose}
-                onOpen={onOpen}
-                fetchListings={fetchListings}
-                displayToast={displayToast}
-            />
-        </div>
+            {activeMarker && (
+                <Modal isOpen={true} closeOnOverlayClick={false} onClose={() => setActiveMarker(null)} size="xl">
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader color="#323437">This address has multiple listings! Select one to view</ModalHeader>
+                        <ModalBody>
+                            {activeMarker.listings.map((listing, idx) => (
+                                <Card
+                                mb={3}
+                                key={idx}
+                                sx={{ cursor: "pointer" }}
+                                onClick={() => {
+                                    navigateToListing(listing, activeMarker.lat, activeMarker.lng);
+                                    setActiveMarker(null);
+                                }}>
+                                    <CardBody display="flex" justifyContent={"space-between"}>
+                                        <Box mt={1}>
+                                            <Text fontWeight="bold" mt={-3}>{listing.title}</Text>
+                                            <Box display="flex" mb={2}>
+                                                <Text mr={2} mt={3.5}><FaMapMarkerAlt fill="#515F7C" /></Text>
+                                                <Text mt={3}>{listing.approxAddress}</Text>
+                                            </Box>
+                                            <Box display="flex">
+                                                <Text mr={2} mt={1}><FaUser fill="#515F7C" /></Text>
+                                                <Text>{listing.Host.username || "MakanMatch Host"}</Text>
+                                            </Box>
+                                        </Box>
+                                        <Box display="flex" flexDirection="column" justifyContent={"center"}>
+                                            <Text mt={2} fontSize="md">${listing.portionPrice} / portion</Text>
+                                        </Box>
+                                    </CardBody>
+                                </Card>
+                            ))}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme='red' mr={3} onClick={handleCloseMapModal}>
+                                Close
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
+        </>
     );
 };
 
