@@ -34,57 +34,57 @@ function ConfirmReserveCard({
             listingID: listingData.listingID,
             portions: portionSize
         })
-        .then(res => {
-            dispatch(reloadAuthToken(authToken));
-            setReserving(false)
+            .then(res => {
+                dispatch(reloadAuthToken(authToken));
+                setReserving(false)
 
-            if (res.status == 200 && res.data.message && res.data.message.startsWith("SUCCESS")) {
-                toast({
-                    title: "Reservation successful!",
-                    description: "You have successfully made a reservation! Makan up!",
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true
-                })
-                console.log("Reservation created; reference number: " + res.data.referenceNum)
-                fetchListingDetails(listingData.listingID);
-            } else if (res.data.startsWith("UERROR")) {
-                console.log("User error occurred in creating reservation; response: " + res.data)
-                toast({
-                    title: "Something went wrong",
-                    description: res.data.substring("UERROR: ".length),
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true
-                })
-            } else {
-                console.log("Failed to create reservation; response: " + res.data)
-                toast({
-                    title: "Something went wrong",
-                    description: "Failed to make a reservation. Please try again later.",
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true
-                })
-            }
-        })
-        .catch(err => {
-            dispatch(reloadAuthToken(authToken));
-            setReserving(false)
-            console.log("Failed to create reservation; error: " + err)
-            var errorMessage = "Failed to make a reservation. Please try again later."
-            if (err.response && err.response.data && typeof err.response.data == 'string' && err.response.data.startsWith("UERROR")) {
-                errorMessage = err.response.data.substring("UERROR: ".length)
-            }
-            
-            toast({
-                title: "Something went wrong",
-                description: errorMessage,
-                status: "error",
-                duration: 5000,
-                isClosable: true
+                if (res.status == 200 && res.data.message && res.data.message.startsWith("SUCCESS")) {
+                    toast({
+                        title: "Reservation successful!",
+                        description: "You have successfully made a reservation! Makan up!",
+                        status: "success",
+                        duration: 5000,
+                        isClosable: true
+                    })
+                    console.log("Reservation created; reference number: " + res.data.referenceNum)
+                    fetchListingDetails(listingData.listingID);
+                } else if (res.data.startsWith("UERROR")) {
+                    console.log("User error occurred in creating reservation; response: " + res.data)
+                    toast({
+                        title: "Something went wrong",
+                        description: res.data.substring("UERROR: ".length),
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true
+                    })
+                } else {
+                    console.log("Failed to create reservation; response: " + res.data)
+                    toast({
+                        title: "Something went wrong",
+                        description: "Failed to make a reservation. Please try again later.",
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true
+                    })
+                }
             })
-        })
+            .catch(err => {
+                dispatch(reloadAuthToken(authToken));
+                setReserving(false)
+                console.log("Failed to create reservation; error: " + err)
+                var errorMessage = "Failed to make a reservation. Please try again later."
+                if (err.response && err.response.data && typeof err.response.data == 'string' && err.response.data.startsWith("UERROR")) {
+                    errorMessage = err.response.data.substring("UERROR: ".length)
+                }
+
+                toast({
+                    title: "Something went wrong",
+                    description: errorMessage,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true
+                })
+            })
     }
 
     return (
