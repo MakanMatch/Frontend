@@ -123,7 +123,7 @@ function AdminAccount() {
                 setOriginalAccountInfo({ ...accountInfo });
             }
         })
-        .catch((err) => {
+        .catch((error) => {
             dispatch(reloadAuthToken(authToken))
                 console.log("Error: ", error)
                 if (error.response && error.response.data && typeof error.response.data == "string") {
@@ -146,7 +146,7 @@ function AdminAccount() {
                         )
                     }
                 } else {
-                    console.log("Unknown error occurred when fetching users; error: " + error)
+                    console.log("Unknown error occurred when updating account details; error: " + error)
                     showToast(
                         "Something went wrong",
                         "Failed to update account details. Please try again",

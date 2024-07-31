@@ -55,7 +55,7 @@ function VerifyToken() {
                             )
                         }
                     } else {
-                        console.log("Unknown error occurred when fetching users; error: " + error)
+                        console.log("Unknown error occurred when verifying token; error: " + error)
                         showToast(
                             "Something went wrong",
                             "Failed to verify token. Please try again",

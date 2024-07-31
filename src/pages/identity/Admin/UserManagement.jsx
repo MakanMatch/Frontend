@@ -1,14 +1,17 @@
+import { useDispatch } from 'react-redux';
 import { Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text, 
-    useToast, 
+    useToast, Spinner
 } from "@chakra-ui/react";
 import UserManagementCard from "../../../components/identity/UserManagementCard";
 import { useSelector } from "react-redux";
 import server from ".././../../networking"
 import { useState, useEffect } from "react";
 import configureShowToast from '../../../components/showToast';
+import { reloadAuthToken } from '../../../slices/AuthState';
 
 function UserManagement() {
     const [users, setUsers] = useState([])
+    const dispatch = useDispatch();
     const toast = useToast();
     const showToast = configureShowToast(toast)
     const { user, authToken, loaded } = useSelector((state) => state.auth);
@@ -17,9 +20,7 @@ function UserManagement() {
         try {
             const response = await server.get('/cdn/fetchAllUsers')
             if (response.status === 200) {
-                console.log(response.data)
                 setUsers(response.data)
-                await getAllProfilePictures(response.data);
             }
         }
         catch (error) {
@@ -62,6 +63,10 @@ function UserManagement() {
             fetchAllUsers()
         }
     }, [loaded])
+
+    if (!loaded) {
+        return <Spinner />;
+    }
     
     return (
         <>
