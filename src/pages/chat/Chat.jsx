@@ -35,11 +35,11 @@ function ChatUi() {
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const ws = useRef(null);
 
-    function getImageLink (userID, imageName) {
-        if (!userID || !imageName) {
+    function getImageLink (userID, imageName, messageID) {
+        if (!userID || !imageName || !messageID) {
             return null;
         }
-        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForChat?userID=${userID}&imageName=${imageName}`;
+        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForChat?userID=${userID}&imageName=${imageName}&messageID=${messageID}`;
     }
     function setupWS() {
         const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
@@ -125,7 +125,6 @@ function ChatUi() {
                 setMessages(receivedMessage.previousMessages);
                 setStatus(receivedMessage.currentStatus);
             } else if (receivedMessage.action === "send") {
-                console.log("Received message: ", receivedMessage)
                 setMessages((prevMessages) => [
                     ...prevMessages,
                     receivedMessage.message,]);
@@ -147,14 +146,12 @@ function ChatUi() {
                 console.log(`Received chatID ${receivedMessage.chatID}`)
                 console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
                 if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
-                    console.log("Chat partner is offline")
                     setStatus(false);
                 }
             } else if (receivedMessage.action === "chat_partner_online") {
                 console.log(`Received chatID ${receivedMessage.chatID}`)
                 console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
                 if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
-                    console.log("Chat partner is online")
                     setStatus(true);
                 }
             } else {
@@ -186,16 +183,16 @@ function ChatUi() {
     }, [loaded]);
 
     useEffect(() => {
-        window.onbeforeunload = (event) => {
-            const e = event || window.event;
-            e.preventDefault();
-            if (e) {
-                e.returnValue = ''
-            }
+        // window.onbeforeunload = (event) => {
+        //     const e = event || window.event;
+        //     e.preventDefault();
+        //     if (e) {
+        //         e.returnValue = ''
+        //     }
 
-            localStorage.removeItem("wsConnected")
-            return ''
-        }
+        //     localStorage.removeItem("wsConnected")
+        //     return ''
+        // }
 
         if (loaded == true) {
             if (!user) {
@@ -246,25 +243,26 @@ function ChatUi() {
             if (imagesToBeSubmitted) {
                 const formData = new FormData();
                 formData.append("image", image);
-    
+                formData.append("senderID", user.userID);
+                formData.append("chatID", chatSelected);
+                formData.append("message", messageInput);
+                formData.append("datetime", new Date().toISOString());
+                formData.append("replyToID", replyTo ? replyTo.messageID : null);
                 try {
-                    const response = await server.post("/chat/uploadImage", formData, {
+                    const response = await server.post("/chat/createImageMessage", formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
                         transformRequest: formData => formData
                     });
     
-                    console.log(response);
                     if (response.status === 200) {
-                        const imageName = response.data.imageName;
-                        const messageWithImage = {  
-                            action: "finalise_send",
-                            imageName: imageName,
-                            message: newMessage,
-                        };
+                        const chatHistory = {
+                            action: "chat_history",
+                            chatID: chatSelected,
+                        }
     
-                        ws.current.send(JSON.stringify(messageWithImage));
+                        ws.current.send(JSON.stringify(chatHistory));
                     }
                 } catch (error) {
                     console.error("Error uploading image: ", error);
@@ -338,7 +336,6 @@ function ChatUi() {
     };
 
     const handleDeleteMessage = () => {
-        console.log(chatSelected);
         if (messageToDelete) {
             const deleteMessage = {
                 id: messageToDelete,
@@ -383,7 +380,7 @@ function ChatUi() {
     };
 
     const handleChatClick = (clickedChatID) => {
-        console.log("Clicked: ", clickedChatID)
+        console.log("Clicked: ", clickedChatID);
         setChatSelected((prev) => {
             if (prev == null) {
                 localStorage.setItem("selectedChatID", clickedChatID)
@@ -515,7 +512,7 @@ function ChatUi() {
                                         onReply={() => handleReply(msg)}
                                         repliedMessage={msg.replyTo}
                                         edited={msg.edited}
-                                        image={msg.image ? getImageLink(msg.senderID, msg.image) : null}
+                                        image={msg.image ? getImageLink(msg.senderID, msg.image, msg.messageID) : null}
                                     />
                                 </React.Fragment>
                             ))}
