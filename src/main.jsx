@@ -57,9 +57,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={'reviews'} element={<Reviews />} />
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"chat2"} element={<Chat2 />}></Route>
-                        <Route path={"targetListing"} element={<GoogleMapsPage/>} />
+                        <Route path={"targetListing"} element={<GoogleMapsPage />} />
                         <Route path={"listing"}>
                             <Route path={"reserve"} element={<ConfirmReservation />} />
+                        </Route>
+                        <Route path='admin'>
+                            <Route index element={<AdminHomepage />} />
+                            <Route path={"hygieneReports"} element={<HygieneReports />} />
+                            <Route path={"userManagement"} element={<UserManagement />} />
+                            <Route path={"myAccount"} element={<AdminAccount />} />
                         </Route>
                         <Route path='*' element={<NotFound />} />
                     </Route>
@@ -73,17 +79,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     </Route>
                     <Route path='/identity' element={<Layout />}>
                         <Route path={"myAccount"} element={<MyAccount />} />
-                        <Route path={"makanHistory"} element={<MakanHistory/>} />
-                        <Route path={"favourites"} element={<Favourites/>} />
-                        <Route path={"makanReviews"} element={<MakanReviews/>} />
-                        <Route path={"schedule"} element={<Schedule/>} />
+                        <Route path={"makanHistory"} element={<MakanHistory />} />
+                        <Route path={"favourites"} element={<Favourites />} />
+                        <Route path={"makanReviews"} element={<MakanReviews />} />
+                        <Route path={"schedule"} element={<Schedule />} />
                         <Route path='*' element={<NotFound />} />
-                    </Route>
-                    <Route path='/admin' element={<Layout />}>
-                        <Route index element={<AdminHomepage />} />
-                        <Route path={"hygieneReports"} element={<HygieneReports />} />
-                        <Route path={"userManagement"} element={<UserManagement />} />
-                        <Route path={"myAccount"} element={<AdminAccount />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
