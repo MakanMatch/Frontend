@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner, Input, InputGroup, InputRightElement, InputLeftElement, useBreakpointValue } from "@chakra-ui/react";
+import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner, Input, InputGroup, InputRightElement, InputLeftElement, useBreakpointValue, IconButton } from "@chakra-ui/react";
 import GuestSideNav from "../../components/identity/GuestSideNav";
 import server from '../../networking'
 import configureShowToast from '../../components/showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import { useSelector, useDispatch } from 'react-redux';
 import FoodListingCard from '../../components/listings/FoodListingCard';
-import { SearchIcon } from "@chakra-ui/icons";
+import { CloseIcon, SearchIcon } from "@chakra-ui/icons";
 
 const Favourites = () => {
     const toast = useToast();
