@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/jsx-key */
-import { Box, Card, CardBody, Stack, StackDivider, Text, useToast, Heading } from "@chakra-ui/react";
+import { Box, Stack, StackDivider, useToast, Heading } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
