@@ -31,6 +31,8 @@ import MakanHistory from './pages/identity/MakanHistory.jsx';
 import Favourites from './pages/identity/Favourites.jsx';
 import MakanReviews from './pages/identity/MakanReviews.jsx';
 import ConfirmReservation from './pages/orders/ConfirmReservation.jsx';
+import CustomerSupport from './pages/customerSupport/CustomerSupport.jsx';
+import MakanBot from './pages/customerSupport/MakanBot.jsx';
 
 const store = configureStore({
     reducer: {
@@ -55,6 +57,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={"listing"}>
                             <Route path={"reserve"} element={<ConfirmReservation />} />
                         </Route>
+                        <Route path={"customerSupport"} element={<CustomerSupport />} />
+                        <Route path={"makanBot"} element={<MakanBot />} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
                     <Route path='/auth' element={<AuthLayout />}>
