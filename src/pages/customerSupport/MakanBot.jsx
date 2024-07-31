@@ -67,7 +67,7 @@ function MakanBot() {
                                 } 
                             }}
                         >
-                            <FaPaperPlane fontSize={"25px"} />
+                            <FaPaperPlane fontSize={"25px"} color="#515F7C" />
                         </Box>
                     </Box>
                 </CardFooter>
