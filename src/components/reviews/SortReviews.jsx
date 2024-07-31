@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, useToast, SimpleGrid, filter } from '@chakra-ui/react';
+import { Text, useToast, SimpleGrid } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import server from '../../networking';
 import ReviewCard from './ReviewCard';
@@ -68,7 +68,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
     };
 
     useEffect(() => {
-        if (loaded && !error) {
+        if (loaded == true && !error) {
             fetchSortedData();
         }
     }, [loaded, user, activeTab, stateRefresh]);
