@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
+import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner, Input, InputGroup, InputRightElement, InputLeftElement, useBreakpointValue } from "@chakra-ui/react";
 import GuestSideNav from "../../components/identity/GuestSideNav";
 import server from '../../networking'
 import configureShowToast from '../../components/showToast';
@@ -19,6 +19,11 @@ const Favourites = () => {
 
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const [searchQuery, setSearchQuery] = useState("");
+
+    const placeholder = useBreakpointValue({
+        base: 'Search...',
+        md: 'Search for a listing title or a host name...',
+    });
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
@@ -102,13 +107,25 @@ const Favourites = () => {
                             {/* Search bar */}
                             {favouritesListingDetails.length > 0 && (
                                 <InputGroup mb={4}>
-                                    <Input
-                                        placeholder="Search by title or host name"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                <InputLeftElement
+                                    pointerEvents="none"
+                                    children={<SearchIcon color="gray.300" />}
+                                />
+                                <Input
+                                    type="text"
+                                    placeholder={placeholder}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                                {searchQuery && (
+                                    <IconButton
+                                        ml={2}
+                                        icon={<CloseIcon />}
+                                        size="sm"
+                                        onClick={() => setSearchQuery('')}
                                     />
-                                    <InputRightElement children={<SearchIcon color="gray.300" />} />
-                                </InputGroup>
+                                )}
+                            </InputGroup>
                             )}
                             {filteredFavourites.length > 0 ? (
                                 <SimpleGrid
