@@ -1,4 +1,4 @@
-import { Box, Card, CardBody, Heading, Text, Image, CardFooter, FormControl, Input, useMediaQuery, useToast, Button } from '@chakra-ui/react';
+import { Box, Card, CardBody, Heading, Text, Image, CardFooter, FormControl, Input, useMediaQuery, useToast } from '@chakra-ui/react';
 import Logo from '../../assets/Logo.png';
 import { FaPaperPlane } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,6 +6,8 @@ import { reloadAuthToken } from '../../slices/AuthState';
 import server from "../../networking";
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+
+let conversationHistory = [];
 
 function MakanBot() {
     const [isSmallerThan880] = useMediaQuery("(max-width: 880px)");
@@ -61,11 +63,20 @@ function MakanBot() {
             return;
         } else {
             setPromptResult("Hold tight! MakanBot is processing your request...");
+            conversationHistory.push({
+                role: "user",
+                content: messagePrompt
+            });
             document.getElementById("promptInput").value = "";
             try {
-                const response = await server.post("/makanBot/queryMakanBotWithUserPrompt", { messagePrompt: messagePrompt });
+                const data = { messagePrompt: messagePrompt, conversationHistory: conversationHistory };
+                const response = await server.post("/makanBot/queryMakanBotWithUserPrompt", data);
                 dispatch(reloadAuthToken(authToken));
                 if (response.status === 200) {
+                    conversationHistory.push({
+                        role: "assistant",
+                        content: response.data.message
+                    });
                     setPromptResult(response.data.message);
                 }
             } catch (error) {
@@ -199,7 +210,7 @@ function MakanBot() {
                     <Box display="flex" justifyContent={"space-between"} width="100%">
                         <Box width="100%">
                             <FormControl>
-                                <Input id="promptInput" type='text' borderRadius={"3xl"} width="95%" placeholder="Enter a prompt here" onKeyDown={handleKeyDown} />
+                                <Input id="promptInput" type='text' borderRadius={"3xl"} padding={5} width="95%" placeholder="Enter a prompt here" onKeyDown={handleKeyDown} />
                             </FormControl>
                         </Box>
                         <Box
