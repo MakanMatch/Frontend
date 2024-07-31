@@ -143,14 +143,10 @@ function ChatUi() {
                     )
                 );
             } else if (receivedMessage.action === "chat_partner_offline") {
-                console.log(`Received chatID ${receivedMessage.chatID}`)
-                console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
                 if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
                     setStatus(false);
                 }
             } else if (receivedMessage.action === "chat_partner_online") {
-                console.log(`Received chatID ${receivedMessage.chatID}`)
-                console.log(`Selected chatID ${localStorage.getItem("selectedChatID")}`)
                 if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
                     setStatus(true);
                 }
