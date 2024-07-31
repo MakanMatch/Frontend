@@ -26,7 +26,7 @@ const CustomerSupport = () => {
         <>
             <Heading>Frequently asked questions</Heading>
             <Box borderRadius={"lg"} boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"} >
-                <Accordion defaultIndex={[0]} allowMultiple mt={10} padding={5}>
+                <Accordion allowMultiple mt={10} padding={5}>
                     {faq.map((faq, index) => (
                         <AccordionItem key={index}>
                             <h2>
