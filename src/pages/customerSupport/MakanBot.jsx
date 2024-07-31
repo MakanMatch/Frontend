@@ -82,7 +82,7 @@ function MakanBot() {
             } catch (error) {
                 dispatch(reloadAuthToken(authToken));
                 if (error.response && error.response.data && typeof error.response.data === "string") {
-                    console.log("Failed to add listing; response: " + error.response);
+                    console.log("Failed to generate response; error: " + error.response);
                     if (error.response.data.startsWith("UERROR")) {
                         displayToast(
                             "Uh-oh!",
@@ -94,17 +94,17 @@ function MakanBot() {
                     } else {
                         displayToast(
                             "Something went wrong",
-                            "Failed to add listing. Please try again",
+                            "Failed to generate response. Please try again",
                             "error",
                             3500,
                             true
                         );
                     }
                 } else {
-                    console.log("Unknown error occurred when adding listing; error: " + error);
+                    console.log("Unknown error occurred when generating response; error: " + error);
                     displayToast(
                         "Something went wrong",
-                        "Failed to add listing. Please try again",
+                        "Failed to generate response. Please try again",
                         "error",
                         3500,
                         true
