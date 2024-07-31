@@ -6,6 +6,7 @@ import { reloadAuthToken } from '../../slices/AuthState';
 import server from "../../networking";
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { marked } from 'marked';
 
 let conversationHistory = [];
 
@@ -121,116 +122,126 @@ function MakanBot() {
     };
 
     return (
-        <Box
-            boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
-            borderRadius={"lg"}
-            padding={15}
-            display="flex"
-            justifyContent="space-between"
-            height={"80vh"}
-            minW={"202px"}
-        >
-            {!isSmallerThan880 && (
-                <Card width="29%">
-                    <CardBody>
-                        <Heading fontSize="22px" mb={5} textAlign={"left"} fontWeight={"bold"} color="grey">Suggested topics: </Heading>
-                        {suggestedPrompts.map((prompt, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                <Box
-                                    backgroundColor={"#F1F4FF"}
-                                    padding={3}
-                                    borderRadius={"3xl"}
-                                    cursor={"pointer"}
-                                    mb={4}
-                                    sx={{
-                                        transition: 'background-color 0.2s ease-in-out',
-                                        _hover: {
-                                            backgroundColor: "#E2E8F0",
-                                            transition: 'background-color 0.2s ease-in-out'
-                                        }
-                                    }}
+        <>
+            <style>
+                {`
+                    ::-webkit-scrollbar {
+                        display: none;
+                    }
+                `}
+            </style>
+            <Box
+                boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
+                borderRadius={"lg"}
+                padding={15}
+                display="flex"
+                justifyContent="space-between"
+                height={"80vh"}
+                minW={"202px"}
+            >
+                {!isSmallerThan880 && (
+                    <Card width="29%">
+                        <CardBody>
+                            <Heading fontSize="22px" mb={5} textAlign={"left"} fontWeight={"bold"} color="grey">Suggested topics: </Heading>
+                            {suggestedPrompts.map((prompt, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5 }}
                                 >
-                                    <Text textAlign={"center"} ml={2} color="#4A5568" maxHeight="36px" overflow="hidden" textOverflow={"ellipsis"} onClick={() => autofillSuggestedPrompt(prompt.prompt)}>{prompt.displayMessage}</Text>
-                                </Box>
-                            </motion.div>
-                        ))}
-                    </CardBody>
-                    <CardFooter display="flex" flexDir={"column"} mt={-4}>
-                        <Box display="flex" justifyContent={"center"} mt={-3}>
-                            <Image src={Logo} height="100px" maxWidth="100px" />
+                                    <Box
+                                        backgroundColor={"#F1F4FF"}
+                                        padding={3}
+                                        borderRadius={"3xl"}
+                                        cursor={"pointer"}
+                                        mb={4}
+                                        sx={{
+                                            transition: 'background-color 0.2s ease-in-out',
+                                            _hover: {
+                                                backgroundColor: "#E2E8F0",
+                                                transition: 'background-color 0.2s ease-in-out'
+                                            }
+                                        }}
+                                    >
+                                        <Text textAlign={"center"} ml={2} color="#4A5568" maxHeight="36px" overflow="hidden" textOverflow={"ellipsis"} onClick={() => autofillSuggestedPrompt(prompt.prompt)}>{prompt.displayMessage}</Text>
+                                    </Box>
+                                </motion.div>
+                            ))}
+                        </CardBody>
+                        <CardFooter display="flex" flexDir={"column"} mt={-4}>
+                            <Box display="flex" justifyContent={"center"} mt={-3}>
+                                <Image src={Logo} height="100px" maxWidth="100px" />
+                            </Box>
+                            <Text fontSize={"25px"} textAlign="center" mt={-2} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} bgClip={"text"} fontFamily={"Short Stack"}>MakanBot</Text>
+                        </CardFooter>
+                    </Card>
+                )}
+                <Card width={isSmallerThan880 ? "100%" : "69%"}>
+                    <CardBody>
+                        <Heading as="h1" size="lg" textAlign="center" mb={5} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} bgClip={"text"} fontFamily={"Short Stack"}>MakanBot</Heading>
+                        <Box 
+                            position="relative"
+                            height="100%" 
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            overflow="hidden"
+                        >
+                            <Box
+                                backgroundColor="#F1F4FF"
+                                width={isSmallerThan880 ? "100%" : "80%"}
+                                height="auto"
+                                maxHeight="308px"
+                                borderRadius="2xl"
+                                display="flex"
+                                justifyContent="center"
+                                alignItems="center"
+                                position="absolute"
+                                top="50%"
+                                left="50%"
+                                transform="translate(-50%, -50%)"
+                                overflow="scroll"
+                                padding={10}
+                            >
+                                <motion.div
+                                    key={promptResult}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5 }}
+                                    style={{ margin: 'auto', textAlign: promptResult === "Having doubts? MakanBot is here to help." ? 'center' : 'left' }}
+                                    // Render Markdown as HTML
+                                    dangerouslySetInnerHTML={{ __html: marked(promptResult) }}
+                                />
+                            </Box>
                         </Box>
-                        <Text fontSize={"25px"} textAlign="center" mt={-2} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} bgClip={"text"} fontFamily={"Short Stack"}>MakanBot</Text>
+                    </CardBody>
+                    <CardFooter>
+                        <Box display="flex" justifyContent={"space-between"} width="100%">
+                            <Box width="100%">
+                                <FormControl>
+                                    <Input id="promptInput" type='text' borderRadius={"3xl"} padding={5} width="95%" placeholder="Enter a prompt here" onKeyDown={handleKeyDown} />
+                                </FormControl>
+                            </Box>
+                            <Box
+                                mt={2}
+                                mr={2}
+                                cursor={"pointer"}
+                                sx={{ 
+                                    transition: 'transform 0.2s ease-in-out',
+                                    _hover: {
+                                        transform: 'translateY(-5px)',
+                                        transition: 'transform 0.2s ease-in-out'
+                                    } 
+                                }}
+                            >
+                                <FaPaperPlane fontSize={"25px"} color="#515F7C" onClick={handleSubmitPrompt} />
+                            </Box>
+                        </Box>
                     </CardFooter>
                 </Card>
-            )}
-            <Card width={isSmallerThan880 ? "100%" : "69%"}>
-            <CardBody>
-                <Heading as="h1" size="lg" textAlign="center" mb={5} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} bgClip={"text"} fontFamily={"Short Stack"}>MakanBot</Heading>
-                <Box 
-                    position="relative"
-                    height="100%" 
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    overflow="hidden"
-                >
-                    <Box
-                        backgroundColor="#F1F4FF"
-                        width={isSmallerThan880 ? "100%" : "80%"}
-                        height="auto"
-                        maxHeight="308px"
-                        borderRadius="2xl"
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        position="absolute"
-                        top="50%"
-                        left="50%"
-                        transform="translate(-50%, -50%)"
-                        overflow="hidden"
-                    >
-                        <motion.div
-                            key={promptResult}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                            style={{ margin: 'auto' }}
-                        >
-                            <Text padding={5}>{promptResult}</Text>
-                        </motion.div>
-                    </Box>
-                </Box>
-            </CardBody>
-                <CardFooter>
-                    <Box display="flex" justifyContent={"space-between"} width="100%">
-                        <Box width="100%">
-                            <FormControl>
-                                <Input id="promptInput" type='text' borderRadius={"3xl"} padding={5} width="95%" placeholder="Enter a prompt here" onKeyDown={handleKeyDown} />
-                            </FormControl>
-                        </Box>
-                        <Box
-                            mt={2}
-                            mr={2}
-                            cursor={"pointer"}
-                            sx={{ 
-                                transition: 'transform 0.2s ease-in-out',
-                                _hover: {
-                                    transform: 'translateY(-5px)',
-                                    transition: 'transform 0.2s ease-in-out'
-                                } 
-                            }}
-                        >
-                            <FaPaperPlane fontSize={"25px"} color="#515F7C" onClick={handleSubmitPrompt} />
-                        </Box>
-                    </Box>
-                </CardFooter>
-            </Card>
-        </Box>
+            </Box>
+        </>
     );
 }
 
