@@ -20,7 +20,6 @@ function Navbar() {
         } else {
             navigate('/auth/login');
         }
-        onClose()
     };
 
     const handleLogoClick = () => {

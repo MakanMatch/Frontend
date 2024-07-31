@@ -157,7 +157,7 @@ const MyAccount = () => {
                         )
                     }
                 } else {
-                    console.log("Unknown error occurred when fetching users; error: " + error)
+                    console.log("Unknown error occurred when updating account details; error: " + error)
                     showToast(
                         "Something went wrong",
                         "Failed to update account details. Please try again",

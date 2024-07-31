@@ -22,7 +22,6 @@ function HygieneReports() {
             console.error('Error fetching hosts:', error);
             showToast("Unable to retrieve hosts", "Please try again later", 3000, true, "error")
         }
-        return [];
     };
 
     useEffect(() => {
@@ -65,8 +64,7 @@ function HygieneReports() {
                 </CardHeader>
                 <CardBody>
                     <Stack divider={<StackDivider />} spacing='4'>
-                    {hosts.length > 0 ? (
-                        hosts.map((host) => (
+                        {hosts ? hosts.map((host) => (
                             <HostManagementCard
                                 key={host.userID}
                                 username={host.username}
@@ -74,10 +72,9 @@ function HygieneReports() {
                                 hygieneGrade={host.hygieneGrade}
                                 hostID={host.userID}
                             />
-                        ))
-                    ) : (
-                        <Text>No hosts flagged.</Text>
-                    )}
+                        )) : (
+                            <Text>No hosts found.</Text>
+                        )}
                     </Stack>
                 </CardBody>
             </Card>
