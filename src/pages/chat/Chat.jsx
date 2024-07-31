@@ -35,11 +35,11 @@ function ChatUi() {
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const ws = useRef(null);
 
-    function getImageLink (userID, imageName, messageID) {
-        if (!userID || !imageName || !messageID) {
+    function getImageLink (userID, messageID) {
+        if (!userID || !messageID) {
             return null;
         }
-        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForChat?userID=${userID}&imageName=${imageName}&messageID=${messageID}`;
+        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForChat?userID=${userID}&messageID=${messageID}`;
     }
     function setupWS() {
         const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
@@ -502,7 +502,7 @@ function ChatUi() {
                                         onReply={() => handleReply(msg)}
                                         repliedMessage={msg.replyTo}
                                         edited={msg.edited}
-                                        image={msg.image ? getImageLink(msg.senderID, msg.image, msg.messageID) : null}
+                                        image={msg.image ? getImageLink(msg.senderID, msg.messageID) : null}
                                     />
                                 </React.Fragment>
                             ))}
