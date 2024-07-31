@@ -129,7 +129,7 @@ const FoodListingsPage = () => {
         return (
             <Center height="100vh">
                 <Fade in={!loaded}>
-                    <Spinner size="xl" />
+                    <Spinner size="lg" />
                 </Fade>
             </Center>
         );

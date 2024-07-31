@@ -170,7 +170,7 @@ function MakanBot() {
             )}
             <Card width={isSmallerThan880 ? "100%" : "69%"}>
             <CardBody>
-                <Heading as="h1" size="lg" textAlign="center" mb={5}>MakanBot</Heading>
+                <Heading as="h1" size="lg" textAlign="center" mb={5} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} bgClip={"text"} fontFamily={"Short Stack"}>MakanBot</Heading>
                 <Box 
                     position="relative"
                     height="100%" 
