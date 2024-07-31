@@ -110,7 +110,7 @@ const MarkeredGMaps = ({
                     style={{
                         height: isSmallerThan1095 ? "45vh" : "83vh",
                         width: "100%",
-                        borderRadius: "10px"
+                        borderRadius: "22px"
                     }}
                 />
             </Skeleton>
