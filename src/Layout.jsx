@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react'
 import './App.css'
-import Home from './pages/Home'
 import Navbar from './components/Navbar'
-import { Outlet } from 'react-router-dom'
-import server from './networking.js'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUser, setLoading } from './slices/AuthState';
 import { useToast } from '@chakra-ui/react'
@@ -12,6 +10,7 @@ import showToast from './components/showToast.js'
 
 function App() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const toast = useToast();
     const sToast = showToast(toast);
     const { user, loaded, error } = useSelector(state => state.auth)
@@ -23,6 +22,23 @@ function App() {
             dispatch(setLoading(true))
         }
     }, []);
+
+    useEffect(() => {
+        if (loaded == true) {
+            const urlPath = location.pathname;
+            if (user) {
+                if (user.userType == "Admin" && !urlPath.startsWith("/admin")) {
+                    navigate("/admin");
+                } else if (user.userType != "Admin" && urlPath.startsWith("/admin")) {
+                    navigate("/");
+                }
+            } else {
+                if (urlPath.startsWith("/admin")) {
+                    navigate("/");
+                }
+            }
+        }
+    }, [loaded, user])
 
     useEffect(() => {
         if (error) {

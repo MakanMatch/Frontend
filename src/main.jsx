@@ -31,6 +31,10 @@ import MakanHistory from './pages/identity/MakanHistory.jsx';
 import Favourites from './pages/identity/Favourites.jsx';
 import MakanReviews from './pages/identity/MakanReviews.jsx';
 import ConfirmReservation from './pages/orders/ConfirmReservation.jsx';
+import AdminHomepage from './pages/identity/Admin/AdminHomepage.jsx';
+import HygieneReports from './pages/identity/Admin/HygieneReports.jsx';
+import UserManagement from './pages/identity/Admin/UserManagement.jsx';
+import AdminAccount from './pages/identity/Admin/AdminAccount.jsx';
 import UpcomingReservation from './pages/orders/UpcomingReservation.jsx';
 import ChargeableCancellation from './pages/orders/ChargeableCancellation.jsx';
 
@@ -59,6 +63,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                             <Route path={"upcoming"} element={<UpcomingReservation />} />
                             <Route path={"chargeableCancel"} element={<ChargeableCancellation />} />
                         </Route>
+                        <Route path='admin'>
+                            <Route index element={<AdminHomepage />} />
+                            <Route path={"hygieneReports"} element={<HygieneReports />} />
+                            <Route path={"userManagement"} element={<UserManagement />} />
+                            <Route path={"myAccount"} element={<AdminAccount />} />
+                        </Route>
                         <Route path='*' element={<NotFound />} />
                     </Route>
                     <Route path='/auth' element={<AuthLayout />}>
@@ -71,15 +81,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     </Route>
                     <Route path='/identity' element={<Layout />}>
                         <Route path={"myAccount"} element={<MyAccount />} />
-                        <Route path={"makanHistory"} element={<MakanHistory/>} />
-                        <Route path={"favourites"} element={<Favourites/>} />
-                        <Route path={"makanReviews"} element={<MakanReviews/>} />
-                        <Route path={"schedule"} element={<Schedule/>} />
+                        <Route path={"makanHistory"} element={<MakanHistory />} />
+                        <Route path={"favourites"} element={<Favourites />} />
+                        <Route path={"makanReviews"} element={<MakanReviews />} />
+                        <Route path={"schedule"} element={<Schedule />} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
         </ChakraProvider>
     </Provider>
-
 )
