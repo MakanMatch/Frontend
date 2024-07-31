@@ -7,6 +7,7 @@ import server from "../../networking";
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { marked } from 'marked';
+import { decode } from 'html-entities';
 
 let conversationHistory = [];
 
@@ -57,6 +58,14 @@ function MakanBot() {
         document.getElementById("promptInput").value = prompt;
     }
 
+    function cleanText(text) {
+        const textarea = document.createElement('textarea');
+        textarea.innerHTML = text;
+        let decodedText = textarea.value;
+    
+        return decodedText.replace(/<\/?[^>]+(>|$)/g, "");
+    }
+
     const handleSubmitPrompt = async () => {
         const messagePrompt = document.getElementById("promptInput").value;
         if (messagePrompt.trim() === "") {
@@ -74,9 +83,10 @@ function MakanBot() {
                 const response = await server.post("/makanBot/queryMakanBotWithUserPrompt", data);
                 dispatch(reloadAuthToken(authToken));
                 if (response.status === 200) {
+                    const textContent = new DOMParser().parseFromString((marked(response.data.message).replace(/\n/g, ' ').trim()), 'text/html').body.textContent;
                     conversationHistory.push({
                         role: "assistant",
-                        content: response.data.message
+                        content: textContent
                     });
                     setPromptResult(response.data.message);
                 }
