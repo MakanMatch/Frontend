@@ -22,6 +22,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
             />
             {searchQuery && (
                 <IconButton
+                    mt={1}
                     ml={2}
                     icon={<CloseIcon />}
                     size="sm"
