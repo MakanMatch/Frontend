@@ -123,8 +123,8 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                 dispatch(reloadAuthToken(authToken))
                 if (error.response && error.response.data) {
                     if (error.response.data.startsWith("UERROR")) {
-                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3500, true, "error")
-                        console.log("User error occurred in retrieving favourite listings; error: ", err.response.data);
+                        displayToast("Something went wrong", error.response.data.substring("UERROR: ".length), 3500, true, "error")
+                        console.log("User error occurred in retrieving favourite listings; error: ", error.response.data);
                         setFavourite(false);
                     } else {
                         displayToast("Error", "Failed to fetch favourite state", "error", 3000, false);
