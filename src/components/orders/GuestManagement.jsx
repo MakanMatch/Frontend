@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { reloadAuthToken } from '../../slices/AuthState'
 import configureShowToast from '../../components/showToast'
 import { FaCommentDots, FaCheck } from "react-icons/fa";
+import { CloseIcon } from '@chakra-ui/icons'    
 
 function GuestManagement({
     listingID,
@@ -185,6 +186,15 @@ function GuestManagement({
                                     Paid & Present
                                 </Button>
                             )}
+                        <IconButton
+                            background="red.500"
+                            color="white"
+                            ml={2}
+                            icon={<CloseIcon />}
+                            size="sm"
+                            onClick={() => handleDeleteReservation()}
+                            _hover={{ bg: "red.600" }}
+                        />
                         </Box>
                     </Box>
                 ))
