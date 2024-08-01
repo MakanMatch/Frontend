@@ -283,7 +283,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                 <ModalOverlay
                     backdropFilter="brightness(1)"
                 />
-                <ModalContent onKeyDown={handleKeyDown}>
+                <ModalContent>
                     <ModalHeader>Host your next meal!</ModalHeader>
                     <ModalBody>
                         <FormControl mb={5} isRequired>
@@ -293,6 +293,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="text"
                                 placeholder="E.g Pani Puri"
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     setTitle(event.target.value)
                                 }
@@ -304,6 +305,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="text"
                                 placeholder="E.g Popular Indian Street Food"
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     setShortDescription(event.target.value)
                                 }
@@ -317,6 +319,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="text"
                                 placeholder="E.g Pani Puri offers a burst of flavors and textures in every bite. It is made of a crispy shell, a mixture of potato, onion, peas and chickpea."
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     setLongDescription(event.target.value)
                                 }
@@ -339,6 +342,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                         max={10}
                                         value={portionPrice}
                                         inputMode="numeric"
+                                        onKeyDown={handleKeyDown}
                                         onChange={(valueAsString, valueAsNumber) => {
                                             const isValid = /^[0-9]*$/.test(valueAsString);
                                             if (!isValid) {
@@ -377,6 +381,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                         max={10}
                                         value={totalSlots}
                                         inputMode="numeric"
+                                        onKeyDown={handleKeyDown}
                                         onChange={(valueAsString, valueAsNumber) => {
                                             const isValid = /^[0-9]*$/.test(valueAsString);
                                             if (!isValid) {
@@ -414,6 +419,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="datetime-local"
                                 value={datetime}
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     checkDate(event.target.value)
                                 }
@@ -426,6 +432,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                 key={Date.now()}
                                 type="file"
                                 size="sm"
+                                onKeyDown={handleKeyDown}
                                 onChange={handleFileChange}
                                 multiple
                             />
