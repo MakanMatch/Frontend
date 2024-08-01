@@ -142,11 +142,11 @@ function GuestManagement({
                                 <Flex
                                     mt={2}
                                     direction={{ base: "column", md: "row" }}
-                                    alignItems="center" 
-                                    justify={{ base: "flex-start", md: "space-between" }} 
+                                    alignItems="center"
+                                    justify={{ base: "flex-start", md: "space-between" }}
                                     width="100%"
                                     gap={3}
-                                >                                    
+                                >
                                     <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total portion: {guest.Reservation.portions}</Text>
                                     <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total price: ${guest.Reservation.totalPrice}</Text>
                                 </Flex>
@@ -163,13 +163,18 @@ function GuestManagement({
                                 onClick={() => navigate(`/chat`)}
                             />
                             {guest.Reservation.paidAndPresent ? (
-                                <IconButton
-                                    icon={<FaCheck />}
-                                    aria-label="Paid & Present"
-                                    colorScheme="green"
-                                    size={{ base: "sm", md: "lg" }}
+                                <Button
+                                    background="green.500"
+                                    color="white"
+                                    borderRadius="10px"
+                                    fontWeight="bold"
+                                    _hover={{ bg: "green.600" }}
+                                    size={{ base: "sm", md: "md" }}
                                     onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
-                                />
+                                    rightIcon={<FaCheck />}
+                                >
+                                    Paid & Present
+                                </Button>
                             ) : (
                                 <Button
                                     variant="MMPrimary"
