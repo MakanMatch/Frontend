@@ -1,28 +1,58 @@
 import { useToast, Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text } from "@chakra-ui/react";
-import HostManagementCard from "../../../components/identity/HostHygieneManagementCard";
-import server from ".././../../networking"
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { reloadAuthToken } from "../../../slices/AuthState";
 import { motion } from "framer-motion";
+import HostManagementCard from "../../../components/identity/HostHygieneManagementCard";
 import configureShowToast from '../../../components/showToast';
+import server from ".././../../networking";
 
 function HygieneReports() {
     const [hosts, setHosts] = useState([])
     const toast = useToast();
+    const dispatch = useDispatch();
     const showToast = configureShowToast(toast);
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const fetchAllHosts = async () => {
         try {
             const response = await server.get('/cdn/fetchAllUsers?fetchHostsOnly=true');
+            dispatch(reloadAuthToken(authToken))              
             if (response.status === 200) {
                 setHosts(response.data);
-                console.log(response.data);
                 return response.data;
             }
         } catch (error) {
-            console.error('Error fetching hosts:', error);
-            showToast("Unable to retrieve hosts", "Please try again later", 3000, true, "error")
+            dispatch(reloadAuthToken(authToken))              
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to fetch host data; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    showToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        3500,
+                        true,
+                        "info"
+                    )
+                } else {
+                    showToast(
+                        "Something went wrong",
+                        "Failed to fetch host data. Please try again",
+                        3500,
+                        true,
+                        "error"
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when fetching host data; error: " + error)
+                showToast(
+                    "Something went wrong",
+                    "Failed to fetch host data. Please try again",
+                    3500,
+                    true,
+                    "error"
+                )
+            }
         }
     };
 

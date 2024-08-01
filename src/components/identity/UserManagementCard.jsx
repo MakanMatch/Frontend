@@ -2,54 +2,146 @@ import { Avatar, Box, HStack, Text, Menu, MenuButton, MenuItem, MenuList, IconBu
 import { useState, useEffect } from 'react';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { reloadAuthToken } from '../../slices/AuthState';
 import configureShowToast from '../../components/showToast';
 import server from "../../networking";
 
 function UserManagementCard({ username, email, userType, userID }) {
     const toast = useToast()
+    const dispatch = useDispatch()
     const showToast = configureShowToast(toast)
     const navigate = useNavigate()
     const [banned, setBanned] = useState(false)
     const [banLoaded, setBanLoaded] = useState(false)
+
+    const { user, authToken, loaded } = useSelector((state) => state.auth)
 
     const profilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`
 
     const handleDeleteUser = async () => {
         try {
             const response = await server.delete(`/identity/myAccount/deleteAccount?adminPrivilege=true&targetUserID=${userID}&userType=${userType}`)
+            dispatch(reloadAuthToken(authToken))
             if (response.status === 200) {
                 window.location.reload()
                 showToast("Success", "User deleted successfully", 3000, true, "success")
             }
         } catch (error) {
-            console.error(error)
-            showToast("Error", "An error occurred while deleting the user", 3000, true, "error")
+            dispatch(reloadAuthToken(authToken))
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to delete user; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    showToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        3500,
+                        true,
+                        "info"
+                    )
+                } else {
+                    showToast(
+                        "Something went wrong",
+                        "Failed to delete user. Please try again",
+                        3500,
+                        true,
+                        "error"
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when deleting user; error: " + error)
+                showToast(
+                    "Something went wrong",
+                    "Failed to delete user. Please try again",
+                    3500,
+                    true,
+                    "error"
+                )
+            }
         }
     };
 
     const handleToggleBanUser = async () => {
         try {
             const response = await server.post("/admin/userManagement/banUser", { userID })
+            dispatch(reloadAuthToken(authToken))
             if (response.status === 200) {
                 setBanned(response.data.banned)
                 showToast("Success", `User ${response.data.banned === true ? "banned" : "un-banned"} successfully!`, 3000, true, "success")
             }
         } catch (error) {
-            console.error(error)
-            showToast("Error", "An error occurred while banning the user", 3000, true, "error")
+            dispatch(reloadAuthToken(authToken))
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to ban/un-ban user; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    showToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        3500,
+                        true,
+                        "info"
+                    )
+                } else {
+                    showToast(
+                        "Something went wrong",
+                        "Failed to ban/un-ban user. Please try again",
+                        3500,
+                        true,
+                        "error"
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when attempting to ban/un-ban user; error: " + error)
+                showToast(
+                    "Something went wrong",
+                    "Failed to ban/un-ban user. Please try again",
+                    3500,
+                    true,
+                    "error"
+                )
+            }
         }
     }
 
     const fetchBanState = async () => {
         try {
             const response = await server.get(`/admin/userManagement/fetchBanState?userID=${userID}`)
+            dispatch(reloadAuthToken(authToken))              
             if (response.status === 200) {
                 setBanned(response.data.banned)
                 setBanLoaded(true)
             }
         } catch (error) {
-            console.error(error)
-            showToast("Error", "An error occurred fetching user data", 3000, true, "error")
+            dispatch(reloadAuthToken(authToken))              
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to load user data; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    showToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        3500,
+                        true,
+                        "info"
+                    )
+                } else {
+                    showToast(
+                        "Something went wrong",
+                        "Failed to load user data. Please try again",
+                        3500,
+                        true,
+                        "error"
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when loading user data; error: " + error)
+                showToast(
+                    "Something went wrong",
+                    "Failed to load user data. Please try again",
+                    3500,
+                    true,
+                    "error"
+                )
+            }
         }
     }
 

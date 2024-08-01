@@ -1,14 +1,11 @@
-import { useDispatch } from 'react-redux';
-import { Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text, 
-    useToast, Spinner
-} from "@chakra-ui/react";
-import UserManagementCard from "../../../components/identity/UserManagementCard";
-import { useSelector } from "react-redux";
-import server from ".././../../networking"
+import { Heading, Card, CardHeader, CardBody, Stack, StackDivider, HStack, Box, Text, useToast, Spinner } from "@chakra-ui/react";
+import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import configureShowToast from '../../../components/showToast';
 import { reloadAuthToken } from '../../../slices/AuthState';
 import { motion } from 'framer-motion';
+import UserManagementCard from "../../../components/identity/UserManagementCard";
+import configureShowToast from '../../../components/showToast';
+import server from ".././../../networking"
 
 function UserManagement() {
     const [users, setUsers] = useState([])

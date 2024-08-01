@@ -1,16 +1,13 @@
-import { Avatar, Box, Editable, Flex, Heading, Stack, FormControl, FormLabel,
-    Button, EditablePreview, EditableInput, ButtonGroup, Popover, PopoverTrigger, PopoverContent, 
-    PopoverArrow, PopoverCloseButton, IconButton, Text, useDisclosure, Spinner, useToast, Input
-} from '@chakra-ui/react'
+import { Avatar, Box, Editable, Flex, Heading, Stack, FormControl, FormLabel, Button, EditablePreview, EditableInput, ButtonGroup, Popover, PopoverTrigger, PopoverContent,  PopoverArrow, PopoverCloseButton, IconButton, Text, useDisclosure, Spinner, useToast, Input } from '@chakra-ui/react'
 import { EditIcon } from '@chakra-ui/icons';
 import { useState, useEffect, useRef, forwardRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useSearchParams  } from 'react-router-dom';
+import { reloadAuthToken } from '../../slices/AuthState';
+import { logout } from '../../slices/AuthState';
+import ChangeAddress from '../../components/identity/ChangeAddress';
 import configureShowToast from '../../components/showToast';
 import server from '../../networking';
-import { reloadAuthToken } from '../../slices/AuthState';
-import ChangeAddress from '../../components/identity/ChangeAddress';
-import { logout } from '../../slices/AuthState';
 
 function PublicGuestProfile() {
     const navigate = useNavigate();
