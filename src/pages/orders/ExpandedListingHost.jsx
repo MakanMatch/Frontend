@@ -369,6 +369,7 @@ function ExpandedListingHost() {
                             <GuestManagement
                                 listingID={listingData.listingID}
                                 guests={listingData.guests}
+                                fetchListingDetails={fetchListingDetails}
                             />
                         </GridItem>
                         <GridItem colSpan={{ base: 3, md: 1 }}>

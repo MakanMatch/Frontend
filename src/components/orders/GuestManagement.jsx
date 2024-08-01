@@ -228,17 +228,6 @@ function GuestManagement({
                                     >
                                         Paid & Present
                                     </Button>
-                                    {!guest.Reservation.markedPaid && (
-                                        <IconButton
-                                            background="red.500"
-                                            color="white"
-                                            ml={2}
-                                            icon={<CloseIcon />}
-                                            size="sm"
-                                            onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID )}
-                                            _hover={{ bg: "red.600" }}
-                                        />
-                                    )}
                                 </Box>
                             )}
                         <IconButton
@@ -247,7 +236,7 @@ function GuestManagement({
                             ml={2}
                             icon={<CloseIcon />}
                             size="sm"
-                            onClick={() => handleDeleteReservation()}
+                            onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID )}
                             _hover={{ bg: "red.600" }}
                         />
                         </Box>

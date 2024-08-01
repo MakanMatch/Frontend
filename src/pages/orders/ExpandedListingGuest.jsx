@@ -39,7 +39,7 @@ function ExpandedListingGuest() {
         foodRating: 0.0,
         hygieneGrade: 0.0,
         mealsMatched: 0,
-        reviewCount: 0
+        reviewsCount: 0
     })
     const { user, loaded, error, authToken } = useSelector(state => state.auth)
     const dispatch = useDispatch();
