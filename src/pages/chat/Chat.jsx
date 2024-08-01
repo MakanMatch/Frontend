@@ -414,175 +414,170 @@ function ChatUi() {
     }
 
     return (
-        <Flex direction = "row" overflowX={"hidden"} w="100%" h="100%">
+        <Flex direction={{ base: "column", md: "row" }} overflowX="hidden" w="100%" h="100%">
             <ChatHistory
                 onUserClick={handleChatClick}
                 chatHistory={chatHistory}
                 chatPartnerUsernames={chatPartnerUsernames}
-                w = "25%"
-                h = "100%"
+                w={{ base: "100%", md: "25%" }}
+                h="100%"
+                display={{ base: chatSelected === null ? "block" : "none", md: "block" }} // Hide ChatHistory on mobile if a chat is selected
             />
-            <Flex flex="1" direction={"column"} overflow={"hidden"}>
-            {chatSelected != null ? (
-                <Center flexDirection="column" alignItems="center" p={5} flex="1">
-                    <Box
-                        bg="white"
-                        w="75%"
-                        p={2}
-                        borderRadius={20}
-                        h="auto"
-                        textColor="black"
-                        alignItems="center"
-                        display="flex"
-                        boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
-                        mb={4}
-                        mt={-4}
-                    >
-                        <Avatar
-                            name={chatPartnerUsernames[chatSelected]}
-                            borderRadius="full"
-                            w={{ base: "20%", md: "10%" }}
-                            h="100%"
-                            minH={"55px"}
-                            maxH={"55px"}
-                            minW={"55px"}
-                            maxW={"55px"}
-                        />
-                        <Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
-                            <Text fontSize={20} mt={2} textAlign={"left"}>
-                                {chatPartnerUsernames[chatSelected]
-                                    ? chatPartnerUsernames[chatSelected]
-                                    : "Chat"}
-                            </Text>
-                            <Spacer h={3} />
-                            <Text
-                                fontSize="sm"
-                                mb={-8}
-                                textAlign={"left"}
-                                color={status ? "green.500" : "gray.300"}
-                            >
-                                {status ? "Online" : "Offline"}
-                            </Text>
+            <Flex flex="1" direction="column" overflow="hidden">
+                {chatSelected !== null ? (
+                    <Center flexDirection="column" alignItems="center" p={5} flex="1">
+                        <Box
+                            bg="white"
+                            w={{ base: "90%", md: "75%" }}
+                            p={2}
+                            borderRadius={20}
+                            h="auto"
+                            textColor="black"
+                            alignItems="center"
+                            display="flex"
+                            boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
+                            mb={4}
+                            mt={-4}
+                        >
+                            <Avatar
+                                name={chatPartnerUsernames[chatSelected]}
+                                borderRadius="full"
+                                w={{ base: "20%", md: "10%" }}
+                                h="100%"
+                                minH="55px"
+                                maxH="55px"
+                                minW="55px"
+                                maxW="55px"
+                            />
+                            <Box mt={-10} ml={{ base: 2, md: 5 }} minW={{ base: "60%", md: "495px" }}>
+                                <Text fontSize={20} mt={2} textAlign="left">
+                                    {chatPartnerUsernames[chatSelected] || "Chat"}
+                                </Text>
+                                <Spacer h={3} />
+                                <Text
+                                    fontSize="sm"
+                                    mb={-8}
+                                    textAlign="left"
+                                    color={status ? "green.500" : "gray.300"}
+                                >
+                                    {status ? "Online" : "Offline"}
+                                </Text>
+                            </Box>
                         </Box>
-                    </Box>
-                    <Box
-                        bg="gray.100"
-                        w="75%"
-                        h="70vh"
-                        p={4}
-                        display="flex"
-                        flexDirection="column"
-                        borderRadius={20}
-                        boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
-                    >
-                        <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX={"hidden"}>
-                            {messages.map((msg, index) => (
-                                <React.Fragment key={msg.messageID}>
-                                    {shouldDisplayDate(msg, messages[index - 1]) && (
-                                        <Text
-                                            fontSize="sm"
-                                            color="gray.500"
-                                            textAlign="center"
-                                            mb={2}
-                                        >
-                                            {formatDate(msg.datetime)}
-                                        </Text>
-                                    )}
-                                    <ChatBubble
-                                        message={msg.message}
-                                        timestamp={new Date(msg.datetime).toLocaleTimeString([], {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                        })}
-                                        isSender={msg.senderID === user.userID}
-                                        sender={msg.sender}
-                                        receiver={chatPartnerUsernames[chatSelected]}
-                                        onEdit={() => openEditModal(msg.messageID, msg.message)}
-                                        onDelete={() => handleDeletePrompt(msg.messageID)}
-                                        onReply={() => handleReply(msg)}
-                                        repliedMessage={msg.replyTo}
-                                        edited={msg.edited}
-                                        image={msg.image ? getImageLink(msg.senderID, msg.messageID) : null}
+                        <Box
+                            bg="gray.100"
+                            w={{ base: "90%", md: "75%" }}
+                            h="70vh"
+                            p={4}
+                            display="flex"
+                            flexDirection="column"
+                            borderRadius={20}
+                            boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
+                        >
+                            <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX="hidden">
+                                {messages.map((msg, index) => (
+                                    <React.Fragment key={msg.messageID}>
+                                        {shouldDisplayDate(msg, messages[index - 1]) && (
+                                            <Text fontSize="sm" color="gray.500" textAlign="center" mb={2}>
+                                                {formatDate(msg.datetime)}
+                                            </Text>
+                                        )}
+                                        <ChatBubble
+                                            message={msg.message}
+                                            timestamp={new Date(msg.datetime).toLocaleTimeString([], {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            })}
+                                            isSender={msg.senderID === user.userID}
+                                            sender={msg.sender}
+                                            receiver={chatPartnerUsernames[chatSelected]}
+                                            onEdit={() => openEditModal(msg.messageID, msg.message)}
+                                            onDelete={() => handleDeletePrompt(msg.messageID)}
+                                            onReply={() => handleReply(msg)}
+                                            repliedMessage={msg.replyTo}
+                                            edited={msg.edited}
+                                            image={msg.image ? getImageLink(msg.senderID, msg.messageID) : null}
+                                        />
+                                    </React.Fragment>
+                                ))}
+                                <div ref={chatBottomRef} /> {/* Ref to scroll to */}
+                            </VStack>
+                            {replyTo && (
+                                <Flex
+                                    bg="gray.200"
+                                    p={2}
+                                    borderRadius="md"
+                                    mb={2}
+                                    align="center"
+                                    justify="space-between"
+                                >
+                                    <Text fontSize="sm" fontStyle="italic">
+                                        Replying to: {replyTo.message}
+                                    </Text>
+                                    <IconButton
+                                        aria-label="Cancel reply"
+                                        icon={<FiX />}
+                                        variant="ghost"
+                                        colorScheme="red"
+                                        size="sm"
+                                        onClick={cancelReply}
                                     />
-                                </React.Fragment>
-                            ))}
-                            <div ref={chatBottomRef} /> {/* Ref to scroll to */}
-                        </VStack>
-                        {replyTo && (
-                            <Flex
-                                bg="gray.200"
-                                p={2}
-                                borderRadius="md"
-                                mb={2}
-                                align="center"
-                                justify="space-between"
-                            >
-                                <Text fontSize="sm" fontStyle="italic">
-                                    Replying to: {replyTo.message}
-                                </Text>
+                                </Flex>
+                            )}
+                            {confirmedImage !== "" && (
+                                <Flex
+                                    bg="gray.200"
+                                    p={2}
+                                    borderRadius="md"
+                                    mb={2}
+                                    align="center"
+                                    justify="space-between"
+                                >
+                                    <Text fontSize="sm" fontStyle="italic">
+                                        {confirmedImage}
+                                    </Text>
+                                    <IconButton
+                                        aria-label="Cancel image"
+                                        icon={<FiX />}
+                                        variant="ghost"
+                                        colorScheme="red"
+                                        size="sm"
+                                    />
+                                </Flex>
+                            )}
+                            <Flex mt={4} align="center">
+                                <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange} />
                                 <IconButton
-                                    aria-label="Cancel reply"
-                                    icon={<FiX />}
+                                    aria-label="Attach image"
+                                    icon={<FaCamera />}
                                     variant="ghost"
-                                    colorScheme="red"
-                                    size="sm"
-                                    onClick={cancelReply}
+                                    colorScheme="gray"
+                                    size="md"
+                                    onClick={() => document.getElementById("file").click()}
+                                    mr={2}
                                 />
-                            </Flex>
-                        )}
-                        {confirmedImage!=="" && (
-                            <Flex
-                                bg="gray.200"
-                                p={2}
-                                borderRadius="md"
-                                mb={2}
-                                align="center"
-                                justify="space-between"
-                            >
-                                <Text fontSize="sm" fontStyle="italic">
-                                    {confirmedImage}
-                                </Text>
-                                <IconButton
-                                    aria-label="Cancel image"
-                                    icon={<FiX />}
-                                    variant="ghost"
-                                    colorScheme="red"
-                                    size="sm"
+                                <Input
+                                    placeholder="Type a message..."
+                                    flex="1"
+                                    mr={2}
+                                    value={messageInput}
+                                    onChange={(e) => setMessageInput(e.target.value)}
+                                    onKeyDown={handleKeyDown}
                                 />
+                                <Button colorScheme="teal" onClick={sendMessage}>
+                                    Send
+                                </Button>
                             </Flex>
-                        )}
-                        <Flex mt={4} align="center">
-                            <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange} />
-                            <IconButton
-                                aria-label="Attach image"
-                                icon={<FaCamera />}
-                                variant="ghost"
-                                colorScheme="gray"
-                                size="md"
-                                onClick={() => document.getElementById("file").click()}
-                                mr={2}
-                            />
-                            <Input
-                                placeholder="Type a message..."
-                                flex="1"
-                                mr={2}
-                                value={messageInput}
-                                onChange={(e) => setMessageInput(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                            />
-                            <Button colorScheme="teal" onClick={sendMessage}>
-                                Send
-                            </Button>
-                        </Flex>
-                    </Box>
-                </Center>
-            ) : (
-                <Center flex="1">
-                    <Text fontSize="xl" color="gray.500">
-                        Select a chat to start messaging or make a reservation.
-                    </Text>
-                </Center>
-            )}
+                        </Box>
+                    </Center>
+                ) : (
+                    <Center flex="1">
+                        <Text fontSize="xl" color="gray.500">
+                            Select a chat to start messaging or make a reservation.
+                        </Text>
+                    </Center>
+                )}
+            </Flex>
             {/* Edit Message Modal */}
             <Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
                 <ModalOverlay />
@@ -650,7 +645,6 @@ function ChatUi() {
                     </AlertDialogContent>
                 </AlertDialogOverlay>
             </AlertDialog>
-        </Flex>
         </Flex>
     );
 }

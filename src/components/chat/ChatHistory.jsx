@@ -2,11 +2,7 @@ import React from "react";
 import { Box, Flex, Text, Avatar, VStack, useMediaQuery } from "@chakra-ui/react";
 
 function ChatHistory({ chatHistory = [], onUserClick, lastMessage, chatPartnerUsernames }) {
-  const [isSmallerThan950px] = useMediaQuery("(min-width: 950px)");
-
-  if (!isSmallerThan950px) {
-    return null;
-  }
+  const [isSmallerThan950px] = useMediaQuery("(max-width: 950px)");
 
   // Filter out any undefined or invalid chat IDs
   const validChatHistory = chatHistory.filter(chatID => chatID && chatPartnerUsernames[chatID]);
@@ -14,7 +10,7 @@ function ChatHistory({ chatHistory = [], onUserClick, lastMessage, chatPartnerUs
   return (
     <Box
       bg="white"
-      w="30%"
+      w={{ base: "25%", md: "30%" }} // Adjust width for responsiveness
       minW="100px"
       h="90%"
       p={4}
@@ -24,7 +20,7 @@ function ChatHistory({ chatHistory = [], onUserClick, lastMessage, chatPartnerUs
       borderColor="gray.200"
       border="1px solid"
     >
-      <Text fontSize="2xl" mb={6} textAlign="left">
+      <Text fontSize={{ base: "xl", md: "2xl" }} mb={6} textAlign="left">
         Messages
       </Text>
       <VStack spacing={0} align="stretch">
@@ -46,10 +42,18 @@ function ChatHistory({ chatHistory = [], onUserClick, lastMessage, chatPartnerUs
               minH="55px" 
             />
             <Box flex="1" minW={0}>
-              <Text fontWeight="bold" textAlign="left">
-                {chatPartnerUsernames[chatID] || `Chat ${chatID}`}
-              </Text>
-              <Text fontSize="sm" color="gray.500" maxW="100%" textAlign="left" isTruncated>
+              {!isSmallerThan950px && (
+                <Text fontWeight="bold" fontSize={{ base: "sm", md: "md" }} textAlign="left">
+                  {chatPartnerUsernames[chatID] || `Chat ${chatID}`}
+                </Text>
+              )}
+              <Text
+                fontSize={{ base: "xs", md: "sm" }} // Responsive font size
+                color="gray.500"
+                maxW="100%"
+                textAlign="left"
+                isTruncated
+              >
                 {lastMessage}
               </Text>
             </Box>
@@ -61,3 +65,4 @@ function ChatHistory({ chatHistory = [], onUserClick, lastMessage, chatPartnerUs
 }
 
 export default ChatHistory;
+
