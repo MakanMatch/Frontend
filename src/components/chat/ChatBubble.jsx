@@ -38,6 +38,7 @@ function ChatBubble({
       maxW="70%"
       alignSelf={isSender ? "flex-end" : "flex-start"}
       borderRadius={image ? "10px" : "lg"} // Apply borderRadius conditionally
+      _hover={{ ".menu-button" : {opacity: 1}}}
     >
       <Flex alignItems="center">
         {!isSender && (
@@ -62,7 +63,14 @@ function ChatBubble({
             wordBreak="break-word" // Ensure words break properly
             overflowWrap="break-word" // Ensure long words wrap
           >
-            <Box position="absolute" top={1} right={1}>
+            <Box 
+            position="absolute" 
+            top={1} 
+            right={1}
+            className="menu-button"
+            opacity={0} // Hide the menu button by default
+            transition={"opacity 0.2s ease"} // Add a transition effect
+            >
               <Menu>
                 <MenuButton
                   as={IconButton}
@@ -130,18 +138,9 @@ function ChatBubble({
             )}
             <Text textAlign={image ? "left" : "center"}>
               {message}
-              {edited && (
-                <Text
-                  as="span"
-                  fontSize="xs" // Making the text smaller
-                  color={isSender ? "gray.300" : "gray.500"}
-                  marginLeft={2}
-                >
-                  (edited)
-                </Text>
-              )}
             </Text>
 
+            <Flex align="center" fontSize="xs" color={isSender ? "gray.300" : "gray.500"} mt={1} >
             {timestamp && (
               <Text
                 fontSize="xs"
@@ -152,6 +151,18 @@ function ChatBubble({
                 {timestamp}
               </Text>
             )}
+            {edited && (
+                <Text
+                  as="span"
+                  fontSize="xs" // Making the text smaller
+                  color={isSender ? "gray.300" : "gray.500"}
+                  marginLeft={2}
+                  mt={1} // Adjusted marginTop to align with timestamp
+                >
+                  (edited)
+                </Text>
+              )}
+              </Flex>
           </Box>
         </Box>
         {isSender && (
