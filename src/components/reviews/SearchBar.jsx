@@ -2,10 +2,10 @@ import React from 'react';
 import { Input, InputGroup, InputLeftElement, IconButton, useBreakpointValue } from '@chakra-ui/react';
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons';
 
-const SearchBar = ({ searchQuery, setSearchQuery }) => {
+const SearchBar = ({ searchQuery, setSearchQuery, basePlaceholder, mdPlaceholder }) => {
     const placeholder = useBreakpointValue({
-        base: 'Search...',
-        md: 'Search for a keyword or review poster name...',
+        base: basePlaceholder,
+        md: mdPlaceholder,
     });
 
     return (

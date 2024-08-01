@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner, Input, InputGroup, InputLeftElement, useBreakpointValue, IconButton } from "@chakra-ui/react";
+import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner} from "@chakra-ui/react";
 import GuestSideNav from "../../components/identity/GuestSideNav";
 import server from '../../networking'
 import configureShowToast from '../../components/showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import { useSelector, useDispatch } from 'react-redux';
 import FoodListingCard from '../../components/listings/FoodListingCard';
-import { CloseIcon, SearchIcon } from "@chakra-ui/icons";
+import { SearchBar } from '../../components/reviews/SearchBar';
 
 const Favourites = () => {
     const toast = useToast();
@@ -19,11 +19,6 @@ const Favourites = () => {
 
     const [isBetween701And739] = useMediaQuery("(min-width: 701px) and (max-width: 739px)");
     const [searchQuery, setSearchQuery] = useState("");
-
-    const placeholder = useBreakpointValue({
-        base: 'Search...',
-        md: 'Search for a listing title or a host name...',
-    });
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
@@ -106,27 +101,7 @@ const Favourites = () => {
                         <Box pl={4} pr={4}>
                             {/* Search bar */}
                             {favouritesListingDetails.length > 0 && (
-                                <InputGroup mb={4}>
-                                <InputLeftElement
-                                    pointerEvents="none"
-                                    children={<SearchIcon color="gray.300" />}
-                                />
-                                <Input
-                                    type="text"
-                                    placeholder={placeholder}
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                {searchQuery && (
-                                    <IconButton
-                                        mt={1}
-                                        ml={2}
-                                        icon={<CloseIcon />}
-                                        size="sm"
-                                        onClick={() => setSearchQuery('')}
-                                    />
-                                )}
-                            </InputGroup>
+                                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} basePlaceholder={"Search..."} mdPlaceholder={"Search for a listing title or a host name..."} />
                             )}
                             {filteredFavourites.length > 0 ? (
                                 <SimpleGrid
