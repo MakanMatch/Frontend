@@ -3,7 +3,6 @@ import { Avatar, Box, Editable, Flex, Heading, Stack, FormControl, FormLabel,
     PopoverArrow, PopoverCloseButton, IconButton, Text, useDisclosure, Spinner, useToast, Input
 } from '@chakra-ui/react'
 import { EditIcon } from '@chakra-ui/icons';
-import { FocusLock } from '@chakra-ui/react';
 import { useState, useEffect, useRef, forwardRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -288,19 +287,17 @@ function PublicGuestProfile() {
                             </PopoverTrigger>
                         )}
                         <PopoverContent p={5}>
-                            <FocusLock returnFocus persistentFocus={false}>
-                                <PopoverArrow />
-                                <PopoverCloseButton />
-                                <Form
-                                    firstFieldRef={firstFieldRef}
-                                    onCancel={handleCancel}
-                                    onSave={onSave}
-                                    fname={fname}
-                                    setFname={setFname}
-                                    lname={lname}
-                                    setLname={setLname}
-                                />
-                            </FocusLock>
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <Form
+                                firstFieldRef={firstFieldRef}
+                                onCancel={handleCancel}
+                                onSave={onSave}
+                                fname={fname}
+                                setFname={setFname}
+                                lname={lname}
+                                setLname={setLname}
+                            />
                         </PopoverContent>
                     </Popover>
                 </Box>

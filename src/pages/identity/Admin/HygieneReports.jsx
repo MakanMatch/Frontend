@@ -16,6 +16,7 @@ function HygieneReports() {
             const response = await server.get('/cdn/fetchAllUsers?fetchHostsOnly=true');
             if (response.status === 200) {
                 setHosts(response.data);
+                console.log(response.data);
                 return response.data;
             }
         } catch (error) {
@@ -64,7 +65,8 @@ function HygieneReports() {
                 </CardHeader>
                 <CardBody>
                     <Stack divider={<StackDivider />} spacing='4'>
-                        {hosts ? hosts.map((host) => (
+                    {hosts.length > 0 ? (
+                        hosts.map((host) => (
                             <HostManagementCard
                                 key={host.userID}
                                 username={host.username}
@@ -72,9 +74,10 @@ function HygieneReports() {
                                 hygieneGrade={host.hygieneGrade}
                                 hostID={host.userID}
                             />
-                        )) : (
-                            <Text>No hosts found.</Text>
-                        )}
+                        ))
+                    ) : (
+                        <Text>No hosts found.</Text>
+                    )}
                     </Stack>
                 </CardBody>
             </Card>

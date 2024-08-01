@@ -335,19 +335,17 @@ function AdminAccount() {
                             <IconButton size='sm' icon={<EditIcon />} ml={2} />
                         </PopoverTrigger>
                         <PopoverContent p={5}>
-                            <FocusLock returnFocus persistentFocus={false}>
-                                <PopoverArrow />
-                                <PopoverCloseButton />
-                                <Form
-                                    firstFieldRef={firstFieldRef}
-                                    onCancel={handleCancel}
-                                    onSave={onSave}
-                                    fname={fname}
-                                    setFname={setFname}
-                                    lname={lname}
-                                    setLname={setLname}
-                                />
-                            </FocusLock>
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <Form
+                                firstFieldRef={firstFieldRef}
+                                onCancel={handleCancel}
+                                onSave={onSave}
+                                fname={fname}
+                                setFname={setFname}
+                                lname={lname}
+                                setLname={setLname}
+                            />
                         </PopoverContent>
                     </Popover>
                 </Box>
