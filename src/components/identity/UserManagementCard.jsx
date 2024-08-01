@@ -24,8 +24,19 @@ function UserManagementCard({ username, email, userType, userID }) {
         }
     };
 
-    const handleBanUser = () => {
+    const handleToggleBanUser = async () => {
         console.log("Ban user");
+        console.log(userID)
+        try {
+            const response = await server.post("/admin/userManagement/banUser", { userID })
+            console.log(response)
+            if (response.status === 200) {
+                showToast("Success", "User banned successfully", 3000, true, "success")
+            }
+        } catch (error) {
+            console.error(error)
+            showToast("Error", "An error occurred while banning the user", 3000, true, "error")
+        }
     }
 
     const handleClickUsername = () => {
@@ -73,7 +84,7 @@ function UserManagementCard({ username, email, userType, userID }) {
                     <MenuButton as={IconButton} icon={<BsThreeDotsVertical />} variant="ghost" cursor="pointer" aria-label="Options" />
                     <MenuList>
                         <MenuItem color="red" onClick={handleDeleteUser}>Delete user</MenuItem>
-                        <MenuItem color="red" onClick={handleBanUser}>Ban user</MenuItem>
+                        <MenuItem color="red" onClick={handleToggleBanUser}>Ban user</MenuItem>
                     </MenuList>
                 </Menu>
             </Box>
