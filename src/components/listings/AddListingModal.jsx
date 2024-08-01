@@ -163,6 +163,23 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
         setIsChecked(!isChecked);
     };
 
+    const handleKeyDown = (event) => {
+        console.log(event.key);
+        if (event.key === "Enter" ) {
+            if (validListing && !isSubmitting && !modalError) {
+                handleSubmitListing();
+            } else {
+                displayToast(
+                    "Uh-oh!",
+                    "Please fill in all the required fields before submitting",
+                    "error",
+                    3000,
+                    true
+                );
+            }
+        }
+    };
+
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
         let filesAccepted = false;
@@ -266,7 +283,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                 <ModalOverlay
                     backdropFilter="brightness(1)"
                 />
-                <ModalContent>
+                <ModalContent onKeyDown={handleKeyDown}>
                     <ModalHeader>Host your next meal!</ModalHeader>
                     <ModalBody>
                         <FormControl mb={5} isRequired>
