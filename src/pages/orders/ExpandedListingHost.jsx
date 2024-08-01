@@ -354,14 +354,14 @@ function ExpandedListingHost() {
                 ) : (
                     <>
                         <GridItem colSpan={2}>
-                            <GuestManagement 
-                            listingID={listingData.listingID}
-                            guests={listingData.guests}
+                            <GuestManagement
+                                listingID={listingData.listingID}
+                                guests={listingData.guests}
                             />
                         </GridItem>
 
                         <GridItem colSpan={1}>
-                            <HostPaymentQR/>
+                            <HostPaymentQR />
                         </GridItem>
 
                     </>

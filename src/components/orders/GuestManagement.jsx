@@ -7,10 +7,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { reloadAuthToken } from '../../slices/AuthState'
 import configureShowToast from '../../components/showToast'
 import { FaCommentDots, FaCheck } from "react-icons/fa";
+import { CloseIcon } from '@chakra-ui/icons'
 
 function GuestManagement({
     listingID,
-    guests
+    guests,
+    fetchListingDetails
 }) {
     const [guestsList, setGuestsList] = useState([]);
     const dispatch = useDispatch();
@@ -20,11 +22,52 @@ function GuestManagement({
     const navigate = useNavigate();
     const [refresh, setRefresh] = useState(false);
 
+    const handleCancelReservation = async (referenceNum, listingID, guestID) => {
+        try {
+            const response = await server.post(`/cancelReservation`, {
+                referenceNum: referenceNum,
+                listingID: listingID,
+                guestID: guestID
+            }, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            dispatch(reloadAuthToken(authToken))
+            if (response.status === 200) {
+                if (response.data && typeof response.data == "string" && response.data.startsWith("SUCCESS")) {
+                    showToast("Reservation cancelled", "You've successfully cancelled the reservation", 3000, false, 'success')
+                    fetchListingDetails();
+                } else {
+                    showToast('Something went wrong', 'An error occurred while cancelling the reservation', 3000, false, 'error');
+                    console.log('Error cancelling the reservation:', response.data);
+                }
+            } else {
+                showToast('Something went wrong', 'An error occurred while cancelling the reservation', 3000, false, 'error');
+                console.log('Error cancelling the reservation:', response.data);
+            }
+        } catch (error) {
+            dispatch(reloadAuthToken(authToken))
+            if (error.response && error.response.data) {
+                if (error.response.data.startsWith("UERROR")) {
+                    showToast('Something went wrong', error.response.data.substring("UERROR: ".length), 3000, false, 'error');
+                    console.log('User error occurred while cancelling the reservation:', error.response.data);
+                } else {
+                    showToast('Something went wrong', 'An error occurred while cancelling the reservation', 3000, false, 'error');
+                    console.log('Error cancelling the reservation:', error.response.data);
+                }
+            } else {
+                showToast('Something went wrong', 'An error occurred while cancelling the reservation', 3000, false, 'error');
+                console.log('Error cancelling the reservation:', error);
+            }
+        }
+    }
+
     const handlePaidAndPresent = async ({ referenceNum, listingID, guestID }) => {
         try {
             const response = await server.put(`/orders/manageGuests/togglePaidAndPresent`, { referenceNum, listingID, guestID });
             dispatch(reloadAuthToken(authToken))
-            if (response.status === 200) {  
+            if (response.status === 200) {
                 if (response.data.paidAndPresent == true) {
                     showToast('Guest marked as paid & present', 'Guest has been marked as paid & present', 3000, false, 'success');
                     guestsList.forEach((guest) => {
@@ -65,7 +108,7 @@ function GuestManagement({
 
     useEffect(() => {
         setGuestsList(guests);
-    }, [guestsList, refresh])
+    }, [guests, refresh])
 
     if (!loaded) {
         return (
@@ -84,7 +127,7 @@ function GuestManagement({
             {guestsList.length > 0 ? (
                 guestsList.map((guest) => (
                     <Box
-                        key={guest.Reservation.userID}
+                        key={guest.userID}
                         display="flex"
                         flexDirection={{ base: 'column', md: 'row' }}
                         alignItems="center"
@@ -146,13 +189,26 @@ function GuestManagement({
                                     onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
                                 />
                             ) : (
-                                <Button
-                                    variant="MMPrimary"
-                                    size={{ base: "sm", md: "md" }}
-                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })} 
-                                >
-                                    Paid & Present
-                                </Button>
+                                <Box>
+                                    <Button
+                                        variant="MMPrimary"
+                                        size={{ base: "sm", md: "md" }}
+                                        onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
+                                    >
+                                        Paid & Present
+                                    </Button>
+                                    {!guest.Reservation.markedPaid && (
+                                        <IconButton
+                                            background="red.500"
+                                            color="white"
+                                            ml={2}
+                                            icon={<CloseIcon />}
+                                            size="sm"
+                                            onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID )}
+                                            _hover={{ bg: "red.600" }}
+                                        />
+                                    )}
+                                </Box>
                             )}
                         </Box>
                     </Box>
