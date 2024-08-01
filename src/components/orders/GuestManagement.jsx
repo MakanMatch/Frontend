@@ -156,7 +156,8 @@ function GuestManagement({
                             <IconButton
                                 icon={<FaCommentDots />}
                                 aria-label="Message Guest"
-                                mr={4}
+                                ml={2}
+                                mr={2}
                                 variant="ghost"
                                 colorScheme="blackAlpha"
                                 size={{ base: "sm", md: "lg" }}
@@ -169,7 +170,7 @@ function GuestManagement({
                                     borderRadius="10px"
                                     fontWeight="bold"
                                     _hover={{ bg: "green.600" }}
-                                    size={{ base: "sm", md: "md" }}
+                                    size="sm"
                                     onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
                                     rightIcon={<FaCheck />}
                                 >
@@ -178,7 +179,7 @@ function GuestManagement({
                             ) : (
                                 <Button
                                     variant="MMPrimary"
-                                    size={{ base: "sm", md: "md" }}
+                                    size="sm"
                                     onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
                                 >
                                     Paid & Present
