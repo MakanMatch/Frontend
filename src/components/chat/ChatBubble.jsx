@@ -28,6 +28,8 @@ function ChatBubble({
   sender,
   receiver,
   image,
+  senderProfilePicture,
+  receiverProfilePicture,
 }) {
   const menuItemColor = useColorModeValue("teal.500", "teal.200");
   const menuItemHoverBg = useColorModeValue("teal.100", "teal.600");
@@ -36,6 +38,15 @@ function ChatBubble({
   const imageSize = useBreakpointValue({ base: "150px", md: "200px" });
   const avatarSize = useBreakpointValue({ base: "30px", md: "40px" });
 
+  function getProfilePictureLink(userID) {
+    if (!userID) {
+      return null;
+    }
+    return `${
+      import.meta.env.VITE_BACKEND_URL
+    }/cdn/getProfilePicture?userID=${userID}`;
+  };
+  
   return (
     <Box
       position="relative"
@@ -48,6 +59,7 @@ function ChatBubble({
       <Flex alignItems="center">
         {!isSender && (
           <Avatar
+            src={receiverProfilePicture}
             name={receiver}
             alt="Profile"
             boxSize={avatarSize}
@@ -171,6 +183,7 @@ function ChatBubble({
         </Box>
         {isSender && (
           <Avatar
+            src={senderProfilePicture}
             name={sender}
             alt="Profile"
             boxSize={avatarSize}
