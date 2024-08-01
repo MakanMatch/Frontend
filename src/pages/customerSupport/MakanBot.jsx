@@ -174,6 +174,7 @@ function MakanBot() {
                                         borderRadius={"3xl"}
                                         cursor={"pointer"}
                                         mb={4}
+                                        onClick={() => autofillSuggestedPrompt(prompt.prompt)}
                                         sx={{
                                             transition: 'background-color 0.2s ease-in-out',
                                             _hover: {
@@ -182,7 +183,7 @@ function MakanBot() {
                                             }
                                         }}
                                     >
-                                        <Text textAlign={"center"} ml={2} color="#4A5568" maxHeight="36px" overflow="hidden" textOverflow={"ellipsis"} onClick={() => autofillSuggestedPrompt(prompt.prompt)}>{prompt.displayMessage}</Text>
+                                        <Text textAlign={"center"} ml={2} color="#4A5568" maxHeight="36px" overflow="hidden" textOverflow={"ellipsis"}>{prompt.displayMessage}</Text>
                                     </Box>
                                 </motion.div>
                             ))}
@@ -197,7 +198,7 @@ function MakanBot() {
                 )}
                 <Card width={isSmallerThan880 ? "100%" : "69%"}>
                     <CardBody>
-                        <Heading as="h1" size="lg" textAlign="center" mb={5} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} bgClip={"text"} fontFamily={"Short Stack"}>MakanBot</Heading>
+                        <Heading as="h1" size="lg" textAlign="center" bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} bgClip={"text"} fontFamily={"Short Stack"}>MakanBot</Heading>
                         <Box
                             position="relative"
                             height="100%"
