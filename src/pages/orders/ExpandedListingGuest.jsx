@@ -91,9 +91,11 @@ function ExpandedListingGuest() {
     };
 
     const processListingData = (data) => {
+        const before = structuredClone(data.datetime);
         let datetime = new Date(data.datetime)
         let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
         data.datetime = formattedString
+        data.fullDatetime = before;
 
         data.images = data.images.split("|")
 

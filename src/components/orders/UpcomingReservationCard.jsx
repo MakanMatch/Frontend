@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import configureShowToast from '../showToast';
 
-function UpcomingReservationCard({ currentReservation, getFirstImageURL, onClick }) {
+function UpcomingReservationCard({ currentReservation, getFirstImageURL, onClick, cursor }) {
     const { onCopy, hasCopied } = useClipboard(currentReservation.referenceNum);
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -23,7 +23,7 @@ function UpcomingReservationCard({ currentReservation, getFirstImageURL, onClick
     }
 
     return (
-        <Card direction={{ base: 'column', sm: 'row' }} overflow='hidden' variant='outline' maxW={"650px"} onClick={onClick}>
+        <Card direction={{ base: 'column', sm: 'row' }} overflow='hidden' variant='outline' maxW={"650px"} onClick={onClick} cursor={cursor}>
             <Image objectFit='cover' maxW={{ base: '100%', sm: '200px' }} src={getFirstImageURL(currentReservation)} alt={currentReservation.listing.title} />
             <Stack>
                 <CardBody>
