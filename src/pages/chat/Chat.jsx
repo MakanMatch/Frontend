@@ -414,15 +414,16 @@ function ChatUi() {
     }
 
     return (
-        <Flex direction={{ base: "column", md: "row" }} overflowX="hidden" w="100%" h="100%">
-            <ChatHistory
-                onUserClick={handleChatClick}
-                chatHistory={chatHistory}
-                chatPartnerUsernames={chatPartnerUsernames}
-                w={{ base: "100%", md: "25%" }}
-                h="100%"
-                display={{ base: chatSelected === null ? "block" : "none", md: "block" }} // Hide ChatHistory on mobile if a chat is selected
-            />
+        <Flex direction="column" overflowX="hidden" w="100%" h="100%">
+            <Flex direction="row" h="100%" w="100%">
+                <ChatHistory
+                    onUserClick={handleChatClick}
+                    chatHistory={chatHistory}
+                    chatPartnerUsernames={chatPartnerUsernames}
+                    w={{ base: "100%", md: "25%" }}
+                    h="100%"
+                    display={{ base: chatSelected === null ? "block" : "none", md: "block" }} // Hide ChatHistory on mobile if a chat is selected
+                />
             <Flex flex="1" direction="column" overflow="hidden">
                 {chatSelected !== null ? (
                     <Center flexDirection="column" alignItems="center" p={5} flex="1">
@@ -646,6 +647,7 @@ function ChatUi() {
                 </AlertDialogOverlay>
             </AlertDialog>
         </Flex>
+    </Flex>
     );
 }
 
