@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import server from '../../networking'
-import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, ScaleFade, Badge, useBreakpointValue } from '@chakra-ui/react'
+import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, ScaleFade, Badge, useBreakpointValue, ModalOverlay, ModalContent, Modal } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
-import { useToast } from '@chakra-ui/react'
+import { useToast, useDisclosure } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux'
 import { reloadAuthToken } from '../../slices/AuthState'
 import configureShowToast from '../../components/showToast'
 import { FaCommentDots, FaCheck } from "react-icons/fa";
-import { CloseIcon } from '@chakra-ui/icons'    
+import { CloseIcon } from '@chakra-ui/icons'
 
 function GuestManagement({
     listingID,
@@ -22,6 +22,7 @@ function GuestManagement({
     const [refresh, setRefresh] = useState(false);
     const textAlign = useBreakpointValue({ base: "center", md: "left" });
     const isBaseScreen = useBreakpointValue({ base: true, md: false });
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handlePaidAndPresent = async ({ referenceNum, listingID, guestID }) => {
         try {
@@ -107,12 +108,13 @@ function GuestManagement({
                             width="100%"
                         >
 
-                            <Avatar 
-                            name={guest.username} 
-                            src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`}
-                            size={{ base: "md", md: "lg" }} 
-                            mr={{ base: 0, md: 4 }} 
-                            mb={{ base: 2, md: 0 }} 
+                            <Avatar
+                                name={guest.username}
+                                src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`}
+                                size={{ base: "md", md: "lg" }}
+                                mr={{ base: 0, md: 4 }}
+                                mb={{ base: 2, md: 0 }}
+                                onClick={onOpen}
                             />
                             <Box>
                                 <Flex
@@ -192,16 +194,26 @@ function GuestManagement({
                                     Paid & Present
                                 </Button>
                             )}
-                        <IconButton
-                            background="red.500"
-                            color="white"
-                            ml={2}
-                            icon={<CloseIcon />}
-                            size="sm"
-                            onClick={() => handleDeleteReservation()}
-                            _hover={{ bg: "red.600" }}
-                        />
+                            <IconButton
+                                background="red.500"
+                                color="white"
+                                ml={2}
+                                icon={<CloseIcon />}
+                                size="sm"
+                                onClick={() => handleDeleteReservation()}
+                                _hover={{ bg: "red.600" }}
+                            />
                         </Box>
+                        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                            <ModalOverlay />
+                            <ModalContent maxW="max-content" background="transparent" boxShadow="none">
+                                <Avatar
+                                    name={guest.username}
+                                    boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
+                                    src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`}
+                                />
+                            </ModalContent>
+                        </Modal>
                     </Box>
                 ))
             ) : (

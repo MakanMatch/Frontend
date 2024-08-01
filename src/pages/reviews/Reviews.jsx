@@ -175,7 +175,7 @@ function Reviews() {
                 <ModalContent maxW="max-content" background="transparent" boxShadow="none">
                     <Avatar
                         name={hostName}
-                        boxSize={{ base: '40vw', md: '30vw' }}  // Responsive size for different screen sizes
+                        boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
                         src={hostProfilePicture}
                         alt={hostName}
                     />

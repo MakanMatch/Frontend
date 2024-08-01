@@ -228,7 +228,7 @@ const ReviewCard = ({
                             <Avatar 
                             name={username}
                             src={posterProfilePicture}
-                            onClick={() => handleProfileClick(posterProfilePicture)} 
+                            onClick={() => handleProfileClick()} 
                             _hover={{ cursor: "pointer" }}
                             />
                             <Box ml={4}>
@@ -326,12 +326,12 @@ const ReviewCard = ({
                 <Modal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} size="lg" isCentered>
                     <ModalOverlay />
                     <ModalContent maxW="max-content" background="transparent" boxShadow="none">
-                        <Image
-                            boxSize='500px'
-                            borderRadius='full'
-                            src={posterProfilePicture}
-                            alt={username}
-                            objectFit='cover'
+                        <Avatar 
+                        boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
+                        borderRadius='full'
+                        src={posterProfilePicture}
+                        name={username}
+                        objectFit='cover'
                         />
                     </ModalContent>
                 </Modal>
