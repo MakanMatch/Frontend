@@ -11,6 +11,7 @@ import {
   useColorModeValue,
   Avatar,
   Image,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { FiEdit, FiTrash2, FiMoreVertical } from "react-icons/fi";
 import { FaReply } from "react-icons/fa";
@@ -25,29 +26,34 @@ function ChatBubble({
   repliedMessage,
   edited,
   sender,
-  receiver, // Corrected spelling from "reciever"
+  receiver,
   image,
 }) {
   const menuItemColor = useColorModeValue("teal.500", "teal.200");
   const menuItemHoverBg = useColorModeValue("teal.100", "teal.600");
 
+  const bubbleMaxWidth = useBreakpointValue({ base: "90%", md: "70%" });
+  const imageSize = useBreakpointValue({ base: "150px", md: "200px" });
+  const avatarSize = useBreakpointValue({ base: "30px", md: "40px" });
+
   return (
     <Box
       position="relative"
       marginY={2}
-      maxW="70%"
+      maxW={bubbleMaxWidth}
       alignSelf={isSender ? "flex-end" : "flex-start"}
       borderRadius={image ? "10px" : "lg"} // Apply borderRadius conditionally
+      _hover={{ ".menu-button": { opacity: 1 } }}
     >
       <Flex alignItems="center">
         {!isSender && (
           <Avatar
-            name={receiver} // Corrected spelling from "reciever"
+            name={receiver}
             alt="Profile"
-            boxSize="40px"
+            boxSize={avatarSize}
             borderRadius="full"
             marginRight={3}
-            marginTop="-40px"
+            marginTop="-20px" // Adjust for smaller screens
           />
         )}
         <Box position="relative" width="100%">
@@ -62,7 +68,14 @@ function ChatBubble({
             wordBreak="break-word" // Ensure words break properly
             overflowWrap="break-word" // Ensure long words wrap
           >
-            <Box position="absolute" top={1} right={1}>
+            <Box 
+              position="absolute" 
+              top={1} 
+              right={1}
+              className="menu-button"
+              opacity={0} // Hide the menu button by default
+              transition={"opacity 0.2s ease"} // Add a transition effect
+            >
               <Menu>
                 <MenuButton
                   as={IconButton}
@@ -122,46 +135,48 @@ function ChatBubble({
                   src={image}
                   alt="Message Image"
                   borderRadius="md"
-                  h="200px"
-                  w="200px"
+                  h={imageSize}
+                  w={imageSize}
                   objectFit="contain"
                 />
               </Box>
             )}
             <Text textAlign={image ? "left" : "center"}>
               {message}
+            </Text>
+            <Flex align="center" fontSize="xs" color={isSender ? "gray.300" : "gray.500"} mt={1}>
+              {timestamp && (
+                <Text
+                  fontSize="xs"
+                  color={isSender ? "gray.300" : "gray.500"}
+                  marginTop={1}
+                  textAlign="right"
+                >
+                  {timestamp}
+                </Text>
+              )}
               {edited && (
                 <Text
                   as="span"
-                  fontSize="xs" // Making the text smaller
+                  fontSize="xs"
                   color={isSender ? "gray.300" : "gray.500"}
                   marginLeft={2}
+                  mt={1}
                 >
                   (edited)
                 </Text>
               )}
-            </Text>
-
-            {timestamp && (
-              <Text
-                fontSize="xs"
-                color={isSender ? "gray.300" : "gray.500"}
-                marginTop={1}
-                textAlign="right"
-              >
-                {timestamp}
-              </Text>
-            )}
+            </Flex>
           </Box>
         </Box>
         {isSender && (
           <Avatar
             name={sender}
             alt="Profile"
-            boxSize="40px"
+            boxSize={avatarSize}
             borderRadius="full"
             marginLeft={3}
-            marginTop="-60px" // Adjusted marginTop to align with message bubble
+            marginTop="-30px" // Adjust for smaller screens
           />
         )}
       </Flex>
