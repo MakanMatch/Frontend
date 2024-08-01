@@ -66,7 +66,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             } catch (error) {
                 dispatch(reloadAuthToken(authToken))
                 if (error.response && error.response.data && typeof error.response.data == "string") {
-                    console.log("Failed to favourite listing; response: " + error.response)
+                    console.log("Failed to favourite listing; response: " + error.response.data)
                     if (error.response.data.startsWith("UERROR")) {
                         displayToast(
                             "Uh-oh!",
@@ -163,7 +163,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {
-                console.log("Failed to fetch host's food rating; response: " + error.response)
+                console.log("Failed to fetch host's food rating; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
                         "Uh-oh!",

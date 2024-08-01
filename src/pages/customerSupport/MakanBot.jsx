@@ -93,7 +93,7 @@ function MakanBot() {
             } catch (error) {
                 dispatch(reloadAuthToken(authToken));
                 if (error.response && error.response.data && typeof error.response.data === "string") {
-                    console.log("Failed to generate response; error: " + error.response);
+                    console.log("Failed to generate response; error: " + error.response.data);
                     if (error.response.data.startsWith("UERROR")) {
                         displayToast(
                             "Uh-oh!",
