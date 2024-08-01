@@ -29,7 +29,7 @@ function GuestManagement({
             dispatch(reloadAuthToken(authToken))
             if (response.status === 200) {
                 if (response.data.paidAndPresent == true) {
-                    showToast('Marked', 'Guest has been marked as paid & present', 3000, false, 'success');
+                    showToast('Reservation Updated', 'Guest has been marked as paid & present', 3000, false, 'success');
                     guestsList.forEach((guest) => {
                         if (guest.Reservation.referenceNum === referenceNum) {
                             guest.Reservation.paidAndPresent = true;
@@ -37,7 +37,7 @@ function GuestManagement({
                     })
                     setRefresh(!refresh);
                 } else {
-                    showToast('Unmarked', 'Guest has been marked as not paid & present', 3000, false, 'success');
+                    showToast('Reservation Updated', 'Guest has been marked as not paid & present', 3000, false, 'success');
                     guestsList.forEach((guest) => {
                         if (guest.Reservation.referenceNum === referenceNum) {
                             guest.Reservation.paidAndPresent = false;
