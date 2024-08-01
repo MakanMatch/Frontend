@@ -20,6 +20,7 @@ function GuestManagement({
     const navigate = useNavigate();
     const [refresh, setRefresh] = useState(false);
     const textAlign = useBreakpointValue({ base: "center", md: "left" });
+    const isBaseScreen = useBreakpointValue({ base: true, md: false });
 
     const handlePaidAndPresent = async ({ referenceNum, listingID, guestID }) => {
         try {
@@ -96,25 +97,34 @@ function GuestManagement({
                         p={4}
                         mb={4}
                     >
-                        <Box display="flex" alignItems="center" mb={{ base: 4, md: 0 }}>
-                            <Avatar name={guest.username} size={{ base: "md", md: "lg" }} mr={4} />
+                        <Flex
+                            direction={{ base: 'column', md: 'row' }}
+                            alignItems={{ base: 'center', md: 'flex-start' }}
+                            mb={{ base: 4, md: 0 }}
+                            textAlign={{ base: 'center', md: 'left' }}
+                            justifyContent={textAlign}  // Ensure centering on base screens
+                            width="100%"
+                        >
+
+                            <Avatar name={guest.username} size={{ base: "md", md: "lg" }} mr={{ base: 0, md: 4 }} mb={{ base: 2, md: 0 }} />
                             <Box>
                                 <Flex
                                     gap={{ base: 2, md: 3 }}
                                     width="100%"
-                                    alignItems={{ base: 'flex-start', md: 'center' }}
+                                    alignItems={{ base: 'center', md: 'center' }}
                                     flexWrap="wrap"
+                                    justifyContent={textAlign}  // Ensure centering on base screens
                                 >
                                     <Box>
                                         <Text
                                             fontWeight="bold"
                                             fontSize={{ base: "md", md: "lg" }}
-                                            textAlign={{ base: "left", md: "right" }}
+                                            textAlign={textAlign}
                                         >
                                             {guest.fname} {guest.lname}
                                         </Text>
                                     </Box>
-                                    {guest.Reservation.markedPaid && (
+                                    {guest.Reservation.markedPaid && !isBaseScreen && (
                                         <Box>
                                             <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
                                                 <Badge colorScheme="purple" variant="solid" px={3} py={1}>PAID</Badge>
@@ -122,12 +132,26 @@ function GuestManagement({
                                         </Box>
                                     )}
                                 </Flex>
-                                <Flex mt={2} wrap="wrap" justify={{ base: "flex-start", md: "space-between" }} width="100%" gap={3}>
+                                {guest.Reservation.markedPaid && isBaseScreen && (
+                                    <Box mt={2}>
+                                        <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
+                                            <Badge colorScheme="purple" variant="solid" px={3} py={1}>PAID</Badge>
+                                        </ScaleFade>
+                                    </Box>
+                                )}
+                                <Flex
+                                    mt={2}
+                                    direction={{ base: "column", md: "row" }}
+                                    alignItems="center" 
+                                    justify={{ base: "flex-start", md: "space-between" }} 
+                                    width="100%"
+                                    gap={3}
+                                >                                    
                                     <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total portion: {guest.Reservation.portions}</Text>
                                     <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total price: ${guest.Reservation.totalPrice}</Text>
                                 </Flex>
                             </Box>
-                        </Box>
+                        </Flex>
                         <Box display="flex" alignItems="center" >
                             <IconButton
                                 icon={<FaCommentDots />}
