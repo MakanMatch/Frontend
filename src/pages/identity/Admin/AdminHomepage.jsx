@@ -31,7 +31,7 @@ function AdminHomepage() {
     return (
         <>
             <Heading mt={10} mb={5}>Hi, {user.username}!</Heading>
-            <Text size={'md'}>Welcome Back to MakanMatch!</Text>
+            <Text size={'md'} mb={5}>Welcome Back to MakanMatch!</Text>
             <Box display="flex" justifyContent="space-between">
                 <Card width="32%">
                     <CardBody>
