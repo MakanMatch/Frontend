@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Input, Text, Center, Flex, VStack, Spacer, IconButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Avatar, useToast, Spinner } from "@chakra-ui/react";
+import { Box, Input, Text, Center, Flex, VStack, Spacer, IconButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Avatar, useToast, Spinner, useMediaQuery, useDisclosure, HStack } from "@chakra-ui/react";
 import { FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatHistory from "../../components/chat/ChatHistory";
@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { changeAuthToken, fetchUser, logout } from "../../slices/AuthState";
 import configureShowToast from "../../components/showToast";
 import { FaCamera } from "react-icons/fa";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import server from '../../networking';
 
 function ChatUi() {
@@ -33,9 +34,10 @@ function ChatUi() {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const ws = useRef(null);
 
-    function getImageLink (userID, messageID) {
+    function getImageLink(userID, messageID) {
         if (!userID || !messageID) {
             return null;
         }
@@ -102,7 +104,7 @@ function ChatUi() {
                     }
                 }
             }
-        
+
             if (receivedMessage.action === "chat_id") {
                 setChatHistory((prevChatHistory) => {
                     if (!prevChatHistory.includes(receivedMessage.chatID)) {
@@ -182,7 +184,7 @@ function ChatUi() {
         window.onbeforeunload = () => {
             localStorage.removeItem("wsConnected");
         };
-        
+
 
         if (loaded == true) {
             if (!user) {
@@ -229,7 +231,7 @@ function ChatUi() {
                 datetime: new Date().toISOString(),
                 replyToID: replyTo ? replyTo.messageID : null,
             };
-    
+
             if (imagesToBeSubmitted) {
                 const formData = new FormData();
                 formData.append("image", image);
@@ -245,13 +247,13 @@ function ChatUi() {
                         },
                         transformRequest: formData => formData
                     });
-    
+
                     if (response.status === 200) {
                         const chatHistory = {
                             action: "chat_history",
                             chatID: chatSelected,
                         }
-    
+
                         ws.current.send(JSON.stringify(chatHistory));
                     }
                 } catch (error) {
@@ -261,14 +263,14 @@ function ChatUi() {
             } else {
                 ws.current.send(JSON.stringify(newMessage));
             }
-    
+
             setMessageInput("");
             setReplyTo(null);
             setImage(null);
             setConfirmedImage("");
         }
     };
-    
+
 
     const fetchChatHistory = (chatID) => {
         if (ws.current) {
@@ -386,6 +388,8 @@ function ChatUi() {
         fetchChatHistory(clickedChatID);
     };
 
+    const [isSmallerThan950px] = useMediaQuery("(max-width: 950px)");
+
     function handleFileChange(event) {
         const file = event.target.files[0];
         if (file) {
@@ -420,234 +424,245 @@ function ChatUi() {
                     onUserClick={handleChatClick}
                     chatHistory={chatHistory}
                     chatPartnerUsernames={chatPartnerUsernames}
+                    drawerOpen={isOpen}
+                    closeDrawer={onClose}
                     w={{ base: "100%", md: "25%" }}
                     h="100%"
                     display={{ base: chatSelected === null ? "block" : "none", md: "block" }} // Hide ChatHistory on mobile if a chat is selected
                 />
-            <Flex flex="1" direction="column" overflow="hidden">
-                {chatSelected !== null ? (
-                    <Center flexDirection="column" alignItems="center" p={5} flex="1">
-                        <Box
-                            bg="white"
-                            w={{ base: "90%", md: "75%" }}
-                            p={2}
-                            borderRadius={20}
-                            h="auto"
-                            textColor="black"
-                            alignItems="center"
-                            display="flex"
-                            boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
-                            mb={4}
-                            mt={-4}
-                        >
-                            <Avatar
-                                name={chatPartnerUsernames[chatSelected]}
-                                borderRadius="full"
-                                w={{ base: "20%", md: "10%" }}
-                                h="100%"
-                                minH="55px"
-                                maxH="55px"
-                                minW="55px"
-                                maxW="55px"
-                            />
-                            <Box mt={-10} ml={{ base: 2, md: 5 }} minW={{ base: "60%", md: "495px" }}>
-                                <Text fontSize={20} mt={2} textAlign="left">
-                                    {chatPartnerUsernames[chatSelected] || "Chat"}
-                                </Text>
-                                <Spacer h={3} />
-                                <Text
-                                    fontSize="sm"
-                                    mb={-8}
-                                    textAlign="left"
-                                    color={status ? "green.500" : "gray.300"}
-                                >
-                                    {status ? "Online" : "Offline"}
-                                </Text>
+                <Flex flex="1" direction="column" overflow="hidden">
+                    {chatSelected !== null ? (
+                        <Center flexDirection="column" alignItems="center" p={5} flex="1">
+                            <Box
+                                bg="white"
+                                w={{ base: "90%", md: "75%" }}
+                                p={2}
+                                borderRadius={20}
+                                h="auto"
+                                textColor="black"
+                                alignItems="center"
+                                display="flex"
+                                boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
+                                mb={4}
+                                mt={-4}
+                            >
+                                <HStack>
+                                    {isSmallerThan950px && (
+                                        <Button bg={'none'} onClick={onOpen} p={0}><HamburgerIcon /></Button>
+                                    )}
+                                    <Avatar
+                                        name={chatPartnerUsernames[chatSelected]}
+                                        borderRadius="full"
+                                        w={{ base: "20%", md: "10%" }}
+                                        h="100%"
+                                        minH="55px"
+                                        maxH="55px"
+                                        minW="55px"
+                                        maxW="55px"
+                                    />
+                                </HStack>
+                                <Box mt={-10} ml={{ base: 2, md: 5 }} minW={{ base: "60%", md: "495px" }}>
+                                    <Text fontSize={20} mt={2} textAlign="left">
+                                        {chatPartnerUsernames[chatSelected] || "Chat"}
+                                    </Text>
+                                    <Spacer h={3} />
+                                    <Text
+                                        fontSize="sm"
+                                        mb={-8}
+                                        textAlign="left"
+                                        color={status ? "green.500" : "gray.300"}
+                                    >
+                                        {status ? "Online" : "Offline"}
+                                    </Text>
+                                </Box>
                             </Box>
-                        </Box>
-                        <Box
-                            bg="gray.100"
-                            w={{ base: "90%", md: "75%" }}
-                            h="70vh"
-                            p={4}
-                            display="flex"
-                            flexDirection="column"
-                            borderRadius={20}
-                            boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
-                        >
-                            <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX="hidden">
-                                {messages.map((msg, index) => (
-                                    <React.Fragment key={msg.messageID}>
-                                        {shouldDisplayDate(msg, messages[index - 1]) && (
-                                            <Text fontSize="sm" color="gray.500" textAlign="center" mb={2}>
-                                                {formatDate(msg.datetime)}
-                                            </Text>
-                                        )}
-                                        <ChatBubble
-                                            message={msg.message}
-                                            timestamp={new Date(msg.datetime).toLocaleTimeString([], {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                            isSender={msg.senderID === user.userID}
-                                            sender={msg.sender}
-                                            receiver={chatPartnerUsernames[chatSelected]}
-                                            onEdit={() => openEditModal(msg.messageID, msg.message)}
-                                            onDelete={() => handleDeletePrompt(msg.messageID)}
-                                            onReply={() => handleReply(msg)}
-                                            repliedMessage={msg.replyTo}
-                                            edited={msg.edited}
-                                            image={msg.image ? getImageLink(msg.senderID, msg.messageID) : null}
+                            <Box
+                                bg="gray.100"
+                                w={{ base: "90%", md: "75%" }}
+                                h="70vh"
+                                p={4}
+                                display="flex"
+                                flexDirection="column"
+                                borderRadius={20}
+                                boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
+                            >
+                                <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX="hidden">
+                                    {messages.map((msg, index) => (
+                                        <React.Fragment key={msg.messageID}>
+                                            {shouldDisplayDate(msg, messages[index - 1]) && (
+                                                <Text fontSize="sm" color="gray.500" textAlign="center" mb={2}>
+                                                    {formatDate(msg.datetime)}
+                                                </Text>
+                                            )}
+                                            <ChatBubble
+                                                message={msg.message}
+                                                timestamp={new Date(msg.datetime).toLocaleTimeString([], {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                })}
+                                                isSender={msg.senderID === user.userID}
+                                                sender={msg.sender}
+                                                receiver={chatPartnerUsernames[chatSelected]}
+                                                onEdit={() => openEditModal(msg.messageID, msg.message)}
+                                                onDelete={() => handleDeletePrompt(msg.messageID)}
+                                                onReply={() => handleReply(msg)}
+                                                repliedMessage={msg.replyTo}
+                                                edited={msg.edited}
+                                                image={msg.image ? getImageLink(msg.senderID, msg.messageID) : null}
+                                            />
+                                        </React.Fragment>
+                                    ))}
+                                    <div ref={chatBottomRef} /> {/* Ref to scroll to */}
+                                </VStack>
+                                {replyTo && (
+                                    <Flex
+                                        bg="gray.200"
+                                        p={2}
+                                        borderRadius="md"
+                                        mb={2}
+                                        align="center"
+                                        justify="space-between"
+                                    >
+                                        <Text fontSize="sm" fontStyle="italic">
+                                            Replying to: {replyTo.message}
+                                        </Text>
+                                        <IconButton
+                                            aria-label="Cancel reply"
+                                            icon={<FiX />}
+                                            variant="ghost"
+                                            colorScheme="red"
+                                            size="sm"
+                                            onClick={cancelReply}
                                         />
-                                    </React.Fragment>
-                                ))}
-                                <div ref={chatBottomRef} /> {/* Ref to scroll to */}
-                            </VStack>
-                            {replyTo && (
-                                <Flex
-                                    bg="gray.200"
-                                    p={2}
-                                    borderRadius="md"
-                                    mb={2}
-                                    align="center"
-                                    justify="space-between"
-                                >
-                                    <Text fontSize="sm" fontStyle="italic">
-                                        Replying to: {replyTo.message}
-                                    </Text>
+                                    </Flex>
+                                )}
+                                {confirmedImage !== "" && (
+                                    <Flex
+                                        bg="gray.200"
+                                        p={2}
+                                        borderRadius="md"
+                                        mb={2}
+                                        align="center"
+                                        justify="space-between"
+                                    >
+                                        <Text fontSize="sm" fontStyle="italic">
+                                            {confirmedImage}
+                                        </Text>
+                                        <IconButton
+                                            aria-label="Cancel image"
+                                            icon={<FiX />}
+                                            variant="ghost"
+                                            colorScheme="red"
+                                            size="sm"
+                                        />
+                                    </Flex>
+                                )}
+                                <Flex mt={4} align="center">
+                                    <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange} />
                                     <IconButton
-                                        aria-label="Cancel reply"
-                                        icon={<FiX />}
+                                        aria-label="Attach image"
+                                        icon={<FaCamera />}
                                         variant="ghost"
-                                        colorScheme="red"
-                                        size="sm"
-                                        onClick={cancelReply}
+                                        colorScheme="gray"
+                                        size="md"
+                                        onClick={() => document.getElementById("file").click()}
+                                        mr={2}
                                     />
-                                </Flex>
-                            )}
-                            {confirmedImage !== "" && (
-                                <Flex
-                                    bg="gray.200"
-                                    p={2}
-                                    borderRadius="md"
-                                    mb={2}
-                                    align="center"
-                                    justify="space-between"
-                                >
-                                    <Text fontSize="sm" fontStyle="italic">
-                                        {confirmedImage}
-                                    </Text>
-                                    <IconButton
-                                        aria-label="Cancel image"
-                                        icon={<FiX />}
-                                        variant="ghost"
-                                        colorScheme="red"
-                                        size="sm"
+                                    <Input
+                                        placeholder="Type a message..."
+                                        flex="1"
+                                        mr={2}
+                                        value={messageInput}
+                                        onChange={(e) => setMessageInput(e.target.value)}
+                                        onKeyDown={handleKeyDown}
                                     />
+                                    <Button colorScheme="teal" onClick={sendMessage}>
+                                        Send
+                                    </Button>
                                 </Flex>
+                            </Box>
+                        </Center>
+                    ) : (
+                        <Center flex="1" flexDirection="column">
+                            {isSmallerThan950px ? (
+                                <Button onClick={onOpen} mt={"10px"}>Select a chat</Button>
+                            ) : (
+                                <Text fontSize="xl" color="gray.500">
+                                    Select a chat to start messaging or make a reservation.
+                                </Text>
                             )}
-                            <Flex mt={4} align="center">
-                                <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange} />
-                                <IconButton
-                                    aria-label="Attach image"
-                                    icon={<FaCamera />}
-                                    variant="ghost"
-                                    colorScheme="gray"
-                                    size="md"
-                                    onClick={() => document.getElementById("file").click()}
-                                    mr={2}
-                                />
-                                <Input
-                                    placeholder="Type a message..."
-                                    flex="1"
-                                    mr={2}
-                                    value={messageInput}
-                                    onChange={(e) => setMessageInput(e.target.value)}
-                                    onKeyDown={handleKeyDown}
-                                />
-                                <Button colorScheme="teal" onClick={sendMessage}>
-                                    Send
-                                </Button>
-                            </Flex>
-                        </Box>
-                    </Center>
-                ) : (
-                    <Center flex="1">
-                        <Text fontSize="xl" color="gray.500">
-                            Select a chat to start messaging or make a reservation.
-                        </Text>
-                    </Center>
-                )}
-            </Flex>
-            {/* Edit Message Modal */}
-            <Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Edit Message</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Input
-                            value={editMessageContent}
-                            onChange={(e) => setEditMessageContent(e.target.value)}
-                            placeholder="Edit your message..."
-                        />
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
-                            Save
-                        </Button>
-                        <Button onClick={closeEditModal}>Cancel</Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-            {/* Image Preview Modal */}
-            <Modal isOpen={imagePreviewOpen} onClose={handleImagePreviewClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Image Preview</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Flex direction="column" align="center">
-                            <Avatar size="2xl" src={imagePreview} alt={imageName} mb={4} />
-                            <Text>{imageName}</Text>
-                        </Flex>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button colorScheme="blue" mr={3} onClick={handleConfirmImage}>
-                            Confirm
-                        </Button>
-                        <Button variant="outline" onClick={handleImagePreviewClose}>
-                            Cancel
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-            {/* Delete Message AlertDialog */}
-            <AlertDialog
-                isOpen={deleteDialogOpen}
-                leastDestructiveRef={undefined}
-                onClose={closeDeleteDialog}
-            >
-                <AlertDialogOverlay>
-                    <AlertDialogContent>
-                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                            Delete Message
-                        </AlertDialogHeader>
-                        <AlertDialogBody>
-                            Are you sure you want to delete this message? You can't undo this
-                            action afterwards.
-                        </AlertDialogBody>
-                        <AlertDialogFooter>
-                            <Button onClick={closeDeleteDialog}>Cancel</Button>
-                            <Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
-                                Delete
+                        </Center>
+                    )}
+                </Flex>
+                {/* Edit Message Modal */}
+                <Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Edit Message</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            <Input
+                                value={editMessageContent}
+                                onChange={(e) => setEditMessageContent(e.target.value)}
+                                placeholder="Edit your message..."
+                            />
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
+                                Save
                             </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
+                            <Button onClick={closeEditModal}>Cancel</Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+                {/* Image Preview Modal */}
+                <Modal isOpen={imagePreviewOpen} onClose={handleImagePreviewClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Image Preview</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            <Flex direction="column" align="center">
+                                <Avatar size="2xl" src={imagePreview} alt={imageName} mb={4} />
+                                <Text>{imageName}</Text>
+                            </Flex>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme="blue" mr={3} onClick={handleConfirmImage}>
+                                Confirm
+                            </Button>
+                            <Button variant="outline" onClick={handleImagePreviewClose}>
+                                Cancel
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+                {/* Delete Message AlertDialog */}
+                <AlertDialog
+                    isOpen={deleteDialogOpen}
+                    leastDestructiveRef={undefined}
+                    onClose={closeDeleteDialog}
+                >
+                    <AlertDialogOverlay>
+                        <AlertDialogContent>
+                            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                                Delete Message
+                            </AlertDialogHeader>
+                            <AlertDialogBody>
+                                Are you sure you want to delete this message? You can't undo this
+                                action afterwards.
+                            </AlertDialogBody>
+                            <AlertDialogFooter>
+                                <Button onClick={closeDeleteDialog}>Cancel</Button>
+                                <Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
+                                    Delete
+                                </Button>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialogOverlay>
+                </AlertDialog>
+            </Flex>
         </Flex>
-    </Flex>
     );
 }
 
