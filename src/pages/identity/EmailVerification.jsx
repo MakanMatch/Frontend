@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Box, Heading, Text, VStack, Image, Button, useToast
+    Box, Heading, Text, VStack, Image, Button, useToast, useMediaQuery
 } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import server from '../../networking';
@@ -11,6 +11,8 @@ function EmailVerification() {
     const [cooldown, setCooldown] = useState(0);
     const toast = useToast()
     const showToast = configureShowToast(toast);
+
+    const [isSmallerThan1040] = useMediaQuery('(max-width: 1040px)');
 
     const email = searchParams.get('email');
     const resendOnLoad = searchParams.get('resendOnLoad');
@@ -49,32 +51,33 @@ function EmailVerification() {
         <Box
             bgPosition="center"
             display="flex"
+            justifyContent="center"
         >
             <Box
-                w="50%"
-                bg="rgba(255, 255, 255, 0.85)"
+                w={isSmallerThan1040 ? '100%' : '65%'}
+                bg="rgba(255, 255, 255, 0.80)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
                 p={8}
                 borderRadius={15}
             >
-                <VStack spacing={4} w="full">
+                <VStack spacing={4} w="full" overflow="hidden">
                     <Heading as="h1" size="xl" textAlign="center">
                         Verify your email
                     </Heading>
                     <Image
                         src= '/src/assets/EmailVerificationImage.png'
                         alt="Email verification"
-                        boxSize="300px"
                         objectFit="cover"
+                        mt={-10}
                     />
-                    <Text fontSize="lg" textAlign="center">
+                    <Text fontSize="lg" textAlign="center" mt={-5} width={"60%"}>
                         We've just sent a verification link to your email. Click the link provided to verify your email!
                     </Text>
                     <Box>
-                        <Button onClick={sendEmailVerification} variant={'MMPrimary'} isDisabled={cooldown > 0}>
-                            {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend Verification Email'}
+                        <Button onClick={sendEmailVerification} variant={'MMPrimary'} isDisabled={cooldown > 0} width="100%">
+                            {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend email'}
                         </Button>
                     </Box>
                 </VStack>

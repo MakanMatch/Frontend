@@ -19,7 +19,7 @@ function VerifyToken() {
         if (token && userID) {
             server.post('/identity/emailVerification/verify', { userID, token })
                 .then((res) => {
-                    // console.log(res.data)
+                    dispatch(reloadAuthToken(authToken))
                     if (res.data.startsWith('SUCCESS')) {
                         showToast('Email Verified', 'Please log in to continue', 3000, true, 'success');
                         navigate('/auth/login');
@@ -31,9 +31,39 @@ function VerifyToken() {
                         console.error('Unexpected response:', res.data);
                     }
                 })
-                .catch((err) => {
-                    console.error('Error verifying token:', err);
+                .catch((error) => {
+                    dispatch(reloadAuthToken(authToken))
                     setMessage("Something went wrong, please try again!");
+                    console.log("Error: ", error)
+                    if (error.response && error.response.data && typeof error.response.data == "string") {
+                        console.log("Error verifying token; response: " + error.response.data)
+                        if (error.response.data.startsWith("UERROR")) {
+                            showToast(
+                                "Uh-oh!",
+                                error.response.data.substring("UERROR: ".length),
+                                3500,
+                                true,
+                                "info",
+                            )
+                        } else {
+                            showToast(
+                                "Something went wrong",
+                                "Failed to verify token. Please try again",
+                                3500,
+                                true,
+                                "error",
+                            )
+                        }
+                    } else {
+                        console.log("Unknown error occurred when verifying token; error: " + error)
+                        showToast(
+                            "Something went wrong",
+                            "Failed to verify token. Please try again",
+                            3500,
+                            true,
+                            "error",
+                        )
+                    }
                 });
         } else {
             setMessage("Invalid link, please try again.");
@@ -44,7 +74,7 @@ function VerifyToken() {
         <Box
             w="50%"
             h="500px"
-            bg="rgba(255, 255, 255, 0.85)"
+            bg="rgba(255, 255, 255, 0.80)"
             display="flex"
             alignItems="center"
             justifyContent="center"
