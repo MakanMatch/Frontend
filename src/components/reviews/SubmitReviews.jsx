@@ -160,7 +160,6 @@ const SubmitReviews = ({
                                 borderRadius='full'
                                 boxSize='100px'
                                 name={hostName}
-                                alt={hostName}
                             />
                             <Text fontSize={{ base: '2xl', md: '3xl' }} textAlign='center' mt={{ base: 2, md: 0 }} ml={{ base: 0, md: 4 }}>
                                 {hostName}

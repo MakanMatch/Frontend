@@ -124,7 +124,6 @@ function Reviews() {
                             name={hostName}
                             boxSize='100px'
                             src={hostProfilePicture}
-                            alt={hostName}
                             onClick={onOpen}
                             cursor="pointer"
                             ml={{ base: 0, md: 4 }}
@@ -177,7 +176,6 @@ function Reviews() {
                         name={hostName}
                         boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
                         src={hostProfilePicture}
-                        alt={hostName}
                     />
                 </ModalContent>
             </Modal>
