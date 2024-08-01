@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import server from '../../networking'
-import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, ScaleFade, Badge } from '@chakra-ui/react'
+import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, ScaleFade, Badge, useBreakpointValue } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -19,12 +19,13 @@ function GuestManagement({
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
     const [refresh, setRefresh] = useState(false);
+    const textAlign = useBreakpointValue({ base: "center", md: "left" });
 
     const handlePaidAndPresent = async ({ referenceNum, listingID, guestID }) => {
         try {
             const response = await server.put(`/orders/manageGuests/togglePaidAndPresent`, { referenceNum, listingID, guestID });
             dispatch(reloadAuthToken(authToken))
-            if (response.status === 200) {  
+            if (response.status === 200) {
                 if (response.data.paidAndPresent == true) {
                     showToast('Guest marked as paid & present', 'Guest has been marked as paid & present', 3000, false, 'success');
                     guestsList.forEach((guest) => {
@@ -149,7 +150,7 @@ function GuestManagement({
                                 <Button
                                     variant="MMPrimary"
                                     size={{ base: "sm", md: "md" }}
-                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })} 
+                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
                                 >
                                     Paid & Present
                                 </Button>
@@ -158,8 +159,9 @@ function GuestManagement({
                     </Box>
                 ))
             ) : (
-                <Text textAlign="left" color="grey" fontSize="large" display="flex" mt={6}>Oops, there are no reservation made yet!</Text>
-            )}
+                <Text textAlign={textAlign} color="grey" fontSize="large" mt={6}>
+                    Oops, there are no reservations made yet!
+                </Text>)}
         </>
     )
 }
