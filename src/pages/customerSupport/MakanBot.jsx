@@ -7,7 +7,6 @@ import server from "../../networking";
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { marked } from 'marked';
-import { decode } from 'html-entities';
 
 let conversationHistory = [];
 
@@ -62,8 +61,22 @@ function MakanBot() {
         const textarea = document.createElement('textarea');
         textarea.innerHTML = text;
         let decodedText = textarea.value;
-    
-        return decodedText.replace(/<\/?[^>]+(>|$)/g, "");
+
+        decodedText = decodedText.replace(/<\/?[^>]+(>|$)/g, "");
+
+        decodedText = decodedText
+            .replace(/(\*\*|__)/g, '') // Bold
+            .replace(/(\*|_)/g, '') // Italic
+            .replace(/~~/g, '') // Strikethrough
+            .replace(/`/g, '') // Inline code
+            .replace(/```[\s\S]*?```/g, '') // Code blocks
+            .replace(/!\[.*?\]\(.*?\)/g, '') // Images
+            .replace(/\[.*?\]\(.*?\)/g, '') // Links
+            .replace(/^\s*\n/gm, '') // Remove empty lines
+            .replace(/\n{2,}/g, '\n') // Reduce multiple newlines to a single newline
+            .replace(/\\/g, "");
+
+        return decodedText;
     }
 
     const handleSubmitPrompt = async () => {
@@ -73,53 +86,46 @@ function MakanBot() {
             return;
         } else {
             setPromptResult("Hold tight! MakanBot is processing your request...");
-            conversationHistory.push({
-                role: "user",
-                content: messagePrompt
-            });
             document.getElementById("promptInput").value = "";
+
             try {
                 const data = { messagePrompt: messagePrompt, conversationHistory: conversationHistory };
                 const response = await server.post("/makanBot/queryMakanBotWithUserPrompt", data);
                 dispatch(reloadAuthToken(authToken));
                 if (response.status === 200) {
-                    const textContent = new DOMParser().parseFromString((marked(response.data.message).replace(/\n/g, ' ').trim()), 'text/html').body.textContent;
+                    console.log("Cleaned text: ", cleanText(response.data.message))
+                    conversationHistory.push({
+                        role: "user",
+                        content: cleanText(messagePrompt)
+                    });
                     conversationHistory.push({
                         role: "assistant",
-                        content: textContent
+                        content: cleanText(response.data.message)
                     });
+                    console.log("Conversation history: ", conversationHistory);
                     setPromptResult(response.data.message);
+                } else {
+                    console.log("Non-200 status code response received when attempting to run MakanBot prompt; response: ", response.data)
+                    displayToast("Failed to process prompt", response.message, "error", 3000, true);
                 }
-            } catch (error) {
+            } catch (err) {
                 dispatch(reloadAuthToken(authToken));
-                if (error.response && error.response.data && typeof error.response.data === "string") {
-                    console.log("Failed to generate response; error: " + error.response.data);
-                    if (error.response.data.startsWith("UERROR")) {
-                        displayToast(
-                            "Uh-oh!",
-                            error.response.data.substring("UERROR: ".length),
-                            "info",
-                            3500,
-                            true
-                        );
+                if (err.response && err.response.data && typeof err.response.data == "string") {
+                    if (err.response.data.startsWith("UERROR")) {
+                        console.log("User error occurred in running MakanBot prompt; response: ", err.response.data)
+                        displayToast("Something went wrong", err.response.data.substring("UERROR: ".length), "error", 3000, true);
                     } else {
-                        displayToast(
-                            "Something went wrong",
-                            "Failed to generate response. Please try again",
-                            "error",
-                            3500,
-                            true
-                        );
+                        if (err.response.data == "ERROR: OpenAIChat is not available at this time.") {
+                            console.log("Server informed that MakanBot is unavaiable.")
+                            displayToast("Oops!", "MakanBot is not available at this time. Please try again later!", "info", 3000, true);
+                            return;
+                        }
+                        console.log("Error occurred in running MakanBot prompt; response: ", err.response.data)
+                        displayToast("Something went wrong", "Failed to run prompt. Please try again!", "error", 3000, true);
                     }
                 } else {
-                    console.log("Unknown error occurred when generating response; error: " + error);
-                    displayToast(
-                        "Something went wrong",
-                        "Failed to generate response. Please try again",
-                        "error",
-                        3500,
-                        true
-                    );
+                    console.log("Unknown error occurred in running MakanBot prompt; error: ", err)
+                    displayToast("Something went wrong", "Failed to run prompt. Please try again!", "error", 3000, true);
                 }
             }
         }
@@ -190,9 +196,9 @@ function MakanBot() {
                 <Card width={isSmallerThan880 ? "100%" : "69%"}>
                     <CardBody>
                         <Heading as="h1" size="lg" textAlign="center" mb={5} bgGradient={"linear(to-br, #ff86d6, #ffa14a)"} bgClip={"text"} fontFamily={"Short Stack"}>MakanBot</Heading>
-                        <Box 
+                        <Box
                             position="relative"
-                            height="100%" 
+                            height="100%"
                             display="flex"
                             justifyContent="center"
                             alignItems="center"
@@ -237,12 +243,12 @@ function MakanBot() {
                                 mt={2}
                                 mr={2}
                                 cursor={"pointer"}
-                                sx={{ 
+                                sx={{
                                     transition: 'transform 0.2s ease-in-out',
                                     _hover: {
                                         transform: 'translateY(-5px)',
                                         transition: 'transform 0.2s ease-in-out'
-                                    } 
+                                    }
                                 }}
                             >
                                 <FaPaperPlane fontSize={"25px"} color="#515F7C" onClick={handleSubmitPrompt} />
