@@ -76,7 +76,7 @@ function Reviews() {
         if (loaded == true) {
             setInitialUserLoginToastIgnore(false);
 
-            if (location.state.hostID) {
+            if (location.state && location.state.hostID) {
                 setHostID(location.state.hostID);
             } else if (searchParams.has('hostID')) {
                 setHostID(searchParams.get('hostID'));

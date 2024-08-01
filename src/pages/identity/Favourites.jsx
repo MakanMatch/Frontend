@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
+import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner} from "@chakra-ui/react";
 import GuestSideNav from "../../components/identity/GuestSideNav";
 import server from '../../networking'
 import configureShowToast from '../../components/showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import { useSelector, useDispatch } from 'react-redux';
 import FoodListingCard from '../../components/listings/FoodListingCard';
-import { SearchIcon } from "@chakra-ui/icons";
+import { SearchBar } from '../../components/reviews/SearchBar';
 
 const Favourites = () => {
     const toast = useToast();
@@ -101,14 +101,7 @@ const Favourites = () => {
                         <Box pl={4} pr={4}>
                             {/* Search bar */}
                             {favouritesListingDetails.length > 0 && (
-                                <InputGroup mb={4}>
-                                    <Input
-                                        placeholder="Search by title or host name"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                    />
-                                    <InputRightElement children={<SearchIcon color="gray.300" />} />
-                                </InputGroup>
+                                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} basePlaceholder={"Search..."} mdPlaceholder={"Search for a listing title or a host name..."} />
                             )}
                             {filteredFavourites.length > 0 ? (
                                 <SimpleGrid
