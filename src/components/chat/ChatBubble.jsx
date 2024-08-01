@@ -10,6 +10,7 @@ import {
   MenuItem,
   useColorModeValue,
   Avatar,
+  Image,
 } from "@chakra-ui/react";
 import { FiEdit, FiTrash2, FiMoreVertical } from "react-icons/fi";
 import { FaReply } from "react-icons/fa";
@@ -24,7 +25,8 @@ function ChatBubble({
   repliedMessage,
   edited,
   sender,
-  reciever,
+  receiver, // Corrected spelling from "reciever"
+  image,
 }) {
   const menuItemColor = useColorModeValue("teal.500", "teal.200");
   const menuItemHoverBg = useColorModeValue("teal.100", "teal.600");
@@ -35,11 +37,12 @@ function ChatBubble({
       marginY={2}
       maxW="70%"
       alignSelf={isSender ? "flex-end" : "flex-start"}
+      borderRadius={image ? "10px" : "lg"} // Apply borderRadius conditionally
     >
       <Flex alignItems="center">
         {!isSender && (
           <Avatar
-            name={reciever}
+            name={receiver} // Corrected spelling from "reciever"
             alt="Profile"
             boxSize="40px"
             borderRadius="full"
@@ -51,11 +54,13 @@ function ChatBubble({
           <Box
             bg={isSender ? "blue.500" : "gray.200"}
             color={isSender ? "white" : "black"}
-            borderRadius="lg"
+            borderRadius={image ? "10px" : "lg"} // Apply borderRadius conditionally
             p={3}
             pb={4} // Adding bottom padding
             pt={6} // Adding top padding to accommodate the menu button
             position="relative"
+            wordBreak="break-word" // Ensure words break properly
+            overflowWrap="break-word" // Ensure long words wrap
           >
             <Box position="absolute" top={1} right={1}>
               <Menu>
@@ -111,7 +116,19 @@ function ChatBubble({
                 </Text>
               </Box>
             )}
-            <Text>
+            {image && (
+              <Box mb={2} textAlign="left">
+                <Image
+                  src={image}
+                  alt="Message Image"
+                  borderRadius="md"
+                  h="200px"
+                  w="200px"
+                  objectFit="contain"
+                />
+              </Box>
+            )}
+            <Text textAlign={image ? "left" : "center"}>
               {message}
               {edited && (
                 <Text
