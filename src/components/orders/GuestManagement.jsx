@@ -107,7 +107,13 @@ function GuestManagement({
                             width="100%"
                         >
 
-                            <Avatar name={guest.username} size={{ base: "md", md: "lg" }} mr={{ base: 0, md: 4 }} mb={{ base: 2, md: 0 }} />
+                            <Avatar 
+                            name={guest.username} 
+                            src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`}
+                            size={{ base: "md", md: "lg" }} 
+                            mr={{ base: 0, md: 4 }} 
+                            mb={{ base: 2, md: 0 }} 
+                            />
                             <Box>
                                 <Flex
                                     gap={{ base: 2, md: 3 }}
