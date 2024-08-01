@@ -8,11 +8,10 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { marked } from 'marked';
 
-let conversationHistory = [];
-
 function MakanBot() {
     const [isSmallerThan880] = useMediaQuery("(max-width: 880px)");
     const [promptResult, setPromptResult] = useState("Having doubts? MakanBot is here to help.");
+    const [conversationHistory, setConversationHistory] = useState([]);
 
     const toast = useToast();
     const dispatch = useDispatch();
@@ -93,16 +92,19 @@ function MakanBot() {
                 const response = await server.post("/makanBot/queryMakanBotWithUserPrompt", data);
                 dispatch(reloadAuthToken(authToken));
                 if (response.status === 200) {
-                    console.log("Cleaned text: ", cleanText(response.data.message))
-                    conversationHistory.push({
-                        role: "user",
-                        content: cleanText(messagePrompt)
+                    var convoHistory = [];
+                    setConversationHistory(prevHistory => {
+                        convoHistory.push(...prevHistory);
+                        convoHistory.push({
+                            role: "user",
+                            content: cleanText(messagePrompt)
+                        })
+                        convoHistory.push({
+                            role: "assistant",
+                            content: cleanText(response.data.message)
+                        });
+                        return convoHistory;
                     });
-                    conversationHistory.push({
-                        role: "assistant",
-                        content: cleanText(response.data.message)
-                    });
-                    console.log("Conversation history: ", conversationHistory);
                     setPromptResult(response.data.message);
                 } else {
                     console.log("Non-200 status code response received when attempting to run MakanBot prompt; response: ", response.data)
