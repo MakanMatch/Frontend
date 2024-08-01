@@ -93,7 +93,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} basePlaceholder={"Search..."} mdPlaceholder={"Search for a keyword or review poster name..."} />
                         )}
                         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
-                            {filteredReviews.length > 0 ?
+                            {filteredReviews.length > 0 &&
                                 filteredReviews.map((review) => (
                                     <ReviewCard
                                         key={review.reviewID}
@@ -110,8 +110,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                                         refreshState={refreshState}
                                         stateRefresh={stateRefresh}
                                     />
-                                )) :
-                                null}
+                                ))}
                         </SimpleGrid>
                     </TabPanel>
                     {/* Repeat the same for other TabPanels */}
@@ -120,7 +119,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} basePlaceholder={"Search..."} mdPlaceholder={"Search for a keyword or review poster name..."} />
                         )}                        
                         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
-                            {filteredReviews.length > 0 ?
+                            {filteredReviews.length > 0 &&
                                 filteredReviews.map((review) => (
                                     <ReviewCard
                                         key={review.reviewID}
@@ -137,8 +136,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                                         refreshState={refreshState}
                                         stateRefresh={stateRefresh}
                                     />
-                                )) :
-                                null}
+                                ))}
                         </SimpleGrid>
                     </TabPanel>
                     <TabPanel>
@@ -146,7 +144,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} basePlaceholder={"Search..."} mdPlaceholder={"Search for a keyword or review poster name..."} />
                         )}                        
                         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
-                            {filteredReviews.length > 0 ?
+                            {filteredReviews.length > 0 &&
                                 filteredReviews.map((review) => (
                                     <ReviewCard
                                         key={review.reviewID}
@@ -163,8 +161,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                                         refreshState={refreshState}
                                         stateRefresh={stateRefresh}
                                     />
-                                )) :
-                                null}
+                                ))}
                         </SimpleGrid>
                     </TabPanel>
                     <TabPanel>
@@ -172,7 +169,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} basePlaceholder={"Search..."} mdPlaceholder={"Search for a keyword or review poster name..."} />
                         )}                        
                         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
-                            {filteredReviews.length > 0 ?
+                            {filteredReviews.length > 0 &&
                                 filteredReviews.map((review) => (
                                     <ReviewCard
                                         key={review.reviewID}
@@ -189,8 +186,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                                         refreshState={refreshState}
                                         stateRefresh={stateRefresh}
                                     />
-                                )) :
-                                null}
+                                ))}
                         </SimpleGrid>
                     </TabPanel>
                 </TabPanels>
