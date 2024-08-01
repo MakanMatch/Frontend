@@ -40,6 +40,7 @@ const SubmitReviews = ({
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { user, loaded, authToken } = useSelector((state) => state.auth);
+    const hostProfilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${hostID}`;
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -155,6 +156,7 @@ const SubmitReviews = ({
                     <ModalBody>
                         <Flex direction='column' align="center" mb={4}>
                             <Avatar
+                                src={hostProfilePicture}
                                 borderRadius='full'
                                 boxSize='100px'
                                 name={hostName}
