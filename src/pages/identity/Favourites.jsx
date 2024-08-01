@@ -6,7 +6,7 @@ import configureShowToast from '../../components/showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import { useSelector, useDispatch } from 'react-redux';
 import FoodListingCard from '../../components/listings/FoodListingCard';
-import { SearchBar } from '../../components/reviews/SearchBar';
+import SearchBar from '../../components/reviews/SearchBar';
 
 const Favourites = () => {
     const toast = useToast();
