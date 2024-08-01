@@ -124,7 +124,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
             dispatch(reloadAuthToken(authToken));
             setIsSubmitting(false);
             if (error.response && error.response.data && typeof error.response.data == "string") {
-                console.log("Failed to add listing; response: " + error.response)
+                console.log("Failed to add listing; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
                         "Uh-oh!",

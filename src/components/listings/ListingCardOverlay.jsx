@@ -66,7 +66,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             } catch (error) {
                 dispatch(reloadAuthToken(authToken))
                 if (error.response && error.response.data && typeof error.response.data == "string") {
-                    console.log("Failed to favourite listing; response: " + error.response)
+                    console.log("Failed to favourite listing; response: " + error.response.data)
                     if (error.response.data.startsWith("UERROR")) {
                         displayToast(
                             "Uh-oh!",
@@ -123,8 +123,8 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                 dispatch(reloadAuthToken(authToken))
                 if (error.response && error.response.data) {
                     if (error.response.data.startsWith("UERROR")) {
-                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3500, true, "error")
-                        console.log("User error occurred in retrieving favourite listings; error: ", err.response.data);
+                        displayToast("Something went wrong", error.response.data.substring("UERROR: ".length), 3500, true, "error")
+                        console.log("User error occurred in retrieving favourite listings; error: ", error.response.data);
                         setFavourite(false);
                     } else {
                         displayToast("Error", "Failed to fetch favourite state", "error", 3000, false);
@@ -163,7 +163,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {
-                console.log("Failed to fetch host's food rating; response: " + error.response)
+                console.log("Failed to fetch host's food rating; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
                         "Uh-oh!",
