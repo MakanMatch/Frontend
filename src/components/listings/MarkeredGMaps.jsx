@@ -15,6 +15,8 @@ const MarkeredGMaps = ({
     const [mapLoaded, setMapLoaded] = useState(false);
     const toast = useToast();
 
+    console.log("Coordinates list: ", coordinatesList);
+
     function displayToast(title, description, status, duration, isClosable) {
         toast.closeAll();
         toast({
