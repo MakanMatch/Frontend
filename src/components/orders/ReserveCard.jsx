@@ -20,7 +20,7 @@ function ReserveCard({ hostData, listingData }) {
                     </VStack>
                     <Spacer />
                     <Box w={'50%'}>
-                        <Link to={"/listing/reserve"} state={{ listingID: listingData.listingID }}>
+                        <Link to={"/reservations/new"} state={{ listingID: listingData.listingID }}>
                             <Button variant={'MMPrimary'} w={'50%'} ml={'20px'} minW={'fit-content'} isDisabled={noSlotsRemaining && !listingData.alreadyReserved} _hover={'none'}>{listingData.alreadyReserved == true ? "View Reservation": "Reserve"}</Button>
                         </Link>
                         </Box>
