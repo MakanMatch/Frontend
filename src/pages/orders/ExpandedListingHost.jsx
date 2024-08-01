@@ -371,7 +371,6 @@ function ExpandedListingHost() {
                                 guests={listingData.guests}
                             />
                         </GridItem>
-
                         <GridItem colSpan={{ base: 3, md: 1 }}>
                             <HostPaymentQR />
                         </GridItem>
