@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormControl, FormLabel, Stack, 
@@ -6,36 +6,34 @@ import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormContro
     AlertDialogFooter, AlertDialogContent, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, 
     PopoverCloseButton, IconButton, Input, ButtonGroup, useMediaQuery
 } from "@chakra-ui/react";
-import { EditIcon, } from "@chakra-ui/icons";
-import  FocusLock from "react-focus-lock"
-import { logout } from "../../slices/AuthState";
-import GuestSidebar from "../../components/identity/GuestSideNav";
-import HostSidebar from "../../components/identity/HostSideNav";
-import server from "../../networking";
-import configureShowToast from '../../components/showToast';
-import ChangePassword from "../../components/identity/ChangePassword";
-import EditPicture from "../../components/identity/EditPicture";
-import ChangeAddress from "../../components/identity/ChangeAddress";
-import { reloadAuthToken } from '../../slices/AuthState';
+import { EditIcon } from "@chakra-ui/icons";
+import { FocusLock } from "@chakra-ui/react";
+import { logout } from "../../../slices/AuthState";
+import configureShowToast from '../../../components/showToast';
+import server from "../../../networking";
+import { reloadAuthToken } from "../../../slices/AuthState";
+import ChangeAddress from "../../../components/identity/ChangeAddress";
+import EditPicture from "../../../components/identity/EditPicture";
+import ChangePassword from "../../../components/identity/ChangePassword";
 
-const MyAccount = () => {
+function AdminAccount() {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const toast = useToast();
     const showToast = configureShowToast(toast);
-    const cancelRef = React.useRef()
-    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+    const dispatch = useDispatch();
+    const cancelRef = useRef()
+    const { user, authToken, loaded } = useSelector((state) => state.auth);
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [accountLoaded, setAccountLoaded] = useState(false);
+    const [accountInfo, setAccountInfo] = useState({});
+    const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
     const { isOpen: isDiscardOpen, onOpen: onDiscardOpen, onClose: onDiscardClose } = useDisclosure();
     const [isEditPictureModalOpen, setEditPictureModalOpen] = useState(false);
     const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
     const [passwordChangeInProgress, setPasswordChangeInProgress] = useState(false);
-    const [deleteInProgress, setDeleteInProgress] = useState(false);
     const [isChangeAddressModalOpen, setChangeAddressModalOpen] = useState(false);
-    const [accountInfo, setAccountInfo] = useState({});
-    const [originalAccountInfo, setOriginalAccountInfo] = useState(null);
-    const { user, loaded, error, authToken } = useSelector((state) => state.auth);
-    const [accountLoaded, setAccountLoaded] = useState(false);
-    const [profilePicture, setProfilePicture] = useState(null);
+
+    const [isSmallerThan560] = useMediaQuery("(max-width: 560px)"); // for linkedin card design (optional)
 
     useEffect(() => {
         if (loaded == true) {
@@ -50,19 +48,19 @@ const MyAccount = () => {
                     setProfilePicture(`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`);
                 } catch (err) {
                     console.log("Error fetching account info:", err);
-                    if (err && err.response && err.response.status && err.response.status == 404) {
+                    if (err.response && err.response.status && err.response.status == 404) {
                         dispatch(logout());
                         localStorage.removeItem('jwt');
                     }
                     showToast("Unable to retrieve account information", "Please try again", 3000, true, "error");
-                    navigate('/');
+                    navigate('/admin');
                 }
             };
 
             if (user && user.userID) {
                 fetchAccountInfo();
             } else {
-                if (!passwordChangeInProgress && !deleteInProgress) {
+                if (!passwordChangeInProgress) {
                     showToast("Redirecting to login", "Please log in first.", 3000, true, "error");
                     navigate('/auth/login');
                 }
@@ -70,30 +68,22 @@ const MyAccount = () => {
         }
     }, [loaded, user]);
 
-    const calculateAccountAge = () => {
-        const createdAt = new Date(accountInfo.createdAt);
-        const currentDate = new Date();
-        const diffInMilliseconds = currentDate - createdAt;
-        const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
-        return diffInDays;
-    };
-
-    const bannerStyles = {
-        guest: {
-            backgroundImage: "url('/src/assets/GuestBanner.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-        },
-        host: {
-            backgroundImage: "url('/src/assets/HostBanner.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-        },
-    };
+    if (!loaded || !user) {
+        return <Spinner />
+    }
 
     const hasChanges = () => {
         return JSON.stringify(accountInfo) !== JSON.stringify(originalAccountInfo);
     };
+
+    const TextInput = React.forwardRef((props, ref) => {
+        return (
+            <FormControl>
+                <FormLabel htmlFor={props.id}>{props.label}</FormLabel>
+                <Input ref={ref} id={props.id} {...props} />
+            </FormControl>
+        );
+    });
 
     const validateFields = () => {
         if (!accountInfo.username || accountInfo.username.trim() === "") {
@@ -118,24 +108,23 @@ const MyAccount = () => {
         }
 
         server.put("/identity/myAccount/updateAccountDetails", {
-                userID: user.userID,
-                username: accountInfo.username,
-                email: accountInfo.email,
-                contactNum: accountInfo.contactNum,
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((res) => {
-                dispatch(reloadAuthToken(authToken))
-                if (res.status == 200 && res.data.startsWith("SUCCESS")) {
-                    showToast("Changes saved", "Your account details have been updated.", 3000, true, "success");
-                    setOriginalAccountInfo({ ...accountInfo });
-                }
-            })
-            .catch((error) => {
-                dispatch(reloadAuthToken(authToken))
+            username: accountInfo.username,
+            email: accountInfo.email,
+            contactNum: accountInfo.contactNum,
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((res) => {
+            dispatch(reloadAuthToken(authToken))
+            if (res.status == 200 && res.data.startsWith("SUCCESS")) {
+                showToast("Changes saved", "Your account details have been updated.", 3000, true, "success");
+                setOriginalAccountInfo({ ...accountInfo });
+            }
+        })
+        .catch((error) => {
+            dispatch(reloadAuthToken(authToken))
                 console.log("Error: ", error)
                 if (error.response && error.response.data && typeof error.response.data == "string") {
                     console.log("Failed to update account details; response: " + error.response.data)
@@ -166,7 +155,7 @@ const MyAccount = () => {
                         "error",
                     )
                 }
-            });
+        });
     };
 
     const handleCancelChanges = () => {
@@ -177,40 +166,6 @@ const MyAccount = () => {
         setAccountInfo({ ...originalAccountInfo });
         onDiscardClose();
         showToast("Changes not saved", "All changes made have been discarded.", 3000, true, "warning");
-    };
-
-    const handleDeleteAccount = () => {
-        onDeleteOpen();
-    };
-
-    const confirmDeleteAccount = () => {
-        setDeleteInProgress(true);
-        server.delete("/identity/myAccount/deleteAccount", {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then((res) => {
-            dispatch(reloadAuthToken(authToken))
-            if (res.status == 200 && res.data.startsWith("SUCCESS")) {
-                showToast("We're sorry to see you go! :(", "See you again next time!", 3000, true, "success");
-                // Remove the jwt
-                dispatch(logout());
-                localStorage.removeItem('jwt');
-                navigate("/auth/login");
-            } else {
-                showToast("ERROR", "Failed to delete account.", 3000, true, "error");
-            }
-        })
-        .catch((err) => {
-            dispatch(reloadAuthToken(authToken))
-            console.error("Error deleting account:", err);
-            showToast("ERROR", "Failed to delete account.", 3000, true, "error");
-        })
-        .finally(() => {
-            onDeleteClose();
-            setDeleteInProgress(false);
-        });
     };
 
     const toggleChangePassword = () => {
@@ -274,13 +229,11 @@ const MyAccount = () => {
             } else if (res.status === 200 && res.data.startsWith("SUCCESS")) {
                 showToast("Name changed", "Your name has been updated!", 3000, true, "success");
                 onClose();
-            } else {
-                showToast("Something went wrong", "Please try again later.", 3000, true, "error");
             }
         })
         .catch((err) => {
             dispatch(reloadAuthToken(authToken))
-            if (err.response && err.response.status === 400) {
+            if (err.response && err.response.status !== 200) {
                 showToast("Invalid Input", err.response.data.substring("UERROR: ".length), 3000, true, "error");
             } else {
                 console.error("Error changing name:", err);
@@ -289,23 +242,6 @@ const MyAccount = () => {
         });
     };
 
-    if (!accountLoaded) {
-        return <Spinner />;
-    }
-
-    if (error) {
-        console.log(error);
-        return <Spinner />;
-    }
-
-    const TextInput = React.forwardRef((props, ref) => {
-        return (
-            <FormControl>
-                <FormLabel htmlFor={props.id}>{props.label}</FormLabel>
-                <Input ref={ref} id={props.id} {...props} />
-            </FormControl>
-        );
-    });
     
     const Form = ({ firstFieldRef, onCancel, onSave, fname, setFname, lname, setLname }) => {
         const handleKeyDown = (e) => {
@@ -357,11 +293,11 @@ const MyAccount = () => {
                 </ButtonGroup>
             </Stack>
         );
-    };
-    
+    }
+
     const PopoverForm = () => {
         const { onOpen, onClose, isOpen } = useDisclosure();
-        const firstFieldRef = React.useRef(null);
+        const firstFieldRef = useRef(null);
         const [fname, setFname] = useState(accountInfo.fname);
         const [lname, setLname] = useState(accountInfo.lname);
         const [localAccountInfo, setLocalAccountInfo] = useState(accountInfo);
@@ -393,7 +329,7 @@ const MyAccount = () => {
         }, [isOpen]);
     
         return (
-            <Box display='flex' alignItems='center' mt="3%" ml="30%">
+            <Box display='flex' alignItems='center' mt="2%" ml="35%">
                 <Box display='flex' alignItems='center' mr={3}>
                     <Text fontSize={25}><b>{localAccountInfo.fname} {localAccountInfo.lname}</b></Text>
                     <Popover
@@ -445,31 +381,34 @@ const MyAccount = () => {
         setProfilePicture(null);
     };
 
-    return (
-        <Flex>
-            {accountInfo.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
+    const handleLogout = () => {
+        dispatch(logout());
+        localStorage.removeItem('jwt');
+        navigate("/auth/login");
+    };
 
-            {/* Right side content */}
-            <Box width="75%" ml={10} position="relative">
-                {/* Profile banner */}
-                <Box
-                    height="25%"
+    return (
+        <>
+            <Box justifyContent={'center'} display={'flex'}>
+                <Box 
+                    backgroundImage={'/src/assets/AdminBanner.jpg'}
+                    width="65vw"
+                    height="25vh"
                     position="relative"
                     borderRadius={15}
-                    {...(accountInfo.userType === "Guest"
-                        ? bannerStyles.guest
-                        : bannerStyles.host)}
+                    backgroundSize="cover"
+                    backgroundPosition="center"
                 >
                     <Flex align="center" justify="flex-end" height="100%" pr={10}>
-                        <Heading mr={5} size={'2xl'} color="Black">
-                            {accountInfo.userType}
+                        <Heading mr={5} size={'xl'} color="Black">
+                            Admin
                         </Heading>
                     </Flex>
 
                     <Box
                         position="absolute"
                         bottom="-70px"
-                        left="16%"
+                        left={isSmallerThan560 ? "50%" : "16%"}
                         transform="translateX(-50%)"
                         zIndex={1}
                         cursor={"pointer"}
@@ -494,11 +433,13 @@ const MyAccount = () => {
                         />
                     </Box>
                 </Box>
+            </Box>
 
-                <PopoverForm />
-                
-                <Stack direction={["column", "row"]} p={4} mt={5} justifyContent="space-between" width="100%" spacing={"20px"}>
-                    <Box p={2} width={"50%"}>
+            <PopoverForm />
+
+            <Box justifyContent={'center'} display={'flex'}>
+                <Stack direction={["column", "row"]} p={4} spacing={"12%"} width={"65vw"}>
+                    <Box p={2} width={"70%"} justifyContent={"flex"}>
                         <FormControl mb={2}>
                             <FormLabel>Username</FormLabel>
                             <Editable
@@ -575,60 +516,37 @@ const MyAccount = () => {
                                     <Text p={2} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{accountInfo.address || "Enter your address"}</Text>
                                 </Box>
 
-                                <Button onClick={toggleChangeAddress}>Edit</Button>
+                                <Button width="15%" onClick={toggleChangeAddress}>Edit</Button>
 
                                 <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} accountInfo={accountInfo} setAccountInfo={setAccountInfo} setOriginalAccountInfo={setOriginalAccountInfo}/>
                             </Flex>
                         </FormControl>
 
-                        <Button variant={"MMPrimary"} mb={4} onClick={(toggleChangePassword)} position="absolute" bottom={0} left={6}>
-                            Change Password
-                        </Button>
+                        <Box display="flex" justifyContent={"left"}>
+                            <Button variant={"MMPrimary"} mt={6} onClick={(toggleChangePassword)}>
+                                Change Password
+                            </Button>
+                        </Box>
 
                         <ChangePassword isOpen={isPasswordModalOpen} onClose={handlePasswordCloseModal} onSubmit={handleChangePassword} />
                     </Box>
 
-                    <Box p={2} width={"22%"}>
-                        <FormControl mb={2}>
-                            <FormLabel>Favorite Cuisine</FormLabel>
-                            <Text textAlign={"left"} pt={2} pb={2}>
-                                {accountInfo.favCuisine || "None"}
-                            </Text>
-                        </FormControl>
-
-                        <FormControl mb={2}>
-                            <FormLabel>Meals Matched</FormLabel>
-                            <Text textAlign={"left"} pt={2} pb={2}>
-                                {accountInfo.mealsMatched + " meals"}
-                            </Text>
-                        </FormControl>
-
-                        <FormControl mb={2}>
-                            <FormLabel>Account Age</FormLabel>
-                            <Text textAlign={"left"} pt={2} pb={2}>
-                                {calculateAccountAge() + " days"}
-                            </Text>
-                        </FormControl>
-                    </Box>
-
-                    <Box p={2} width={"18%"}>
-                        <Flex justifyContent={"flex-end"} flexDirection={"column"}>
+                    <Box width={"18%"} display="flex" justifyContent={"right"} flexDirection="column" alignItems="flex-end" mr={-4}>
                             {hasChanges() && (
                                 <>
-                                    <Button p={6} variant={"MMPrimary"} onClick={handleSaveChanges} width="full" mb={5}>
+                                    <Button p={4} variant={"MMPrimary"} onClick={handleSaveChanges} width={'full'} mb={5}>
                                         Save Changes
                                     </Button>
 
-                                    <Button p={6} colorScheme="red" borderRadius={10} onClick={handleCancelChanges} width="full" mb={4}>
+                                    <Button p={4} colorScheme="red" borderRadius={10} onClick={handleCancelChanges} width={'full'} mb={4}>
                                         Cancel
                                     </Button>
                                 </>
                             )}
 
-                            <Button colorScheme="red" onClick={handleDeleteAccount} borderRadius={10} position="absolute" bottom={0} mb={4}>
-                                Delete Account
+                            <Button colorScheme="red" borderRadius={10} width={'11%'} position="absolute" bottom={"7.5%"} onClick={handleLogout}>
+                                Logout
                             </Button>
-                        </Flex>
                     </Box>
                 </Stack>
             </Box>
@@ -661,37 +579,10 @@ const MyAccount = () => {
                     </AlertDialogContent>
                 </AlertDialogOverlay>
             </AlertDialog>
+        </>
+        
+    )
+}
 
-            {/* Delete Account Confirmation Modal */}
-            <AlertDialog
-                isOpen={isDeleteOpen}
-                leastDestructiveRef={cancelRef}
-                onClose={onDeleteClose}
-                size="sm"
-            >
-                <AlertDialogOverlay>
-                    <AlertDialogContent>
-                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                            Delete Account
-                        </AlertDialogHeader>
 
-                        <AlertDialogBody>
-                            Are you sure? You can't undo this action afterwards.
-                        </AlertDialogBody>
-
-                        <AlertDialogFooter>
-                            <Button ref={cancelRef} onClick={onDeleteClose}>
-                                Cancel
-                            </Button>
-                            <Button colorScheme="red" onClick={confirmDeleteAccount} ml={3}>
-                                Delete
-                            </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
-        </Flex>
-    );
-};
-
-export default MyAccount;
+export default AdminAccount;

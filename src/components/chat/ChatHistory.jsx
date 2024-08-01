@@ -18,36 +18,38 @@ function ChatHistory({ chatHistory = [], onUserClick, lastMessage, chatPartnerUs
       minW="100px"
       h="90%"
       p={4}
-      boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
-      borderRadius={"10px"}
-      overflow={"hidden"}
+      boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)"
+      borderRadius="10px"
+      overflow="hidden"
       borderColor="gray.200"
+      border="1px solid"
     >
-      <Text fontSize="2xl" mb={6} textAlign={"left"}>
+      <Text fontSize="2xl" mb={6} textAlign="left">
         Messages
       </Text>
-      <VStack spacing={4} align="stretch" alignContent={"left"}>
-        {validChatHistory.map((chatID) => (
+      <VStack spacing={0} align="stretch">
+        {validChatHistory.map((chatID, index) => (
           <Flex
             key={chatID}
             align="center"
             p={3}
             _hover={{ bg: "gray.100", cursor: "pointer" }}
-            borderRadius="md"
-            w="100%"
+            borderBottom={index < validChatHistory.length - 1 ? "1px solid" : "none"}
+            borderColor="gray.200"
             onClick={() => onUserClick(chatID)}
+            w="100%"
           >
             <Avatar 
               name={chatPartnerUsernames[chatID] || `Chat ${chatID}`} 
               mr={3} 
-              minW={"55px"} 
-              minH={"55px"} 
+              minW="55px" 
+              minH="55px" 
             />
             <Box flex="1" minW={0}>
-              <Text fontWeight="bold" textAlign={"left"}>
+              <Text fontWeight="bold" textAlign="left">
                 {chatPartnerUsernames[chatID] || `Chat ${chatID}`}
               </Text>
-              <Text fontSize="sm" color="gray.500" maxW="100%" textAlign={"left"} isTruncated>
+              <Text fontSize="sm" color="gray.500" maxW="100%" textAlign="left" isTruncated>
                 {lastMessage}
               </Text>
             </Box>
