@@ -5,7 +5,7 @@ import { Avatar, Box, Editable, Flex, Heading, Stack, FormControl, FormLabel,
 import { EditIcon } from '@chakra-ui/icons';
 import { useState, useEffect, useRef, forwardRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams  } from 'react-router-dom';
 import configureShowToast from '../../components/showToast';
 import server from '../../networking';
 import { reloadAuthToken } from '../../slices/AuthState';
@@ -17,6 +17,7 @@ function PublicGuestProfile() {
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
     const cancelRef = useRef()
     const { user, authToken, loaded } = useSelector((state) => state.auth);
     const [profilePicture, setProfilePicture] = useState(null);
@@ -26,12 +27,13 @@ function PublicGuestProfile() {
     const [passwordChangeInProgress, setPasswordChangeInProgress] = useState(false);
     const [isChangeAddressModalOpen, setChangeAddressModalOpen] = useState(false);
 
-
     useEffect(() => {
         if (loaded == true) {
             const fetchAccountInfo = async () => {
                 try {
-                    const userID = user.userID;
+                    // const userID = user.userID;
+                    const userID = searchParams.get('userID')
+                    console.log("User ID: ", userID);
                     const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
                     dispatch(reloadAuthToken(authToken))              
                     setAccountInfo(response.data);
@@ -166,6 +168,14 @@ function PublicGuestProfile() {
 
     const handleChangeAddressCloseModal = () => {
         setChangeAddressModalOpen(false);
+    };
+
+    const calculateAccountAge = () => {
+        const createdAt = new Date(accountInfo.createdAt);
+        const currentDate = new Date();
+        const diffInMilliseconds = currentDate - createdAt;
+        const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+        return diffInDays;
     };
 
     const TextInput = forwardRef((props, ref) => {
@@ -346,8 +356,8 @@ function PublicGuestProfile() {
 
             <PopoverForm />
 
-            <Box justifyContent={'center'} display={'flex'}>
-                <Stack direction={["column", "row"]} p={4} spacing={"12%"} width={"65vw"}>
+            <Box justifyContent={'center'} display={'flex'} mt={3}>
+                <Stack direction={["column", "row"]} p={4} spacing={"5%"} width={"65vw"}>
                     <Box p={2} width={"70%"} justifyContent={"flex"}>
                     <FormControl mb={2}>
                             <FormLabel>Username</FormLabel>
@@ -412,33 +422,50 @@ function PublicGuestProfile() {
                                 <EditableInput p={2} borderRadius={10} />
                             </Editable>
                         </FormControl>
+                        {user && user.userType === "Admin" && (
+                            <FormControl>
+                                <FormLabel>Address</FormLabel>
+                                <Flex alignItems="center" justifyContent={"space-between"}>
+                                    <Box 
+                                        textAlign={"left"}
+                                        borderColor={"black"}
+                                        borderWidth={1}
+                                        borderRadius={10}
+                                        overflow={"hidden"}
+                                        width="80%"
+                                        height="40px"
+                                        isDisabled={user && user.userType !== "Admin"}
+                                    >
+                                        <Text p={2} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{accountInfo.address || "Enter your address"}</Text>
+                                    </Box>
 
-                        <FormControl>
-                            <FormLabel>Address</FormLabel>
-                            <Flex alignItems="center" justifyContent={"space-between"}>
-                                <Box 
-                                    textAlign={"left"}
-                                    borderColor={"black"}
-                                    borderWidth={1}
-                                    borderRadius={10}
-                                    overflow={"hidden"}
-                                    width="80%"
-                                    height="40px"
-                                    isDisabled={user && user.userType !== "Admin"}
-                                >
-                                    <Text p={2} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{accountInfo.address || "Enter your address"}</Text>
-                                </Box>
-
-                                {user && user.userType === "Admin" && (
+                                    
                                     <Button width="15%" onClick={toggleChangeAddress}>Edit</Button>
-                                )}
 
-                                <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} accountInfo={accountInfo} setAccountInfo={setAccountInfo} setOriginalAccountInfo={setOriginalAccountInfo}/>
-                            </Flex>
+                                    <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} accountInfo={accountInfo} setAccountInfo={setAccountInfo} setOriginalAccountInfo={setOriginalAccountInfo}/>
+                                </Flex>
+                            </FormControl>
+                        )}
+                    </Box>
+
+                    <Box p={2} width={"25%"}>
+                        <FormControl mb={2}>
+                            <FormLabel>Meals Matched</FormLabel>
+                            <Text textAlign={"left"} pt={2} pb={2}>
+                                {accountInfo.mealsMatched + " meals"}
+                            </Text>
+                        </FormControl>
+
+                        <FormControl mb={2}>
+                            <FormLabel>Account Age</FormLabel>
+                            <Text textAlign={"left"} pt={2} pb={2}>
+                                {calculateAccountAge() + " days"}
+                            </Text>
                         </FormControl>
                     </Box>
 
-                    <Box width={"18%"} display="flex" justifyContent={"right"} flexDirection="column" alignItems="flex-end" mr={-4}>
+                    {user && user.userType === "Admin" && (
+                        <Box width={"15%"} display="flex" justifyContent={"right"} flexDirection="column" alignItems="flex-end" mr={-4}>
                             {hasChanges() && (
                                 <>
                                     <Button p={4} variant={"MMPrimary"} onClick={handleSaveChanges} width={'full'} mb={5}>
@@ -451,10 +478,11 @@ function PublicGuestProfile() {
                                 </>
                             )}
 
-                            <Button colorScheme="red" borderRadius={10} width={'11%'} position="absolute" bottom={"8%"} onClick={handleLogout}>
+                            <Button colorScheme="red" borderRadius={10} width={'10%'} position="absolute" bottom={"8%"} onClick={handleLogout}>
                                 Logout
                             </Button>
-                    </Box>
+                        </Box>
+                    )}
                 </Stack>
             </Box>
         </>
