@@ -140,7 +140,7 @@ function Reviews() {
                                 <>
                                     <Spacer display={{ base: 'none', md: 'block' }} />
                                     <Tooltip label={`Hygiene Rating for ${hostName}`} aria-label="Host Hygiene Rating tooltip">
-                                        <Button variant="solid" colorScheme="blue" size="md" borderRadius="10px" cursor="default" >
+                                        <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
                                             {hostHygieneGrade}
                                         </Button>
                                     </Tooltip>
