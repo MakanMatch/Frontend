@@ -216,7 +216,7 @@ function GuestManagement({
                             <Flex
                                 direction="row"
                                 alignItems="center"
-                                justifyContent={{base:"center", md:"flex-end"}}
+                                justifyContent={{base:"center", md:"right"}}
                                 width="100%"
                                 mt={{base: 4, md: 1}}
                                 gap={2}
