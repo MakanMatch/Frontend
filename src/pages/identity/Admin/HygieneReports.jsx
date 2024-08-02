@@ -118,6 +118,7 @@ function HygieneReports() {
                                         hygieneGrade={host.hygieneGrade}
                                         hostID={host.userID}
                                         flaggedForHygiene={host.flaggedForHygiene}
+                                        fetchAllHosts={fetchAllHosts}
                                     />
                                 ))
                             ) : (

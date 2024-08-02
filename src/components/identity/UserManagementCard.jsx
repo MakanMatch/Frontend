@@ -171,7 +171,7 @@ function UserManagementCard({ username, fname, lname, email, userType, contactNu
                             <MenuButton as={IconButton} icon={<BsThreeDotsVertical />} variant="ghost" cursor="pointer" aria-label="Options" />
                             <MenuList>
                                 { !isBanned && <MenuItem onClick={toggleOpenEditDetails}>Edit Details</MenuItem>}
-                                <MenuItem color={isBanned ? "green" : "red"} onClick={handleToggleBanUser}>{isBanned ? "Unban" : "Ban"} user</MenuItem>
+                                <MenuItem color={isBanned ? "green" : "red"} onClick={handleToggleBanUser}>{isBanned ? "Un-ban" : "Ban"} user</MenuItem>
                                 <MenuItem color="red" onClick={onOpen}>Delete user</MenuItem>
                             </MenuList>
                         </Menu>
