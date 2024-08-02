@@ -134,7 +134,7 @@ function GuestManagement({
                     <Flex
                         key={guest.userID}
                         display="flex"
-                        flexDirection='column'
+                        flexDirection="column"
                         alignItems="center"
                         justifyContent="space-between"
                         borderWidth="1px"
@@ -214,7 +214,7 @@ function GuestManagement({
                                 </Box>
                             </Flex>
                             <Flex
-                                direction='row'
+                                direction="row"
                                 alignItems="center"
                                 justifyContent={{base:"center", md:"flex-end"}}
                                 width="100%"
