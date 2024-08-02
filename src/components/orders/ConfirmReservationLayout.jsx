@@ -40,7 +40,7 @@ function ConfirmReservationLayout({
                         <Box textAlign={"left"} flexDirection={"column"}>
                             {isSmallerThan800 && (
                                 <StaticGMaps
-                                    coordinates={{ lat: 1.3016989, lng: 103.8284868 }}
+                                coordinates={{ lat: listingData.approxCoordinates[0], lng: listingData.approxCoordinates[1] }}
                                     style={{
                                         height: "200px",
                                         width: "300px",
@@ -63,7 +63,7 @@ function ConfirmReservationLayout({
 
                         {!isSmallerThan800 && (
                             <StaticGMaps
-                                coordinates={{ lat: 1.3016989, lng: 103.8284868 }}
+                                coordinates={{ lat: listingData.approxCoordinates[0], lng: listingData.approxCoordinates[1] }}
                                 style={{
                                     height: "200px",
                                     width: "250px",
