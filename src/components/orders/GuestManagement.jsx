@@ -250,16 +250,6 @@ function GuestManagement({
                                 />
                             )}
                         </Box>
-                        <Modal isOpen={isOpen} onClose={onClose} isCentered>
-                            <ModalOverlay />
-                            <ModalContent maxW="max-content" background="transparent" boxShadow="none">
-                                <Avatar
-                                    name={guest.username}
-                                    boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
-                                    src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`}
-                                />
-                            </ModalContent>
-                        </Modal>
                     </Box>
                 ))
             ) : (

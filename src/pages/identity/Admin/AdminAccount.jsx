@@ -501,7 +501,7 @@ function AdminAccount() {
                             </Editable>
                         </FormControl>
 
-                        <FormControl>
+                        {/* <FormControl>
                             <FormLabel>Address</FormLabel>
                             <Flex alignItems="center" justifyContent={"space-between"}>
                                 <Box 
@@ -520,7 +520,7 @@ function AdminAccount() {
 
                                 <ChangeAddress isOpen={isChangeAddressModalOpen} onClose={handleChangeAddressCloseModal} accountInfo={accountInfo} setAccountInfo={setAccountInfo} setOriginalAccountInfo={setOriginalAccountInfo}/>
                             </Flex>
-                        </FormControl>
+                        </FormControl> */}
 
                         <Box display="flex" justifyContent={"left"}>
                             <Button variant={"MMPrimary"} mt={6} onClick={(toggleChangePassword)}>
