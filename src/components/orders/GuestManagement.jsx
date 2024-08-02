@@ -231,7 +231,7 @@ function GuestManagement({
                                 <Box>
                                     <Button
                                         variant="MMPrimary"
-                                        size={{ base: "sm", md: "md" }}
+                                        size="sm"
                                         onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
                                     >
                                         Paid & Present
