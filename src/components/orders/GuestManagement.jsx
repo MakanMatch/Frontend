@@ -249,7 +249,7 @@ function GuestManagement({
                                         </Button>
                                     </Box>
                                 )}
-                                {!guest.Reservation.markedPaid && (
+                                {!guest.Reservation.markedPaid && !guest.Reservation.chargeableCancelActive && (
                                     <IconButton
                                         background="red.500"
                                         color="white"
@@ -288,16 +288,16 @@ function GuestManagement({
                                 </Box>
                                 <Box>
                                     <Button
-                                        background="green.500"
+                                        background="red.500"
                                         color="white"
                                         borderRadius="10px"
                                         fontWeight="bold"
-                                        _hover={{ bg: "green.600" }}
+                                        _hover={{ bg: "red.600" }}
                                         size="sm"
                                         ml={{ base: 0, md: 4 }}
                                         onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
                                     >
-                                        Confirm {/* Adjust text size for md screens */}
+                                        Confirm Cancellation {/* Adjust text size for md screens */}
                                     </Button>
                                 </Box>
                             </Box>
