@@ -389,7 +389,6 @@ function ChatUi() {
     };
 
     const handleChatClick = (clickedChatID) => {
-        console.log("Clicked: ", clickedChatID);
         setNextChat(() => {
             const prev = chatSelected;
             if (prev == null) {
@@ -442,7 +441,7 @@ function ChatUi() {
     if (!loaded || !user) {
         return <Spinner />
     }
-    console.log(getProfilePictureLink(chatPartnerID["11ae5b6d-0137-4c42-9424-732674e11063"]))
+    const filteredMessages = messages.filter(msg => msg.chatID === chatSelected);
     return (
         <Flex direction="column" overflowX="hidden" w="100%" h="100%">
             <Flex direction="row" h="100%" w="100%">
@@ -517,7 +516,7 @@ function ChatUi() {
                                 boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
                             >
                                 <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX="hidden">
-                                    {messages.map((msg, index) => (
+                                    {filteredMessages.map((msg, index) => (
                                         <React.Fragment key={msg.messageID}>
                                             {shouldDisplayDate(msg, messages[index - 1]) && (
                                                 <Text fontSize="sm" color="gray.500" textAlign="center" mb={2}>
@@ -539,8 +538,8 @@ function ChatUi() {
                                                 repliedMessage={msg.replyTo}
                                                 edited={msg.edited}
                                                 image={msg.image ? getImageLink(msg.senderID, msg.messageID) : null}
-                                                receiverProfilePicture = {getProfilePictureLink(chatPartnerID[chatSelected])}
-                                                senderProfilePicture = {getProfilePictureLink(user.userID)}
+                                                receiverProfilePicture = {chatPartnerID[chatSelected]}
+                                                senderProfilePicture = {user.userID}
                                             />
                                         </React.Fragment>
                                     ))}

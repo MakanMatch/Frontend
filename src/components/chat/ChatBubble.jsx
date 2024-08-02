@@ -59,7 +59,7 @@ function ChatBubble({
       <Flex alignItems="center">
         {!isSender && (
           <Avatar
-            src={receiverProfilePicture}
+            src={getProfilePictureLink(receiverProfilePicture)}
             name={receiver}
             alt="Profile"
             boxSize={avatarSize}
@@ -183,7 +183,7 @@ function ChatBubble({
         </Box>
         {isSender && (
           <Avatar
-            src={senderProfilePicture}
+            src={getProfilePictureLink(senderProfilePicture)}
             name={sender}
             alt="Profile"
             boxSize={avatarSize}
