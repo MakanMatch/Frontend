@@ -139,7 +139,7 @@ function Reviews() {
                             {hostReviewsCount > 0 && (
                                 <>
                                     <Spacer display={{ base: 'none', md: 'block' }} />
-                                    <Tooltip label={`Number of reviews for ${hostName}`} aria-label="Number of reviews tooltip">
+                                    <Tooltip label={`Hygiene Rating for ${hostName}`} aria-label="Host Hygiene Rating tooltip">
                                         <Button variant="solid" colorScheme="blue" size="md" borderRadius="10px" cursor="default" >
                                             {hostHygieneGrade}
                                         </Button>
