@@ -145,7 +145,7 @@ function GuestManagement({
                     >
                         <Flex
                             direction={{ base: 'column', md: 'row' }}
-                            alignItems={{ base: 'center', md: 'flex-start' }}
+                            alignItems={{ base: 'center', md: 'space-between' }}
                             mb={{ base: 4, md: 0 }}
                             textAlign={{ base: 'center', md: 'left' }}
                             width="100%"
