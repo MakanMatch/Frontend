@@ -145,7 +145,7 @@ function GuestManagement({
                             direction={{ base: 'column', md: 'row' }}
                             alignItems={{ base: 'center', md: 'flex-start' }}
                             mb={{ base: 4, md: 0 }}
-                            textAlign={{ base: 'center', md: 'left' }}  
+                            textAlign={{ base: 'center', md: 'left' }}
                             width="100%"
                         >
                             <Flex
@@ -207,12 +207,19 @@ function GuestManagement({
                                     </Flex>
                                 </Box>
                             </Flex>
-                            <Flex alignItems="center" >
+                            <Flex
+                                direction={{ base: 'column', md: 'row' }}
+                                alignItems="center"
+                                justifyContent="flex-end"
+                                width="100%"
+                                mt={1}
+                                gap={2}
+                                wrap="wrap"  // Ensure wrapping of buttons
+                            >
                                 <IconButton
                                     icon={<FaCommentDots />}
                                     aria-label="Message Guest"
                                     ml={2}
-                                    mr={2}
                                     variant="ghost"
                                     colorScheme="blackAlpha"
                                     size={{ base: "sm", md: "lg" }}
@@ -246,7 +253,6 @@ function GuestManagement({
                                     <IconButton
                                         background="red.500"
                                         color="white"
-                                        ml={2}
                                         icon={<CloseIcon />}
                                         size="sm"
                                         onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
@@ -280,17 +286,20 @@ function GuestManagement({
                                         {guest.fname} {guest.lname} just cancelled their reservation. Check that they've paid the cancellation fee of ${guest.Reservation.totalPrice * 2} and confirm cancellation.
                                     </Text>
                                 </Box>
-                                <Button
-                                    background="green.500"
-                                    color="white"
-                                    borderRadius="10px"
-                                    _hover={{ bg: "green.600" }}
-                                    size={{ base: "sm", md: "md" }}
-                                    ml={{ base: 0, md: 4 }}
-                                    onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
-                                >
-                                    <Text fontSize={{ base: "sm", md: "md" }}>Confirm</Text> {/* Adjust text size for md screens */}
-                                </Button>
+                                <Box>
+                                    <Button
+                                        background="green.500"
+                                        color="white"
+                                        borderRadius="10px"
+                                        fontWeight="bold"
+                                        _hover={{ bg: "green.600" }}
+                                        size="sm"
+                                        ml={{ base: 0, md: 4 }}
+                                        onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
+                                    >
+                                        Confirm {/* Adjust text size for md screens */}
+                                    </Button>
+                                </Box>
                             </Box>
                         )}
 
