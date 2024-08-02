@@ -14,7 +14,7 @@ import server from '../../networking';
 function ChatUi() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState({});
     const [messageInput, setMessageInput] = useState("");
     const [messageToDelete, setMessageToDelete] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -139,26 +139,40 @@ function ChatUi() {
                     }));
                 }
             } else if (receivedMessage.action === "chat_history") {
-                setMessages(receivedMessage.previousMessages);
+                setMessages((prevMessages) => ({
+                    ...prevMessages,
+                    [receivedMessage.chatID]: [...receivedMessage.previousMessages],
+                }));
                 setStatus(receivedMessage.currentStatus);
             } else if (receivedMessage.action === "send") {
-                setMessages((prevMessages) => [
+                setMessages((prevMessages) => ({
                     ...prevMessages,
-                    receivedMessage.message,]);
+                    [receivedMessage.message.chatID]: [
+                        ...(prevMessages[receivedMessage.message.chatID] || []),
+                        receivedMessage.message,
+                    ],
+                }));
             } else if (receivedMessage.action === "edit") {
-                setMessages((prevMessages) =>
-                    prevMessages.map((msg) =>
+                console.log(receivedMessage)
+                setMessages((prevMessages) => ({
+                    ...prevMessages,
+                    [receivedMessage.chatID]: prevMessages[receivedMessage.chatID].map((msg) =>
                         msg.messageID === receivedMessage.messageID
-                            ? { ...msg, message: receivedMessage.message, edited: true }
+                            ? {
+                                ...msg,
+                                message: receivedMessage.message,
+                                edited: true,
+                            }
                             : msg
-                    )
-                );
+                    ),
+                  }));
             } else if (receivedMessage.action === "delete") {
-                setMessages((prevMessages) =>
-                    prevMessages.filter(
+                setMessages((prevMessages) => ({
+                    ...prevMessages,
+                    [receivedMessage.chatID]: prevMessages[receivedMessage.chatID].filter(
                         (msg) => msg.messageID !== receivedMessage.messageID
-                    )
-                );
+                    ),
+                }));
             } else if (receivedMessage.action === "chat_partner_offline") {
                 if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
                     setStatus(false);
@@ -328,13 +342,6 @@ function ChatUi() {
                 datetime: new Date().toISOString(),
             };
             ws.current.send(JSON.stringify(editedMessage));
-            setMessages((prevMessages) =>
-                prevMessages.map((msg) =>
-                    msg.messageID === editMessageId
-                        ? { ...msg, message: editMessageContent, edited: true }
-                        : msg
-                )
-            );
             closeEditModal();
         }
     };
@@ -411,7 +418,11 @@ function ChatUi() {
             setChatSelected(nextChat)
             setNextChat(null);
         }
-    }, [chatSelected, nextChat])
+    }, [chatSelected, nextChat]);
+
+    useEffect(() => {
+        console.log(messages);
+      }, [messages]);
 
     const [isSmallerThan950px] = useMediaQuery("(max-width: 950px)");
 
@@ -441,7 +452,8 @@ function ChatUi() {
     if (!loaded || !user) {
         return <Spinner />
     }
-    const filteredMessages = messages.filter(msg => msg.chatID === chatSelected);
+    const filteredMessages = messages[chatSelected] || [];
+    console.log(messages)
     return (
         <Flex direction="column" overflowX="hidden" w="100%" h="100%">
             <Flex direction="row" h="100%" w="100%">
@@ -516,9 +528,9 @@ function ChatUi() {
                                 boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
                             >
                                 <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX="hidden">
-                                    {filteredMessages.map((msg, index) => (
+                                {filteredMessages.map((msg, index) => (
                                         <React.Fragment key={msg.messageID}>
-                                            {shouldDisplayDate(msg, messages[index - 1]) && (
+                                            {shouldDisplayDate(msg, filteredMessages[index - 1]) && (
                                                 <Text fontSize="sm" color="gray.500" textAlign="center" mb={2}>
                                                     {formatDate(msg.datetime)}
                                                 </Text>
