@@ -253,7 +253,15 @@ function ExpandedListingHost() {
             .catch(err => {
                 dispatch(reloadAuthToken(authToken))
                 console.log("Failed to update listing; error: " + err);
-                showToast("Something went wrong", "Failed to update the listing. Try again later.", 1500, true, "error")
+                if (err.response && err.response.data && typeof err.response.data == "string") {
+                    if (err.response.data.startsWith("UERROR")) {
+                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 1500, true, "error")
+                    } else {
+                        showToast("Something went wrong", "Failed to update the listing. Try again later.", 1500, true, "error")
+                    }
+                } else {
+                    showToast("Something went wrong", "Failed to update the listing. Try again later.", 1500, true, "error")
+                }
             })
     }
 
