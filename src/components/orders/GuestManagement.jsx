@@ -174,7 +174,7 @@ function GuestManagement({
                                         width="100%"
                                         alignItems={{ base: 'center', md: 'center' }}
                                         flexWrap="wrap"
-                                        justifyContent={textAlign}  // Ensure centering on base screens
+                                        justifyContent={{ base: 'center', md: 'left' }}
                                     >
                                         <Box>
                                             <Text
