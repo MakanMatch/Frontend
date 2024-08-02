@@ -9,7 +9,6 @@ import { BsFillPeopleFill } from "react-icons/bs";
 import { FaWallet } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import configureShowToast from '../../components/showToast';
 
 export default function CalenderUI() {
@@ -96,15 +95,9 @@ export default function CalenderUI() {
         };
 
         return (
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <div style={{ overflow: "hidden", padding: "5px", fontSize: "11px", cursor: "pointer" }} onClick={handleScheduleClick}>
-                    <i>{eventInfo.event.title}</i>
-                </div>
-            </motion.div>
+            <div style={{ overflow: "hidden", padding: "5px", fontSize: "11px", cursor: "pointer" }} onClick={handleScheduleClick}>
+                <i>{eventInfo.event.title}</i>
+            </div>
         );
     }
 
@@ -124,76 +117,70 @@ export default function CalenderUI() {
     }
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-        >
-            <div>
-                <FullCalendar
-                    plugins={[dayGridPlugin]}
-                    initialView="dayGridMonth"
-                    weekends={true}
-                    events={events}
-                    eventContent={renderEventContent}
-                    height={"660px"}
-                    eventOverlap={false}
-                    eventDisplay="block"
-                    nextDayThreshold="23:59:59"
-                />
-                {selectedListing && (
-                    <Modal isOpen={isOpen} onClose={closeListingDetailModal} size={"sm"}>
-                        <ModalOverlay />
-                        <ModalContent>
-                            <ModalCloseButton />
-                            <ModalBody>
-                                <Skeleton isLoaded={imageLoaded} width="100%" borderRadius="lg" fadeDuration={1} p={5}>
-                                    <Image
-                                        height="200px"
-                                        src={selectedListing.image}
-                                        onLoad={() => setImageLoaded(true)}
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = "/placeholderImage.png";
-                                        }}
-                                        borderRadius="lg"
-                                        width={"100%"}
-                                        objectFit="cover"
-                                        style={{ pointerEvents: "none" }}
-                                        mt={3}
-                                    />
-                                </Skeleton>
-                                
-                                <Box display="flex" justifyContent={"center"}  fontWeight="bold">
-                                    <Text fontSize="25px">{selectedListing.fullTitle}</Text>
+        <div>
+            <FullCalendar
+                plugins={[dayGridPlugin]}
+                initialView="dayGridMonth"
+                weekends={true}
+                events={events}
+                eventContent={renderEventContent}
+                height={"660px"}
+                eventOverlap={false}
+                eventDisplay="block"
+                nextDayThreshold="23:59:59"
+            />
+            {selectedListing && (
+                <Modal isOpen={isOpen} onClose={closeListingDetailModal} size={"sm"}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            <Skeleton isLoaded={imageLoaded} width="100%" borderRadius="lg" fadeDuration={1} p={5}>
+                                <Image
+                                    height="200px"
+                                    src={selectedListing.image}
+                                    onLoad={() => setImageLoaded(true)}
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = "/placeholderImage.png";
+                                    }}
+                                    borderRadius="lg"
+                                    width={"100%"}
+                                    objectFit="cover"
+                                    style={{ pointerEvents: "none" }}
+                                    mt={3}
+                                />
+                            </Skeleton>
+                            
+                            <Box display="flex" justifyContent={"center"}  fontWeight="bold">
+                                <Text fontSize="25px">{selectedListing.fullTitle}</Text>
+                            </Box>
+
+                            <Box display="flex" justifyContent="center" mt={3}>
+                                <Text fontWeight={"bold"} fontSize="15px">{formatDate(selectedListing.datetime)}</Text>
+                            </Box>
+
+                            <HStack display="flex" justifyContent="center" spacing={10} mt={5}>
+                                <Box display="flex" alignItems="center" p="5px">
+                                    <FaWallet fill="#515F7C" size="30px" />
+                                    <Text fontSize="20px" ml="10px" mt={1}>${selectedListing.revenue}</Text>
                                 </Box>
 
-                                <Box display="flex" justifyContent="center" mt={3}>
-                                    <Text fontWeight={"bold"} fontSize="15px">{formatDate(selectedListing.datetime)}</Text>
+                                <Box display="flex" alignItems="center">
+                                    <BsFillPeopleFill size="30px" color="#515F7C"/>
+                                    <Text fontSize="20px" ml="10px" mt={1}>{selectedListing.slotsTaken}/{selectedListing.totalSlots}</Text>
                                 </Box>
+                            </HStack>
 
-                                <HStack display="flex" justifyContent="center" spacing={10} mt={5}>
-                                    <Box display="flex" alignItems="center" p="5px">
-                                        <FaWallet fill="#515F7C" size="30px" />
-                                        <Text fontSize="20px" ml="10px" mt={1}>${selectedListing.revenue}</Text>
-                                    </Box>
-
-                                    <Box display="flex" alignItems="center">
-                                        <BsFillPeopleFill size="30px" color="#515F7C"/>
-                                        <Text fontSize="20px" ml="10px" mt={1}>{selectedListing.slotsTaken}/{selectedListing.totalSlots}</Text>
-                                    </Box>
-                                </HStack>
-
-                            </ModalBody>
-                            <ModalFooter display="flex" justifyContent="center">
-                                <Button variant="MMPrimary" onClick={() => navigate("/expandedListingHost", { state: { listingID: selectedListing.listingID } })}>
-                                    View details
-                                </Button>
-                            </ModalFooter>
-                        </ModalContent>
-                    </Modal>
-                )}
-            </div>
-        </motion.div>
+                        </ModalBody>
+                        <ModalFooter display="flex" justifyContent="center">
+                            <Button variant="MMPrimary" onClick={() => navigate("/expandedListingHost", { state: { listingID: selectedListing.listingID } })}>
+                                View details
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
+        </div>
     );
 }

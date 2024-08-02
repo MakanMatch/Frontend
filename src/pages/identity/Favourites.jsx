@@ -5,7 +5,6 @@ import server from '../../networking'
 import configureShowToast from '../../components/showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import { useSelector, useDispatch } from 'react-redux';
-import { motion } from 'framer-motion';
 import FoodListingCard from '../../components/listings/FoodListingCard';
 import { SearchIcon } from "@chakra-ui/icons";
 
@@ -92,86 +91,80 @@ const Favourites = () => {
                     },
                 }}
             >
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <Box>
-                        <Stack divider={<StackDivider />} spacing='4'>
-                            <Box>
-                                <Heading p={5} ml={3} mb={-4} size={"lg"} textAlign="left">
-                                    My Favourites
-                                </Heading>
-                            </Box>
-                            <Box pl={4} pr={4}>
-                                {/* Search bar */}
-                                {favouritesListingDetails.length > 0 && (
-                                    <InputGroup mb={4}>
-                                        <Input
-                                            placeholder="Search by title or host name"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                        />
-                                        <InputRightElement children={<SearchIcon color="gray.300" />} />
-                                    </InputGroup>
-                                )}
-                                {filteredFavourites.length > 0 ? (
-                                    <SimpleGrid
-                                        spacing={4}
-                                        templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
-                                    >
-                                        {filteredFavourites.map((listing) => (
-                                            <SlideFade
-                                                in={true}
-                                                offsetY="20px"
-                                                key={listing.FavouriteListing.listingID}
-                                            >
-                                                <Box
-                                                    display={isBetween701And739 ? "flex" : "initial"}
-                                                    justifyContent={isBetween701And739 ? "center" : "initial"}>
-                                                    <FoodListingCard
-                                                        listingID={listing.listingID}
-                                                        title={listing.title}
-                                                        portionPrice={listing.portionPrice}
-                                                        hostName={listing.Host.username || "MakanMatch Host"}
-                                                        hostFoodRating={listing.Host.foodRating || 0}
-                                                        hostID={listing.Host.userID}
-                                                        images={listing.images.map((imageName) =>
-                                                            getImageLink(listing.listingID, imageName)
-                                                        ) || []}
-                                                        shortDescription={listing.shortDescription}
-                                                        address={listing.address}
-                                                        approxAddress={listing.approxAddress}
-                                                        totalSlots={listing.totalSlots}
-                                                        latitude={parseFloat(listing.coordinates.split(',')[0])}
-                                                        longitude={parseFloat(listing.coordinates.split(',')[1])}
-                                                    />
-                                                </Box>
-                                            </SlideFade>
-                                        ))}
-                                    </SimpleGrid>
-                                ) : (
-                                    <Box
-                                        display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        height="70vh"
-                                    >
-                                        <Text
-                                            textAlign="center"
-                                            fontSize="lg"
-                                            color="gray.500"
-                                            width="50%"
+                <Box>
+                    <Stack divider={<StackDivider />} spacing='4'>
+                        <Box>
+                            <Heading p={5} ml={3} mb={-4} size={"lg"} textAlign="left">
+                                My Favourites
+                            </Heading>
+                        </Box>
+                        <Box pl={4} pr={4}>
+                            {/* Search bar */}
+                            {favouritesListingDetails.length > 0 && (
+                                <InputGroup mb={4}>
+                                    <Input
+                                        placeholder="Search by title or host name"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                    <InputRightElement children={<SearchIcon color="gray.300" />} />
+                                </InputGroup>
+                            )}
+                            {filteredFavourites.length > 0 ? (
+                                <SimpleGrid
+                                    spacing={4}
+                                    templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+                                >
+                                    {filteredFavourites.map((listing) => (
+                                        <SlideFade
+                                            in={true}
+                                            offsetY="20px"
+                                            key={listing.FavouriteListing.listingID}
                                         >
-                                            No favourite listings available
-                                        </Text>
-                                    </Box>
-                                )}
-                            </Box>
-                        </Stack>
-                    </Box>
-                </motion.div>
+                                            <Box
+                                                display={isBetween701And739 ? "flex" : "initial"}
+                                                justifyContent={isBetween701And739 ? "center" : "initial"}>
+                                                <FoodListingCard
+                                                    listingID={listing.listingID}
+                                                    title={listing.title}
+                                                    portionPrice={listing.portionPrice}
+                                                    hostName={listing.Host.username || "MakanMatch Host"}
+                                                    hostFoodRating={listing.Host.foodRating || 0}
+                                                    hostID={listing.Host.userID}
+                                                    images={listing.images.map((imageName) =>
+                                                        getImageLink(listing.listingID, imageName)
+                                                    ) || []}
+                                                    shortDescription={listing.shortDescription}
+                                                    address={listing.address}
+                                                    approxAddress={listing.approxAddress}
+                                                    totalSlots={listing.totalSlots}
+                                                    latitude={parseFloat(listing.coordinates.split(',')[0])}
+                                                    longitude={parseFloat(listing.coordinates.split(',')[1])}
+                                                />
+                                            </Box>
+                                        </SlideFade>
+                                    ))}
+                                </SimpleGrid>
+                            ) : (
+                                <Box
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    height="70vh"
+                                >
+                                    <Text
+                                        textAlign="center"
+                                        fontSize="lg"
+                                        color="gray.500"
+                                        width="50%"
+                                    >
+                                        No favourite listings available
+                                    </Text>
+                                </Box>
+                            )}
+                        </Box>
+                    </Stack>
+                </Box>
             </Box>
         </Box>
     );

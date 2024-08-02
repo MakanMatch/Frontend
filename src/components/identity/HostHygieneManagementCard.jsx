@@ -20,46 +20,46 @@ function HostHygieneManagementCard({ username, email, hygieneGrade, hostID }) {
         navigate("/reviews", { state: { hostID: hostID } });
     }
 
-    // const handleIssueWarning = async() => {
-    //     try {
-    //         const response = await server.post("/admin/hygieneReports/issueWarning", { hostID });
-    //         dispatch(reloadAuthToken(authToken))              
-    //         if (response.status === 200) {
-    //             showToast("Warning issued", `${username} has been issued a warning`, 3000, true, "success");
-    //         }
-    //     } catch (error) {
-    //         dispatch(reloadAuthToken(authToken))
-    //         if (error.response && error.response.data && typeof error.response.data == "string") {
-    //             console.log("Failed to issue warning to host; response: " + error.response)
-    //             if (error.response.data.startsWith("UERROR")) {
-    //                 showToast(
-    //                     "Uh-oh!",
-    //                     error.response.data.substring("UERROR: ".length),
-    //                     3500,
-    //                     true,
-    //                     "info"
-    //                 )
-    //             } else {
-    //                 showToast(
-    //                     "Something went wrong",
-    //                     "Failed to issue warning to host. Please try again",
-    //                     3500,
-    //                     true,
-    //                     "error"
-    //                 )
-    //             }
-    //         } else {
-    //             console.log("Unknown error occurred when issuing warning to host; error: " + error)
-    //             showToast(
-    //                 "Something went wrong",
-    //                 "Failed to issue warning to host. Please try again",
-    //                 3500,
-    //                 true,
-    //                 "error"
-    //             )
-    //         }
-    //     }
-    // }
+    const handleIssueWarning = async() => {
+        try {
+            const response = await server.post("/admin/hygieneReports/issueWarning", { hostID });
+            dispatch(reloadAuthToken(authToken))              
+            if (response.status === 200) {
+                showToast("Warning issued", `${username} has been issued a warning`, 3000, true, "success");
+            }
+        } catch (error) {
+            dispatch(reloadAuthToken(authToken))
+            if (error.response && error.response.data && typeof error.response.data == "string") {
+                console.log("Failed to issue warning to host; response: " + error.response)
+                if (error.response.data.startsWith("UERROR")) {
+                    showToast(
+                        "Uh-oh!",
+                        error.response.data.substring("UERROR: ".length),
+                        3500,
+                        true,
+                        "info"
+                    )
+                } else {
+                    showToast(
+                        "Something went wrong",
+                        "Failed to issue warning to host. Please try again",
+                        3500,
+                        true,
+                        "error"
+                    )
+                }
+            } else {
+                console.log("Unknown error occurred when issuing warning to host; error: " + error)
+                showToast(
+                    "Something went wrong",
+                    "Failed to issue warning to host. Please try again",
+                    3500,
+                    true,
+                    "error"
+                )
+            }
+        }
+    }
 
 	return (
         <HStack display="flex" justifyContent={"space-between"}>
@@ -84,14 +84,14 @@ function HostHygieneManagementCard({ username, email, hygieneGrade, hostID }) {
                 </Text>
             </Box>
             
-            {/* <Box width={"3%"}>
+            <Box width={"3%"}>
                 <Menu>
                     <MenuButton as={IconButton} icon={<BsThreeDotsVertical />} variant="ghost" cursor="pointer" aria-label="Options" />
                     <MenuList>
                         <MenuItem color="red" onClick={handleIssueWarning}>Issue warning</MenuItem>
                     </MenuList>
                 </Menu>
-            </Box> */}
+            </Box>
             
         </HStack>
     );
