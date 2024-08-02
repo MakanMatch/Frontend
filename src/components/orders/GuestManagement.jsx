@@ -8,6 +8,7 @@ import { reloadAuthToken } from '../../slices/AuthState'
 import configureShowToast from '../../components/showToast'
 import { FaCommentDots, FaCheck } from "react-icons/fa";
 import { CloseIcon } from '@chakra-ui/icons'
+import Extensions from '../../extensions'
 
 function GuestManagement({
     listingID,
@@ -17,7 +18,7 @@ function GuestManagement({
     const [guestsList, setGuestsList] = useState([]);
     const dispatch = useDispatch();
     const { user, loaded, authToken } = useSelector((state) => state.auth);
-    const [selectedImage, setSelectedImage] = useState(null); 
+    const [selectedImage, setSelectedImage] = useState(null);
     const [selectedGuestUsername, setSelectedGuestUsername] = useState(null);
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -162,7 +163,7 @@ function GuestManagement({
                                     size="md"
                                     mr={{ base: 0, md: 4 }}
                                     mb={{ base: 2, md: 0 }}
-                                    onClick={ () => {
+                                    onClick={() => {
                                         setSelectedGuestUsername(guest.username)
                                         setSelectedImage(`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`)
                                         onOpen()
@@ -216,9 +217,9 @@ function GuestManagement({
                             <Flex
                                 direction="row"
                                 alignItems="center"
-                                justifyContent={{base:"center", md:"right"}}
+                                justifyContent={{ base: "center", md: "right" }}
                                 width="100%"
-                                mt={{base: 4, md: 1}}
+                                mt={{ base: 4, md: 1 }}
                                 gap={2}
                                 wrap="wrap"  // Ensure wrapping of buttons
                             >
@@ -289,8 +290,9 @@ function GuestManagement({
                                 >
                                     <Text fontWeight="bold" fontSize={{ base: "lg", md: "xl" }}>Cancelled within six hours</Text>
                                     <Text fontSize={{ base: "sm", md: "md" }}>
-                                        {guest.fname} {guest.lname} just cancelled their reservation. Check that they've paid the cancellation fee of ${guest.Reservation.totalPrice * 2} and confirm cancellation.
+                                        {guest.fname} {guest.lname} just cancelled their reservation. Check that they've paid the cancellation fee of <span style={{ color: "red", fontWeight: "bold" }}>{Extensions.formatCurrency(guest.Reservation.totalPrice * 2)}</span> and confirm cancellation.
                                     </Text>
+
                                 </Box>
                                 <Box>
                                     <Button
