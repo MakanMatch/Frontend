@@ -36,10 +36,18 @@ function PublicGuestProfile() {
                     localStorage.removeItem('jwt');
                 } else if (err.response && err.response.status && err.response.status == 403) {
                     showToast("Account Banned", "The account you are trying to access has been banned.", 3000, true, "error");   
-                    navigate(-1);
+                    if (window.history.length > 1) {
+                        navigate(-1);
+                    } else {
+                        navigate('/');
+                    }
                 } else {
                     showToast("Unable to retrieve account information", "Please try again", 3000, true, "error");
-                    navigate(-1);
+                    if (window.history.length > 1) {
+                        navigate(-1);
+                    } else {
+                        navigate('/');
+                    }
                 }
                 
             }

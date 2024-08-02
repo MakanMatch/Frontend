@@ -22,7 +22,7 @@ function HostHygieneManagementCard({ username, email, hygieneGrade, hostID }) {
 
     const handleIssueWarning = async() => {
         try {
-            const response = await server.post("/admin/hygieneReports/issueWarning", { hostID });
+            const response = await server.post("/admin/hygieneReports/issueWarning", { reason, hostID });
             dispatch(reloadAuthToken(authToken))              
             if (response.status === 200) {
                 showToast("Warning issued", `${username} has been issued a warning`, 3000, true, "success");

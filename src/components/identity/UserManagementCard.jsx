@@ -16,7 +16,6 @@ function UserManagementCard({ username, fname, lname, email, userType, contactNu
     const navigate = useNavigate()
 
     const [isBanned, setIsBanned] = useState(banned)
-    const [imageLoaded, setImageLoaded] = useState(false)
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isOpenEditDetails, onOpen: onOpenEditDetails, onClose: onCloseEditDetails } = useDisclosure();
