@@ -260,7 +260,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                 <ChevronRightIcon boxSize={8} mr={-1} mt={-4} onClick={handleNextImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} right="-5" zIndex={1} />
                             </Box>
                         )}
-                        <Skeleton isLoaded={imageLoaded} height="150px" width="310px" borderRadius="5px" fadeDuration={1}>
+                        <Skeleton isLoaded={imageLoaded} height="150px" width="310px" borderRadius="5px" fadeDuration={2}>
                             <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ rotate: 0, scale: 1 }}
@@ -383,7 +383,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                     </Box>
                                 </>
                             ) : (
-                                <Skeleton height="100px" width="100%" borderRadius={"10px"} />
+                                <Skeleton height="100px" width="100%" borderRadius={"10px"} fadeDuration={2} />
                             )}
                         </Box>
                         <Link to={'/reviews'} state={{ hostID }}>

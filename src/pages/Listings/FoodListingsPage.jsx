@@ -137,9 +137,15 @@ const FoodListingsPage = () => {
     
     return (
         <>
-            <Text fontSize={"30px"} mb={4}>
-                {user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
-            </Text>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <Text fontSize={"30px"} mb={4}>
+                    {user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
+                </Text>
+            </motion.div>
             {isSmallerThan1095 && listings.length > 0 && (
                 <Box mb={4}>
                     <MarkeredGMaps

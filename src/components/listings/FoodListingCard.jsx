@@ -38,7 +38,7 @@ const FoodListingCard = ({
                     <CardBody padding={0}>
                         <Box>
                             <SlideFade in={true} offsetY="20px">
-                                <Skeleton isLoaded={imageLoaded} height="108px" width="100%" borderRadius="13px 13px 0 0" fadeDuration={0.7}>
+                                <Skeleton isLoaded={imageLoaded} height="108px" width="100%" borderRadius="13px 13px 0 0" fadeDuration={2}>
                                     <Image
                                         key={images[0]}
                                         src={images[0]}

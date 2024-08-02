@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { reloadAuthToken } from "../../slices/AuthState";
+import { motion } from "framer-motion";
 import GuestSideNav from "../../components/identity/GuestSideNav";
 import MakanHistoryCard from "../../components/identity/MakanHistoryCard";
 import configureShowToast from '../../components/showToast';
@@ -91,24 +92,30 @@ const MakanHistory = () => {
                     },
                 }}
             >
-                <Box>
-                    <Stack divider={<StackDivider />} spacing='4'>
-                        <Box>
-                            <Heading p={5} ml={3} mb={-4} size={"lg"} textAlign="left">
-                                Makan History
-                            </Heading>
-                        </Box>
-                        <Box display="flex" flexDir={"column"} padding="20px">
-                            {reservations && reservations.map((reservation) => (
-                                <MakanHistoryCard
-                                    key={reservation.referenceNum}
-                                    reservation={reservation}
-                                    listing={listings.find((listing) => listing.listingID === reservation.listingID)}
-                                />
-                            ))}
-                        </Box>
-                    </Stack>
-                </Box>
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <Box>
+                        <Stack divider={<StackDivider />} spacing='4'>
+                            <Box>
+                                <Heading p={5} ml={3} mb={-4} size={"lg"} textAlign="left">
+                                    Makan History
+                                </Heading>
+                            </Box>
+                            <Box display="flex" flexDir={"column"} padding="20px">
+                                {reservations && reservations.map((reservation) => (
+                                    <MakanHistoryCard
+                                        key={reservation.referenceNum}
+                                        reservation={reservation}
+                                        listing={listings.find((listing) => listing.listingID === reservation.listingID)}
+                                    />
+                                ))}
+                            </Box>
+                        </Stack>
+                    </Box>
+                </motion.div>
             </Box>
         </Box>
     );

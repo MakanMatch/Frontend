@@ -19,7 +19,6 @@ function UserManagement() {
         try {
             const response = await server.get('/cdn/fetchAllUsers')
             if (response.status === 200) {
-                console.log("Users: ", response.data)
                 setUsers(response.data)
                 setUsersLoaded(true)
             }
@@ -115,9 +114,12 @@ function UserManagement() {
                                 users.map((user) => (
                                     <UserManagementCard
                                         key={user.userID}
+                                        fname={user.fname}
+                                        lname={user.lname}
                                         username={user.username}
                                         email={user.email}
                                         userType={user.userType}
+                                        contactNum={user.contactNum}
                                         userID={user.userID}
                                         banned={user.banned}
                                         fetchAllUsers={fetchAllUsers}
