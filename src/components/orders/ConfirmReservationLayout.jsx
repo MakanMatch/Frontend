@@ -52,7 +52,7 @@ function ConfirmReservationLayout({
 
                             <Text fontWeight={"bold"}>Date and Time:</Text>
                             <Text>{listingData.datetime}</Text>
-                            <Text mb={"20px"}>{new Date(listingData.fullDatetime).toLocaleString('en-US', { timeStyle: 'short' }) }</Text>
+                            <Text mb={"20px"}>{new Date(listingData.fullDatetime).toLocaleString('en-US', { timeStyle: 'short' })}</Text>
 
                             <Text fontWeight={"bold"}>Host:</Text>
                             <Text mb={"20px"}>{hostData.username}</Text>
@@ -79,20 +79,29 @@ function ConfirmReservationLayout({
                     <Box textAlign={"left"} flexDirection={"column"}>
                         {user ? (
                             <>
-                                <Heading as={"h5"} size={"md"} mb={"5px"}>Profile</Heading>
-                                <Text fontWeight={"light"}>
-                                    Details retrieved from your MakanMatch account.
-                                    <ChakraLink as={Link} to={"/identity/myaccount"} ml={"5px"} color={'primaryColour'}>Change here.</ChakraLink>
-                                </Text>
+                                {user.userType == "Guest" ? (
+                                    <Box>
+                                        <Heading as={"h5"} size={"md"} mb={"5px"}>Profile</Heading>
+                                        <Text fontWeight={"light"}>
+                                            Details retrieved from your MakanMatch account.
+                                            <ChakraLink as={Link} to={"/identity/myaccount"} ml={"5px"} color={'primaryColour'}>Change here.</ChakraLink>
+                                        </Text>
 
-                                <FormControl mt={"10px"}>
-                                    <FormLabel>Username</FormLabel>
-                                    <Input type='text' placeholder='John Doe' value={user.username} isReadOnly />
-                                    <FormLabel mt={"10px"}>Contact Number</FormLabel>
-                                    <Input type="number" placeholder='Not Provided (Recommended to provide)' value={userData.contactNum} isReadOnly />
-                                    <FormLabel mt={"10px"}>Email</FormLabel>
-                                    <Input type='text' placeholder='email@example.com' value={userData.email} isReadOnly />
-                                </FormControl>
+                                        <FormControl mt={"10px"}>
+                                            <FormLabel>Username</FormLabel>
+                                            <Input type='text' placeholder='John Doe' value={user.username} isReadOnly />
+                                            <FormLabel mt={"10px"}>Contact Number</FormLabel>
+                                            <Input type="number" placeholder='Not Provided (Recommended to provide)' value={userData.contactNum} isReadOnly />
+                                            <FormLabel mt={"10px"}>Email</FormLabel>
+                                            <Input type='text' placeholder='email@example.com' value={userData.email} isReadOnly />
+                                        </FormControl>
+                                    </Box>
+                                ) : (
+                                    <Box>
+                                        <Heading as={"h5"} size={"md"} mb={"5px"}>Oops!</Heading>
+                                        <Text fontWeight={"light"}>You're logged in as a Host currently. Login with a Guest account to make a reservation for this listing.</Text>
+                                    </Box>
+                                )}
                             </>
                         ) : (
                             <>
@@ -103,14 +112,14 @@ function ConfirmReservationLayout({
                     </Box>
                 </Box>
 
-                {!isSmallerThan800 && (
+                {!isSmallerThan800 && user.userType == "Guest" && (
                     <Box display={"flex"} justifyContent={"center"}>
                         <ConfirmReserveCard listingData={listingData} userData={userData} hostData={hostData} fetchListingDetails={fetchListingDetails} />
                     </Box>
                 )}
             </Box>
 
-            {isSmallerThan800 && (
+            {isSmallerThan800 && user.userType == "Guest" && (
                 <Box display={"flex"} justifyContent={"center"} mt={"50px"}>
                     <ConfirmReserveCard listingData={listingData} userData={userData} hostData={hostData} fetchListingDetails={fetchListingDetails} />
                 </Box>
