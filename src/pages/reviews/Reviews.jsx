@@ -21,7 +21,7 @@ function Reviews() {
     const navigate = useNavigate();
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const [hostName, setHostName] = useState("");
-    const [hostAddress, setHostAddress] = useState("");
+    const [hostApproxAddress, setHostApproxAddress] = useState("");
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
     const [stateRefresh, refreshState] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -61,7 +61,7 @@ function Reviews() {
                 return
             } else {
                 setHostName(response.data.username);
-                setHostAddress(response.data.address);
+                setHostApproxAddress(response.data.approxAddress);
                 setHostHygieneGrade(response.data.hygieneGrade);
             }
         } catch (error) {
@@ -154,11 +154,11 @@ function Reviews() {
                 <Spacer display={{ base: 'none', md: 'block' }} />
                 <Box display="flex" justifyContent="center" alignItems="center" background="gray.200" borderRadius="15px" p={5} mb={4}>
                     <Flex alignItems="center" maxWidth="100%">
-                        <Tooltip label="This box contains the host address" aria-label="Host address tooltip">
+                        <Tooltip label="This box contains the host approximate address" aria-label="Host approximate address tooltip">
                             <InfoOutlineIcon mr={2} />
                         </Tooltip>
                         <Text fontSize="m" whiteSpace="normal" wordBreak="break-word">
-                            {hostAddress}
+                            {hostApproxAddress}
                         </Text>
                     </Flex>
                 </Box>
