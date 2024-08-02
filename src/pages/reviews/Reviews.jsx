@@ -22,6 +22,7 @@ function Reviews() {
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const [hostName, setHostName] = useState("");
     const [hostApproxAddress, setHostApproxAddress] = useState("");
+    const [hostReviewsCount, setHostReviewsCount] = useState(0);
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
     const [stateRefresh, refreshState] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -63,6 +64,7 @@ function Reviews() {
                 setHostName(response.data.username);
                 setHostApproxAddress(response.data.approxAddress);
                 setHostHygieneGrade(response.data.hygieneGrade);
+                setHostReviewsCount(response.data.reviewsCount);
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
@@ -134,11 +136,16 @@ function Reviews() {
                         </Flex>
                         <Flex gap={3}>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            <Tooltip label={`Hygiene grade for ${hostName}`} aria-label="Hygiene grade tooltip">
-                                <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
-                                    {hostHygieneGrade}
-                                </Button>
-                            </Tooltip>
+                            {hostReviewsCount > 0 && (
+                                <>
+                                    <Spacer display={{ base: 'none', md: 'block' }} />
+                                    <Tooltip label={`Number of reviews for ${hostName}`} aria-label="Number of reviews tooltip">
+                                        <Button variant="solid" colorScheme="blue" size="md" borderRadius="10px" cursor="default" >
+                                            {hostHygieneGrade}
+                                        </Button>
+                                    </Tooltip>
+                                </>
+                            )}
                             <Spacer display={{ base: 'none', md: 'block' }} />
                             {user && user.userID && user.userID != hostID && (
                                 <SubmitReviews
