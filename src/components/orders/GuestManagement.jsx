@@ -17,6 +17,8 @@ function GuestManagement({
     const [guestsList, setGuestsList] = useState([]);
     const dispatch = useDispatch();
     const { user, loaded, authToken } = useSelector((state) => state.auth);
+    const [selectedImage, setSelectedImage] = useState(null); 
+    const [selectedGuestUsername, setSelectedGuestUsername] = useState(null);
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
@@ -160,7 +162,11 @@ function GuestManagement({
                                     size="md"
                                     mr={{ base: 0, md: 4 }}
                                     mb={{ base: 2, md: 0 }}
-                                    onClick={onOpen}
+                                    onClick={ () => {
+                                        setSelectedGuestUsername(guest.username)
+                                        setSelectedImage(`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`)
+                                        onOpen()
+                                    }}
                                 />
                                 <Box>
                                     <Flex
@@ -308,7 +314,18 @@ function GuestManagement({
             ) : (
                 <Text textAlign={textAlign} color="grey" fontSize="large" mt={6}>
                     Oops, there are no reservations made yet!
-                </Text>)}
+                </Text>
+            )}
+            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                <ModalOverlay />
+                <ModalContent maxW="max-content" background="transparent" boxShadow="none">
+                    <Avatar
+                        name={selectedGuestUsername}
+                        boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
+                        src={selectedImage}
+                    />
+                </ModalContent>
+            </Modal>
         </>
     )
 }
