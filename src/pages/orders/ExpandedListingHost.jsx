@@ -1,5 +1,5 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip, Badge, ScaleFade, Stack } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip, Badge, ScaleFade, Stack, useBreakpointValue } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
@@ -9,6 +9,8 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import DeleteImageAlert from '../../components/orders/DeleteImageAlert'
 import UploadNewImageModal from '../../components/orders/UploadNewImageModal'
 import HostListingImage from '../../components/orders/HostListingImage'
+import HostPaymentQR from '../../components/orders/HostPaymentQR'
+import GuestManagement from '../../components/orders/GuestManagement'
 import configureShowToast from '../../components/showToast'
 import { reloadAuthToken } from '../../slices/AuthState'
 
@@ -49,10 +51,15 @@ function ExpandedListingHost() {
     const [file, setFile] = useState(null);
     const { user, loaded, error, authToken } = useSelector(state => state.auth)
     const dispatch = useDispatch();
+    const [editListing, setEditListing] = useState(true)
+    const isBase = useBreakpointValue({ base: true, md: false });
 
     const handleClose = () => {
         onClose()
         setFile(null)
+    }
+    const handleEditListing = () => {
+        setEditListing(!editListing)
     }
     const handleDeleteImageDialogClosure = () => {
         closeDeleteImageDialog()
@@ -132,7 +139,7 @@ function ExpandedListingHost() {
     useEffect(checkForChanges, [shortDescription, longDescription, guestSlots, pricePerPortion])
 
     const fetchListingDetails = (id) => {
-        server.get(`/cdn/getListing?id=${id || listingID}`)
+        server.get(`/cdn/getListing?id=${id || listingID}&includeReservations=true`)
             .then(response => {
                 dispatch(reloadAuthToken(authToken))
                 if (response.status == 200) {
@@ -271,74 +278,107 @@ function ExpandedListingHost() {
                 gap={4}
                 p={"10px"}
             >
-                <GridItem colSpan={2}>
-                    <VStack alignItems={"flex-start"}>
+                <GridItem colSpan={{ base: 3, md: 2 }}>
+                    <VStack alignItems={{ base: "center", md: "flex-start" }}>
                         <Text>{listingData.datetime}</Text>
-                        <HStack spacing={5} alignItems={'center'}>
-                            <Heading>{listingData.title}</Heading>
-                            <ScaleFade initialScale={0.5} in={!listingPublished}>
-                                <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>HIDDEN</Badge>
-                            </ScaleFade>
-                        </HStack>
-                    </VStack>
-                </GridItem>
-                <GridItem colSpan={1} alignContent={"flex-end"}>
-                    {changesMade && (
-                        <SlideFade in={true}>
-                            <HStack>
-                                <Spacer />
-                                <Button variant={"MMPrimary"} onClick={handleSaveChanges}>Save Changes</Button>
-                            </HStack>
-                        </SlideFade>
-                    )}
-                </GridItem>
-                <GridItem colSpan={3} mb={"20px"}>
-                    <VStack alignItems={"flex-start"}>
-                        <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
-                            {listingData.images.map((imgName, index) => {
-                                if (imgName) {
-                                    return (
-                                        <HostListingImage key={index} index={index} listingImages={listingData.images} imgURL={imgBackendURL(imgName)} imgName={imgName} handleDeleteImage={handleDeleteImage} />
-                                    )
-                                }
-                            })}
-                            <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={onOpen} rounded={"10px"}>
-                                <SmallAddIcon boxSize={"10"} />
-                            </Center>
-                        </HStack>
-                    </VStack>
-                </GridItem>
-                <GridItem colSpan={2}>
-                    <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
-                        <VStack alignItems={"flex-start"} width={"100%"}>
-                            <Text fontWeight={"bold"} mb={"10px"}>Short Description (shown on Home page)</Text>
-                            <Input placeholder='Briefly describe your dish' value={shortDescription} onChange={handleShortDescriptionChange} />
-
-                            <Text fontWeight={"bold"} mb={"10px"} mt={5}>Description</Text>
-                            <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleLongDescriptionChange} />
-                        </VStack>
-
-                        {/* <Spacer /> */}
-
-                        <VStack alignItems={"flex-start"} width={"100%"}>
-                            <Heading size={"md"}>Listing Statistics</Heading>
-
-                            <HStack spacing={"30px"} wrap={"wrap"}>
-                                <Statistic value={"2/5"} description={"Reservations"} />
-                                <Statistic value={"1000"} description={"Impressions"} />
-                                <Statistic value={"45%"} description={"Click-Through Rate"} />
-                                <Statistic value={"$7.00"} description={"Revenue"} />
-                            </HStack>
+                        <VStack alignItems={{ base: "center", md: "flex-start" }}>
+                            {isBase ? (
+                                <>
+                                    <Heading>{listingData.title}</Heading>
+                                    <ScaleFade initialScale={0.5} in={!listingPublished}>
+                                        <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>HIDDEN</Badge>
+                                    </ScaleFade>
+                                </>
+                            ) : (
+                                <HStack spacing={5} alignItems={'center'}>
+                                    <Heading>{listingData.title}</Heading>
+                                    <ScaleFade initialScale={0.5} in={!listingPublished}>
+                                        <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>HIDDEN</Badge>
+                                    </ScaleFade>
+                                </HStack>
+                            )}
                         </VStack>
                     </VStack>
                 </GridItem>
-
-                <GridItem colSpan={1}>
-                    <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
+                <GridItem colSpan={{ base: 3, md: 1 }}>
+                    <VStack h="92%" justify={{ base: "center", md: "flex-end" }} alignItems={{ base: "center", md: "flex-end" }} spacing={4}>
+                        {changesMade && (
+                            <SlideFade in={true}>
+                                <Button variant="MMPrimary" onClick={handleSaveChanges}>Save Changes</Button>
+                            </SlideFade>
+                        )}
+                        <Button variant="link" onClick={handleEditListing} color="blue" textDecoration="underline">
+                            {editListing ? "Manage Guests" : "Edit Listing"}
+                        </Button>
+                    </VStack>
                 </GridItem>
+                {/*Edit Listing*/}
+                {editListing ? (
+                    <>
+                        <GridItem colSpan={3} mb={"20px"}>
+                            <VStack alignItems={"flex-start"}>
+                                <HStack spacing={"10px"} overflowX={"auto"} height={"250px"}>
+                                    {listingData.images.map((imgName, index) => {
+                                        if (imgName) {
+                                            return (
+                                                <HostListingImage key={index} index={index} listingImages={listingData.images} imgURL={imgBackendURL(imgName)} imgName={imgName} handleDeleteImage={handleDeleteImage} />
+                                            )
+                                        }
+                                    })}
+                                    <Center h={"100%"} aspectRatio={"1"} bg={"gray.300"} textAlign={"center"} onClick={onOpen} rounded={"10px"}>
+                                        <SmallAddIcon boxSize={"10"} />
+                                    </Center>
+                                </HStack>
+                            </VStack>
+                        </GridItem>
+                        <GridItem colSpan={{ base: 3, md: 2 }}>
+                            <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
+                                <VStack alignItems={"flex-start"} width={"100%"}>
+                                    <Text fontWeight={"bold"} mb={"10px"}>Short Description (shown on Home page)</Text>
+                                    <Input placeholder='Briefly describe your dish' value={shortDescription} onChange={handleShortDescriptionChange} />
+
+                                    <Text fontWeight={"bold"} mb={"10px"} mt={5}>Description</Text>
+                                    <Textarea placeholder='Describe your dish here' value={longDescription} onChange={handleLongDescriptionChange} />
+                                </VStack>
+
+                                {/* <Spacer /> */}
+
+                                <VStack alignItems={"flex-start"} width={"100%"} mt={3}>
+                                    <Heading size={"md"}>Listing Statistics</Heading>
+
+                                    <HStack spacing={"30px"} wrap={"wrap"}>
+                                        <Statistic value={"2/5"} description={"Reservations"} />
+                                        <Statistic value={"1000"} description={"Impressions"} />
+                                        <Statistic value={"45%"} description={"Click-Through Rate"} />
+                                        <Statistic value={"$7.00"} description={"Revenue"} />
+                                    </HStack>
+                                </VStack>
+                            </VStack>
+                        </GridItem>
+
+                        <GridItem colSpan={{ base: 3, md: 1 }} mt={3}>
+                            <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
+                        </GridItem>
+
+                        <UploadNewImageModal isOpen={isOpen} handleClose={handleClose} handleFileSubmission={handleFileSubmission} isUploading={isUploading} uploadImage={uploadImage} />
+                        <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} showToast={showToast} refreshPage={fetchListingDetails} />
+                    </>
+                ) : (
+                    <>
+                        <GridItem colSpan={{ base: 3, md: 2 }}>
+                            <GuestManagement
+                                listingID={listingData.listingID}
+                                guests={listingData.guests}
+                                fetchListingDetails={fetchListingDetails}
+                            />
+                        </GridItem>
+                        <GridItem colSpan={{ base: 3, md: 1 }}>
+                            <HostPaymentQR />
+                        </GridItem>
+
+                    </>
+                )}
             </Grid>
-            <UploadNewImageModal isOpen={isOpen} handleClose={handleClose} handleFileSubmission={handleFileSubmission} isUploading={isUploading} uploadImage={uploadImage} />
-            <DeleteImageAlert isOpen={deleteImageDialogOpen} onClose={handleDeleteImageDialogClosure} listingID={listingData.listingID} imageName={imageToBeDeleted} showToast={showToast} refreshPage={fetchListingDetails} />
         </>
     )
 }

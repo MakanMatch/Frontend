@@ -1,13 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton, WrapItem, Tooltip } from "@chakra-ui/react";
 import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
+import { motion } from "framer-motion";
 import server from "../../networking";
 
 function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
@@ -65,7 +66,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
             } catch (error) {
                 dispatch(reloadAuthToken(authToken))
                 if (error.response && error.response.data && typeof error.response.data == "string") {
-                    console.log("Failed to favourite listing; response: " + error.response)
+                    console.log("Failed to favourite listing; response: " + error.response.data)
                     if (error.response.data.startsWith("UERROR")) {
                         displayToast(
                             "Uh-oh!",
@@ -122,8 +123,8 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                 dispatch(reloadAuthToken(authToken))
                 if (error.response && error.response.data) {
                     if (error.response.data.startsWith("UERROR")) {
-                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3500, true, "error")
-                        console.log("User error occurred in retrieving favourite listings; error: ", err.response.data);
+                        displayToast("Something went wrong", error.response.data.substring("UERROR: ".length), 3500, true, "error")
+                        console.log("User error occurred in retrieving favourite listings; error: ", error.response.data);
                         setFavourite(false);
                     } else {
                         displayToast("Error", "Failed to fetch favourite state", "error", 3000, false);
@@ -162,7 +163,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
             if (error.response && error.response.data && typeof error.response.data == "string") {
-                console.log("Failed to fetch host's food rating; response: " + error.response)
+                console.log("Failed to fetch host's food rating; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
                         "Uh-oh!",
@@ -260,23 +261,33 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             </Box>
                         )}
                         <Skeleton isLoaded={imageLoaded} height="150px" width="310px" borderRadius="5px" fadeDuration={1}>
-                            <Image
-                                key={images[imageIndex]}
-                                src={images[imageIndex]}
-                                onError={(e) => {
-                                    e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
-                                    e.target.src = "/placeholderImage.png";
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ rotate: 0, scale: 1 }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 260,
+                                    damping: 20
                                 }}
-                                onLoad={() => setImageLoaded(true)}
-                                borderRadius="5px"
-                                minWidth="310px"
-                                maxWidth="310px"
-                                minHeight="150px"
-                                maxHeight="150px"
-                                objectFit="cover"
-                                style={{ pointerEvents: "none" }}
-                                className="image"
-                            />
+                            >
+                                <Image
+                                    key={images[imageIndex]}
+                                    src={images[imageIndex]}
+                                    onError={(e) => {
+                                        e.target.onerror = null; // Prevent infinite loop if placeholder also fails to load
+                                        e.target.src = "/placeholderImage.png";
+                                    }}
+                                    onLoad={() => setImageLoaded(true)}
+                                    borderRadius="5px"
+                                    minWidth="310px"
+                                    maxWidth="310px"
+                                    minHeight="150px"
+                                    maxHeight="150px"
+                                    objectFit="cover"
+                                    style={{ pointerEvents: "none" }}
+                                    className="image"
+                                />
+                            </motion.div>
                         </Skeleton>
                         <Text
                             borderRadius="50%"
@@ -292,7 +303,11 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             zIndex="10"
                             backgroundColor="white"
                             cursor="pointer"
-                            onClick={() => navigate(-1)}>
+                            onClick={() => {
+                                localStorage.removeItem("mapRemountDenyOnModalOpen");
+                                localStorage.removeItem("mapRemountDenyOnModalClose");
+                                navigate(-1)
+                            }}>
                             <ArrowBackIcon height="50%" />
                         </Text>
                     </Box>
@@ -382,8 +397,19 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                         <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1} className="enable-select" maxW={"80%"} overflow="hidden">{renderDescription()}</Text>
                     </Box>
 
-                    <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1} mt={1}><FaMapMarkerAlt fill="#515F7C" /></Text><Text ml={1} className="enable-select">{approxAddress}</Text>
+                    <Box display="flex" justifyContent="left" mb={1}>
+                        <WrapItem>
+                            <Tooltip label='Full address will be provided upon successful reservation' placement="right" borderRadius={'lg'} openDelay={500}>
+                                <Box display="flex" alignItems="center">
+                                    <Text mr={1} mt={1}>
+                                        <FaMapMarkerAlt fill="#515F7C" />
+                                    </Text>
+                                    <Text ml={1} className="enable-select">
+                                        {approxAddress}
+                                    </Text>
+                                </Box>
+                            </Tooltip>
+                        </WrapItem>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>

@@ -19,7 +19,6 @@ function ConfirmReservationLayout({
     const { user, loaded, authToken } = useSelector(state => state.auth)
 
     const handleGoBack = () => {
-        console.log("hello")
         if (window.history.length > 1) {
             navigate(-1);
         } else {
@@ -89,6 +88,8 @@ function ConfirmReservationLayout({
                                 <FormControl mt={"10px"}>
                                     <FormLabel>Username</FormLabel>
                                     <Input type='text' placeholder='John Doe' value={user.username} isReadOnly />
+                                    <FormLabel mt={"10px"}>Contact Number</FormLabel>
+                                    <Input type="number" placeholder='Not Provided (Recommended to provide)' value={userData.contactNum} isReadOnly />
                                     <FormLabel mt={"10px"}>Email</FormLabel>
                                     <Input type='text' placeholder='email@example.com' value={userData.email} isReadOnly />
                                 </FormControl>

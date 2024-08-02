@@ -105,6 +105,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
             })
             dispatch(reloadAuthToken(authToken));
             if (addListingResponse.status == 200) {
+                onClose();
                 setDefaultState();
                 setIsSubmitting(false);
                 if (addListingResponse.data.listingDetails.published === false) {
@@ -123,7 +124,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
             dispatch(reloadAuthToken(authToken));
             setIsSubmitting(false);
             if (error.response && error.response.data && typeof error.response.data == "string") {
-                console.log("Failed to add listing; response: " + error.response)
+                console.log("Failed to add listing; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
                         "Uh-oh!",
@@ -160,6 +161,22 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
     const handlePublishToggle = () => {
         setIsChecked(!isChecked);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter" ) {
+            if (validListing && !isSubmitting && !modalError) {
+                handleSubmitListing();
+            } else {
+                displayToast(
+                    "Uh-oh!",
+                    "Please fill in all the required fields before submitting",
+                    "error",
+                    3000,
+                    true
+                );
+            }
+        }
     };
 
     const handleFileChange = (event) => {
@@ -231,7 +248,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
     useEffect(() => {
         if (portionPrice > 10) {
-            setPortionPrice(10);
             displayToast(
                 "Woah, that's too expensive!",
                 "Fee cannot exceed $10",
@@ -244,7 +260,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
     useEffect(() => {
         if (totalSlots > 10) {
-            setTotalSlots(10);
             displayToast(
                 "Too many Slots!",
                 "You can prepare for a maximum of 10 slots",
@@ -277,6 +292,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="text"
                                 placeholder="E.g Pani Puri"
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     setTitle(event.target.value)
                                 }
@@ -288,6 +304,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="text"
                                 placeholder="E.g Popular Indian Street Food"
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     setShortDescription(event.target.value)
                                 }
@@ -301,6 +318,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="text"
                                 placeholder="E.g Pani Puri offers a burst of flavors and textures in every bite. It is made of a crispy shell, a mixture of potato, onion, peas and chickpea."
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     setLongDescription(event.target.value)
                                 }
@@ -319,21 +337,33 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                     <InputLeftAddon>$</InputLeftAddon>
                                     <NumberInput
                                         step={1}
-                                        defaultValue={1}
-                                        value={portionPrice}
                                         min={1}
                                         max={10}
-                                        mb={4}
-                                        onChange={(
-                                            valueAsString,
-                                            valueAsNumber
-                                        ) =>
-                                            setPortionPrice(valueAsNumber || 1)
-                                        }
+                                        value={portionPrice}
+                                        inputMode="numeric"
+                                        onKeyDown={handleKeyDown}
+                                        onChange={(valueAsString, valueAsNumber) => {
+                                            const isValid = /^[0-9]*$/.test(valueAsString);
+                                            if (!isValid) {
+                                                return;
+                                            }
+                                            if (valueAsString === "") {
+                                                setPortionPrice("");
+                                            } else {
+                                                setPortionPrice(valueAsNumber);
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if (portionPrice === "") {
+                                                setPortionPrice(0);
+                                            } else if (portionPrice < 0) {
+                                                setPortionPrice(0);
+                                            } else if (portionPrice > 10) {
+                                                setPortionPrice(10);
+                                            }
+                                        }}
                                     >
-                                        <NumberInputField
-                                            borderRadius={"0px 6px 6px 0px"}
-                                        />
+                                        <NumberInputField borderRadius={"0px 6px 6px 0px"} />
                                         <NumberInputStepper>
                                             <NumberIncrementStepper />
                                             <NumberDecrementStepper />
@@ -344,17 +374,34 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
                             <FormControl flex="1" ml={2} isRequired>
                                 <FormLabel>No. of Slots (Max: 10)</FormLabel>
-                                <NumberInput
-                                    step={1}
-                                    defaultValue={1}
-                                    value={totalSlots}
-                                    min={1}
-                                    max={10}
-                                    mb={4}
-                                    onChange={(valueAsString, valueAsNumber) =>
-                                        setTotalSlots(valueAsNumber || 1)
-                                    }
-                                >
+                                    <NumberInput
+                                        step={1}
+                                        min={1}
+                                        max={10}
+                                        value={totalSlots}
+                                        inputMode="numeric"
+                                        onKeyDown={handleKeyDown}
+                                        onChange={(valueAsString, valueAsNumber) => {
+                                            const isValid = /^[0-9]*$/.test(valueAsString);
+                                            if (!isValid) {
+                                                return;
+                                            }
+                                            if (valueAsString === "") {
+                                                setTotalSlots("");
+                                            } else {
+                                                setTotalSlots(valueAsNumber);
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if (totalSlots === "") {
+                                                setTotalSlots(0);
+                                            } else if (totalSlots < 0) {
+                                                setTotalSlots(0);
+                                            } else if (totalSlots > 10) {
+                                                setTotalSlots(10);
+                                            }
+                                        }}
+                                    >
                                     <NumberInputField />
                                     <NumberInputStepper>
                                         <NumberIncrementStepper />
@@ -380,8 +427,10 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                         <FormControl mb={5} isRequired>
                             <FormLabel>Upload photos of your dish (Max: 5 images)</FormLabel>
                             <Input
+                                key={Date.now()}
                                 type="file"
                                 size="sm"
+                                onKeyDown={handleKeyDown}
                                 onChange={handleFileChange}
                                 multiple
                             />

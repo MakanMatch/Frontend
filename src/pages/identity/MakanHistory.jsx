@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/jsx-key */
-import { Box, Card, CardBody, Stack, StackDivider, Text, useToast, Heading } from "@chakra-ui/react";
+import { Box, Stack, StackDivider, useToast, Heading } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,6 @@ import server from "../../networking";
 
 const MakanHistory = () => {
     const [reservations, setReservations] = useState([]);
-    const [listings, setListings] = useState([]);
 
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
@@ -27,8 +26,7 @@ const MakanHistory = () => {
             const pastReservationsResponse = await server.get("/makanHistory/getGuestPastReservations");
             dispatch(reloadAuthToken(authToken));
             if (pastReservationsResponse.status === 200) {
-                setReservations(pastReservationsResponse.data.pastReservations);
-                setListings(pastReservationsResponse.data.foodListings);
+                setReservations(pastReservationsResponse.data);
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
@@ -103,7 +101,6 @@ const MakanHistory = () => {
                                 <MakanHistoryCard
                                     key={reservation.referenceNum}
                                     reservation={reservation}
-                                    listing={listings.find((listing) => listing.listingID === reservation.listingID)}
                                 />
                             ))}
                         </Box>
