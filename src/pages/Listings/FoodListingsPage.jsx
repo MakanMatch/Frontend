@@ -137,21 +137,33 @@ const FoodListingsPage = () => {
     
     return (
         <>
-            <Text fontSize={"30px"} mb={4}>
-                {user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
-            </Text>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <Text fontSize={"30px"} mb={4}>
+                    {user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
+                </Text>
+            </motion.div>
             {isSmallerThan1095 && listings.length > 0 && (
                 <Box mb={4}>
-                    <MarkeredGMaps
-                        coordinatesList={listings.map((listing) => {
-                            const [lat, lng] = listing.approxCoordinates.split(',').map(parseFloat);
-                            return { lat, lng };
-                        })}
-                        listings={listings}
-                        isSmallerThan1095={true}
-                        setActiveMarker={setActiveMarker}
-                        navigateToListing={navigateToListing}
-                    />
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <MarkeredGMaps
+                            coordinatesList={listings.map((listing) => {
+                                const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
+                                return { lat, lng };
+                            })}
+                            listings={listings}
+                            isSmallerThan1095={true}
+                            setActiveMarker={setActiveMarker}
+                            navigateToListing={navigateToListing}
+                        />
+                    </motion.div>
                 </Box>
             )}
             <Skeleton isLoaded={!loading} style={{ borderRadius: "10px" }}>
@@ -192,13 +204,9 @@ const FoodListingsPage = () => {
                                             justifyContent={isBetween701And739 ? "center" : "initial"}
                                         >
                                             <motion.div
-                                                initial={{ scale: 0 }}
-                                                animate={{ rotate: 0, scale: 1 }}
-                                                transition={{
-                                                    type: "spring",
-                                                    stiffness: 260,
-                                                    damping: 20
-                                                }}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.5 }}
                                             >
                                                 <FoodListingCard
                                                     listingID={listing.listingID}
@@ -238,13 +246,9 @@ const FoodListingsPage = () => {
                     {!isSmallerThan1095 && listings.length > 0 && (
                         <Box flex="1" ml={5}>
                             <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ rotate: 0, scale: 1 }}
-                                transition={{
-                                    type: "spring",
-                                    stiffness: 260,
-                                    damping: 20
-                                }}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
                             >
                                 <MarkeredGMaps
                                     coordinatesList={listings.map((listing) => {

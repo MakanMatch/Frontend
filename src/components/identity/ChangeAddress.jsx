@@ -42,7 +42,13 @@ const ChangeAddress = ({ isOpen, onClose, accountInfo, setAccountInfo, setOrigin
             })
             .catch((err) => {
                 if (err.response && err.response.status === 400) {
-                    showToast("Invalid Input", err.response.data.substring("UERROR: ".length), 3000, true, "error");
+                    if (err.response.data.startsWith("UERROR: ")) {
+                        console.log("User error occured in changing address: ", err.response.data);
+                        showToast("Invalid Input", err.response.data.substring("UERROR: ".length), 3000, true, "error");
+                    } else {
+                        console.log("Unexpected error occured in changing address: ", err.response.data);
+                        showToast("ERROR", "Failed to change address.", 3000, true, "error");
+                    }
                 } else {
                     console.error("Error changing address:", err);
                     showToast("ERROR", "Failed to change address.", 3000, true, "error");
