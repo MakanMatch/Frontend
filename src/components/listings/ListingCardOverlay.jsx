@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton, WrapItem, Tooltip } from "@chakra-ui/react";
 import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
@@ -397,8 +397,19 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                         <Text mr={1}><InfoOutlineIcon fill="#515F7C" /></Text><Text ml={1} className="enable-select" maxW={"80%"} overflow="hidden">{renderDescription()}</Text>
                     </Box>
 
-                    <Box display="flex" justifyContent={"left"} mb={1}>
-                        <Text mr={1} mt={1}><FaMapMarkerAlt fill="#515F7C" /></Text><Text ml={1} className="enable-select">{approxAddress}</Text>
+                    <Box display="flex" justifyContent="left" mb={1}>
+                        <WrapItem>
+                            <Tooltip label='Full address will be provided upon successful reservation' placement="right" borderRadius={'lg'} openDelay={500}>
+                                <Box display="flex" alignItems="center">
+                                    <Text mr={1} mt={1}>
+                                        <FaMapMarkerAlt fill="#515F7C" />
+                                    </Text>
+                                    <Text ml={1} className="enable-select">
+                                        {approxAddress}
+                                    </Text>
+                                </Box>
+                            </Tooltip>
+                        </WrapItem>
                     </Box>
 
                     <Box display="flex" justifyContent={"left"} mb={1}>

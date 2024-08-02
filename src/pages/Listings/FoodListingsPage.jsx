@@ -144,7 +144,7 @@ const FoodListingsPage = () => {
                 <Box mb={4}>
                     <MarkeredGMaps
                         coordinatesList={listings.map((listing) => {
-                            const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
+                            const [lat, lng] = listing.approxCoordinates.split(',').map(parseFloat);
                             return { lat, lng };
                         })}
                         listings={listings}
@@ -213,8 +213,8 @@ const FoodListingsPage = () => {
                                                     shortDescription={listing.shortDescription}
                                                     approxAddress={listing.approxAddress}
                                                     totalSlots={listing.totalSlots}
-                                                    latitude={parseFloat(listing.coordinates.split(',')[0])}
-                                                    longitude={parseFloat(listing.coordinates.split(',')[1])}
+                                                    latitude={parseFloat(listing.approxCoordinates.split(',')[0])}
+                                                    longitude={parseFloat(listing.approxCoordinates.split(',')[1])}
                                                     sx={{ cursor: "pointer" }}
                                                 />
                                             </motion.div>
@@ -248,7 +248,7 @@ const FoodListingsPage = () => {
                             >
                                 <MarkeredGMaps
                                     coordinatesList={listings.map((listing) => {
-                                        const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
+                                        const [lat, lng] = listing.approxCoordinates.split(',').map(parseFloat);
                                         return { lat, lng };
                                     })}
                                     listings={listings}

@@ -2,13 +2,14 @@ import React from 'react';
 import { Box, Button, Text, Icon, Card } from "@chakra-ui/react";
 import { StarIcon, CalendarIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../slices/AuthState';
 
 const HostSidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
+    const { user } = useSelector(state => state.auth);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -51,7 +52,9 @@ const HostSidebar = () => {
                 justifyContent="left" 
                 colorScheme="white" 
                 sx={{ ...DrawerHover, bg: activePage === "makanReviews" ? "#E4EBF8" : "transparent" }}
-                onClick={() => handleNavigation('makanReviews')}
+                onClick={() => navigate('/reviews', { state: {
+                    hostID: user.userID
+                }})}
             >
                 <StarIcon />
                 <Text ml={3}>Makan Reviews</Text>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Input, Text, Center, Flex, VStack, Spacer, IconButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Avatar, useToast, Spinner, useMediaQuery, useDisclosure, HStack } from "@chakra-ui/react";
+import { Box, Input, Text, Center, Flex, VStack, Spacer, IconButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Avatar, useToast, Spinner, useMediaQuery, useDisclosure, HStack, Fade } from "@chakra-ui/react";
 import { FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatHistory from "../../components/chat/ChatHistory";
@@ -23,13 +23,16 @@ function ChatUi() {
     const [editMessageContent, setEditMessageContent] = useState("");
     const [chatHistory, setChatHistory] = useState([]); // Array of chat IDs
     const [chatPartnerUsernames, setChatPartnerUsernames] = useState({}); // Object to map chat ID to username
+    const [chatPartnerID, setChatPartnerID] = useState({});
     const [chatSelected, setChatSelected] = useState(null);
+    const [nextChat, setNextChat] = useState(null);
     const [status, setStatus] = useState(false);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null); // New state for image preview
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false); // New state for image preview modal
     const [imageName, setImageName] = useState(""); // New state for image name
     const [confirmedImage, setConfirmedImage] = useState(""); // New state for confirmed image
+    const [sendLoading, setSendLoading] = useState(false);
     const chatBottomRef = useRef(null);
     const toast = useToast();
     const showToast = configureShowToast(toast);
@@ -42,6 +45,13 @@ function ChatUi() {
             return null;
         }
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForChat?userID=${userID}&messageID=${messageID}`;
+    }
+
+    function getProfilePictureLink(userID) {
+        if (!userID) {
+            return null;
+        }
+        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`;
     }
     function setupWS() {
         const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
@@ -106,6 +116,11 @@ function ChatUi() {
             }
 
             if (receivedMessage.action === "chat_id") {
+                setChatPartnerID((prevIDs) => ({
+                    ...prevIDs,
+                    [receivedMessage.chatID]: receivedMessage.chatPartnerID,
+                }));
+                
                 setChatHistory((prevChatHistory) => {
                     if (!prevChatHistory.includes(receivedMessage.chatID)) {
                         return [...prevChatHistory, receivedMessage.chatID];
@@ -222,6 +237,7 @@ function ChatUi() {
 
     const sendMessage = async () => {
         if (ws.current && messageInput.trim() !== "" && (image === null || (image !== null && messageInput.trim() !== ""))) {
+            setSendLoading(true);
             const imagesToBeSubmitted = image ? true : false;
             const newMessage = {
                 action: "send",
@@ -268,6 +284,7 @@ function ChatUi() {
             setReplyTo(null);
             setImage(null);
             setConfirmedImage("");
+            setSendLoading(false);
         }
     };
 
@@ -372,8 +389,8 @@ function ChatUi() {
     };
 
     const handleChatClick = (clickedChatID) => {
-        console.log("Clicked: ", clickedChatID);
-        setChatSelected((prev) => {
+        setNextChat(() => {
+            const prev = chatSelected;
             if (prev == null) {
                 localStorage.setItem("selectedChatID", clickedChatID)
                 return clickedChatID
@@ -384,9 +401,17 @@ function ChatUi() {
                 localStorage.removeItem("selectedChatID")
                 return null
             }
-        });
+        })
+        setChatSelected(null);
         fetchChatHistory(clickedChatID);
     };
+
+    useEffect(() => {
+        if (nextChat) {
+            setChatSelected(nextChat)
+            setNextChat(null);
+        }
+    }, [chatSelected, nextChat])
 
     const [isSmallerThan950px] = useMediaQuery("(max-width: 950px)");
 
@@ -416,7 +441,7 @@ function ChatUi() {
     if (!loaded || !user) {
         return <Spinner />
     }
-
+    const filteredMessages = messages.filter(msg => msg.chatID === chatSelected);
     return (
         <Flex direction="column" overflowX="hidden" w="100%" h="100%">
             <Flex direction="row" h="100%" w="100%">
@@ -429,9 +454,11 @@ function ChatUi() {
                     w={{ base: "100%", md: "25%" }}
                     h="100%"
                     display={{ base: chatSelected === null ? "block" : "none", md: "block" }} // Hide ChatHistory on mobile if a chat is selected
+                    profilePhoto={chatPartnerID}
                 />
                 <Flex flex="1" direction="column" overflow="hidden">
                     {chatSelected !== null ? (
+                        <Fade in>
                         <Center flexDirection="column" alignItems="center" p={5} flex="1">
                             <Box
                                 bg="white"
@@ -451,7 +478,9 @@ function ChatUi() {
                                         <Button bg={'none'} onClick={onOpen} p={0}><HamburgerIcon /></Button>
                                     )}
                                     <Avatar
-                                        name={chatPartnerUsernames[chatSelected]}
+                                        size="md"
+                                        src={getProfilePictureLink(chatPartnerID[chatSelected])}
+                                        name= {chatPartnerUsernames[chatSelected]}
                                         borderRadius="full"
                                         w={{ base: "20%", md: "10%" }}
                                         h="100%"
@@ -487,7 +516,7 @@ function ChatUi() {
                                 boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
                             >
                                 <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX="hidden">
-                                    {messages.map((msg, index) => (
+                                    {filteredMessages.map((msg, index) => (
                                         <React.Fragment key={msg.messageID}>
                                             {shouldDisplayDate(msg, messages[index - 1]) && (
                                                 <Text fontSize="sm" color="gray.500" textAlign="center" mb={2}>
@@ -509,6 +538,8 @@ function ChatUi() {
                                                 repliedMessage={msg.replyTo}
                                                 edited={msg.edited}
                                                 image={msg.image ? getImageLink(msg.senderID, msg.messageID) : null}
+                                                receiverProfilePicture = {chatPartnerID[chatSelected]}
+                                                senderProfilePicture = {user.userID}
                                             />
                                         </React.Fragment>
                                     ))}
@@ -576,12 +607,13 @@ function ChatUi() {
                                         onChange={(e) => setMessageInput(e.target.value)}
                                         onKeyDown={handleKeyDown}
                                     />
-                                    <Button colorScheme="teal" onClick={sendMessage}>
+                                    <Button colorScheme="teal" onClick={sendMessage} isLoading={sendLoading}>
                                         Send
                                     </Button>
                                 </Flex>
                             </Box>
                         </Center>
+                        </Fade>
                     ) : (
                         <Center flex="1" flexDirection="column">
                             {isSmallerThan950px ? (

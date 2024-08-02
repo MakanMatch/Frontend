@@ -7,7 +7,6 @@ import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormContro
     PopoverCloseButton, IconButton, Input, ButtonGroup, useMediaQuery
 } from "@chakra-ui/react";
 import { EditIcon, } from "@chakra-ui/icons";
-import  FocusLock from "react-focus-lock"
 import { logout } from "../../slices/AuthState";
 import GuestSidebar from "../../components/identity/GuestSideNav";
 import HostSidebar from "../../components/identity/HostSideNav";
@@ -408,19 +407,17 @@ const MyAccount = () => {
                             <IconButton size='sm' icon={<EditIcon />} ml={2} />
                         </PopoverTrigger>
                         <PopoverContent p={5}>
-                            <FocusLock returnFocus persistentFocus={false}>
-                                <PopoverArrow />
-                                <PopoverCloseButton />
-                                <Form
-                                    firstFieldRef={firstFieldRef}
-                                    onCancel={handleCancel}
-                                    onSave={onSave}
-                                    fname={fname}
-                                    setFname={setFname}
-                                    lname={lname}
-                                    setLname={setLname}
-                                />
-                            </FocusLock>
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <Form
+                                firstFieldRef={firstFieldRef}
+                                onCancel={handleCancel}
+                                onSave={onSave}
+                                fname={fname}
+                                setFname={setFname}
+                                lname={lname}
+                                setLname={setLname}
+                            />
                         </PopoverContent>
                     </Popover>
                 </Box>
