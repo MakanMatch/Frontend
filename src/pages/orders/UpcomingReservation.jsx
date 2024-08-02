@@ -42,7 +42,7 @@ function UpcomingReservation() {
             reservation.currentGuest = currentGuest;
 
             return reservation;
-        })
+        }).filter(reservation => new Date() < new Date(reservation.listing.fullDatetime));
 
         console.log("Reservation data processed: ", processedReservations);
 
@@ -147,7 +147,7 @@ function UpcomingReservation() {
                     )}
 
                     <Box mt={"5%"}>
-                        <UpcomingReservationCard currentReservation={currentReservation} getFirstImageURL={getFirstImageURL} onClick={onOpen} />
+                        <UpcomingReservationCard currentReservation={currentReservation} getFirstImageURL={getFirstImageURL} onClick={onOpen} cursor={reservations.length > 1 && "pointer"} />
                     </Box>
 
                     <Box display={"flex"} flexDirection={"row"} justifyContent={"space-between"} mt={"30px"}>
@@ -195,7 +195,7 @@ function UpcomingReservation() {
                                     <UpcomingReservationCard key={reservation.referenceNum} currentReservation={reservation} getFirstImageURL={getFirstImageURL} onClick={() => {
                                         setCurrentReservation(reservation);
                                         onClose();
-                                    }} />
+                                    }} cursor={"pointer"} />
                                 ))}
                             </VStack>
                         </ModalBody>
