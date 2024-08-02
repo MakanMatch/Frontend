@@ -117,6 +117,7 @@ function HygieneReports() {
                                         email={host.email}
                                         hygieneGrade={host.hygieneGrade}
                                         hostID={host.userID}
+                                        flaggedForHygiene={host.flaggedForHygiene}
                                     />
                                 ))
                             ) : (

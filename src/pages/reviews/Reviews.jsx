@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Flex, Text, Spacer, useToast, Heading, Tooltip, Spinner, Avatar } from '@chakra-ui/react';
+import { Button, Box, Flex, Text, Spacer, useToast, Heading, Tooltip, Spinner, Avatar, ScaleFade, Badge } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -23,6 +23,7 @@ function Reviews() {
     const [hostName, setHostName] = useState("");
     const [hostAddress, setHostAddress] = useState("");
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
+    const [flagged, setFlagged] = useState(false);
     const [stateRefresh, refreshState] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const location = useLocation();
@@ -63,6 +64,7 @@ function Reviews() {
                 setHostName(response.data.username);
                 setHostAddress(response.data.address);
                 setHostHygieneGrade(response.data.hygieneGrade);
+                setFlagged(response.data.flaggedForHygiene);
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
@@ -93,6 +95,10 @@ function Reviews() {
             showToast("Please log in", "Login to a MakanMatch account to like and submit reviews!", 3000, true, "info");
         }
     }, [user]);
+
+    useEffect(() => {
+        console.log("Host banned:", flagged);
+    }, [flagged]);
 
     useEffect(() => {
         if (hostID) {
@@ -150,6 +156,21 @@ function Reviews() {
                             )}
                         </Flex>
                     </Flex>
+                    {flagged === true && (
+                        <ScaleFade in>
+                            <Badge
+                                colorScheme="red"
+                                ml="10px"
+                                mt={-10}
+                                variant="solid"
+                                px={2}
+                                py={0.5}
+                                fontSize="xs"
+                            >
+                                Flagged
+                            </Badge>
+                        </ScaleFade>
+                    )}
                 </Box>
                 <Spacer display={{ base: 'none', md: 'block' }} />
                 <Box display="flex" justifyContent="center" alignItems="center" background="gray.200" borderRadius="15px" p={5} mb={4}>

@@ -223,6 +223,7 @@ const FoodListingsPage = () => {
                                                     totalSlots={listing.totalSlots}
                                                     latitude={parseFloat(listing.approxCoordinates.split(',')[0])}
                                                     longitude={parseFloat(listing.approxCoordinates.split(',')[1])}
+                                                    flaggedForHygiene={listing.Host.flaggedForHygiene}
                                                     sx={{ cursor: "pointer" }}
                                                 />
                                             </motion.div>
