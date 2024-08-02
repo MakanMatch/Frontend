@@ -208,11 +208,11 @@ function GuestManagement({
                                 </Box>
                             </Flex>
                             <Flex
-                                direction={{ base: 'column', md: 'row' }}
+                                direction='row'
                                 alignItems="center"
-                                justifyContent="flex-end"
+                                justifyContent={{base:"center", md:"flex-end"}}
                                 width="100%"
-                                mt={1}
+                                mt={{base: 4, md: 1}}
                                 gap={2}
                                 wrap="wrap"  // Ensure wrapping of buttons
                             >
