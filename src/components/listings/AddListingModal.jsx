@@ -419,7 +419,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="datetime-local"
                                 value={datetime}
-                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     checkDate(event.target.value)
                                 }
