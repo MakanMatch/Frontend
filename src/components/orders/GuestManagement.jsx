@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import server from '../../networking'
-import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, ScaleFade, Badge, useBreakpointValue } from '@chakra-ui/react'
+import { Spinner, Text, Box, Button, Avatar, IconButton, Flex, ScaleFade, Badge, useBreakpointValue, ModalOverlay, ModalContent, Modal } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
-import { useToast } from '@chakra-ui/react'
+import { useToast, useDisclosure } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux'
 import { reloadAuthToken } from '../../slices/AuthState'
 import configureShowToast from '../../components/showToast'
@@ -23,6 +23,7 @@ function GuestManagement({
     const [refresh, setRefresh] = useState(false);
     const textAlign = useBreakpointValue({ base: "center", md: "left" });
     const isBaseScreen = useBreakpointValue({ base: true, md: false });
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleCancelReservation = async (referenceNum, listingID, guestID) => {
         try {
@@ -149,7 +150,14 @@ function GuestManagement({
                             width="100%"
                         >
 
-                            <Avatar name={guest.username} size={{ base: "md", md: "lg" }} mr={{ base: 0, md: 4 }} mb={{ base: 2, md: 0 }} />
+                            <Avatar
+                                name={guest.username}
+                                src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`}
+                                size={{ base: "md", md: "lg" }}
+                                mr={{ base: 0, md: 4 }}
+                                mb={{ base: 2, md: 0 }}
+                                onClick={onOpen}
+                            />
                             <Box>
                                 <Flex
                                     gap={{ base: 2, md: 3 }}
@@ -242,6 +250,16 @@ function GuestManagement({
                                 />
                             )}
                         </Box>
+                        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                            <ModalOverlay />
+                            <ModalContent maxW="max-content" background="transparent" boxShadow="none">
+                                <Avatar
+                                    name={guest.username}
+                                    boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
+                                    src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`}
+                                />
+                            </ModalContent>
+                        </Modal>
                     </Box>
                 ))
             ) : (
