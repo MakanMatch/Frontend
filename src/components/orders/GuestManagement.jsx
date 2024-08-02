@@ -123,7 +123,7 @@ function GuestManagement({
         <>
             {guestsList.length > 0 && (
                 <>
-                    <Text fontWeight="bold" fontSize="large" display="flex" mb={10} mt={4}>Guests</Text>
+                    <Text fontWeight="bold" fontSize="large" display="flex" mb={10} mt={5}>Reserved Guests</Text>
                     <Text textAlign="left" color="grey" fontSize="large" display="flex" mb={10}>When guests arrive, check that they have paid and click "Paid & Present" to let us know.</Text>
                 </>
             )}
