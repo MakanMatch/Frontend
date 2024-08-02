@@ -188,7 +188,7 @@ function GuestManagement({
                                         {guest.Reservation.markedPaid && !isBaseScreen && (
                                             <Box>
                                                 <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
-                                                    <Badge colorScheme="purple" variant="solid" px={3} py={1}>PAID</Badge>
+                                                    <Badge colorScheme="purple" variant="solid" px={3} py={1}>GUEST PAID</Badge>
                                                 </ScaleFade>
                                             </Box>
                                         )}
@@ -196,7 +196,7 @@ function GuestManagement({
                                     {guest.Reservation.markedPaid && isBaseScreen && (
                                         <Box mt={2}>
                                             <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
-                                                <Badge colorScheme="purple" variant="solid" px={3} py={1}>PAID</Badge>
+                                                <Badge colorScheme="purple" variant="solid" px={3} py={1}>GUEST PAID</Badge>
                                             </ScaleFade>
                                         </Box>
                                     )}
@@ -312,7 +312,7 @@ function GuestManagement({
                     </Flex>
                 ))
             ) : (
-                <Text textAlign={textAlign} color="grey" fontSize="large" mt={6}>
+                <Text textAlign={textAlign} color="grey" fontSize="large" mt={5}>
                     Oops, there are no reservations made yet!
                 </Text>
             )}
