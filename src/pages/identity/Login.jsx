@@ -40,33 +40,44 @@ function Login() {
         })
             .then((res) => {
                 setIsLoading(false);
-                if (res && res.data) {
+                if (res.status == 200) {
                     console.log("Account logged in successfully.");
                     showToast('Login successful', 'Welcome back to MakanMatch!', 3000, true, 'success')
-                    // Set the JWT token in localStorage
+                    
                     localStorage.setItem('jwt', res.data.accessToken);
                     dispatch(changeAuthToken(res.data.accessToken));
+
                     const authStateData = { userID: res.data.user.userID, username: res.data.user.username, userType: res.data.user.userType }
                     dispatch(setUser(authStateData));
+
                     if (res.data.user.userType == "Admin"){
                         navigate('/admin');
                     } else {
                         navigate('/');
                     }
                 } else {
-                    console.log("An error has occurred logging in to the account.")
+                    console.log("Non-200 status code response when attempting to login, response: " + res.data);
                     showToast('Login failed', 'Invalid username or password.', 3000, true, 'error')
                 }
             })
             .catch((err) => {
                 setIsLoading(false);
-                console.log(err)
-                if (err.response.data === "UERROR: Invalid username or email or password.") {
-                    formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
-                    formik.setFieldError('password', 'Incorrect password.');
+                console.log("Error in attempting to login, error: ", err)
+                if (err.response && err.response.data && typeof err.response.data == "string") {
+                    if (err.response.data.startsWith("UERROR")) {
+                        if (err.response.data === "UERROR: Invalid username or email or password.") {
+                            formik.setFieldError('usernameOrEmail', 'Invalid username or email.');
+                            formik.setFieldError('password', 'Incorrect password.');
+                            showToast('Login failed', 'Invalid username or password.', 3000, true, 'error')
+                        } else {
+                            showToast('Login failed', err.response.data.substring("UERROR: ".length), 3000, true, 'error')
+                        }
+                    } else {
+                        showToast('Login failed', 'An error occurred in logging you in. Please try again.', 3000, true, 'error')
+                    }
+                } else {
+                    showToast('Login failed', 'An error occurred in logging you in. Please try again.', 3000, true, 'error')
                 }
-                showToast('Login failed', 'Invalid username or password.', 3000, true, 'error')
-                console.log(err)
             });
 
         actions.setSubmitting(false);

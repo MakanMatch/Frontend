@@ -72,6 +72,9 @@ function AdminAccount() {
     }
 
     const hasChanges = () => {
+        if (!accountInfo || !originalAccountInfo || !setAccountLoaded) {
+            return false;
+        }
         return JSON.stringify(accountInfo) !== JSON.stringify(originalAccountInfo);
     };
 
@@ -320,9 +323,13 @@ function AdminAccount() {
         }, [isOpen]);
     
         return (
-            <Box display='flex' alignItems='center' mt="2%" ml="35%">
+            <Box display='flex' alignItems='center' mt="2%" ml="35%" minHeight="50px">
                 <Box display='flex' alignItems='center' mr={3}>
-                    <Text fontSize={25}><b>{localAccountInfo.fname} {localAccountInfo.lname}</b></Text>
+                    {localAccountInfo.fname && localAccountInfo.lname ? (
+                        <Text fontSize={25}><b>{localAccountInfo.fname} {localAccountInfo.lname}</b></Text>
+                    ) : (
+                        <Spinner size="md" />
+                    )}
                     <Popover
                         isOpen={isOpen}
                         initialFocusRef={firstFieldRef}
@@ -426,98 +433,100 @@ function AdminAccount() {
 
             <PopoverForm />
 
-            <Box justifyContent={'center'} display={'flex'}>
-                <Stack direction={["column", "row"]} p={4} spacing={"12%"} width={"65vw"}>
-                    <Box p={2} width={"70%"} justifyContent={"flex"}>
-                        <FormControl mb={2}>
-                            <FormLabel>Username</FormLabel>
-                            <Editable
-                                value={accountInfo.username}
-                                onChange={(value) => setAccountInfo({ ...accountInfo, username: value })}
-                                // onChange={(value) => {           
-                                //     const { username, ...rest } = accountInfo;
-                                //     setAccountInfo({ ...rest, username: value });
-                                // }}
-                                textAlign={"left"}
-                                borderColor={"black"}
-                                borderWidth={1}
-                                borderRadius={10}
-                            >
-                                <EditablePreview p={2} borderRadius={10} />
-                                <EditableInput p={2} borderRadius={10} />
-                            </Editable>
-                        </FormControl>
+            {accountLoaded && accountInfo && (
+                <Box justifyContent={'center'} display={'flex'}>
+                    <Stack direction={["column", "row"]} p={4} spacing={"12%"} width={"65vw"}>
+                        <Box p={2} width={"70%"} justifyContent={"flex"}>
+                            <FormControl mb={2}>
+                                <FormLabel>Username</FormLabel>
+                                <Editable
+                                    value={accountInfo.username}
+                                    onChange={(value) => setAccountInfo({ ...accountInfo, username: value })}
+                                    // onChange={(value) => {           
+                                    //     const { username, ...rest } = accountInfo;
+                                    //     setAccountInfo({ ...rest, username: value });
+                                    // }}
+                                    textAlign={"left"}
+                                    borderColor={"black"}
+                                    borderWidth={1}
+                                    borderRadius={10}
+                                >
+                                    <EditablePreview p={2} borderRadius={10} />
+                                    <EditableInput p={2} borderRadius={10} />
+                                </Editable>
+                            </FormControl>
 
-                        <FormControl mb={2}>
-                            <FormLabel>Email</FormLabel>
-                            <Editable
-                                value={accountInfo.email}
-                                onChange={(value) => setAccountInfo({ ...accountInfo, email: value })}
-                                // onChange={(value) => {
-                                //     const { email, ...rest } = accountInfo;
-                                //     setAccountInfo({ ...rest, email: value });
-                                // }}
-                                textAlign={"left"}
-                                borderColor={"black"}
-                                borderWidth={1}
-                                borderRadius={10}
-                                overflow={"hidden"}
-                                textOverflow="ellipsis"
-                                whiteSpace="nowrap"
-                            >
-                                <EditablePreview p={2} borderRadius={10} />
-                                <EditableInput p={2} borderRadius={10} />
-                            </Editable>
-                        </FormControl>
+                            <FormControl mb={2}>
+                                <FormLabel>Email</FormLabel>
+                                <Editable
+                                    value={accountInfo.email}
+                                    onChange={(value) => setAccountInfo({ ...accountInfo, email: value })}
+                                    // onChange={(value) => {
+                                    //     const { email, ...rest } = accountInfo;
+                                    //     setAccountInfo({ ...rest, email: value });
+                                    // }}
+                                    textAlign={"left"}
+                                    borderColor={"black"}
+                                    borderWidth={1}
+                                    borderRadius={10}
+                                    overflow={"hidden"}
+                                    textOverflow="ellipsis"
+                                    whiteSpace="nowrap"
+                                >
+                                    <EditablePreview p={2} borderRadius={10} />
+                                    <EditableInput p={2} borderRadius={10} />
+                                </Editable>
+                            </FormControl>
 
-                        <FormControl mb={2}>
-                            <FormLabel>Contact</FormLabel>
-                            <Editable 
-                                value={accountInfo.contactNum || ''} 
-                                placeholder="Enter your contact number"
-                                onChange={(value) => setAccountInfo({ ...accountInfo, contactNum: value })}
-                                // onChange={(value) => {
-                                //     const { contactNum, ...rest } = accountInfo;
-                                //     setAccountInfo({ ...rest, contactNum: value });
-                                // }}
-                                textAlign={"left"}
-                                borderColor={"black"}
-                                borderWidth={1}
-                                borderRadius={10}
-                            >
-                                <EditablePreview p={2} borderRadius={10} />
-                                <EditableInput p={2} borderRadius={10} />
-                            </Editable>
-                        </FormControl>
+                            <FormControl mb={2}>
+                                <FormLabel>Contact</FormLabel>
+                                <Editable 
+                                    value={accountInfo.contactNum || ''} 
+                                    placeholder="Enter your contact number"
+                                    onChange={(value) => setAccountInfo({ ...accountInfo, contactNum: value })}
+                                    // onChange={(value) => {
+                                    //     const { contactNum, ...rest } = accountInfo;
+                                    //     setAccountInfo({ ...rest, contactNum: value });
+                                    // }}
+                                    textAlign={"left"}
+                                    borderColor={"black"}
+                                    borderWidth={1}
+                                    borderRadius={10}
+                                >
+                                    <EditablePreview p={2} borderRadius={10} />
+                                    <EditableInput p={2} borderRadius={10} />
+                                </Editable>
+                            </FormControl>
 
-                        <Box display="flex" justifyContent={"left"}>
-                            <Button variant={"MMPrimary"} mt={6} onClick={(toggleChangePassword)}>
-                                Change Password
-                            </Button>
+                            <Box display="flex" justifyContent={"left"}>
+                                <Button variant={"MMPrimary"} mt={6} onClick={(toggleChangePassword)}>
+                                    Change Password
+                                </Button>
+                            </Box>
+
+                            <ChangePassword isOpen={isPasswordModalOpen} onClose={handlePasswordCloseModal} onSubmit={handleChangePassword} />
                         </Box>
 
-                        <ChangePassword isOpen={isPasswordModalOpen} onClose={handlePasswordCloseModal} onSubmit={handleChangePassword} />
-                    </Box>
+                        <Box width={"18%"} display="flex" justifyContent={"right"} flexDirection="column" alignItems="flex-end" mr={-4}>
+                                {hasChanges() && (
+                                    <>
+                                        <Button p={4} variant={"MMPrimary"} onClick={handleSaveChanges} width={'full'} mb={5}>
+                                            Save Changes
+                                        </Button>
 
-                    <Box width={"18%"} display="flex" justifyContent={"right"} flexDirection="column" alignItems="flex-end" mr={-4}>
-                            {hasChanges() && (
-                                <>
-                                    <Button p={4} variant={"MMPrimary"} onClick={handleSaveChanges} width={'full'} mb={5}>
-                                        Save Changes
-                                    </Button>
+                                        <Button p={4} colorScheme="red" borderRadius={10} onClick={handleCancelChanges} width={'full'} mb={4}>
+                                            Cancel
+                                        </Button>
+                                    </>
+                                )}
 
-                                    <Button p={4} colorScheme="red" borderRadius={10} onClick={handleCancelChanges} width={'full'} mb={4}>
-                                        Cancel
-                                    </Button>
-                                </>
-                            )}
-
-                            <Button colorScheme="red" borderRadius={10} width={'11%'} position="absolute" bottom={"8%"} onClick={handleLogout}>
-                                Logout
-                            </Button>
-                    </Box>
-                </Stack>
-            </Box>
+                                <Button colorScheme="red" borderRadius={10} width={'11%'} position="absolute" bottom={"8%"} onClick={handleLogout}>
+                                    Logout
+                                </Button>
+                        </Box>
+                    </Stack>
+                </Box>
+            )}
 
             {/* Discard Changes Confirmation Modal */}
             <AlertDialog

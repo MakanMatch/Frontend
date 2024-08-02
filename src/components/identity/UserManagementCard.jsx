@@ -1,5 +1,5 @@
-import { Avatar, Box, HStack, Text, Menu, MenuButton, MenuItem, MenuList, IconButton, useToast, Link, Spinner } from '@chakra-ui/react'
-import { useState, useEffect } from 'react';
+import { Avatar, Box, HStack, Text, Menu, MenuButton, MenuItem, MenuList, IconButton, useToast, Link, Spinner, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, AlertDialogCloseButton, useDisclosure, Button, Badge, SlideFade, ScaleFade } from '@chakra-ui/react'
+import { useState, useEffect, useRef } from 'react';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,11 +13,15 @@ function UserManagementCard({ username, email, userType, userID, banned, fetchAl
     const showToast = configureShowToast(toast)
     const navigate = useNavigate()
 
-    const { authToken } = useSelector((state) => state.auth.authToken)
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const cancelRef = useRef()
+
+    const authToken = useSelector((state) => state.auth.authToken)
 
     const profilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`
 
     const handleDeleteUser = async () => {
+        onClose();
         try {
             const response = await server.delete(`/identity/myAccount/deleteAccount?targetUserID=${userID}&userType=${userType}`)
             dispatch(reloadAuthToken(authToken))
@@ -110,48 +114,82 @@ function UserManagementCard({ username, email, userType, userID, banned, fetchAl
     }
 
 	return (
-        <HStack display="flex" justifyContent={"space-between"} color={banned === true ? "red" : "black"}>
-            <Box display="flex" alignItems="center" width={"40%"} ml={3}>
-                <Avatar src={profilePicture}/>
-				<Box ml={3}>
-					<Link 
-                        size='sm' 
-                        minWidth={"290px"} 
-                        maxWidth={"290px"} 
-                        overflow={"hidden"} 
-                        textOverflow={"ellipsis"} 
-                        whiteSpace={'nowrap'} 
-                        textAlign={"left"} 
-                        onClick={handleClickUsername}
-                    >
-						{username}
-					</Link>
-				</Box>
-            </Box>
+        <>
+            <HStack display="flex" justifyContent={"space-between"}>
+                <Box display="flex" alignItems="center" width={"40%"} ml={3}>
+                    <Avatar src={profilePicture}/>
+                    <Box ml={3}>
+                        <Link 
+                            size='sm' 
+                            minWidth={"290px"} 
+                            maxWidth={"290px"} 
+                            overflow={"hidden"} 
+                            textOverflow={"ellipsis"} 
+                            whiteSpace={'nowrap'} 
+                            textAlign={"left"} 
+                            onClick={handleClickUsername}
+                        >
+                            {username}
+                        </Link>
+                    </Box>
+                    {banned && (
+                        <ScaleFade in>
+                            <Badge colorScheme={'red'} ml={"15px"} variant={'solid'} px={3} py={1}>BANNED</Badge>
+                        </ScaleFade>
+                    )}
+                </Box>
 
-            <Box width={"37%"}>
-                <Text size='sm' minWidth={"290px"} maxWidth={"290px"} overflow={"hidden"} textOverflow={"ellipsis"} whiteSpace={'nowrap'} textAlign={"left"}>
-                    {email}
-                </Text>
-            </Box>
-            
-            <Box width={"20%"}>
-                <Text size='sm' textAlign={"left"}>
-                    {userType}
-                </Text>
-            </Box>
-            
-            <Box width="3%">
-                <Menu>
-                    <MenuButton as={IconButton} icon={<BsThreeDotsVertical />} variant="ghost" cursor="pointer" aria-label="Options" />
-                    <MenuList>
-                        <MenuItem color="red" onClick={handleDeleteUser}>Delete user</MenuItem>
-                        <MenuItem color={banned === true ? "green" : "red"} onClick={handleToggleBanUser}>{banned === false ? "Ban" : "Un-ban"} user</MenuItem>
-                    </MenuList>
-                </Menu>
-            </Box>
-            
-        </HStack>
+                <Box width={"37%"}>
+                    <Text size='sm' minWidth={"290px"} maxWidth={"290px"} overflow={"hidden"} textOverflow={"ellipsis"} whiteSpace={'nowrap'} textAlign={"left"}>
+                        {email}
+                    </Text>
+                </Box>
+                
+                <Box width={"20%"}>
+                    <Text size='sm' textAlign={"left"}>
+                        {userType}
+                    </Text>
+                </Box>
+                
+                <Box width="3%">
+                    <Menu>
+                        <MenuButton as={IconButton} icon={<BsThreeDotsVertical />} variant="ghost" cursor="pointer" aria-label="Options" />
+                        <MenuList>
+                            <MenuItem color="red" onClick={onOpen}>Delete user</MenuItem>
+                            <MenuItem color={banned === true ? "green" : "red"} onClick={handleToggleBanUser}>{banned === false ? "Ban" : "Un-ban"} user</MenuItem>
+                        </MenuList>
+                    </Menu>
+                </Box>
+            </HStack>
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+            >
+                <AlertDialogOverlay>
+                <AlertDialogContent>
+                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                        Delete {username}
+                    </AlertDialogHeader>
+
+                    <AlertDialogBody>
+                        <Text>
+                            Are you sure? You can't undo this action afterwards.
+                        </Text>
+                    </AlertDialogBody>
+
+                    <AlertDialogFooter>
+                    <Button ref={cancelRef} onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button colorScheme='red' onClick={handleDeleteUser} ml={3}>
+                        Delete
+                    </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+        </>
     );
 }
 

@@ -15,43 +15,40 @@ function PublicGuestProfile() {
     const showToast = configureShowToast(toast);
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
-    const { user, authToken, loaded } = useSelector((state) => state.auth);
     const [profilePicture, setProfilePicture] = useState(null);
     const [accountLoaded, setAccountLoaded] = useState(false);
     const [accountInfo, setAccountInfo] = useState({});
 
     useEffect(() => {
-        if (loaded == true) {
-            const fetchAccountInfo = async () => {
-                try {
-                    const userID = searchParams.get('userID')
-                    console.log("User ID: ", userID);
-                    const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
-                    dispatch(reloadAuthToken(authToken))              
-                    setAccountInfo(response.data);
-                    setAccountLoaded(true);
-                    setProfilePicture(`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`);
-                } catch (err) {
-                    console.log("Error fetching account info:", err);
-                    if (err.response && err.response.status && err.response.status == 404) {
-                        dispatch(logout());
-                        localStorage.removeItem('jwt');
-                    }
+        const fetchAccountInfo = async () => {
+            try {
+                const userID = searchParams.get('userID')
+                console.log("User ID: ", userID);
+                const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
+                console.log(response)
+                setAccountInfo(response.data);
+                setAccountLoaded(true);
+                setProfilePicture(`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`);
+            } catch (err) {
+                console.log("Error fetching account info:", err);
+                if (err.response && err.response.status && err.response.status == 404) {
+                    dispatch(logout());
+                    localStorage.removeItem('jwt');
+                } else if (err.response && err.response.status && err.response.status == 403) {
+                    showToast("Account Banned", "The account you are trying to access has been banned.", 3000, true, "error");   
+                    navigate(-1);
+                } else {
                     showToast("Unable to retrieve account information", "Please try again", 3000, true, "error");
-                    navigate('/admin');
+                    navigate(-1);
                 }
-            };
-
-            if (user && user.userID) {
-                fetchAccountInfo();
-            } else {
-                showToast("Redirecting to login", "Please log in first.", 3000, true, "error");
-                navigate('/auth/login');
+                
             }
         }
-    }, [loaded, user]);
 
-    if (!loaded || !user) {
+        fetchAccountInfo()
+    }, []);
+
+    if (!accountLoaded) {
         return <Spinner />
     }
 
@@ -106,7 +103,7 @@ function PublicGuestProfile() {
                     >
                         <Avatar
                             size="2xl"
-                            // src={profilePicture}
+                            src={profilePicture}
                             position="relative"
                             bg="white"
                             border="4px solid white"
@@ -116,56 +113,38 @@ function PublicGuestProfile() {
                 </Box>
             </Box>
 
-            <Box justifyContent={'center'} display={'flex'} mt={20}>
-                <Stack direction={["column", "row"]} p={4} spacing={"5%"} width={"65vw"}>
-                    <Box p={2} width={"70%"} justifyContent={"flex"}>
+            <Text fontSize={"25px"} fontWeight={"bold"} mt={5}>{`${accountInfo.fname} ${accountInfo.lname}`}</Text>
+
+
+            <Box justifyContent={'center'} display={'flex'} mt={10}>
+                <Box p={4} spacing={"5%"} width="70%" display="flex" justifyContent={"space-between"}>
+                    <Box p={2} justifyContent={"flex"}>
                         <FormControl mb={2}>
                             <FormLabel>Name</FormLabel>
-                            <Editable
-                                value={`${accountInfo.fname} ${accountInfo.lname}`}
-                                textAlign={"left"}
-                                borderColor={"black"}
-                                borderWidth={1}
-                                borderRadius={10}
-                                isDisabled="true"
-                            >
-                                <EditablePreview p={2} borderRadius={10} />
-                                <EditableInput p={2} borderRadius={10} />
-                            </Editable>
-                        </FormControl>
-
-                        <FormControl mb={2}>
-                            <FormLabel>Username</FormLabel>
-                            <Editable
-                                value={accountInfo.username}
-                                textAlign={"left"}
-                                borderColor={"black"}
-                                borderWidth={1}
-                                borderRadius={10}
-                                isDisabled="true"
-                            >
-                                <EditablePreview p={2} borderRadius={10} />
-                                <EditableInput p={2} borderRadius={10} />
-                            </Editable>
+                            <Text textAlign={"left"} pt={2} pb={2} fontWeight={"bold"}>
+                                {accountInfo.fname} {accountInfo.lname}
+                            </Text>
                         </FormControl>
                     </Box>
 
-                    <Box p={2} width={"25%"}>
+                    <Box p={2}>
                         <FormControl mb={2}>
                             <FormLabel>Meals Matched</FormLabel>
-                            <Text textAlign={"left"} pt={2} pb={2}>
+                            <Text textAlign={"left"} pt={2} pb={2} fontWeight={"bold"}>
                                 {accountInfo.mealsMatched + " meals"}
                             </Text>
                         </FormControl>
+                    </Box>
 
+                    <Box p={2}>
                         <FormControl mb={2}>
                             <FormLabel>Account Age</FormLabel>
-                            <Text textAlign={"left"} pt={2} pb={2}>
+                            <Text textAlign={"left"} pt={2} pb={2} fontWeight={"bold"}>
                                 {calculateAccountAge() + " days"}
                             </Text>
                         </FormControl>
                     </Box>
-                </Stack>
+                </Box>
             </Box>
         </>
     )

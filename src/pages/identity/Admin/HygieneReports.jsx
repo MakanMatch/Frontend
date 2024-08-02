@@ -127,11 +127,7 @@ function HygieneReports() {
                     </Card>
                 </motion.div>
             ) : (
-                <Center height="100vh">
-                    <Fade in={!loaded}>
-                        <Spinner size="xl" />
-                    </Fade>
-                </Center>
+                <Spinner size="lg" mt={10} />
             )}
         </>
     )
