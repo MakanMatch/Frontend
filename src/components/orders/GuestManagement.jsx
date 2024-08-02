@@ -303,7 +303,7 @@ function GuestManagement({
                                         ml={{ base: 0, md: 4 }}
                                         onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
                                     >
-                                        Confirm Cancellation {/* Adjust text size for md screens */}
+                                        Confirm Cancellation
                                     </Button>
                                 </Box>
                             </Box>
