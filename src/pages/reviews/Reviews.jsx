@@ -147,7 +147,7 @@ function Reviews() {
                                 </>
                             )}
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            {user && user.userID && user.userID != hostID && (
+                            {user && user.userID && user.userID != hostID && user.userType !== "Host" && (
                                 <SubmitReviews
                                     hostName={hostName}
                                     hostID={hostID}

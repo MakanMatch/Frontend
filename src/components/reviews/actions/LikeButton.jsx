@@ -11,8 +11,7 @@ import { reloadAuthToken } from '../../../slices/AuthState';
 function LikeButton({
     reviewID,
     isLiked,
-    likeCount,
-    hostID
+    likeCount
 }) {
     const toast = useToast();
     const showToast = configureShowToast(toast)
@@ -70,7 +69,7 @@ function LikeButton({
                 color: liked ? 'black' : 'gray.800'
             }}
             onClick={handleLikeClick}
-            isDisabled={loaded && user && user.userID === hostID}
+            isDisabled={loaded && user && user.userType === 'Host'}
         >
             <Text>{currentLikeCount}</Text>
         </Button>
