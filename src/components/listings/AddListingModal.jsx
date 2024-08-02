@@ -164,7 +164,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
     };
 
     const handleKeyDown = (event) => {
-        console.log(event.key);
         if (event.key === "Enter" ) {
             if (validListing && !isSubmitting && !modalError) {
                 handleSubmitListing();
