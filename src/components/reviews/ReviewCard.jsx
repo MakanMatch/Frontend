@@ -30,6 +30,7 @@ const ReviewCard = ({
     likeCount,
     reviewID,
     posterID,
+    hostID,
     isLiked,
     refreshState,
     stateRefresh
@@ -303,6 +304,7 @@ const ReviewCard = ({
                         reviewID={reviewID}
                         isLiked={isLiked}
                         likeCount={likeCount}
+                        hostID={hostID}
                     />
                     {loaded && user != null && posterID === user.userID && (
                         <Flex ml={4}>

@@ -106,6 +106,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                                         likeCount={review.likeCount}
                                         reviewID={review.reviewID}
                                         posterID={review.guestID}
+                                        hostID={hostID}
                                         isLiked={review.isLiked}
                                         refreshState={refreshState}
                                         stateRefresh={stateRefresh}
@@ -132,6 +133,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                                         likeCount={review.likeCount}
                                         reviewID={review.reviewID}
                                         posterID={review.guestID}
+                                        hostID={hostID}
                                         isLiked={review.isLiked}
                                         refreshState={refreshState}
                                         stateRefresh={stateRefresh}
@@ -156,6 +158,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                                         images={review.images ? review.images.split("|").map(image => getImageLink(review.reviewID, image)) : []}
                                         likeCount={review.likeCount}
                                         reviewID={review.reviewID}
+                                        hostID={hostID}
                                         posterID={review.guestID}
                                         isLiked={review.isLiked}
                                         refreshState={refreshState}
@@ -182,6 +185,7 @@ const SortReviews = ({ hostID, refreshState, stateRefresh }) => {
                                         likeCount={review.likeCount}
                                         reviewID={review.reviewID}
                                         posterID={review.guestID}
+                                        hostID={hostID}
                                         isLiked={review.isLiked}
                                         refreshState={refreshState}
                                         stateRefresh={stateRefresh}
