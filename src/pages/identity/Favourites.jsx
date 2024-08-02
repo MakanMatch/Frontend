@@ -128,11 +128,10 @@ const Favourites = () => {
                                                         getImageLink(listing.listingID, imageName)
                                                     ) || []}
                                                     shortDescription={listing.shortDescription}
-                                                    address={listing.address}
                                                     approxAddress={listing.approxAddress}
                                                     totalSlots={listing.totalSlots}
-                                                    latitude={parseFloat(listing.coordinates.split(',')[0])}
-                                                    longitude={parseFloat(listing.coordinates.split(',')[1])}
+                                                    latitude={parseFloat(listing.approxCoordinates.split(',')[0])}
+                                                    longitude={parseFloat(listing.approxCoordinates.split(',')[1])}
                                                 />
                                             </Box>
                                         </SlideFade>
