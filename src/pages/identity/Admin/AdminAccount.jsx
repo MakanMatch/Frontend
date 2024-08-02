@@ -473,6 +473,7 @@ function AdminAccount() {
                                     textOverflow="ellipsis"
                                     whiteSpace="nowrap"
                                 >
+
                                     <EditablePreview p={2} borderRadius={10} />
                                     <EditableInput p={2} borderRadius={10} />
                                 </Editable>

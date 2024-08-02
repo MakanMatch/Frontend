@@ -30,6 +30,7 @@ function Reviews() {
     const [hostID, setHostID] = useState("");
     const dispatch = useDispatch();
     const [initialUserLoginToastIgnore, setInitialUserLoginToastIgnore] = useState(true);
+    const hostProfilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${hostID}`;
 
     const getColorScheme = (hygieneGrade) => {
         if (hygieneGrade >= 5) return 'green';
@@ -76,7 +77,7 @@ function Reviews() {
         if (loaded == true) {
             setInitialUserLoginToastIgnore(false);
 
-            if (location.state.hostID) {
+            if (location.state && location.state.hostID) {
                 setHostID(location.state.hostID);
             } else if (searchParams.has('hostID')) {
                 setHostID(searchParams.get('hostID'));
@@ -122,8 +123,7 @@ function Reviews() {
                         <Avatar
                             name={hostName}
                             boxSize='100px'
-                            // src='https://bit.ly/dan-abramov' // Change this to the actual host image
-                            alt={hostName}
+                            src={hostProfilePicture}
                             onClick={onOpen}
                             cursor="pointer"
                             ml={{ base: 0, md: 4 }}
@@ -174,9 +174,8 @@ function Reviews() {
                 <ModalContent maxW="max-content" background="transparent" boxShadow="none">
                     <Avatar
                         name={hostName}
-                        boxSize={{ base: '40vw', md: '30vw' }}  // Responsive size for different screen sizes
-                        // src='https://bit.ly/dan-abramov' // Uncomment and use actual host image URL
-                        alt={hostName}
+                        boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
+                        src={hostProfilePicture}
                     />
                 </ModalContent>
             </Modal>

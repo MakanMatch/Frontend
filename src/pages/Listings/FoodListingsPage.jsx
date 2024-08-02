@@ -129,7 +129,7 @@ const FoodListingsPage = () => {
         return (
             <Center height="100vh">
                 <Fade in={!loaded}>
-                    <Spinner size="xl" />
+                    <Spinner size="lg" />
                 </Fade>
             </Center>
         );
@@ -172,7 +172,7 @@ const FoodListingsPage = () => {
                         height="83vh"
                         overflowY="auto"
                         boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
-                        borderRadius={"22px 8px 8px 22px"}
+                        borderRadius={"22px 22px 22px 22px"}
                         p="4"
                         flex={2}
                         css={{
@@ -221,8 +221,8 @@ const FoodListingsPage = () => {
                                                     shortDescription={listing.shortDescription}
                                                     approxAddress={listing.approxAddress}
                                                     totalSlots={listing.totalSlots}
-                                                    latitude={parseFloat(listing.coordinates.split(',')[0])}
-                                                    longitude={parseFloat(listing.coordinates.split(',')[1])}
+                                                    latitude={parseFloat(listing.approxCoordinates.split(',')[0])}
+                                                    longitude={parseFloat(listing.approxCoordinates.split(',')[1])}
                                                     sx={{ cursor: "pointer" }}
                                                 />
                                             </motion.div>
@@ -252,7 +252,7 @@ const FoodListingsPage = () => {
                             >
                                 <MarkeredGMaps
                                     coordinatesList={listings.map((listing) => {
-                                        const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
+                                        const [lat, lng] = listing.approxCoordinates.split(',').map(parseFloat);
                                         return { lat, lng };
                                     })}
                                     listings={listings}

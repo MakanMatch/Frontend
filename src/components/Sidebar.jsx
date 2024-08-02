@@ -87,7 +87,7 @@ function Sidebar({ isOpen, onClose }) {
                             <Text ml={3}>Chats</Text>
                         </Button>
 
-                        <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => handleNavigationClick("/")}>
+                        <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => handleNavigationClick("/customerSupport")}>
                             <Text as={BsQuestionCircle} fontSize="20px" color="#515F7C" ml={0.5} />
                             <Text ml={3}>Customer Support</Text>
                         </Button>

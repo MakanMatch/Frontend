@@ -31,6 +31,8 @@ import MakanHistory from './pages/identity/MakanHistory.jsx';
 import Favourites from './pages/identity/Favourites.jsx';
 import MakanReviews from './pages/identity/MakanReviews.jsx';
 import ConfirmReservation from './pages/orders/ConfirmReservation.jsx';
+import CustomerSupport from './pages/customerSupport/CustomerSupport.jsx';
+import MakanBot from './pages/customerSupport/MakanBot.jsx';
 import AdminHomepage from './pages/identity/Admin/AdminHomepage.jsx';
 import HygieneReports from './pages/identity/Admin/HygieneReports.jsx';
 import UserManagement from './pages/identity/Admin/UserManagement.jsx';
@@ -71,6 +73,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                             <Route path={"userManagement"} element={<UserManagement />} />
                             <Route path={"myAccount"} element={<AdminAccount />} />
                         </Route>
+                        <Route path={"customerSupport"} element={<CustomerSupport />} />
+                        <Route path={"makanBot"} element={<MakanBot />} />
                         <Route path='*' element={<NotFound />} />
                     </Route>
                     <Route path='/auth' element={<AuthLayout />}>

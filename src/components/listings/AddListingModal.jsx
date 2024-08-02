@@ -124,7 +124,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
             dispatch(reloadAuthToken(authToken));
             setIsSubmitting(false);
             if (error.response && error.response.data && typeof error.response.data == "string") {
-                console.log("Failed to add listing; response: " + error.response)
+                console.log("Failed to add listing; response: " + error.response.data)
                 if (error.response.data.startsWith("UERROR")) {
                     displayToast(
                         "Uh-oh!",
@@ -161,6 +161,22 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
 
     const handlePublishToggle = () => {
         setIsChecked(!isChecked);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter" ) {
+            if (validListing && !isSubmitting && !modalError) {
+                handleSubmitListing();
+            } else {
+                displayToast(
+                    "Uh-oh!",
+                    "Please fill in all the required fields before submitting",
+                    "error",
+                    3000,
+                    true
+                );
+            }
+        }
     };
 
     const handleFileChange = (event) => {
@@ -276,6 +292,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="text"
                                 placeholder="E.g Pani Puri"
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     setTitle(event.target.value)
                                 }
@@ -287,6 +304,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="text"
                                 placeholder="E.g Popular Indian Street Food"
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     setShortDescription(event.target.value)
                                 }
@@ -300,6 +318,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             <Input
                                 type="text"
                                 placeholder="E.g Pani Puri offers a burst of flavors and textures in every bite. It is made of a crispy shell, a mixture of potato, onion, peas and chickpea."
+                                onKeyDown={handleKeyDown}
                                 onChange={(event) =>
                                     setLongDescription(event.target.value)
                                 }
@@ -322,6 +341,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                         max={10}
                                         value={portionPrice}
                                         inputMode="numeric"
+                                        onKeyDown={handleKeyDown}
                                         onChange={(valueAsString, valueAsNumber) => {
                                             const isValid = /^[0-9]*$/.test(valueAsString);
                                             if (!isValid) {
@@ -360,6 +380,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                         max={10}
                                         value={totalSlots}
                                         inputMode="numeric"
+                                        onKeyDown={handleKeyDown}
                                         onChange={(valueAsString, valueAsNumber) => {
                                             const isValid = /^[0-9]*$/.test(valueAsString);
                                             if (!isValid) {
@@ -409,6 +430,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                 key={Date.now()}
                                 type="file"
                                 size="sm"
+                                onKeyDown={handleKeyDown}
                                 onChange={handleFileChange}
                                 multiple
                             />

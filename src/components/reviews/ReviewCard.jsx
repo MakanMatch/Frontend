@@ -38,9 +38,10 @@ const ReviewCard = ({
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const imageRefs = useRef([]);
     const { user, loaded } = useSelector((state) => state.auth);
+    const posterProfilePicture = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${posterID}`;
 
-    const handleProfileClick = (image) => {
-        setProfileImage(image);
+
+    const handleProfileClick = () => {
         setIsProfileOpen(true);
     }
 
@@ -224,10 +225,11 @@ const ReviewCard = ({
                         justifyContent="space-between"
                         wrap="wrap">
                         <Flex alignItems='center' mb={{ base: 2, md: 0 }}>
-                            <Avatar name={username}
-                            // src='../../src/assets/Logo.png'  // Change to actual profile picture
-                            // onClick={() => handleProfileClick('../../src/assets/Logo.png')} // Change to actual profile picture
-                            // _hover={{ cursor: "pointer" }} // Uncomment if profile picture is clickable
+                            <Avatar 
+                            name={username}
+                            src={posterProfilePicture}
+                            onClick={() => handleProfileClick()} 
+                            _hover={{ cursor: "pointer" }}
                             />
                             <Box ml={4}>
                                 <Heading textAlign="left" size='sm'>{username ? username : "Guest"}</Heading>
@@ -324,11 +326,12 @@ const ReviewCard = ({
                 <Modal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} size="lg" isCentered>
                     <ModalOverlay />
                     <ModalContent maxW="max-content" background="transparent" boxShadow="none">
-                        <Image
-                            boxSize='500px'
-                            borderRadius='full'
-                            src='https://bit.ly/sage-adebayo'
-                            alt='Dan Abramov'
+                        <Avatar 
+                        boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
+                        borderRadius='full'
+                        src={posterProfilePicture}
+                        name={username}
+                        objectFit='cover'
                         />
                     </ModalContent>
                 </Modal>

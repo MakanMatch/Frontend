@@ -8,8 +8,8 @@ import configureShowToast from '../showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import MealDetailsSection from './MealDetailsSection';
 import placeholderImage from '../../assets/placeholderImage.svg';
-import { CheckCircleIcon, CheckIcon } from '@chakra-ui/icons';
-import { BsFillCheckCircleFill } from 'react-icons/bs';
+import { CheckCircleIcon, CheckIcon, RepeatClockIcon } from '@chakra-ui/icons';
+import { BsClockFill, BsFillCheckCircleFill } from 'react-icons/bs';
 
 function ManageReservationSection({ currentReservation, setCurrentReservation, setReservations, refreshReservations, inSixHourWindow, dataLoaded, mode = "full" }) {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
@@ -166,7 +166,18 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, s
                 </Box>
             ) : (
                 <Fade in>
-                    {inSixHourWindow ? (
+                    {currentReservation.chargeableCancelActive && (
+                        <Box mr={mode == "full" && "3vh"}>
+                            <Box display={"flex"} justifyContent={"center"} flexDir={"column"} mt={"20px"} alignItems={"center"}>
+                                <BsClockFill color={"#f2ed46"} size={'50px'} onClick={toggleMarkedPaid} />
+                                <Heading size={"lg"} mt={"20px"}>Pending Cancellation</Heading>
+                                <Text mt={"10px"}>You have paid the <strong>{Extensions.formatCurrency(currentReservation.totalPrice * 2)}</strong> cancellation fee to {currentReservation.listing.Host.fname}.</Text>
+                                <Text mt={"10px"}>The host needs to check your fee payment and confirm the cancellation.</Text>
+                                <Button variant={'link'} color={'primaryColour'} fontSize={'small'} mt={"10px"} onClick={() => navigate("/chat")}>Inform them here.</Button>
+                            </Box>
+                        </Box>
+                    )}
+                    {inSixHourWindow && !currentReservation.chargeableCancelActive && (
                         <>
                             {!currentReservation.markedPaid ? (
                                 <Box>
@@ -212,8 +223,9 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, s
                                 </Box>
                             )}
                         </>
-                    ) : (
-                        <>
+                    )}
+                    {!inSixHourWindow && !currentReservation.chargeableCancelActive && !currentReservation.markedPaid && (
+                        <Box>
                             <MealDetailsSection currentReservation={currentReservation} dataLoaded={dataLoaded} />
                             <br />
                             <br />
@@ -223,7 +235,7 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, s
                                 <Spacer />
                                 <Button mt={"20px"} colorScheme='red' fontWeight={"bold"} borderRadius={"10px"} onClick={() => setShowingCancelConfirmation(true)}>Cancel Reservation</Button>
                             </HStack>
-                        </>
+                        </Box>
                     )}
                 </Fade>
             )}

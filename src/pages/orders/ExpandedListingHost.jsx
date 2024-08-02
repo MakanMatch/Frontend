@@ -1,5 +1,5 @@
 import { PlusSquareIcon, SmallAddIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip, Badge, ScaleFade, Stack } from '@chakra-ui/react'
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Center, Container, EditableTextarea, Flex, Grid, GridItem, HStack, Heading, Image, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Spinner, Text, Textarea, VStack, useToast, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, StatUpArrow, Input, SlideFade, CloseButton, Tooltip, Badge, ScaleFade, Stack, useBreakpointValue } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import ReservationSettingsCard from '../../components/orders/ReservationSettingsCard'
@@ -52,6 +52,7 @@ function ExpandedListingHost() {
     const { user, loaded, error, authToken } = useSelector(state => state.auth)
     const dispatch = useDispatch();
     const [editListing, setEditListing] = useState(true)
+    const isBase = useBreakpointValue({ base: true, md: false });
 
     const handleClose = () => {
         onClose()
@@ -277,19 +278,30 @@ function ExpandedListingHost() {
                 gap={4}
                 p={"10px"}
             >
-                <GridItem colSpan={2}>
-                    <VStack alignItems={"flex-start"}>
+                <GridItem colSpan={{ base: 3, md: 2 }}>
+                    <VStack alignItems={{ base: "center", md: "flex-start" }}>
                         <Text>{listingData.datetime}</Text>
-                        <HStack spacing={5} alignItems={'center'}>
-                            <Heading>{listingData.title}</Heading>
-                            <ScaleFade initialScale={0.5} in={!listingPublished}>
-                                <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>HIDDEN</Badge>
-                            </ScaleFade>
-                        </HStack>
+                        <VStack alignItems={{ base: "center", md: "flex-start" }}>
+                            {isBase ? (
+                                <>
+                                    <Heading>{listingData.title}</Heading>
+                                    <ScaleFade initialScale={0.5} in={!listingPublished}>
+                                        <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>HIDDEN</Badge>
+                                    </ScaleFade>
+                                </>
+                            ) : (
+                                <HStack spacing={5} alignItems={'center'}>
+                                    <Heading>{listingData.title}</Heading>
+                                    <ScaleFade initialScale={0.5} in={!listingPublished}>
+                                        <Badge colorScheme={'purple'} variant={'solid'} px={3} py={1}>HIDDEN</Badge>
+                                    </ScaleFade>
+                                </HStack>
+                            )}
+                        </VStack>
                     </VStack>
                 </GridItem>
-                <GridItem colSpan={1}>
-                    <VStack h="92%" justify="flex-end" alignItems="flex-end" spacing={4}>
+                <GridItem colSpan={{ base: 3, md: 1 }}>
+                    <VStack h="92%" justify={{ base: "center", md: "flex-end" }} alignItems={{ base: "center", md: "flex-end" }} spacing={4}>
                         {changesMade && (
                             <SlideFade in={true}>
                                 <Button variant="MMPrimary" onClick={handleSaveChanges}>Save Changes</Button>
@@ -319,7 +331,7 @@ function ExpandedListingHost() {
                                 </HStack>
                             </VStack>
                         </GridItem>
-                        <GridItem colSpan={2}>
+                        <GridItem colSpan={{ base: 3, md: 2 }}>
                             <VStack alignItems={"flex-start"} spacing={{ base: "10px", md: "20px", lg: "30px" }}>
                                 <VStack alignItems={"flex-start"} width={"100%"}>
                                     <Text fontWeight={"bold"} mb={"10px"}>Short Description (shown on Home page)</Text>
@@ -331,7 +343,7 @@ function ExpandedListingHost() {
 
                                 {/* <Spacer /> */}
 
-                                <VStack alignItems={"flex-start"} width={"100%"}>
+                                <VStack alignItems={"flex-start"} width={"100%"} mt={3}>
                                     <Heading size={"md"}>Listing Statistics</Heading>
 
                                     <HStack spacing={"30px"} wrap={"wrap"}>
@@ -344,7 +356,7 @@ function ExpandedListingHost() {
                             </VStack>
                         </GridItem>
 
-                        <GridItem colSpan={1}>
+                        <GridItem colSpan={{ base: 3, md: 1 }} mt={3}>
                             <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
                         </GridItem>
 
@@ -353,15 +365,15 @@ function ExpandedListingHost() {
                     </>
                 ) : (
                     <>
-                        <GridItem colSpan={2}>
-                            <GuestManagement 
-                            listingID={listingData.listingID}
-                            guests={listingData.guests}
+                        <GridItem colSpan={{ base: 3, md: 2 }}>
+                            <GuestManagement
+                                listingID={listingData.listingID}
+                                guests={listingData.guests}
+                                fetchListingDetails={fetchListingDetails}
                             />
                         </GridItem>
-
-                        <GridItem colSpan={1}>
-                            <HostPaymentQR/>
+                        <GridItem colSpan={{ base: 3, md: 1 }}>
+                            <HostPaymentQR />
                         </GridItem>
 
                     </>
