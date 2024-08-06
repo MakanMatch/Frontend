@@ -420,10 +420,6 @@ function ChatUi() {
         }
     }, [chatSelected, nextChat]);
 
-    useEffect(() => {
-        console.log(messages);
-      }, [messages]);
-
     const [isSmallerThan950px] = useMediaQuery("(max-width: 950px)");
 
     function handleFileChange(event) {
@@ -452,8 +448,7 @@ function ChatUi() {
     if (!loaded || !user) {
         return <Spinner />
     }
-    const filteredMessages = messages[chatSelected] || [];
-    console.log(messages)
+    const filteredMessages = messages.filter(msg => msg.chatID === chatSelected);
     return (
         <Flex direction="column" overflowX="hidden" w="100%" h="100%">
             <Flex direction="row" h="100%" w="100%">
