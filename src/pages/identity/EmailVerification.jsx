@@ -3,6 +3,7 @@ import {
     Box, Heading, Text, VStack, Image, Button, useToast, useMediaQuery
 } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import server from '../../networking';
 import configureShowToast from '../../components/showToast';
 
@@ -48,41 +49,49 @@ function EmailVerification() {
     };
 
     return (
-        <Box
-            bgPosition="center"
-            display="flex"
-            justifyContent="center"
-        >
-            <Box
-                w={isSmallerThan1040 ? '100%' : '65%'}
-                bg="rgba(255, 255, 255, 0.80)"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                p={8}
-                borderRadius={15}
+        <>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
             >
-                <VStack spacing={4} w="full" overflow="hidden">
-                    <Heading as="h1" size="xl" textAlign="center">
-                        Verify your email
-                    </Heading>
-                    <Image
-                        src= '/src/assets/EmailVerificationImage.png'
-                        alt="Email verification"
-                        objectFit="cover"
-                        mt={-10}
-                    />
-                    <Text fontSize="lg" textAlign="center" mt={-5} width={"60%"}>
-                        We've just sent a verification link to your email. Click the link provided to verify your email!
-                    </Text>
-                    <Box>
-                        <Button onClick={sendEmailVerification} variant={'MMPrimary'} isDisabled={cooldown > 0} width="100%">
-                            {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend email'}
-                        </Button>
+                <Box
+                    bgPosition="center"
+                    display="flex"
+                    justifyContent="center"
+                >
+                    <Box
+                        w={isSmallerThan1040 ? '100%' : '65%'}
+                        bg="rgba(255, 255, 255, 0.80)"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        p={8}
+                        borderRadius={15}
+                    >
+                        <VStack spacing={4} w="full" overflow="hidden">
+                            <Heading as="h1" size="xl" textAlign="center">
+                                Verify your email
+                            </Heading>
+                            <Image
+                                src= '/src/assets/EmailVerificationImage.png'
+                                alt="Email verification"
+                                objectFit="cover"
+                                mt={-10}
+                            />
+                            <Text fontSize="lg" textAlign="center" mt={-5} width={"60%"}>
+                                We've just sent a verification link to your email. Click the link provided to verify your email!
+                            </Text>
+                            <Box>
+                                <Button onClick={sendEmailVerification} variant={'MMPrimary'} isDisabled={cooldown > 0} width="100%">
+                                    {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend email'}
+                                </Button>
+                            </Box>
+                        </VStack>
                     </Box>
-                </VStack>
-            </Box>
-        </Box>
+                </Box>
+            </motion.div>
+        </>
     );
 }
 

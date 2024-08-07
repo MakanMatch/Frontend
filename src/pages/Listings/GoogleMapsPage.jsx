@@ -3,6 +3,7 @@
 /* eslint-disable react/prop-types */
 import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
 import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
+import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Box, useToast, Center, Fade, Spinner, useMediaQuery, Card, Image, Stack, CardBody, Heading, Text, CardFooter, Button } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
@@ -13,6 +14,7 @@ const GoogleMapsPage = () => {
     const toast = useToast();
     const location = useLocation();
     const loaded = useSelector((state) => state.auth.loaded);
+    const { listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude, flaggedForHygiene } = location.state;
 
     function displayToast(title, description, status, duration, isClosable) {
         toast.closeAll();
@@ -31,14 +33,16 @@ const GoogleMapsPage = () => {
         }
     }
 
-    const { listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude } = location.state;
-    // if location.state doesnt have the required data, navigate back to homepage and show a toast
-    if (!listingID || !hostID || !images || !title || !shortDescription || !approxAddress || !portionPrice || !totalSlots || !latitude || !longitude) {
-        navigate("/");
-        setTimeout(() => {
-            displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, true);
-        }, 200);
-    }
+    useEffect(() => {
+        // if location.state doesnt have the required data, navigate back to homepage and show a toast
+        if (!listingID || !hostID || !images || !title || !shortDescription || !approxAddress || !portionPrice || !totalSlots || !latitude || !longitude || typeof flaggedForHygiene !== "boolean") {
+            navigate("/");
+            setTimeout(() => {
+                displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, true);
+            }, 200);
+        }
+    }, [])
+
     if (!loaded) {
         return (
             <div>
@@ -70,7 +74,7 @@ const GoogleMapsPage = () => {
                             damping: 20
                         }}
                     >
-                        <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
+                        <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} flaggedForHygiene={flaggedForHygiene} />
                     </motion.div>
                 </Box>
                 {/* <Box display="flex" justifyContent={"center"}>

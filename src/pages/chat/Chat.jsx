@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Input, Text, Center, Flex, VStack, Spacer, IconButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Avatar, useToast, Spinner } from "@chakra-ui/react";
+import { Box, Input, Text, Center, Flex, VStack, Spacer, IconButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Avatar, useToast, Spinner, useMediaQuery, useDisclosure, HStack, Fade, AvatarBadge } from "@chakra-ui/react";
 import { FiX } from "react-icons/fi";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatHistory from "../../components/chat/ChatHistory";
@@ -8,12 +8,13 @@ import { useNavigate } from "react-router-dom";
 import { changeAuthToken, fetchUser, logout } from "../../slices/AuthState";
 import configureShowToast from "../../components/showToast";
 import { FaCamera } from "react-icons/fa";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import server from '../../networking';
 
 function ChatUi() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState({});
     const [messageInput, setMessageInput] = useState("");
     const [messageToDelete, setMessageToDelete] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -22,24 +23,35 @@ function ChatUi() {
     const [editMessageContent, setEditMessageContent] = useState("");
     const [chatHistory, setChatHistory] = useState([]); // Array of chat IDs
     const [chatPartnerUsernames, setChatPartnerUsernames] = useState({}); // Object to map chat ID to username
+    const [chatPartnerID, setChatPartnerID] = useState({});
     const [chatSelected, setChatSelected] = useState(null);
+    const [nextChat, setNextChat] = useState(null);
     const [status, setStatus] = useState(false);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null); // New state for image preview
     const [imagePreviewOpen, setImagePreviewOpen] = useState(false); // New state for image preview modal
     const [imageName, setImageName] = useState(""); // New state for image name
     const [confirmedImage, setConfirmedImage] = useState(""); // New state for confirmed image
+    const [sendLoading, setSendLoading] = useState(false);
     const chatBottomRef = useRef(null);
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const ws = useRef(null);
 
-    function getImageLink (userID, messageID) {
+    function getImageLink(userID, messageID) {
         if (!userID || !messageID) {
             return null;
         }
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForChat?userID=${userID}&messageID=${messageID}`;
+    }
+
+    function getProfilePictureLink(userID) {
+        if (!userID) {
+            return null;
+        }
+        return `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`;
     }
     function setupWS() {
         const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
@@ -102,8 +114,13 @@ function ChatUi() {
                     }
                 }
             }
-        
+
             if (receivedMessage.action === "chat_id") {
+                setChatPartnerID((prevIDs) => ({
+                    ...prevIDs,
+                    [receivedMessage.chatID]: receivedMessage.chatPartnerID,
+                }));
+
                 setChatHistory((prevChatHistory) => {
                     if (!prevChatHistory.includes(receivedMessage.chatID)) {
                         return [...prevChatHistory, receivedMessage.chatID];
@@ -122,26 +139,34 @@ function ChatUi() {
                     }));
                 }
             } else if (receivedMessage.action === "chat_history") {
-                setMessages(receivedMessage.previousMessages);
+                setMessages((prevMessages) => ({
+                    ...prevMessages,
+                    [receivedMessage.chatID]: [...receivedMessage.previousMessages],
+                }));
                 setStatus(receivedMessage.currentStatus);
             } else if (receivedMessage.action === "send") {
-                setMessages((prevMessages) => [
+                setMessages((prevMessages) => ({
                     ...prevMessages,
-                    receivedMessage.message,]);
+                    [receivedMessage.message.chatID]: [
+                        ...(prevMessages[receivedMessage.message.chatID] || []),
+                        receivedMessage.message,
+                    ],
+                }));
             } else if (receivedMessage.action === "edit") {
-                setMessages((prevMessages) =>
-                    prevMessages.map((msg) =>
+                setMessages((prevMessages) => ({
+                    ...prevMessages,
+                    [receivedMessage.chatID]: prevMessages[receivedMessage.chatID].map((msg) =>
                         msg.messageID === receivedMessage.messageID
-                            ? { ...msg, message: receivedMessage.message, edited: true }
-                            : msg
-                    )
-                );
+                            ? { ...msg, message: receivedMessage.message, edited: true } : msg
+                    ),
+                }));
             } else if (receivedMessage.action === "delete") {
-                setMessages((prevMessages) =>
-                    prevMessages.filter(
+                setMessages((prevMessages) => ({
+                    ...prevMessages,
+                    [receivedMessage.chatID]: prevMessages[receivedMessage.chatID].filter(
                         (msg) => msg.messageID !== receivedMessage.messageID
-                    )
-                );
+                    ),
+                }));
             } else if (receivedMessage.action === "chat_partner_offline") {
                 if (receivedMessage.chatID == localStorage.getItem("selectedChatID")) {
                     setStatus(false);
@@ -182,18 +207,12 @@ function ChatUi() {
         window.onbeforeunload = () => {
             localStorage.removeItem("wsConnected");
         };
-        
+
 
         if (loaded == true) {
             if (!user) {
                 navigate("/auth/login");
-                showToast(
-                    "Please login first",
-                    "You need to login to use chat features.",
-                    3500,
-                    true,
-                    "error"
-                );
+                showToast("Please login first", "You need to login to use chat features.", 3500, true, "error");
                 return;
             }
 
@@ -219,7 +238,14 @@ function ChatUi() {
     }, [messages]);
 
     const sendMessage = async () => {
+        if (messageInput === "" && image === null) {
+            showToast("Message cannot be empty", "Message cannot be empty please input something", 3500, true, "error")
+        }
+        if (image !== null && messageInput === "") {
+            showToast("Image messages need to have a message with it", "Image messages need to have a message with it", 3500, true, "error")
+        }
         if (ws.current && messageInput.trim() !== "" && (image === null || (image !== null && messageInput.trim() !== ""))) {
+            setSendLoading(true);
             const imagesToBeSubmitted = image ? true : false;
             const newMessage = {
                 action: "send",
@@ -229,7 +255,7 @@ function ChatUi() {
                 datetime: new Date().toISOString(),
                 replyToID: replyTo ? replyTo.messageID : null,
             };
-    
+
             if (imagesToBeSubmitted) {
                 const formData = new FormData();
                 formData.append("image", image);
@@ -240,18 +266,16 @@ function ChatUi() {
                 formData.append("replyToID", replyTo ? replyTo.messageID : null);
                 try {
                     const response = await server.post("/chat/createImageMessage", formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
+                        headers: { 'Content-Type': 'multipart/form-data', },
                         transformRequest: formData => formData
                     });
-    
+
                     if (response.status === 200) {
                         const chatHistory = {
                             action: "chat_history",
                             chatID: chatSelected,
                         }
-    
+
                         ws.current.send(JSON.stringify(chatHistory));
                     }
                 } catch (error) {
@@ -261,14 +285,15 @@ function ChatUi() {
             } else {
                 ws.current.send(JSON.stringify(newMessage));
             }
-    
+
             setMessageInput("");
             setReplyTo(null);
             setImage(null);
             setConfirmedImage("");
+            setSendLoading(false);
         }
     };
-    
+
 
     const fetchChatHistory = (chatID) => {
         if (ws.current) {
@@ -298,6 +323,9 @@ function ChatUi() {
     };
 
     const handleEditMessage = () => {
+        if (editMessageContent.trim() === "") {
+            showToast("Edited Message cannot be empty", "Edited Message cannot be empty please input something", 3500, true, "error")
+        }
         if (editMessageId && editMessageContent.trim() !== "") {
             const editedMessage = {
                 id: editMessageId,
@@ -309,13 +337,6 @@ function ChatUi() {
                 datetime: new Date().toISOString(),
             };
             ws.current.send(JSON.stringify(editedMessage));
-            setMessages((prevMessages) =>
-                prevMessages.map((msg) =>
-                    msg.messageID === editMessageId
-                        ? { ...msg, message: editMessageContent, edited: true }
-                        : msg
-                )
-            );
             closeEditModal();
         }
     };
@@ -370,8 +391,8 @@ function ChatUi() {
     };
 
     const handleChatClick = (clickedChatID) => {
-        console.log("Clicked: ", clickedChatID);
-        setChatSelected((prev) => {
+        setNextChat(() => {
+            const prev = chatSelected;
             if (prev == null) {
                 localStorage.setItem("selectedChatID", clickedChatID)
                 return clickedChatID
@@ -382,9 +403,19 @@ function ChatUi() {
                 localStorage.removeItem("selectedChatID")
                 return null
             }
-        });
+        })
+        setChatSelected(null);
         fetchChatHistory(clickedChatID);
     };
+
+    useEffect(() => {
+        if (nextChat) {
+            setChatSelected(nextChat)
+            setNextChat(null);
+        }
+    }, [chatSelected, nextChat]);
+
+    const [isSmallerThan950px] = useMediaQuery("(max-width: 950px)");
 
     function handleFileChange(event) {
         const file = event.target.files[0];
@@ -412,245 +443,261 @@ function ChatUi() {
     if (!loaded || !user) {
         return <Spinner />
     }
-
+    const filteredMessages = messages[chatSelected] || [];
     return (
-        <Flex direction = "row" overflowX={"hidden"} w="100%" h="100%">
-            <ChatHistory
-                onUserClick={handleChatClick}
-                chatHistory={chatHistory}
-                chatPartnerUsernames={chatPartnerUsernames}
-                w = "25%"
-                h = "100%"
-            />
-            <Flex flex="1" direction={"column"} overflow={"hidden"}>
-            {chatSelected != null ? (
-                <Center flexDirection="column" alignItems="center" p={5} flex="1">
-                    <Box
-                        bg="white"
-                        w="75%"
-                        p={2}
-                        borderRadius={20}
-                        h="auto"
-                        textColor="black"
-                        alignItems="center"
-                        display="flex"
-                        boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
-                        mb={4}
-                        mt={-4}
-                    >
-                        <Avatar
-                            name={chatPartnerUsernames[chatSelected]}
-                            borderRadius="full"
-                            w={{ base: "20%", md: "10%" }}
-                            h="100%"
-                            minH={"55px"}
-                            maxH={"55px"}
-                            minW={"55px"}
-                            maxW={"55px"}
-                        />
-                        <Box mt={-10} ml={{ base: 0, md: 5 }} minW={"495px"}>
-                            <Text fontSize={20} mt={2} textAlign={"left"}>
-                                {chatPartnerUsernames[chatSelected]
-                                    ? chatPartnerUsernames[chatSelected]
-                                    : "Chat"}
-                            </Text>
-                            <Spacer h={3} />
-                            <Text
-                                fontSize="sm"
-                                mb={-8}
-                                textAlign={"left"}
-                                color={status ? "green.500" : "gray.300"}
-                            >
-                                {status ? "Online" : "Offline"}
-                            </Text>
-                        </Box>
-                    </Box>
-                    <Box
-                        bg="gray.100"
-                        w="75%"
-                        h="70vh"
-                        p={4}
-                        display="flex"
-                        flexDirection="column"
-                        borderRadius={20}
-                        boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"}
-                    >
-                        <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX={"hidden"}>
-                            {messages.map((msg, index) => (
-                                <React.Fragment key={msg.messageID}>
-                                    {shouldDisplayDate(msg, messages[index - 1]) && (
+        <Flex direction="column" overflowX="hidden" w="100%" h="100%">
+            <Flex direction="row" h="100%" w="100%">
+                <ChatHistory
+                    onUserClick={handleChatClick}
+                    chatHistory={chatHistory}
+                    chatPartnerUsernames={chatPartnerUsernames}
+                    drawerOpen={isOpen}
+                    closeDrawer={onClose}
+                    w={{ base: "100%", md: "25%" }}
+                    h="100%"
+                    display={{ base: chatSelected === null ? "block" : "none", md: "block" }} // Hide ChatHistory on mobile if a chat is selected
+                    profilePhoto={chatPartnerID}
+                />
+                <Flex flex="1" direction="column" overflow="hidden">
+                    {chatSelected !== null ? (
+                        <Fade in>
+                            <Center flexDirection="column" alignItems="center" p={5} flex="1">
+                                <Box
+                                    bg="white"
+                                    w={{ base: "90%", md: "75%" }}
+                                    p={2}
+                                    borderRadius={20}
+                                    h="auto"
+                                    textColor="black"
+                                    alignItems="center"
+                                    display="flex"
+                                    boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
+                                    mb={4}
+                                    mt={-4}
+                                >
+                                    <HStack>
+                                        {isSmallerThan950px && (
+                                            <Button bg={'none'} onClick={onOpen} p={0}><HamburgerIcon /></Button>
+                                        )}
+                                        <Avatar
+                                            size="md"
+                                            src={getProfilePictureLink(chatPartnerID[chatSelected])}
+                                            name={chatPartnerUsernames[chatSelected]}
+                                            borderRadius="full"
+                                            w={{ base: "20%", md: "10%" }}
+                                            h="100%"
+                                            minH="55px"
+                                            maxH="55px"
+                                            minW="55px"
+                                            maxW="55px"
+                                        >
+                                            {status ? <AvatarBadge boxSize="1em" bg="green.500" /> : <AvatarBadge boxSize="1em" bg="gray.300" />}
+                                        </Avatar>
+                                    </HStack>
+                                    <Box mt={-10} ml={{ base: 2, md: 5 }} minW={{ base: "60%", md: "495px" }}>
+                                        <Text fontSize={20} mt={2} textAlign="left">
+                                            {chatPartnerUsernames[chatSelected] || "Chat"}
+                                        </Text>
+                                        <Spacer h={3} />
                                         <Text
                                             fontSize="sm"
-                                            color="gray.500"
-                                            textAlign="center"
-                                            mb={2}
+                                            mb={-8}
+                                            textAlign="left"
+                                            color={status ? "green.500" : "gray.300"}
                                         >
-                                            {formatDate(msg.datetime)}
+                                            {status ? "Online" : "Offline"}
                                         </Text>
+                                    </Box>
+                                </Box>
+                                <Box
+                                    bg="gray.100"
+                                    w={{ base: "90%", md: "75%" }}
+                                    h="70vh"
+                                    p={4}
+                                    display="flex"
+                                    flexDirection="column"
+                                    borderRadius={20}
+                                    boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
+                                >
+                                    <VStack spacing={4} align="stretch" flex="1" overflowY="auto" overflowX="hidden">
+                                        {filteredMessages.map((msg, index) => (
+                                            <React.Fragment key={msg.messageID}>
+                                                {shouldDisplayDate(msg, filteredMessages[index - 1]) && (
+                                                    <Text fontSize="sm" color="gray.500" textAlign="center" mb={2}>
+                                                        {formatDate(msg.datetime)}
+                                                    </Text>
+                                                )}
+                                                <ChatBubble
+                                                    message={msg.message}
+                                                    timestamp={new Date(msg.datetime).toLocaleTimeString([], {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                    })}
+                                                    isSender={msg.senderID === user.userID}
+                                                    sender={msg.sender}
+                                                    receiver={chatPartnerUsernames[chatSelected]}
+                                                    onEdit={() => openEditModal(msg.messageID, msg.message)}
+                                                    onDelete={() => handleDeletePrompt(msg.messageID)}
+                                                    onReply={() => handleReply(msg)}
+                                                    repliedMessage={msg.replyTo}
+                                                    edited={msg.edited}
+                                                    image={msg.image ? getImageLink(msg.senderID, msg.messageID) : null}
+                                                    receiverProfilePicture={chatPartnerID[chatSelected]}
+                                                    senderProfilePicture={user.userID}
+                                                />
+                                            </React.Fragment>
+                                        ))}
+                                        <div ref={chatBottomRef} /> {/* Ref to scroll to */}
+                                    </VStack>
+                                    {replyTo && (
+                                        <Flex
+                                            bg="gray.200"
+                                            p={2}
+                                            borderRadius="md"
+                                            mb={2}
+                                            align="center"
+                                            justify="space-between"
+                                        >
+                                            <Text fontSize="sm" fontStyle="italic">
+                                                Replying to: {replyTo.message}
+                                            </Text>
+                                            <IconButton
+                                                aria-label="Cancel reply"
+                                                icon={<FiX />}
+                                                variant="ghost"
+                                                colorScheme="red"
+                                                size="sm"
+                                                onClick={cancelReply}
+                                            />
+                                        </Flex>
                                     )}
-                                    <ChatBubble
-                                        message={msg.message}
-                                        timestamp={new Date(msg.datetime).toLocaleTimeString([], {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                        })}
-                                        isSender={msg.senderID === user.userID}
-                                        sender={msg.sender}
-                                        receiver={chatPartnerUsernames[chatSelected]}
-                                        onEdit={() => openEditModal(msg.messageID, msg.message)}
-                                        onDelete={() => handleDeletePrompt(msg.messageID)}
-                                        onReply={() => handleReply(msg)}
-                                        repliedMessage={msg.replyTo}
-                                        edited={msg.edited}
-                                        image={msg.image ? getImageLink(msg.senderID, msg.messageID) : null}
-                                    />
-                                </React.Fragment>
-                            ))}
-                            <div ref={chatBottomRef} /> {/* Ref to scroll to */}
-                        </VStack>
-                        {replyTo && (
-                            <Flex
-                                bg="gray.200"
-                                p={2}
-                                borderRadius="md"
-                                mb={2}
-                                align="center"
-                                justify="space-between"
-                            >
-                                <Text fontSize="sm" fontStyle="italic">
-                                    Replying to: {replyTo.message}
+                                    {confirmedImage !== "" && (
+                                        <Flex
+                                            bg="gray.200"
+                                            p={2}
+                                            borderRadius="md"
+                                            mb={2}
+                                            align="center"
+                                            justify="space-between"
+                                        >
+                                            <Text fontSize="sm" fontStyle="italic">
+                                                {confirmedImage}
+                                            </Text>
+                                            <IconButton
+                                                aria-label="Cancel image"
+                                                icon={<FiX />}
+                                                variant="ghost"
+                                                colorScheme="red"
+                                                size="sm"
+                                            />
+                                        </Flex>
+                                    )}
+                                    <Flex mt={4} align="center">
+                                        <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange} accept="image/*" />
+                                        <IconButton
+                                            aria-label="Attach image"
+                                            icon={<FaCamera />}
+                                            variant="ghost"
+                                            colorScheme="gray"
+                                            size="md"
+                                            onClick={() => document.getElementById("file").click()}
+                                            mr={2}
+                                        />
+                                        <Input
+                                            placeholder="Type a message..."
+                                            flex="1"
+                                            mr={2}
+                                            value={messageInput}
+                                            onChange={(e) => setMessageInput(e.target.value)}
+                                            onKeyDown={handleKeyDown}
+                                        />
+                                        <Button colorScheme="teal" onClick={sendMessage} isLoading={sendLoading}>
+                                            Send
+                                        </Button>
+                                    </Flex>
+                                </Box>
+                            </Center>
+                        </Fade>
+                    ) : (
+                        <Center flex="1" flexDirection="column">
+                            {isSmallerThan950px ? (
+                                <Button onClick={onOpen} mt={"10px"}>Select a chat</Button>
+                            ) : (
+                                <Text fontSize="xl" color="gray.500">
+                                    Select a chat to start messaging or make a reservation.
                                 </Text>
-                                <IconButton
-                                    aria-label="Cancel reply"
-                                    icon={<FiX />}
-                                    variant="ghost"
-                                    colorScheme="red"
-                                    size="sm"
-                                    onClick={cancelReply}
-                                />
-                            </Flex>
-                        )}
-                        {confirmedImage!=="" && (
-                            <Flex
-                                bg="gray.200"
-                                p={2}
-                                borderRadius="md"
-                                mb={2}
-                                align="center"
-                                justify="space-between"
-                            >
-                                <Text fontSize="sm" fontStyle="italic">
-                                    {confirmedImage}
-                                </Text>
-                                <IconButton
-                                    aria-label="Cancel image"
-                                    icon={<FiX />}
-                                    variant="ghost"
-                                    colorScheme="red"
-                                    size="sm"
-                                />
-                            </Flex>
-                        )}
-                        <Flex mt={4} align="center">
-                            <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange} />
-                            <IconButton
-                                aria-label="Attach image"
-                                icon={<FaCamera />}
-                                variant="ghost"
-                                colorScheme="gray"
-                                size="md"
-                                onClick={() => document.getElementById("file").click()}
-                                mr={2}
-                            />
+                            )}
+                        </Center>
+                    )}
+                </Flex>
+                {/* Edit Message Modal */}
+                <Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Edit Message</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
                             <Input
-                                placeholder="Type a message..."
-                                flex="1"
-                                mr={2}
-                                value={messageInput}
-                                onChange={(e) => setMessageInput(e.target.value)}
-                                onKeyDown={handleKeyDown}
+                                value={editMessageContent}
+                                onChange={(e) => setEditMessageContent(e.target.value)}
+                                placeholder="Edit your message..."
                             />
-                            <Button colorScheme="teal" onClick={sendMessage}>
-                                Send
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
+                                Save
                             </Button>
-                        </Flex>
-                    </Box>
-                </Center>
-            ) : (
-                <Center flex="1">
-                    <Text fontSize="xl" color="gray.500">
-                        Select a chat to start messaging or make a reservation.
-                    </Text>
-                </Center>
-            )}
-            {/* Edit Message Modal */}
-            <Modal isOpen={editMessageId !== null} onClose={closeEditModal}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Edit Message</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Input
-                            value={editMessageContent}
-                            onChange={(e) => setEditMessageContent(e.target.value)}
-                            placeholder="Edit your message..."
-                        />
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button colorScheme="blue" mr={3} onClick={handleEditMessage}>
-                            Save
-                        </Button>
-                        <Button onClick={closeEditModal}>Cancel</Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-            {/* Image Preview Modal */}
-            <Modal isOpen={imagePreviewOpen} onClose={handleImagePreviewClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Image Preview</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Flex direction="column" align="center">
-                            <Avatar size="2xl" src={imagePreview} alt={imageName} mb={4} />
-                            <Text>{imageName}</Text>
-                        </Flex>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button colorScheme="blue" mr={3} onClick={handleConfirmImage}>
-                            Confirm
-                        </Button>
-                        <Button variant="outline" onClick={handleImagePreviewClose}>
-                            Cancel
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-            {/* Delete Message AlertDialog */}
-            <AlertDialog
-                isOpen={deleteDialogOpen}
-                leastDestructiveRef={undefined}
-                onClose={closeDeleteDialog}
-            >
-                <AlertDialogOverlay>
-                    <AlertDialogContent>
-                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                            Delete Message
-                        </AlertDialogHeader>
-                        <AlertDialogBody>
-                            Are you sure you want to delete this message? You can't undo this
-                            action afterwards.
-                        </AlertDialogBody>
-                        <AlertDialogFooter>
-                            <Button onClick={closeDeleteDialog}>Cancel</Button>
-                            <Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
-                                Delete
+                            <Button onClick={closeEditModal}>Cancel</Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+                {/* Image Preview Modal */}
+                <Modal isOpen={imagePreviewOpen} onClose={handleImagePreviewClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Image Preview</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            <Flex direction="column" align="center">
+                                <Avatar size="2xl" src={imagePreview} alt={imageName} mb={4} />
+                                <Text>{imageName}</Text>
+                            </Flex>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme="blue" mr={3} onClick={handleConfirmImage}>
+                                Confirm
                             </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
-        </Flex>
+                            <Button variant="outline" onClick={handleImagePreviewClose}>
+                                Cancel
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+                {/* Delete Message AlertDialog */}
+                <AlertDialog
+                    isOpen={deleteDialogOpen}
+                    leastDestructiveRef={undefined}
+                    onClose={closeDeleteDialog}
+                >
+                    <AlertDialogOverlay>
+                        <AlertDialogContent>
+                            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                                Delete Message
+                            </AlertDialogHeader>
+                            <AlertDialogBody>
+                                Are you sure you want to delete this message? You can't undo this
+                                action afterwards.
+                            </AlertDialogBody>
+                            <AlertDialogFooter>
+                                <Button onClick={closeDeleteDialog}>Cancel</Button>
+                                <Button colorScheme="red" onClick={handleDeleteMessage} ml={3}>
+                                    Delete
+                                </Button>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialogOverlay>
+                </AlertDialog>
+            </Flex>
         </Flex>
     );
 }

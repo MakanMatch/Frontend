@@ -9,6 +9,7 @@ import UpcomingReservationCard from '../../components/orders/UpcomingReservation
 import ManageReservationSection from '../../components/orders/ManageReservationSection';
 import MealDetailsSection from '../../components/orders/MealDetailsSection';
 import Extensions from '../../extensions';
+import { FaMapMarkerAlt } from 'react-icons/fa';
 
 function UpcomingReservation() {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
@@ -42,7 +43,7 @@ function UpcomingReservation() {
             reservation.currentGuest = currentGuest;
 
             return reservation;
-        })
+        }).filter(reservation => new Date() < new Date(reservation.listing.fullDatetime));
 
         console.log("Reservation data processed: ", processedReservations);
 
@@ -141,19 +142,22 @@ function UpcomingReservation() {
         <Box p={isSmallerThan800 ? "5px" : "20px"}>
             <Box mt={"30px"} display={"flex"} justifyContent={"space-between"} flexDirection={"row"} maxW={"100%"}>
                 <Box display={"flex"} justifyContent={"left"} flexDirection={"column"} textAlign={"left"} width={!isSmallerThan800 ? "50%" : "100%"}>
-                    <Heading fontFamily={'Sora'} fontWeight={'bold'} fontSize={{ 'base': 'x-large', 'lg': 'xx-large' }}>{inSixHourWindow ? "Your reservation is soon.": "Your Upcoming Reservation"}</Heading>
+                    <Heading fontFamily={'Sora'} fontWeight={'bold'} fontSize={{ 'base': 'x-large', 'lg': 'xx-large' }}>{inSixHourWindow ? "Your reservation is soon." : "Your Upcoming Reservation"}</Heading>
                     {reservations.length > 1 && (
                         <Button justifyContent={"left"} variant={'link'} onClick={onOpen} color={'primaryColour'} mt={"10px"}>View another</Button>
                     )}
 
                     <Box mt={"5%"}>
-                        <UpcomingReservationCard currentReservation={currentReservation} getFirstImageURL={getFirstImageURL} onClick={onOpen} />
+                        <UpcomingReservationCard currentReservation={currentReservation} getFirstImageURL={getFirstImageURL} onClick={onOpen} cursor={reservations.length > 1 && "pointer"} />
                     </Box>
 
                     <Box display={"flex"} flexDirection={"row"} justifyContent={"space-between"} mt={"30px"}>
                         <Box>
                             <Text><strong>Address</strong></Text>
                             <Text maxW={"150px"} overflowWrap={"break-word"}>{currentReservation.listing.address}</Text>
+                            <a target="_blank" href={`https://www.google.com/maps/search/?api=1&query=${currentReservation.listing.Host.address}`}>
+                                <Button mt={"10px"} variant={"link"} color={"primaryColour"} fontSize={"smaller"} leftIcon={<FaMapMarkerAlt />}>Navigate there</Button>
+                            </a>
                         </Box>
 
                         <Box ml={"5%"}>
@@ -195,7 +199,7 @@ function UpcomingReservation() {
                                     <UpcomingReservationCard key={reservation.referenceNum} currentReservation={reservation} getFirstImageURL={getFirstImageURL} onClick={() => {
                                         setCurrentReservation(reservation);
                                         onClose();
-                                    }} />
+                                    }} cursor={"pointer"} />
                                 ))}
                             </VStack>
                         </ModalBody>

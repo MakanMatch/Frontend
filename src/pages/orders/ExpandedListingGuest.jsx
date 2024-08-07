@@ -1,4 +1,4 @@
-import { Avatar, Box, Center, Divider, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Spinner, Stack, StackDivider, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
+import { Avatar, Box, Button, Center, Divider, Flex, Grid, GridItem, HStack, Heading, Image, Spacer, Spinner, Stack, StackDivider, Text, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import server from '../../networking'
@@ -37,13 +37,16 @@ function ExpandedListingGuest() {
         userID: null,
         username: null,
         foodRating: 0.0,
-        hygieneGrade: 0.0
+        hygieneGrade: 0.0,
+        mealsMatched: 0,
+        reviewsCount: 0
     })
     const { user, loaded, error, authToken } = useSelector(state => state.auth)
     const dispatch = useDispatch();
 
     const [listingID, setListingID] = useState(searchParams.get("id"))
     const imgBackendURL = (imgName) => `${backendAPIURL}/cdn/getImageForListing/?listingID=${listingData.listingID}&imageName=${imgName}`
+    const hostProfilePictureURL = `${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${hostData.userID}`
 
     useEffect(() => {
         if (loaded == true) {
@@ -66,9 +69,11 @@ function ExpandedListingGuest() {
         if (listingData.hostID) {
             if (user && listingData.hostID == user.userID) {
                 console.log("Logged in user is host of listing; redirecting to host view...")
-                navigate(`/expandedListingHost`, { state: {
-                    listingID: listingData.listingID
-                }})
+                navigate(`/expandedListingHost`, {
+                    state: {
+                        listingID: listingData.listingID
+                    }
+                })
                 return
             } else {
                 fetchHostData()
@@ -76,10 +81,21 @@ function ExpandedListingGuest() {
         }
     }, [listingData, user])
 
+    const getColorScheme = (hygieneGrade) => {
+        if (hygieneGrade >= 5) return 'green';
+        if (hygieneGrade >= 4) return 'teal';
+        if (hygieneGrade >= 3) return 'yellow';
+        if (hygieneGrade >= 2) return 'orange';
+        if (hygieneGrade >= 1) return 'red';
+        return 'gray';
+    };
+
     const processListingData = (data) => {
+        const before = structuredClone(data.datetime);
         let datetime = new Date(data.datetime)
         let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
         data.datetime = formattedString
+        data.fullDatetime = before;
 
         data.images = data.images.split("|")
 
@@ -103,8 +119,9 @@ function ExpandedListingGuest() {
     }
 
     const processHostData = (data) => {
-        const { userID, username, foodRating, hygieneGrade } = data
-        return { userID, username, foodRating, hygieneGrade }
+        const { userID, username, foodRating, hygieneGrade, mealsMatched, reviewsCount, createdAt } = data
+        const accountAgeInDays = Math.floor((new Date() - new Date(createdAt)) / (1000 * 60 * 60 * 24))
+        return { userID, username, foodRating, hygieneGrade, mealsMatched, reviewsCount, accountAgeInDays }
     }
 
     const fetchListingDetails = (id) => {
@@ -207,41 +224,41 @@ function ExpandedListingGuest() {
             <GridItem colSpan={isLargerThan700 ? 2 : 3}>
                 <Flex direction={'row'} width={'100%'} justifyContent={'space-between'}>
                     <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0}>
-                        <Text fontWeight={'bold'} fontSize={'1.5em'}>{hostData.foodRating}</Text>
+                        <Text fontWeight={'bold'} fontSize={'1.5em'}>{hostData.foodRating}<span style={{ fontSize: "medium" }}>/5</span></Text>
                         <Text>Food Rating</Text>
                     </VStack>
 
                     <Divider borderColor={'black'} orientation="vertical" />
 
                     <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0} ml={"5%"}>
-                        <Text fontWeight={'bold'} fontSize={'1.5em'}>108</Text>
+                        <Text fontWeight={'bold'} fontSize={'1.5em'}>{hostData.mealsMatched}</Text>
                         <Text>Guests Served</Text>
                     </VStack>
 
                     <Divider borderColor={'black'} orientation="vertical" />
 
                     <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0} ml={"5%"}>
-                        <Text fontWeight={'bold'} fontSize={'1.5em'}>73</Text>
+                        <Text fontWeight={'bold'} fontSize={'1.5em'}>{hostData.reviewsCount}</Text>
                         <Text>Reviews</Text>
                     </VStack>
 
                     <Spacer />
                 </Flex>
 
-                <Flex direction={'row'} width={'100%'} justifyContent={'space-between'} mt={'5%'}>
+                <Flex direction={'row'} width={'100%'} justifyContent={'space-between'} alignItems={"center"} mt={'5%'}>
                     <HStack>
-                        <Avatar size={'md'} name={hostData.username} />
+                        <Avatar size={'md'} src={hostProfilePictureURL} name={hostData.username} />
                         <VStack height={'100%'} p={'10px'} alignItems={'flex-start'} spacing={0}>
                             <Text fontWeight={'bold'}>Hosted by {hostData.username}</Text>
-                            <Text color={'gray.500'}>2 years hosting</Text>
+                            <Text color={'gray.500'}>{hostData.accountAgeInDays} days hosting</Text>
                         </VStack>
                     </HStack>
 
                     <Spacer />
 
-                    <Center bg={'green'} w={'fit-content'} p={'20px'} rounded={'10px'}>
-                        <Text color={'white'}>{hostData.hygieneGrade}</Text>
-                    </Center>
+                    <Button variant="solid" colorScheme={getColorScheme(hostData.hygieneGrade)} size="md" borderRadius="10px" cursor="default" >
+                        {hostData.hygieneGrade}
+                    </Button>
 
                     <Spacer />
                 </Flex>

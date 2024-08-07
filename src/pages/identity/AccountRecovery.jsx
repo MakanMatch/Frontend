@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useSelector } from 'react-redux';
+import { motion } from 'framer-motion';
 import server from '../../networking';
 import configureShowToast from '../../components/showToast';
 
@@ -107,145 +108,153 @@ function AccountRecovery() {
     });
 
     return (
-        <Box
-            bgPosition="center"
-            display="flex"
-            justifyContent={"center"}
-        >
-            <Box
-                w={isSmallerThan755 ? "90%" : "50%"}
-                minW="380px"
-                h="100%"
-                bg="rgba(255, 255, 255, 0.80)"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                p={8}
-                borderRadius={15}
+        <>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
             >
-                <VStack spacing={4} w="full">
-                    <Box w={isSmallerThan755 ? "70vw" : "43vw"} display={'flex'} justifyContent={'start'}>
-                        <Text
-                            borderRadius="50%"
-                            height="40px"
-                            width="40px"
-                            boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            zIndex="10"
-                            backgroundColor="white"
-                            cursor="pointer"
-                            onClick={() => navigate("/auth/login")}>
-                            <ArrowBackIcon height="50%" />
-                        </Text>
-                    </Box>
-                    <Heading as="h1" size="xl" mb={5} textAlign="center">
-                        Recover your account
-                    </Heading>
-                    <FormControl mb={4} isInvalid={formik.errors.usernameOrEmail && formik.touched.usernameOrEmail} width={isSmallerThan755 ? "65vw" : "90%"}>
-                        <FormLabel fontSize='15px'>Username or Email</FormLabel>
-                        <Input
-                            name="usernameOrEmail"
-                            type="text"
-                            value={usernameOrEmail}
-                            placeholder='Enter Username or Email'
-                            borderColor='black'
-                            size='md'
-                            borderRadius='5px'
-                            onChange={(e) => setUsernameOrEmail(e.target.value)}
-                            isDisabled={isResetKeySent}
-                        />
-                        <FormErrorMessage fontSize='12px'>{formik.errors.usernameOrEmail}</FormErrorMessage>
-                    </FormControl>
-                    <Box display="flex" justifyContent="start">
-                        <Button onClick={sendResetKey} variant={"MMPrimary"} isDisabled={cooldown > 0} mb={4}>
-                            {cooldown > 0 ? `Resend in ${cooldown}s` : 'Send password reset key'}
-                        </Button>
-                    </Box>
-                    {showResetFields && (
-                        <Box as="form" onSubmit={formik.handleSubmit}>
-                            <FormControl isInvalid={formik.errors.resetKey && formik.touched.resetKey} mb={4}>
-                                <FormLabel>Enter reset key</FormLabel>
+                <Box
+                    bgPosition="center"
+                    display="flex"
+                    justifyContent={"center"}
+                >
+                    <Box
+                        w={isSmallerThan755 ? "90%" : "50%"}
+                        minW="380px"
+                        h="100%"
+                        bg="rgba(255, 255, 255, 0.80)"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        p={8}
+                        borderRadius={15}
+                    >
+                        <VStack spacing={4} w="full">
+                            <Box w={isSmallerThan755 ? "70vw" : "43vw"} display={'flex'} justifyContent={'start'}>
+                                <Text
+                                    borderRadius="50%"
+                                    height="40px"
+                                    width="40px"
+                                    boxShadow="0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    zIndex="10"
+                                    backgroundColor="white"
+                                    cursor="pointer"
+                                    onClick={() => navigate("/auth/login")}>
+                                    <ArrowBackIcon height="50%" />
+                                </Text>
+                            </Box>
+                            <Heading as="h1" size="xl" mb={5} textAlign="center">
+                                Recover your account
+                            </Heading>
+                            <FormControl mb={4} isInvalid={formik.errors.usernameOrEmail && formik.touched.usernameOrEmail} width={isSmallerThan755 ? "65vw" : "90%"}>
+                                <FormLabel fontSize='15px'>Username or Email</FormLabel>
                                 <Input
-                                    name="resetKey"
+                                    name="usernameOrEmail"
                                     type="text"
-                                    placeholder='Reset Key'
+                                    value={usernameOrEmail}
+                                    placeholder='Enter Username or Email'
                                     borderColor='black'
                                     size='md'
                                     borderRadius='5px'
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.resetKey}
-                                    width={isSmallerThan755 ? "65vw" : "100%"}
+                                    onChange={(e) => setUsernameOrEmail(e.target.value)}
+                                    isDisabled={isResetKeySent}
                                 />
-                                <FormErrorMessage fontSize='12px'>{formik.errors.resetKey}</FormErrorMessage>
+                                <FormErrorMessage fontSize='12px'>{formik.errors.usernameOrEmail}</FormErrorMessage>
                             </FormControl>
-                            <FormControl isInvalid={formik.errors.newPassword && formik.touched.newPassword} mb={4}>
-                                <FormLabel>Enter new password</FormLabel>
-                                <InputGroup>
-                                    <Input
-                                        name="newPassword"
-                                        type={showNewPassword ? 'text' : 'password'}
-                                        placeholder='New Password'
-                                        borderColor='black'
-                                        size='md'
-                                        borderRadius='5px'
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.newPassword}
-                                        width={isSmallerThan755 ? "65vw" : "100%"}
-                                    />
-                                    <InputRightElement width='4.5rem'>
-                                        <IconButton
-                                            h='1.5rem'
-                                            size='sm'
-                                            mb={2.1}
-                                            onClick={handleShowNewPassword}
-                                            icon={showNewPassword ? <ViewOffIcon /> : <ViewIcon />}
-                                            aria-label={showNewPassword ? 'Hide password' : 'Show password'}
-                                        />
-                                    </InputRightElement>
-                                </InputGroup>
-                                <FormErrorMessage fontSize='12px'>{formik.errors.newPassword}</FormErrorMessage>
-                            </FormControl>
-                            <FormControl isInvalid={formik.errors.confirmNewPassword && formik.touched.confirmNewPassword} mb={4} width={isSmallerThan755 ? "65vw" : "38vw"}>
-                                <FormLabel>Confirm new password</FormLabel>
-                                <InputGroup>
-                                    <Input
-                                        name="confirmNewPassword"
-                                        type={showConfirmNewPassword ? 'text' : 'password'}
-                                        placeholder='Confirm New Password'
-                                        borderColor='black'
-                                        size='md'
-                                        borderRadius='5px'
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.confirmNewPassword}
-                                    />
-                                    <InputRightElement width='4.5rem'>
-                                        <IconButton
-                                            h='1.5rem'
-                                            size='sm'
-                                            mb={2.1}
-                                            onClick={handleShowConfirmNewPassword}
-                                            icon={showConfirmNewPassword ? <ViewOffIcon /> : <ViewIcon />}
-                                            aria-label={showConfirmNewPassword ? 'Hide password' : 'Show password'}
-                                        />
-                                    </InputRightElement>
-                                </InputGroup>
-                                <FormErrorMessage fontSize='12px'>{formik.errors.confirmNewPassword}</FormErrorMessage>
-                            </FormControl>
-                            <Box display="flex" justifyContent="center">
-                                <Button type="submit" variant={"MMPrimary"} mb={4} mt={4}>
-                                    Reset Password
+                            <Box display="flex" justifyContent="start">
+                                <Button onClick={sendResetKey} variant={"MMPrimary"} isDisabled={cooldown > 0} mb={4}>
+                                    {cooldown > 0 ? `Resend in ${cooldown}s` : 'Send password reset key'}
                                 </Button>
                             </Box>
-                        </Box>
-                    )}
-                </VStack>
-            </Box>
-        </Box>
+                            {showResetFields && (
+                                <Box as="form" onSubmit={formik.handleSubmit}>
+                                    <FormControl isInvalid={formik.errors.resetKey && formik.touched.resetKey} mb={4}>
+                                        <FormLabel>Enter reset key</FormLabel>
+                                        <Input
+                                            name="resetKey"
+                                            type="text"
+                                            placeholder='Reset Key'
+                                            borderColor='black'
+                                            size='md'
+                                            borderRadius='5px'
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.resetKey}
+                                            width={isSmallerThan755 ? "65vw" : "100%"}
+                                        />
+                                        <FormErrorMessage fontSize='12px'>{formik.errors.resetKey}</FormErrorMessage>
+                                    </FormControl>
+                                    <FormControl isInvalid={formik.errors.newPassword && formik.touched.newPassword} mb={4}>
+                                        <FormLabel>Enter new password</FormLabel>
+                                        <InputGroup>
+                                            <Input
+                                                name="newPassword"
+                                                type={showNewPassword ? 'text' : 'password'}
+                                                placeholder='New Password'
+                                                borderColor='black'
+                                                size='md'
+                                                borderRadius='5px'
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.newPassword}
+                                                width={isSmallerThan755 ? "65vw" : "100%"}
+                                            />
+                                            <InputRightElement width='4.5rem'>
+                                                <IconButton
+                                                    h='1.5rem'
+                                                    size='sm'
+                                                    mb={2.1}
+                                                    onClick={handleShowNewPassword}
+                                                    icon={showNewPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                                    aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                                                />
+                                            </InputRightElement>
+                                        </InputGroup>
+                                        <FormErrorMessage fontSize='12px'>{formik.errors.newPassword}</FormErrorMessage>
+                                    </FormControl>
+                                    <FormControl isInvalid={formik.errors.confirmNewPassword && formik.touched.confirmNewPassword} mb={4} width={isSmallerThan755 ? "65vw" : "38vw"}>
+                                        <FormLabel>Confirm new password</FormLabel>
+                                        <InputGroup>
+                                            <Input
+                                                name="confirmNewPassword"
+                                                type={showConfirmNewPassword ? 'text' : 'password'}
+                                                placeholder='Confirm New Password'
+                                                borderColor='black'
+                                                size='md'
+                                                borderRadius='5px'
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.confirmNewPassword}
+                                            />
+                                            <InputRightElement width='4.5rem'>
+                                                <IconButton
+                                                    h='1.5rem'
+                                                    size='sm'
+                                                    mb={2.1}
+                                                    onClick={handleShowConfirmNewPassword}
+                                                    icon={showConfirmNewPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                                    aria-label={showConfirmNewPassword ? 'Hide password' : 'Show password'}
+                                                />
+                                            </InputRightElement>
+                                        </InputGroup>
+                                        <FormErrorMessage fontSize='12px'>{formik.errors.confirmNewPassword}</FormErrorMessage>
+                                    </FormControl>
+                                    <Box display="flex" justifyContent="center">
+                                        <Button type="submit" variant={"MMPrimary"} mb={4} mt={4}>
+                                            Reset Password
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            )}
+                        </VStack>
+                    </Box>
+                </Box>
+            </motion.div>
+        </>
     );
 }
 

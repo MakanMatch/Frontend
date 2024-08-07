@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, forwardRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormControl, FormLabel, Stack, 
@@ -7,10 +7,8 @@ import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormContro
     PopoverCloseButton, IconButton, Input, ButtonGroup, useMediaQuery
 } from "@chakra-ui/react";
 import { EditIcon, } from "@chakra-ui/icons";
-import  FocusLock from "react-focus-lock"
 import { logout } from "../../slices/AuthState";
-import GuestSidebar from "../../components/identity/GuestSideNav";
-import HostSidebar from "../../components/identity/HostSideNav";
+import MyAccountSideBar from "../../components/identity/MyAccountSidebar";
 import server from "../../networking";
 import configureShowToast from '../../components/showToast';
 import ChangePassword from "../../components/identity/ChangePassword";
@@ -23,7 +21,7 @@ const MyAccount = () => {
     const dispatch = useDispatch();
     const toast = useToast();
     const showToast = configureShowToast(toast);
-    const cancelRef = React.useRef()
+    const cancelRef = useRef()
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const { isOpen: isDiscardOpen, onOpen: onDiscardOpen, onClose: onDiscardClose } = useDisclosure();
     const [isEditPictureModalOpen, setEditPictureModalOpen] = useState(false);
@@ -298,7 +296,7 @@ const MyAccount = () => {
         return <Spinner />;
     }
 
-    const TextInput = React.forwardRef((props, ref) => {
+    const TextInput = forwardRef((props, ref) => {
         return (
             <FormControl>
                 <FormLabel htmlFor={props.id}>{props.label}</FormLabel>
@@ -361,7 +359,7 @@ const MyAccount = () => {
     
     const PopoverForm = () => {
         const { onOpen, onClose, isOpen } = useDisclosure();
-        const firstFieldRef = React.useRef(null);
+        const firstFieldRef = useRef(null);
         const [fname, setFname] = useState(accountInfo.fname);
         const [lname, setLname] = useState(accountInfo.lname);
         const [localAccountInfo, setLocalAccountInfo] = useState(accountInfo);
@@ -408,19 +406,17 @@ const MyAccount = () => {
                             <IconButton size='sm' icon={<EditIcon />} ml={2} />
                         </PopoverTrigger>
                         <PopoverContent p={5}>
-                            <FocusLock returnFocus persistentFocus={false}>
-                                <PopoverArrow />
-                                <PopoverCloseButton />
-                                <Form
-                                    firstFieldRef={firstFieldRef}
-                                    onCancel={handleCancel}
-                                    onSave={onSave}
-                                    fname={fname}
-                                    setFname={setFname}
-                                    lname={lname}
-                                    setLname={setLname}
-                                />
-                            </FocusLock>
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <Form
+                                firstFieldRef={firstFieldRef}
+                                onCancel={handleCancel}
+                                onSave={onSave}
+                                fname={fname}
+                                setFname={setFname}
+                                lname={lname}
+                                setLname={setLname}
+                            />
                         </PopoverContent>
                     </Popover>
                 </Box>
@@ -447,7 +443,7 @@ const MyAccount = () => {
 
     return (
         <Flex>
-            {accountInfo.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
+            <MyAccountSideBar />
 
             {/* Right side content */}
             <Box width="75%" ml={10} position="relative">
@@ -456,13 +452,13 @@ const MyAccount = () => {
                     height="25%"
                     position="relative"
                     borderRadius={15}
-                    {...(accountInfo.userType === "Guest"
+                    {...(user.userType === "Guest"
                         ? bannerStyles.guest
                         : bannerStyles.host)}
                 >
                     <Flex align="center" justify="flex-end" height="100%" pr={10}>
                         <Heading mr={5} size={'2xl'} color="Black">
-                            {accountInfo.userType}
+                            {user.userType}
                         </Heading>
                     </Flex>
 
