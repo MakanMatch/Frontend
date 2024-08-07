@@ -16,13 +16,13 @@ function EmailVerification() {
     const [isSmallerThan1040] = useMediaQuery('(max-width: 1040px)');
 
     const email = searchParams.get('email');
-    const resendOnLoad = searchParams.get('resendOnLoad');
+    // const resendOnLoad = searchParams.get('resendOnLoad');
 
-    useEffect(() => {
-        if (resendOnLoad === 'true') {
-            sendEmailVerification()
-        }
-    }, [])
+    // useEffect(() => {
+    //     if (resendOnLoad === 'true') {
+    //         sendEmailVerification()
+    //     }
+    // }, [])
     
     useEffect(() => {
         let timer;

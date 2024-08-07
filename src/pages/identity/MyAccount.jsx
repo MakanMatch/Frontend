@@ -15,6 +15,7 @@ import ChangePassword from "../../components/identity/ChangePassword";
 import EditPicture from "../../components/identity/EditPicture";
 import ChangeAddress from "../../components/identity/ChangeAddress";
 import { reloadAuthToken } from '../../slices/AuthState';
+import EmailVerificationAlert from "../../components/identity/EmailVerificationAlert";
 
 const MyAccount = () => {
     const navigate = useNavigate();
@@ -441,10 +442,6 @@ const MyAccount = () => {
         setProfilePicture(null);
     };
 
-    const handleResendEmail = () => {
-        navigate(`/auth/emailVerification?email=${accountInfo.email}&resendOnLoad=true`);
-    }
-
     return (
         <Flex>
             <MyAccountSideBar />
@@ -498,13 +495,7 @@ const MyAccount = () => {
                 <PopoverForm />
 
                 {!accountInfo.emailVerified && (
-                    <Box flexDirection={"column"} justifyContent={"center"}>
-                        <Alert status='warning' mt={6} mb={-5} borderRadius={10}>
-                            <AlertIcon />
-                            Your email has NOT been verified. Your account will be locked in {7-calculateAccountAge()} days
-                            <Button ml={10} size={"sm"} onClick={handleResendEmail}>Resend Verification Email</Button>
-                        </Alert>
-                    </Box>
+                    <EmailVerificationAlert email={accountInfo.email} calculateAccountAge={calculateAccountAge}/>
                 )}
                 
                 <Stack direction={["column", "row"]} p={4} mt={4} justifyContent="space-between" width="100%" spacing={"20px"} height={"50vh"}>
