@@ -157,12 +157,7 @@ function ChatUi() {
                     ...prevMessages,
                     [receivedMessage.chatID]: prevMessages[receivedMessage.chatID].map((msg) =>
                         msg.messageID === receivedMessage.messageID
-                            ? {
-                                ...msg,
-                                message: receivedMessage.message,
-                                edited: true,
-                            }
-                            : msg
+                            ? {...msg, message: receivedMessage.message, edited: true}: msg
                     ),
                   }));
             } else if (receivedMessage.action === "delete") {
@@ -217,13 +212,7 @@ function ChatUi() {
         if (loaded == true) {
             if (!user) {
                 navigate("/auth/login");
-                showToast(
-                    "Please login first",
-                    "You need to login to use chat features.",
-                    3500,
-                    true,
-                    "error"
-                );
+                showToast("Please login first", "You need to login to use chat features.", 3500, true, "error");
                 return;
             }
 
@@ -271,9 +260,7 @@ function ChatUi() {
                 formData.append("replyToID", replyTo ? replyTo.messageID : null);
                 try {
                     const response = await server.post("/chat/createImageMessage", formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
+                        headers: {'Content-Type': 'multipart/form-data',},
                         transformRequest: formData => formData
                     });
 
@@ -330,6 +317,9 @@ function ChatUi() {
     };
 
     const handleEditMessage = () => {
+        if(editMessageContent.trim() === ""){
+            showToast("Edited Message cannot be empty", "Edited Message cannot be empty please input something", 3500, true, "error")
+        }
         if (editMessageId && editMessageContent.trim() !== "") {
             const editedMessage = {
                 id: editMessageId,
