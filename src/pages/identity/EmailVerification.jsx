@@ -16,13 +16,13 @@ function EmailVerification() {
     const [isSmallerThan1040] = useMediaQuery('(max-width: 1040px)');
 
     const email = searchParams.get('email');
-    // const resendOnLoad = searchParams.get('resendOnLoad');
+    const fromCreateAccount = searchParams.get('fromCreateAccount');
 
-    // useEffect(() => {
-    //     if (resendOnLoad === 'true') {
-    //         sendEmailVerification()
-    //     }
-    // }, [])
+    useEffect(() => {
+        if (fromCreateAccount === 'true') {
+            setCooldown(30);
+        }
+    }, [])
     
     useEffect(() => {
         let timer;
