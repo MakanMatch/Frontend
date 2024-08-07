@@ -25,20 +25,14 @@ function PublicGuestProfile() {
             const fetchAccountInfo = async () => {
                 try {
                     const userID = searchParams.get('userID')
-                    console.log("User ID: ", userID);
                     const response = await server.get(`/cdn/accountInfo?userID=${userID}`);
                     dispatch(reloadAuthToken(authToken))   
-                    console.log(response)
                     setAccountInfo(response.data);
                     setAccountLoaded(true);
                     setProfilePicture(`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${userID}`);
                 } catch (err) {
                     console.log("Error fetching account info:", err);
                     if (err.response && err.response.status && err.response.status == 404) {
-                        dispatch(logout());
-                        localStorage.removeItem('jwt');
-                    } else if (err.response && err.response.status && err.response.status == 403) {
-                        showToast("Account Banned", "The account you are trying to access has been banned.", 3000, true, "error");   
                         if (window.history.length > 1) {
                             navigate(-1);
                         } else {

@@ -34,7 +34,7 @@ const FoodListingCard = ({
                     }
                 `}
             </style>
-            <Link to={"/targetListing"} state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}>
+            <Link to={"/targetListing"} state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude, flaggedForHygiene }}>
                 <Card maxW="sm" className="image-container" borderRadius={"2xl"}>
                     <CardBody padding={0}>
                         <Box>

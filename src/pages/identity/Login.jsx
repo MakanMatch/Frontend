@@ -17,7 +17,7 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
-    const authToken = useSelector((state) => state.auth.authToken);
+    const { authToken, loaded } = useSelector((state) => state.auth);
 
     const [isSmallerThan800] = useMediaQuery("(max-width: 800px)");
     const [isSmallerThan323] = useMediaQuery("(max-width: 323px)");
@@ -27,7 +27,7 @@ function Login() {
             showToast("Logged In", "You are already logged in!", 3000, true, 'success')
             navigate('/');
         }
-    }, [authToken]);
+    }, [loaded]);
 
     const handleShowPassword = () => setShowPassword(!showPassword);
 

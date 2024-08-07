@@ -31,9 +31,9 @@ const GoogleMapsPage = () => {
         }
     }
 
-    const { listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude } = location.state;
+    const { listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude, flaggedForHygiene } = location.state;
     // if location.state doesnt have the required data, navigate back to homepage and show a toast
-    if (!listingID || !hostID || !images || !title || !shortDescription || !approxAddress || !portionPrice || !totalSlots || !latitude || !longitude) {
+    if (!listingID || !hostID || !images || !title || !shortDescription || !approxAddress || !portionPrice || !totalSlots || !latitude || !longitude || flaggedForHygiene == null) {
         navigate("/");
         setTimeout(() => {
             displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, true);
@@ -70,7 +70,7 @@ const GoogleMapsPage = () => {
                             damping: 20
                         }}
                     >
-                        <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} />
+                        <ListingCardOverlay listingID={listingID} hostID={hostID} images={images} title={title} shortDescription={shortDescription} approxAddress={approxAddress} portionPrice={portionPrice} totalSlots={totalSlots} displayToast={displayToast} flaggedForHygiene={flaggedForHygiene} />
                     </motion.div>
                 </Box>
                 {/* <Box display="flex" justifyContent={"center"}>

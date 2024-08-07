@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton, WrapItem, Tooltip } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton, WrapItem, Tooltip, ScaleFade, Badge } from "@chakra-ui/react";
 import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,7 +11,7 @@ import { reloadAuthToken } from "../../slices/AuthState";
 import { motion } from "framer-motion";
 import server from "../../networking";
 
-function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
+function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast, flaggedForHygiene }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
@@ -320,6 +320,21 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             mb={5}
                         >
                             <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
+                            {flaggedForHygiene && (
+                                <ScaleFade in>
+                                    <Badge
+                                        mt={-4}
+                                        colorScheme="red"
+                                        variant="solid"
+                                        px={2}
+                                        py={0.5}
+                                        fontSize="2xs"
+                                        ml={-32}
+                                    >
+                                        Flagged
+                                    </Badge>
+                                </ScaleFade>
+                            )}
                             <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
                                 {(!user || user.userID !== hostID) ? (favourite ? "🩷" : "🤍") : null}
                             </Text>
