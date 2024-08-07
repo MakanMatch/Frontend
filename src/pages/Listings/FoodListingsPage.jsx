@@ -43,7 +43,6 @@ const FoodListingsPage = () => {
             const response = await server.get("/cdn/listings?includeHost=true");
             dispatch(reloadAuthToken(authToken));
             if (response.status === 200) {
-                console.log(response.data);
                 setListings(response.data);
             } else { console.log("Unexpected response received; response:", response.data); }
         } catch (error) {
