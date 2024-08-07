@@ -37,8 +37,10 @@ function ExpandedListingHost() {
         address: null,
         totalSlots: null,
         datetime: null,
-        published: null
+        published: null,
+        Host: {}
     })
+    const [hostPaymentImage, setHostPaymentImage] = useState(null);
     const [longDescription, setLongDescription] = useState(listingData.longDescription)
     const [shortDescription, setShortDescription] = useState(listingData.shortDescription)
     const [guestSlots, setGuestSlots] = useState(1)
@@ -138,8 +140,14 @@ function ExpandedListingHost() {
 
     useEffect(checkForChanges, [shortDescription, longDescription, guestSlots, pricePerPortion])
 
+    useEffect(() => {
+        if (listingData && listingData.Host) {
+            setHostPaymentImage(listingData.Host.paymentImage || null)
+        }
+    }, [listingData])
+
     const fetchListingDetails = (id) => {
-        server.get(`/cdn/getListing?id=${id || listingID}&includeReservations=true`)
+        server.get(`/cdn/getListing?id=${id || listingID}&includeReservations=true&includeHost=true`)
             .then(response => {
                 dispatch(reloadAuthToken(authToken))
                 if (response.status == 200) {
@@ -151,6 +159,7 @@ function ExpandedListingHost() {
                         return
                     }
                     setListingData(processedData)
+                    setHostPaymentImage(processedData.Host.paymentImage)
                     setShortDescription(processedData.shortDescription || "")
                     setLongDescription(processedData.longDescription || "")
                     setListingPublished(processedData.published || false)
@@ -253,7 +262,15 @@ function ExpandedListingHost() {
             .catch(err => {
                 dispatch(reloadAuthToken(authToken))
                 console.log("Failed to update listing; error: " + err);
-                showToast("Something went wrong", "Failed to update the listing. Try again later.", 1500, true, "error")
+                if (err.response && err.response.data && typeof err.response.data == "string") {
+                    if (err.response.data.startsWith("UERROR")) {
+                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 1500, true, "error")
+                    } else {
+                        showToast("Something went wrong", "Failed to update the listing. Try again later.", 1500, true, "error")
+                    }
+                } else {
+                    showToast("Something went wrong", "Failed to update the listing. Try again later.", 1500, true, "error")
+                }
             })
     }
 
@@ -357,7 +374,7 @@ function ExpandedListingHost() {
                         </GridItem>
 
                         <GridItem colSpan={{ base: 3, md: 1 }} mt={3}>
-                            <ReservationSettingsCard listingPublished={listingPublished} togglePublished={togglePublished} pricePerPortion={pricePerPortion} guestSlots={guestSlots} handleSettingsChange={handleSettingsChange} />
+                            <ReservationSettingsCard listingPublished={listingPublished} paymentImage={hostPaymentImage} togglePublished={togglePublished} setEditListing={setEditListing} pricePerPortion={pricePerPortion} guestSlots={guestSlots} minGuests={listingData.guests.map(g => g.Reservation.portions).reduce((t, n) => t + n, 0)} handleSettingsChange={handleSettingsChange} />
                         </GridItem>
 
                         <UploadNewImageModal isOpen={isOpen} handleClose={handleClose} handleFileSubmission={handleFileSubmission} isUploading={isUploading} uploadImage={uploadImage} />
@@ -373,7 +390,7 @@ function ExpandedListingHost() {
                             />
                         </GridItem>
                         <GridItem colSpan={{ base: 3, md: 1 }}>
-                            <HostPaymentQR />
+                            <HostPaymentQR setHostPaymentImage={setHostPaymentImage} />
                         </GridItem>
 
                     </>

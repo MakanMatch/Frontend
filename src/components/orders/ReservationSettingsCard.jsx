@@ -2,7 +2,7 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Button, Card, CardBody, CardFooter, CardHeader, HStack, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Spacer, Text, VStack } from '@chakra-ui/react'
 import React from 'react'
 
-function ReservationSettingsCard({ listingPublished, togglePublished, pricePerPortion, guestSlots, handleSettingsChange }) {
+function ReservationSettingsCard({ listingPublished, paymentImage, togglePublished, setEditListing, pricePerPortion, guestSlots, minGuests, handleSettingsChange }) {
     const formatAsCurrency = (val) => `$` + val
     const parseCurrencyValue = (val) => val.replace(/^\$/, '')
 
@@ -12,9 +12,9 @@ function ReservationSettingsCard({ listingPublished, togglePublished, pricePerPo
             <CardBody>
                 <VStack spacing={"10px"} textAlign={"left"}>
                     <HStack width={"100%"}>
-                        <Text>Max. Guests</Text>
+                        <Text>Max. Portions</Text>
                         <Spacer />
-                        <NumberInput defaultValue={1} min={1} max={10} value={guestSlots} onChange={(value) => handleSettingsChange(value, "guestSlots")}>
+                        <NumberInput defaultValue={1} min={minGuests > 0 ? minGuests : 1} max={10} value={guestSlots} onChange={(value) => handleSettingsChange(value, "guestSlots")}>
                             <NumberInputField />
                             <NumberInputStepper>
                                 <NumberIncrementStepper />
@@ -33,10 +33,18 @@ function ReservationSettingsCard({ listingPublished, togglePublished, pricePerPo
                 </VStack>
             </CardBody>
             <CardFooter>
-                {listingPublished ?
-                    <Button variant={"MMPrimary"} width={"100%"} leftIcon={<ViewOffIcon />} onClick={() => togglePublished(false)}>Hide Listing</Button> :
-                    <Button variant={"MMPrimary"} width={"100%"} leftIcon={<ViewIcon />} onClick={() => togglePublished(true)}>Publish Listing</Button>
-                }
+                <VStack width={"100%"}>
+                    {listingPublished ?
+                        <Button variant={"MMPrimary"} width={"100%"} isDisabled={!paymentImage} _hover={!paymentImage && 'none'} leftIcon={<ViewOffIcon />} onClick={() => togglePublished(false)}>Hide Listing</Button> :
+                        <Button variant={"MMPrimary"} width={"100%"} isDisabled={!paymentImage} _hover={!paymentImage && 'none'} leftIcon={<ViewIcon />} onClick={() => togglePublished(true)}>Publish Listing</Button>
+                    }
+                    {!paymentImage && (
+                        <>
+                            <Text fontSize={"sm"} color={"red.500"}>Please upload your PayNow QR code before publishing listing.</Text>
+                            <Button fontSize={"sm"} variant={"link"} color={"primaryColour"} onClick={() => setEditListing(false)}>See Manage Guests screen.</Button>
+                        </>
+                    )}
+                </VStack>
             </CardFooter>
         </Card>
     )
