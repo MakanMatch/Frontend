@@ -109,13 +109,7 @@ function MyListings() {
                                                     title={listing.title}
                                                     portionPrice={listing.portionPrice}
                                                     images={listing.images.split("|").map((imageName) => getImageLink(listing.listingID, imageName))}
-                                                    shortDescription={listing.shortDescription}
-                                                    approxAddress={listing.approxAddress}
-                                                    totalSlots={listing.totalSlots}
-                                                    latitude={parseFloat(listing.approxCoordinates.split(",")[0])}
-                                                    longitude={parseFloat(listing.approxCoordinates.split(",")[1])}
                                                     published={listing.published}
-                                                    flaggedForHygiene={listing.Host.flaggedForHygiene}
                                                     archived={listing.datetime < new Date().toISOString()}
                                                     displayToast={displayToast}
                                                 />

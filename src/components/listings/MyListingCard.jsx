@@ -8,13 +8,7 @@ const MyListingCard = ({
     title,
     portionPrice,
     images,
-    shortDescription,
-    approxAddress,
-    totalSlots,
-    latitude,
-    longitude,
     published,
-    flaggedForHygiene,
     archived,
     displayToast
 }) => {
@@ -23,9 +17,9 @@ const MyListingCard = ({
 
     const handleClickMyListingCard = () => {
         if (archived === true) {
-            displayToast("This is a past listing", "You can no longer view this listing", "error", 3000, true);
+            displayToast("This meal has been completed!", "You can no longer view this listing", "success", 3000, true);
         } else {
-            navigate(`/targetListing`, { state: { listingID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude, flaggedForHygiene } });
+            navigate(`/expandedListingHost`, { state: { listingID: listingID } });
         }
     };
 
