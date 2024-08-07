@@ -44,7 +44,7 @@ function EmailVerification() {
             })
             .catch((err) => {
                 console.log(err)
-                showToast('Error', err.response?.data || 'Failed to send verification email.', 3000, true, 'error')
+                showToast('Error', err.response.data.substring("ERROR: ".length) || 'Failed to send verification email.', 3000, true, 'error')
             });
     };
 
