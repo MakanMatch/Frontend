@@ -40,6 +40,7 @@ import AdminAccount from './pages/identity/Admin/AdminAccount.jsx';
 import UpcomingReservation from './pages/orders/UpcomingReservation.jsx';
 import ChargeableCancellation from './pages/orders/ChargeableCancellation.jsx';
 import PublicGuestProfile from './pages/identity/PublicGuestProfile.jsx';
+import MyListings from './pages/Listings/MyListings.jsx'
 
 const store = configureStore({
     reducer: {
@@ -62,6 +63,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                         <Route path={'chat'} element={<Chat />} />
                         <Route path={"targetListing"} element={<GoogleMapsPage/>} />
                         <Route path={"guestInfo"} element={<PublicGuestProfile />} />
+                        <Route path={"myListings"} element={<MyListings />} />
                         <Route path={"reservations"}>
                             <Route path={"new"} element={<ConfirmReservation />} />
                             <Route path={"upcoming"} element={<UpcomingReservation />} />
