@@ -22,6 +22,10 @@ const CustomerSupport = () => {
         {
             question: "What if I have dietary restrictions or allergies?",
             answer: "Hosts provide detailed descriptions of the meals they offer, including ingredients. You can also communicate directly with the host throught the chat page to discuss any dietary needs or allergies before making a reservation."
+        },
+        {
+            question: 'What happens if a guest cancels a reservation?',
+            answer: "If a guest cancels their reservation more than 6 hours before the scheduled time, no cancellation fee is charged. However, if the cancellation occurs within the 6-hour window, a cancellation fee of double the original reseravtion price will apply."
         }
     ]
 
@@ -32,15 +36,15 @@ const CustomerSupport = () => {
         },
         {
             question: 'How can I manage my reservations?',
-            answer: "You can manage your reservations through the guest management dashboard. Here, you can view all reserved guests for your food listings, check their payment status, confirm or cancel reservations, and communicate directly with guests."
+            answer: "You can manage your reservations through the guest management dashboard. Here, you can view all reservations for your food listings, check payment status, confirm or cancel reservations, and communicate directly with guests."
         },
         {
             question: 'Where can I view my reviews?',
-            answer: "You can see all your reviews on the Makan Reviews page. Positive reviews enhance your reputation, while constructive feedback can help you improve your services. Maintaining a good hygiene rating is crucial to attract more guests; a poor rating may result in being flagged by the system."
+            answer: "You can see all your reviews on the Makan Reviews page. Positive reviews enhance your reputation, while constructive feedback can help you improve guest dining experience. Maintaining a good hygiene rating is crucial to attract more guests; a poor rating may result in being flagged by the admin."
         },
         {
             question: 'What happens if a guest cancels a reservation?',
-            answer: "If a guest cancels their reservation more than 6 hours before the scheduled time, no cancellation fee will be charged. However, if the cancellation occurs within the 6-hour window, a cancellation fee will apply."
+            answer: "If a guest cancels their reservation more than 6 hours before the scheduled time, no cancellation fee is charged. However, if the cancellation occurs within the 6-hour window, a cancellation fee of double the original reseravtion price will apply."
         },
         {
             question: 'How can I update my listing details?',
