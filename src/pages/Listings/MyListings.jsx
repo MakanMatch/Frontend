@@ -32,7 +32,6 @@ function MyListings() {
     const fetchHostListings = async () => {
         const fetchHostListings = await server.get("/listings/getHostListings");
         if (fetchHostListings.status === 200) {
-            console.log(fetchHostListings.data);
             setListings(fetchHostListings.data);
             setDataLoaded(true);
         } else {
@@ -109,9 +108,7 @@ function MyListings() {
                                                     listingID={listing.listingID}
                                                     title={listing.title}
                                                     portionPrice={listing.portionPrice}
-                                                    images={Array.from(listing.images || [], (imageName) =>
-                                                        getImageLink(listing.listingID, imageName)
-                                                    )}
+                                                    images={listing.images.split("|").map((imageName) => getImageLink(listing.listingID, imageName))}
                                                     shortDescription={listing.shortDescription}
                                                     approxAddress={listing.approxAddress}
                                                     totalSlots={listing.totalSlots}
