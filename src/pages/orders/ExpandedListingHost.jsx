@@ -374,7 +374,7 @@ function ExpandedListingHost() {
                         </GridItem>
 
                         <GridItem colSpan={{ base: 3, md: 1 }} mt={3}>
-                            <ReservationSettingsCard listingPublished={listingPublished} paymentImage={hostPaymentImage} togglePublished={togglePublished} setEditListing={setEditListing} pricePerPortion={pricePerPortion} guestSlots={guestSlots} minGuests={listingData.guests.map(g => g.Reservation.portions).reduce((t, n) => t + n, 0)} handleSettingsChange={handleSettingsChange} />
+                            <ReservationSettingsCard listingID={listingID} listingPublished={listingPublished} paymentImage={hostPaymentImage} togglePublished={togglePublished} setEditListing={setEditListing} pricePerPortion={pricePerPortion} guestSlots={guestSlots} minGuests={listingData.guests.map(g => g.Reservation.portions).reduce((t, n) => t + n, 0)} handleSettingsChange={handleSettingsChange} />
                         </GridItem>
 
                         <UploadNewImageModal isOpen={isOpen} handleClose={handleClose} handleFileSubmission={handleFileSubmission} isUploading={isUploading} uploadImage={uploadImage} />
