@@ -23,6 +23,15 @@ const FoodListingsPage = () => {
     const toast = useToast();
     const dispatch = useDispatch();
 
+    const salutations = [
+        "What's on your mind?",
+        "How about italian cuisine today?",
+        "Feeling hungry?",
+        "Let's find you something to eat!",
+        "Ready to dig in?",
+        "Wine and dine?"
+    ]
+
     function displayToast(title, description, status, duration, isClosable) {
         toast.closeAll();
         toast({
@@ -137,9 +146,18 @@ const FoodListingsPage = () => {
     
     return (
         <>
-            <Text fontSize={"30px"} mb={4}>
+            <Text fontSize={"25px"} mb={4} ml={5} textAlign={"left"} fontFamily={"arial"}>
                 {user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
             </Text>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <Text fontSize={"15px"} mb={4} textAlign={"left"} ml={5} color="grey" fontFamily={"arial"}>
+                    {salutations[Math.floor(Math.random() * salutations.length)]}
+                </Text>
+            </motion.div>
             {isSmallerThan1095 && listings.length > 0 && (
                 <Box mb={4}>
                     <MarkeredGMaps
