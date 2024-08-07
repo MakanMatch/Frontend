@@ -51,7 +51,7 @@ const CustomerSupport = () => {
             answer: "You can modify your listing descriptions and reservation settings, such as the maximum number of guests and portion price, through the edit listing dashboard. This ensures guests have the most accurate and up-to-date information about what you offer."
         }
     ]
-    
+
 
     if (!loaded) {
         return <Spinner />
@@ -62,13 +62,15 @@ const CustomerSupport = () => {
             <Heading>Frequently asked questions</Heading>
             <Box borderRadius={"lg"} boxShadow={"0 2px 4px 2px rgba(0.1, 0.1, 0.1, 0.1)"} >
                 {user && user.userType === "Host" ? (
-                    <Accordion allowMultiple mt={10} padding={5}>
+                    <Accordion allowToggle mt={10} padding={5}>
                         {hostFaq.map((faq, index) => (
                             <AccordionItem key={index}>
                                 <h2>
-                                    <AccordionButton>
+                                    <AccordionButton _expanded={{ bg: 'blue.100', color: 'black' }}>
                                         <Box flex="1" textAlign="left">
-                                            {faq.question}
+                                            <Text>
+                                                {faq.question}
+                                            </Text>
                                         </Box>
                                         <AccordionIcon />
                                     </AccordionButton>
@@ -80,13 +82,15 @@ const CustomerSupport = () => {
                         ))}
                     </Accordion>
                 ) : (
-                    <Accordion allowMultiple mt={10} padding={5}>
+                    <Accordion allowToggle mt={10} padding={5}>
                         {guestFaq.map((faq, index) => (
                             <AccordionItem key={index}>
                                 <h2>
-                                    <AccordionButton>
+                                    <AccordionButton _expanded={{ bg: 'blue.100', color: 'black' }}>
                                         <Box flex="1" textAlign="left">
-                                            {faq.question}
+                                            <Text>
+                                                {faq.question}
+                                            </Text>
                                         </Box>
                                         <AccordionIcon />
                                     </AccordionButton>
@@ -98,23 +102,6 @@ const CustomerSupport = () => {
                         ))}
                     </Accordion>
                 )}
-                {/* <Accordion allowMultiple mt={10} padding={5}>
-                    {guestFaq.map((faq, index) => (
-                        <AccordionItem key={index}>
-                            <h2>
-                                <AccordionButton>
-                                    <Box flex="1" textAlign="left">
-                                        {faq.question}
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel pb={4} textAlign="left" color="grey">
-                                {faq.answer}
-                            </AccordionPanel>
-                        </AccordionItem>
-                    ))}
-                </Accordion> */}
             </Box>
             <Box display="flex" justifyContent="center" mt={18}>
                 <Button
