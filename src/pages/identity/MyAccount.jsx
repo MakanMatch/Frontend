@@ -8,8 +8,7 @@ import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormContro
 } from "@chakra-ui/react";
 import { EditIcon, } from "@chakra-ui/icons";
 import { logout } from "../../slices/AuthState";
-import GuestSidebar from "../../components/identity/GuestSideNav";
-import HostSidebar from "../../components/identity/HostSideNav";
+import MyAccountSideBar from "../../components/identity/MyAccountSidebar";
 import server from "../../networking";
 import configureShowToast from '../../components/showToast';
 import ChangePassword from "../../components/identity/ChangePassword";
@@ -444,7 +443,7 @@ const MyAccount = () => {
 
     return (
         <Flex>
-            {user.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
+            <MyAccountSideBar />
 
             {/* Right side content */}
             <Box width="75%" ml={10} position="relative">

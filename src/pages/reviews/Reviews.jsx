@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import SubmitReviews from '../../components/reviews/SubmitReviews';
 import SortReviews from '../../components/reviews/SortReviews';
-import { Button, Box, Flex, Text, Spacer, useToast, Heading, Tooltip, Spinner, Avatar } from '@chakra-ui/react';
+import { Button, Box, Flex, Text, Spacer, useToast, Heading, Tooltip, Spinner, Avatar, ScaleFade, Badge, VStack } from '@chakra-ui/react';
 import server from '../../networking';
 import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -24,6 +24,7 @@ function Reviews() {
     const [hostApproxAddress, setHostApproxAddress] = useState("");
     const [hostReviewsCount, setHostReviewsCount] = useState(0);
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
+    const [flagged, setFlagged] = useState(false);
     const [stateRefresh, refreshState] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const location = useLocation();
@@ -64,14 +65,23 @@ function Reviews() {
                 setHostName(response.data.username);
                 setHostApproxAddress(response.data.approxAddress);
                 setHostHygieneGrade(response.data.hygieneGrade);
+                setFlagged(response.data.flaggedForHygiene);
                 setHostReviewsCount(response.data.reviewsCount);
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
-            showToast("Error fetching host information", "Please try again later", 3000, true, "error");
-            console.error("Error fetching host info:", error);
-            navigate('/')
-            return
+            if (error.response && error.response.status && error.response.status == 404) {
+                if (window.history.length > 1) {
+                    navigate(-1);
+                } else {
+                    navigate('/');
+                }
+            } else {
+                showToast("Error fetching host information", "Please try again later", 3000, true, "error");
+                console.error("Error fetching host info:", error);
+                navigate('/')
+                return
+            }
         }
     };
 
@@ -131,9 +141,27 @@ function Reviews() {
                             ml={{ base: 0, md: 4 }}
                         />
                         <Spacer display={{ base: 'none', md: 'block' }} />
-                        <Flex direction="column" align={{ base: 'center', md: 'left' }} ml={{ base: 0, md: 4 }} textAlign={{ base: 'center', md: 'left' }}>
-                            <Text fontSize={{ base: '2xl', md: '4xl' }}>{hostName}</Text>
+                        <Flex direction="column" align={{ base: 'center', md: 'left' }} ml={{ base: 0, md: 4 }} textAlign={{ base: 'center', md: 'left' }} justifyContent={{ base: 'center', md: 'flex-start' }}>
+                            <Flex align="center">
+                                <VStack alignItems={{base: "center", md: "flex-start"}} spacing={0}>
+                                    <Text fontSize={{ base: '2xl', md: '4xl' }}>{hostName}</Text>
+                                    {flagged === true && (
+                                        <ScaleFade in>
+                                            <Badge
+                                                colorScheme="red"
+                                                variant="solid"
+                                                px={2}
+                                                py={0.5}
+                                                fontSize="xs"
+                                            >
+                                                Flagged
+                                            </Badge>
+                                        </ScaleFade>
+                                    )}
+                                </VStack>
+                            </Flex>
                         </Flex>
+
                         <Flex gap={3}>
                             <Spacer display={{ base: 'none', md: 'block' }} />
                             {hostReviewsCount > 0 && (
