@@ -153,7 +153,6 @@ function ChatUi() {
                     ],
                 }));
             } else if (receivedMessage.action === "edit") {
-                console.log(receivedMessage)
                 setMessages((prevMessages) => ({
                     ...prevMessages,
                     [receivedMessage.chatID]: prevMessages[receivedMessage.chatID].map((msg) =>
@@ -448,7 +447,7 @@ function ChatUi() {
     if (!loaded || !user) {
         return <Spinner />
     }
-    const filteredMessages = messages.filter(msg => msg.chatID === chatSelected);
+    const filteredMessages = messages[chatSelected] || [];
     return (
         <Flex direction="column" overflowX="hidden" w="100%" h="100%">
             <Flex direction="row" h="100%" w="100%">
