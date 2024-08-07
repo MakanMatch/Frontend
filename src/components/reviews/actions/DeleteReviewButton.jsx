@@ -22,12 +22,14 @@ function DeleteReviewButton({
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const { user, authToken } = useSelector((state) => state.auth);
+    const [deleting, setDeleting] = useState(false);
     const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
     const onClose = () => setIsOpen(false);
     const cancelRef = useRef();
 
     const handleDelete = async () => {
+        setDeleting(true);
         try {
             const deleteReview = await server.delete(`/manageReviews`, {
                 data: {
@@ -35,6 +37,7 @@ function DeleteReviewButton({
                 }
             })
             dispatch(reloadAuthToken(authToken))
+            setDeleting(false);
             if (deleteReview.status === 200) {
                 showToast("Review deleted", "", 3000, false, "success");
                 refreshState(!stateRefresh)
@@ -43,6 +46,7 @@ function DeleteReviewButton({
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
+            setDeleting(false);
             showToast("Error deleting review", "", 3000, false, "error");
             console.log("Error deleting review:", error);
         }
@@ -77,7 +81,7 @@ function DeleteReviewButton({
                             <Button ref={cancelRef} onClick={onClose}>
                                 Cancel
                             </Button>
-                            <Button colorScheme="red" onClick={handleDelete} ml={3}>
+                            <Button colorScheme="red" onClick={handleDelete} isLoading={deleting} loadingText="Deleting..." ml={3}>
                                 Delete
                             </Button>
                         </AlertDialogFooter>
