@@ -27,8 +27,10 @@ function GuestManagement({
     const textAlign = useBreakpointValue({ base: "center", md: "left" });
     const isBaseScreen = useBreakpointValue({ base: true, md: false });
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleCancelReservation = async (referenceNum, listingID, guestID) => {
+        setIsLoading(true);
         try {
             const response = await server.post(`/cancelReservation`, {
                 referenceNum: referenceNum,
@@ -40,6 +42,7 @@ function GuestManagement({
                 }
             });
             dispatch(reloadAuthToken(authToken))
+            setIsLoading(false);
             if (response.status === 200) {
                 if (response.data && typeof response.data == "string" && response.data.startsWith("SUCCESS")) {
                     showToast("Reservation cancelled", "You've successfully cancelled the reservation", 3000, false, 'success')
@@ -54,6 +57,7 @@ function GuestManagement({
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
+            setIsLoading(false);
             if (error.response && error.response.data) {
                 if (error.response.data.startsWith("UERROR")) {
                     showToast('Something went wrong', error.response.data.substring("UERROR: ".length), 3000, false, 'error');
@@ -262,6 +266,7 @@ function GuestManagement({
                                         color="white"
                                         icon={<CloseIcon />}
                                         size="sm"
+                                        isLoading={isLoading}
                                         onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
                                         _hover={{ bg: "red.600" }}
                                     />
@@ -303,6 +308,7 @@ function GuestManagement({
                                         _hover={{ bg: "red.600" }}
                                         size="sm"
                                         ml={{ base: 0, md: 4 }}
+                                        isLoading={isLoading}
                                         onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
                                     >
                                         Confirm Cancellation
