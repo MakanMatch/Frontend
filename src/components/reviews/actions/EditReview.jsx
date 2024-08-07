@@ -34,6 +34,8 @@ const EditReview = ({
 	const { user, authToken } = useSelector((state) => state.auth);
 	const dispatch = useDispatch();
 
+	
+
 	useEffect(() => {
 		setFoodRating(reviewFoodRating);
 		setHygieneRating(reviewHygieneRating);
@@ -168,6 +170,7 @@ const EditReview = ({
 								borderRadius='full'
 								boxSize='100px'
 								name={user.username}
+								src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${user.userID}`}
 								alt={user.username}
 							/>
 							<Text fontSize={{ base: '2xl', md: '3xl' }} textAlign='center' mt={{ base: 2, md: 0 }} ml={{ base: 0, md: 4 }}>

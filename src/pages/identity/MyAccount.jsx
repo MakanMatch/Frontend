@@ -444,7 +444,7 @@ const MyAccount = () => {
 
     return (
         <Flex>
-            {accountInfo.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
+            {user.userType === "Guest" ? <GuestSidebar /> : <HostSidebar />}
 
             {/* Right side content */}
             <Box width="75%" ml={10} position="relative">
@@ -453,13 +453,13 @@ const MyAccount = () => {
                     height="25%"
                     position="relative"
                     borderRadius={15}
-                    {...(accountInfo.userType === "Guest"
+                    {...(user.userType === "Guest"
                         ? bannerStyles.guest
                         : bannerStyles.host)}
                 >
                     <Flex align="center" justify="flex-end" height="100%" pr={10}>
                         <Heading mr={5} size={'2xl'} color="Black">
-                            {accountInfo.userType}
+                            {user.userType}
                         </Heading>
                     </Flex>
 
