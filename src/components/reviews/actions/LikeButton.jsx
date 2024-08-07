@@ -11,7 +11,7 @@ import { reloadAuthToken } from '../../../slices/AuthState';
 function LikeButton({
     reviewID,
     isLiked,
-    likeCount,
+    likeCount
 }) {
     const toast = useToast();
     const showToast = configureShowToast(toast)
@@ -23,13 +23,7 @@ function LikeButton({
 
     const handleLikeClick = () => {
         if (loaded && (!user || !user.userID)) {
-            toast({
-                title: "Please log in",
-                description: "You need to log in before liking a review",
-                status: "info",
-                duration: 3000,
-                isClosable: true,
-            });
+            showToast("You must be logged in to like a review", "Please log in to like this review.", 3000, true, "info");
             navigate('/auth/login');
         } else {
             toggleLike();
@@ -75,6 +69,7 @@ function LikeButton({
                 color: liked ? 'black' : 'gray.800'
             }}
             onClick={handleLikeClick}
+            isDisabled={loaded && user && user.userType === 'Host'}
         >
             <Text>{currentLikeCount}</Text>
         </Button>

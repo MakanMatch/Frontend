@@ -8,6 +8,7 @@ import { StarIcon } from "@chakra-ui/icons"
 import { BsFillPeopleFill } from "react-icons/bs";
 import { FaWallet } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import configureShowToast from '../../components/showToast';
 
 export default function CalenderUI() {
@@ -18,6 +19,8 @@ export default function CalenderUI() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [selectedListing, setSelectedListing] = useState(null);
     const [imageLoaded, setImageLoaded] = useState(false);
+
+    const navigate = useNavigate();
 
     function getImageLink(listingID, imageName) {
         return `${import.meta.env.VITE_BACKEND_URL}/cdn/getImageForListing?listingID=${listingID}&imageName=${imageName}`;
@@ -92,7 +95,7 @@ export default function CalenderUI() {
         };
 
         return (
-            <div style={{ overflow: "hidden", padding: "5px", fontSize: "11px" }} onClick={handleScheduleClick}>
+            <div style={{ overflow: "hidden", padding: "5px", fontSize: "11px", cursor: "pointer" }} onClick={handleScheduleClick}>
                 <i>{eventInfo.event.title}</i>
             </div>
         );
@@ -170,9 +173,9 @@ export default function CalenderUI() {
                             </HStack>
 
                         </ModalBody>
-                        <ModalFooter>
-                            <Button colorScheme='blue' mr={3} onClick={closeListingDetailModal}>
-                                Close
+                        <ModalFooter display="flex" justifyContent="center">
+                            <Button variant="MMPrimary" onClick={() => navigate("/expandedListingHost", { state: { listingID: selectedListing.listingID } })}>
+                                View details
                             </Button>
                         </ModalFooter>
                     </ModalContent>

@@ -8,6 +8,7 @@ import { reloadAuthToken } from '../../slices/AuthState'
 import configureShowToast from '../../components/showToast'
 import { FaCommentDots, FaCheck } from "react-icons/fa";
 import { CloseIcon } from '@chakra-ui/icons'
+import Extensions from '../../extensions'
 
 function GuestManagement({
     listingID,
@@ -17,6 +18,8 @@ function GuestManagement({
     const [guestsList, setGuestsList] = useState([]);
     const dispatch = useDispatch();
     const { user, loaded, authToken } = useSelector((state) => state.auth);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedGuestUsername, setSelectedGuestUsername] = useState(null);
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const navigate = useNavigate();
@@ -123,71 +126,134 @@ function GuestManagement({
         <>
             {guestsList.length > 0 && (
                 <>
-                    <Text fontWeight="bold" fontSize="large" display="flex" mb={10} mt={4}>Guests</Text>
+                    <Text fontWeight="bold" fontSize="large" display="flex" mb={10} mt={5}>Reserved Guests</Text>
                     <Text textAlign="left" color="grey" fontSize="large" display="flex" mb={10}>When guests arrive, check that they have paid and click "Paid & Present" to let us know.</Text>
                 </>
             )}
             {guestsList.length > 0 ? (
                 guestsList.map((guest) => (
-                    <Box
+                    <Flex
                         key={guest.userID}
                         display="flex"
-                        flexDirection={{ base: 'column', md: 'row' }}
+                        flexDirection="column"
                         alignItems="center"
                         justifyContent="space-between"
                         borderWidth="1px"
                         borderRadius="lg"
-                        overflow="hidden"
+                        overflow="scroll"
                         p={4}
                         mb={4}
                     >
                         <Flex
                             direction={{ base: 'column', md: 'row' }}
-                            alignItems={{ base: 'center', md: 'flex-start' }}
+                            alignItems={{ base: 'center', md: 'space-between' }}
                             mb={{ base: 4, md: 0 }}
                             textAlign={{ base: 'center', md: 'left' }}
-                            justifyContent={textAlign}  // Ensure centering on base screens
                             width="100%"
                         >
-
-                            <Avatar
-                                name={guest.username}
-                                src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`}
-                                size={{ base: "md", md: "lg" }}
-                                mr={{ base: 0, md: 4 }}
-                                mb={{ base: 2, md: 0 }}
-                                onClick={onOpen}
-                            />
-                            <Box>
-                                <Flex
-                                    gap={{ base: 2, md: 3 }}
-                                    width="100%"
-                                    alignItems={{ base: 'center', md: 'center' }}
-                                    flexWrap="wrap"
-                                    justifyContent={textAlign}  // Ensure centering on base screens
-                                >
-                                    <Box>
-                                        <Text
-                                            fontWeight="bold"
-                                            fontSize={{ base: "md", md: "lg" }}
-                                            textAlign={textAlign}
-                                        >
-                                            {guest.fname} {guest.lname}
-                                        </Text>
-                                    </Box>
-                                    {guest.Reservation.markedPaid && !isBaseScreen && (
+                            <Flex
+                                direction={{ base: 'column', md: 'row' }}
+                                alignItems="center"
+                                justifyContent={{ base: 'center', md: 'left' }}
+                                width="100%"
+                            >
+                                <Avatar
+                                    name={guest.username}
+                                    src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`}
+                                    size="md"
+                                    mr={{ base: 0, md: 4 }}
+                                    mb={{ base: 2, md: 0 }}
+                                    onClick={() => {
+                                        setSelectedGuestUsername(guest.username)
+                                        setSelectedImage(`${import.meta.env.VITE_BACKEND_URL}/cdn/getProfilePicture?userID=${guest.Reservation.guestID}`)
+                                        onOpen()
+                                    }}
+                                />
+                                <Box>
+                                    <Flex
+                                        gap={{ base: 2, md: 3 }}
+                                        width="100%"
+                                        alignItems={{ base: 'center', md: 'center' }}
+                                        flexWrap="wrap"
+                                        justifyContent={{ base: 'center', md: 'left' }}
+                                    >
                                         <Box>
+                                            <Text
+                                                fontWeight="bold"
+                                                fontSize={{ base: "md", md: "lg" }}
+                                                textAlign={textAlign}
+                                            >
+                                                {guest.fname} {guest.lname}
+                                            </Text>
+                                        </Box>
+                                        {guest.Reservation.markedPaid && !isBaseScreen && (
+                                            <Box>
+                                                <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
+                                                    <Badge colorScheme="purple" variant="solid" px={3} py={1}>GUEST PAID</Badge>
+                                                </ScaleFade>
+                                            </Box>
+                                        )}
+                                    </Flex>
+                                    {guest.Reservation.markedPaid && isBaseScreen && (
+                                        <Box mt={2}>
                                             <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
-                                                <Badge colorScheme="purple" variant="solid" px={3} py={1}>PAID</Badge>
+                                                <Badge colorScheme="purple" variant="solid" px={3} py={1}>GUEST PAID</Badge>
                                             </ScaleFade>
                                         </Box>
                                     )}
-                                </Flex>
-                                {guest.Reservation.markedPaid && isBaseScreen && (
-                                    <Box mt={2}>
-                                        <ScaleFade initialScale={0.5} in={guest.Reservation.markedPaid}>
-                                            <Badge colorScheme="purple" variant="solid" px={3} py={1}>PAID</Badge>
-                                        </ScaleFade>
+                                    <Flex
+                                        mt={2}
+                                        direction={{ base: "column", md: "row" }}
+                                        alignItems="center"
+                                        justify={{ base: "flex-start", md: "space-between" }}
+                                        width="100%"
+                                        gap={3}
+                                    >
+                                        <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total portion: {guest.Reservation.portions}</Text>
+                                        <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total price: ${guest.Reservation.totalPrice}</Text>
+                                    </Flex>
+                                </Box>
+                            </Flex>
+                            <Flex
+                                direction="row"
+                                alignItems="center"
+                                justifyContent={{ base: "center", md: "right" }}
+                                width="100%"
+                                mt={{ base: 4, md: 1 }}
+                                gap={2}
+                                wrap="wrap"  // Ensure wrapping of buttons
+                            >
+                                <IconButton
+                                    icon={<FaCommentDots />}
+                                    aria-label="Message Guest"
+                                    ml={2}
+                                    variant="ghost"
+                                    colorScheme="blackAlpha"
+                                    size={{ base: "sm", md: "lg" }}
+                                    onClick={() => navigate(`/chat`)}
+                                />
+                                {guest.Reservation.paidAndPresent ? (
+                                    <Button
+                                        background="green.500"
+                                        color="white"
+                                        borderRadius="10px"
+                                        fontWeight="bold"
+                                        _hover={{ bg: "green.600" }}
+                                        size="sm"
+                                        onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
+                                        rightIcon={<FaCheck />}
+                                    >
+                                        Paid & Present
+                                    </Button>
+                                ) : (
+                                    <Box>
+                                        <Button
+                                            variant="MMPrimary"
+                                            size="sm"
+                                            onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
+                                        >
+                                            Paid & Present
+                                        </Button>
                                     </Box>
                                 )}
                                 <Flex
@@ -203,60 +269,78 @@ function GuestManagement({
                                     <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Ref: {guest.Reservation.referenceNum}</Text>
                                 </Flex>
                             </Box>
+                                {!guest.Reservation.markedPaid && !guest.Reservation.chargeableCancelActive && (
+                                    <IconButton
+                                        background="red.500"
+                                        color="white"
+                                        icon={<CloseIcon />}
+                                        size="sm"
+                                        onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
+                                        _hover={{ bg: "red.600" }}
+                                    />
+                                )}
+                            </Flex>
                         </Flex>
-                        <Box display="flex" alignItems="center" >
-                            <IconButton
-                                icon={<FaCommentDots />}
-                                aria-label="Message Guest"
-                                ml={2}
-                                mr={2}
-                                variant="ghost"
-                                colorScheme="blackAlpha"
-                                size={{ base: "sm", md: "lg" }}
-                                onClick={() => navigate(`/chat`)}
-                            />
-                            {guest.Reservation.paidAndPresent ? (
-                                <Button
-                                    background="green.500"
-                                    color="white"
-                                    borderRadius="10px"
-                                    fontWeight="bold"
-                                    _hover={{ bg: "green.600" }}
-                                    size="sm"
-                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
-                                    rightIcon={<FaCheck />}
+                        {guest.Reservation.chargeableCancelActive && (
+                            <Box
+                                display="flex"
+                                alignItems="center"
+                                flexDirection={{ base: 'column', md: 'row' }}
+                                justifyContent="space-between"
+                                borderWidth="1px"
+                                borderRadius="lg"
+                                overflow="hidden"
+                                p={4}
+                                mb={4}
+                                bg="yellow.100"
+                                mt={4}
+                                width="100%"
+                            >
+                                <Box
+                                    textAlign={{ base: "center", md: "left" }}
+                                    mb={{ base: 4, md: 0 }}
+                                    width={{ base: "100%", md: "auto" }}
                                 >
-                                    Paid & Present
-                                </Button>
-                            ) : (
+                                    <Text fontWeight="bold" fontSize={{ base: "lg", md: "xl" }}>Cancelled within six hours</Text>
+                                    <Text fontSize={{ base: "sm", md: "md" }}>
+                                        {guest.fname} {guest.lname} just cancelled their reservation. Check that they've paid the cancellation fee of <span style={{ color: "red", fontWeight: "bold" }}>{Extensions.formatCurrency(guest.Reservation.totalPrice * 2)}</span> and confirm cancellation.
+                                    </Text>
+
+                                </Box>
                                 <Box>
                                     <Button
-                                        variant="MMPrimary"
-                                        size={{ base: "sm", md: "md" }}
-                                        onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
+                                        background="red.500"
+                                        color="white"
+                                        borderRadius="10px"
+                                        fontWeight="bold"
+                                        _hover={{ bg: "red.600" }}
+                                        size="sm"
+                                        ml={{ base: 0, md: 4 }}
+                                        onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
                                     >
-                                        Paid & Present
+                                        Confirm Cancellation
                                     </Button>
                                 </Box>
-                            )}
-                            {!guest.Reservation.markedPaid && (
-                                <IconButton
-                                    background="red.500"
-                                    color="white"
-                                    ml={2}
-                                    icon={<CloseIcon />}
-                                    size="sm"
-                                    onClick={() => handleCancelReservation(guest.Reservation.referenceNum, listingID, guest.userID)}
-                                    _hover={{ bg: "red.600" }}
-                                />
-                            )}
-                        </Box>
-                    </Box>
+                            </Box>
+                        )}
+
+                    </Flex>
                 ))
             ) : (
-                <Text textAlign={textAlign} color="grey" fontSize="large" mt={6}>
+                <Text textAlign={textAlign} color="grey" fontSize="large" mt={5}>
                     Oops, there are no reservations made yet!
-                </Text>)}
+                </Text>
+            )}
+            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                <ModalOverlay />
+                <ModalContent maxW="max-content" background="transparent" boxShadow="none">
+                    <Avatar
+                        name={selectedGuestUsername}
+                        boxSize={{ base: '60vw', md: '30vw' }}  // Responsive size for different screen sizes
+                        src={selectedImage}
+                    />
+                </ModalContent>
+            </Modal>
         </>
     )
 }

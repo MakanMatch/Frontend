@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton, WrapItem, Tooltip } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Card, CardBody, CardFooter, Divider, Heading, Image, Progress, Stack, Text, useToast, Skeleton, WrapItem, Tooltip, ScaleFade, Badge } from "@chakra-ui/react";
 import { InfoOutlineIcon, ArrowBackIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FaWallet, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,7 +11,7 @@ import { reloadAuthToken } from "../../slices/AuthState";
 import { motion } from "framer-motion";
 import server from "../../networking";
 
-function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast }) {
+function ListingCardOverlay({ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, displayToast, flaggedForHygiene }) {
     const [imageIndex, setImageIndex] = useState(0);
     const [favourite, setFavourite] = useState(false);
     const [showFullDescription, setShowFullDescription] = useState(false);
@@ -260,7 +260,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                 <ChevronRightIcon boxSize={8} mr={-1} mt={-4} onClick={handleNextImage} color={"#A9A9A9"} _hover={{ cursor: "pointer", color: "#515F7C", transition: "0.2s ease" }} position={"absolute"} right="-5" zIndex={1} />
                             </Box>
                         )}
-                        <Skeleton isLoaded={imageLoaded} height="150px" width="310px" borderRadius="5px" fadeDuration={1}>
+                        <Skeleton isLoaded={imageLoaded} height="150px" width="310px" borderRadius="5px" fadeDuration={2}>
                             <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ rotate: 0, scale: 1 }}
@@ -319,7 +319,24 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             mt={2}
                             mb={5}
                         >
-                            <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
+                            <Box display="flex"> 
+                                <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
+                                {flaggedForHygiene && (
+                                    <ScaleFade in>
+                                        <Badge
+                                            mt={-4}
+                                            colorScheme="red"
+                                            variant="solid"
+                                            px={2}
+                                            py={0.5}
+                                            fontSize="2xs"
+                                            ml={3}
+                                        >
+                                            Flagged
+                                        </Badge>
+                                    </ScaleFade>
+                                )}
+                            </Box>
                             <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
                                 {(!user || user.userID !== hostID) ? (favourite ? "🩷" : "🤍") : null}
                             </Text>
@@ -383,7 +400,7 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                                     </Box>
                                 </>
                             ) : (
-                                <Skeleton height="100px" width="100%" borderRadius={"10px"} />
+                                <Skeleton height="100px" width="100%" borderRadius={"10px"} fadeDuration={2} />
                             )}
                         </Box>
                         <Link to={'/reviews'} state={{ hostID }}>
