@@ -65,6 +65,12 @@ function HostPaymentQR({
             console.log('Invalid file type:', file.type);
         }
     };
+    
+    const handleUploadClick = () => {
+        if (!isLoading) {
+            document.getElementById('file-upload').click();
+        }
+    };
 
     if (!loaded) {
         return <Spinner />
@@ -81,7 +87,7 @@ function HostPaymentQR({
                 justifyContent="center"
                 width="100%"
                 height="400px"
-                onClick={() => !isLoading && document.getElementById('file-upload').click()}
+                onClick={() => handleUploadClick()}
                 _hover={{
                     '& .qr-code-image': {
                         filter: "grayscale(100%)",
