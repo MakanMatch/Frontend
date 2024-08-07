@@ -21,7 +21,8 @@ function Reviews() {
     const navigate = useNavigate();
     const { user, loaded, error, authToken } = useSelector((state) => state.auth);
     const [hostName, setHostName] = useState("");
-    const [hostAddress, setHostAddress] = useState("");
+    const [hostApproxAddress, setHostApproxAddress] = useState("");
+    const [hostReviewsCount, setHostReviewsCount] = useState(0);
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
     const [flagged, setFlagged] = useState(false);
     const [stateRefresh, refreshState] = useState(false);
@@ -62,9 +63,10 @@ function Reviews() {
                 return
             } else {
                 setHostName(response.data.username);
-                setHostAddress(response.data.address);
+                setHostApproxAddress(response.data.approxAddress);
                 setHostHygieneGrade(response.data.hygieneGrade);
                 setFlagged(response.data.flaggedForHygiene);
+                setHostReviewsCount(response.data.reviewsCount);
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
@@ -162,13 +164,18 @@ function Reviews() {
 
                         <Flex gap={3}>
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            <Tooltip label={`Hygiene grade for ${hostName}`} aria-label="Hygiene grade tooltip">
-                                <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
-                                    {hostHygieneGrade}
-                                </Button>
-                            </Tooltip>
+                            {hostReviewsCount > 0 && (
+                                <>
+                                    <Spacer display={{ base: 'none', md: 'block' }} />
+                                    <Tooltip label={`Hygiene Rating for ${hostName}`} aria-label="Host Hygiene Rating tooltip">
+                                        <Button variant="solid" colorScheme={colorScheme} size="md" borderRadius="10px" cursor="default" >
+                                            {hostHygieneGrade}
+                                        </Button>
+                                    </Tooltip>
+                                </>
+                            )}
                             <Spacer display={{ base: 'none', md: 'block' }} />
-                            {user && user.userID && user.userID != hostID && (
+                            {user && user.userID && user.userID != hostID && user.userType !== "Host" && (
                                 <SubmitReviews
                                     hostName={hostName}
                                     hostID={hostID}
@@ -182,11 +189,11 @@ function Reviews() {
                 <Spacer display={{ base: 'none', md: 'block' }} />
                 <Box display="flex" justifyContent="center" alignItems="center" background="gray.200" borderRadius="15px" p={5} mb={4}>
                     <Flex alignItems="center" maxWidth="100%">
-                        <Tooltip label="This box contains the host address" aria-label="Host address tooltip">
+                        <Tooltip label="This box contains the host approximate address" aria-label="Host approximate address tooltip">
                             <InfoOutlineIcon mr={2} />
                         </Tooltip>
                         <Text fontSize="m" whiteSpace="normal" wordBreak="break-word">
-                            {hostAddress}
+                            {hostApproxAddress}
                         </Text>
                     </Flex>
                 </Box>
