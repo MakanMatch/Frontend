@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/jsx-key */
-import { Box, Stack, StackDivider, useToast, Heading } from "@chakra-ui/react";
+import { Box, Stack, StackDivider, useToast, Heading, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -97,12 +97,20 @@ const MakanHistory = () => {
                             </Heading>
                         </Box>
                         <Box display="flex" flexDir={"column"} padding="20px">
-                            {reservations && reservations.map((reservation) => (
-                                <MakanHistoryCard
-                                    key={reservation.referenceNum}
-                                    reservation={reservation}
-                                />
-                            ))}
+                            {reservations.length > 0 ? (
+                                reservations.map((reservation) => (
+                                    <MakanHistoryCard
+                                        key={reservation.referenceNum}
+                                        reservation={reservation}
+                                    />
+                                ))
+                            ) : (
+                                <Box display="flex" justifyContent="center" alignItems="center" height="60vh">
+                                    <Text size={"md"} textAlign="center" color="grey">
+                                        No past reservations found
+                                    </Text>
+                                </Box>
+                            )}
                         </Box>
                     </Stack>
                 </Box>
