@@ -196,10 +196,11 @@ function GuestManagement({
                                     alignItems="center"
                                     justify={{ base: "flex-start", md: "space-between" }}
                                     width="100%"
-                                    gap={3}
+                                    gap={{ base: 0, md: 3 }}
                                 >
                                     <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total portion: {guest.Reservation.portions}</Text>
                                     <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total price: ${guest.Reservation.totalPrice}</Text>
+                                    <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Ref: {guest.Reservation.referenceNum}</Text>
                                 </Flex>
                             </Box>
                         </Flex>
