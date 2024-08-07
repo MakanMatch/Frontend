@@ -159,7 +159,7 @@ const FoodListingsPage = () => {
     
     return (
         <>
-            <Text fontSize={"25px"} mb={4} ml={5} textAlign={"left"} fontFamily={"arial"}>
+            <Text fontSize={"25px"} mb={4} ml={5} textAlign={"left"}>
                 {user ? `Good ${timeOfDay()} ${user.username}!` : "Welcome to MakanMatch!"}
             </Text>
             <motion.div
@@ -167,7 +167,7 @@ const FoodListingsPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                <Text fontSize={"15px"} mb={4} textAlign={"left"} ml={5} color="grey" fontFamily={"arial"}>
+                <Text fontSize={"15px"} mb={4} textAlign={"left"} ml={5} color="grey">
                     {salutations[Math.floor(Math.random() * salutations.length)]}
                 </Text>
             </motion.div>
