@@ -237,7 +237,7 @@ const EditReview = ({
 								loadingText="Submitting..."
 								borderRadius={"10px"}
 							>
-								Submitting...
+								Saving...
 							</Button>
 						) : (
 							<Button
