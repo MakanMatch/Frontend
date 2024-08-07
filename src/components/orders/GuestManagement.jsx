@@ -233,29 +233,33 @@ function GuestManagement({
                                     size={{ base: "sm", md: "lg" }}
                                     onClick={() => navigate(`/chat`)}
                                 />
-                                {guest.Reservation.paidAndPresent ? (
-                                    <Button
-                                        background="green.500"
-                                        color="white"
-                                        borderRadius="10px"
-                                        fontWeight="bold"
-                                        _hover={{ bg: "green.600" }}
-                                        size="sm"
-                                        onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
-                                        rightIcon={<FaCheck />}
-                                    >
-                                        Paid & Present
-                                    </Button>
-                                ) : (
-                                    <Box>
-                                        <Button
-                                            variant="MMPrimary"
-                                            size="sm"
-                                            onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
-                                        >
-                                            Paid & Present
-                                        </Button>
-                                    </Box>
+                                {!guest.Reservation.chargeableCancelActive && (
+                                    <>
+                                        {guest.Reservation.paidAndPresent ? (
+                                            <Button
+                                                background="green.500"
+                                                color="white"
+                                                borderRadius="10px"
+                                                fontWeight="bold"
+                                                _hover={{ bg: "green.600" }}
+                                                size="sm"
+                                                onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
+                                                rightIcon={<FaCheck />}
+                                            >
+                                                Paid & Present
+                                            </Button>
+                                        ) : (
+                                            <Box>
+                                                <Button
+                                                    variant="MMPrimary"
+                                                    size="sm"
+                                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
+                                                >
+                                                    Paid & Present
+                                                </Button>
+                                            </Box>
+                                        )}
+                                    </>
                                 )}
                                 {!guest.Reservation.markedPaid && !guest.Reservation.chargeableCancelActive && (
                                     <IconButton
