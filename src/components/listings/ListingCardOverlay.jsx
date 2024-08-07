@@ -319,22 +319,24 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
                             mt={2}
                             mb={5}
                         >
-                            <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
-                            {flaggedForHygiene && (
-                                <ScaleFade in>
-                                    <Badge
-                                        mt={-4}
-                                        colorScheme="red"
-                                        variant="solid"
-                                        px={2}
-                                        py={0.5}
-                                        fontSize="2xs"
-                                        ml={-32}
-                                    >
-                                        Flagged
-                                    </Badge>
-                                </ScaleFade>
-                            )}
+                            <Box display="flex"> 
+                                <Heading size="md" mt={-2} className="enable-select">{title}</Heading>
+                                {flaggedForHygiene && (
+                                    <ScaleFade in>
+                                        <Badge
+                                            mt={-4}
+                                            colorScheme="red"
+                                            variant="solid"
+                                            px={2}
+                                            py={0.5}
+                                            fontSize="2xs"
+                                            ml={3}
+                                        >
+                                            Flagged
+                                        </Badge>
+                                    </ScaleFade>
+                                )}
+                            </Box>
                             <Text onClick={toggleFavourite} mt={-2} cursor={"pointer"} className="favouriteButton">
                                 {(!user || user.userID !== hostID) ? (favourite ? "🩷" : "🤍") : null}
                             </Text>

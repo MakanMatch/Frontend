@@ -68,7 +68,7 @@ function Reviews() {
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
-            if (error.response && error.response.status && error.response.status == 404 && error.response.data === "UERROR: Account is banned.") {
+            if (error.response && error.response.status && error.response.status == 404) {
                 if (window.history.length > 1) {
                     navigate(-1);
                 } else {
