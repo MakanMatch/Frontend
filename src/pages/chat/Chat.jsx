@@ -591,7 +591,7 @@ function ChatUi() {
                                     </Flex>
                                 )}
                                 <Flex mt={4} align="center">
-                                    <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange} />
+                                    <Input type="file" id="file" style={{ display: "none" }} onChange={handleFileChange} accept="image/*" />
                                     <IconButton
                                         aria-label="Attach image"
                                         icon={<FaCamera />}
