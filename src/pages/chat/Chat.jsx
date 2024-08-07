@@ -238,6 +238,12 @@ function ChatUi() {
     }, [messages]);
 
     const sendMessage = async () => {
+        if (messageInput === "" && image === null){
+            showToast("Message cannot be empty", "Message cannot be empty please input something", 3500, true, "error")
+        }
+        if (image !== null && messageInput === ""){
+            showToast("Image messages need to have a message with it", "Image messages need to have a message with it", 3500, true, "error")
+        }
         if (ws.current && messageInput.trim() !== "" && (image === null || (image !== null && messageInput.trim() !== ""))) {
             setSendLoading(true);
             const imagesToBeSubmitted = image ? true : false;
