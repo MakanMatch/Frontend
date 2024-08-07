@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { reloadAuthToken } from "../../slices/AuthState";
-import GuestSideNav from "../../components/identity/GuestSideNav";
+import MyAccountSidebar from "../../components/identity/MyAccountSidebar";
 import MakanHistoryCard from "../../components/identity/MakanHistoryCard";
 import configureShowToast from '../../components/showToast';
 import server from "../../networking";
@@ -75,7 +75,7 @@ const MakanHistory = () => {
 
     return (
         <Box display="flex">
-            <GuestSideNav />
+            <MyAccountSidebar />
             <Box
                 width="75%"
                 ml={10}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, useToast, Heading, Stack, StackDivider, Text, SimpleGrid, SlideFade, useMediaQuery, Spinner} from "@chakra-ui/react";
-import GuestSideNav from "../../components/identity/GuestSideNav";
+import MyAccountSidebar from "../../components/identity/MyAccountSidebar";
 import server from '../../networking'
 import configureShowToast from '../../components/showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
@@ -77,7 +77,7 @@ const Favourites = () => {
 
     return (
         <Box display="flex">
-            <GuestSideNav />
+            <MyAccountSidebar />
             <Box
                 width="75%"
                 ml={10}

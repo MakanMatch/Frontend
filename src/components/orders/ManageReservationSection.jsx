@@ -8,7 +8,6 @@ import configureShowToast from '../showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import MealDetailsSection from './MealDetailsSection';
 import placeholderImage from '../../assets/placeholderImage.svg';
-import { CheckCircleIcon, CheckIcon, RepeatClockIcon } from '@chakra-ui/icons';
 import { BsClockFill, BsFillCheckCircleFill } from 'react-icons/bs';
 
 function ManageReservationSection({ currentReservation, setCurrentReservation, setReservations, refreshReservations, inSixHourWindow, dataLoaded, mode = "full" }) {

@@ -26,7 +26,7 @@ instance.interceptors.response.use((config) => {
 
     return config
 }, (err) => {
-    if (err.response && err.response.data && typeof err.response.data == "string" && err.response.data.startsWith("ERROR: Token expired")) {
+    if (err.response && err.response.data && (err.response.data.startsWith("ERROR: Token expired") || err.response.data.startsWith("ERROR: User does not exist") || err.response.data.startsWith("ERROR: User is banned"))) {
         localStorage.removeItem('jwt')
         localStorage.removeItem('tokenRefreshed')
     }

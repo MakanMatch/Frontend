@@ -27,7 +27,7 @@ function App() {
         if (loaded == true) {
             const urlPath = location.pathname;
             if (user) {
-                if (user.userType == "Admin" && !urlPath.startsWith("/admin")) {
+                if (user.userType == "Admin" && !urlPath.startsWith("/admin") && !urlPath.startsWith("/reviews") && !urlPath.startsWith("/guestInfo")) {
                     navigate("/admin");
                 } else if (user.userType != "Admin" && urlPath.startsWith("/admin")) {
                     navigate("/");
@@ -38,7 +38,7 @@ function App() {
                 }
             }
         }
-    }, [loaded, user])
+    }, [loaded, user, window.location.pathname])
 
     useEffect(() => {
         if (error) {

@@ -8,13 +8,15 @@ import configureShowToast from '../../components/showToast';
 import placeholderImage from '../../assets/placeholderImage.svg';
 
 function HostPaymentQR({ 
-    hostID 
+    hostID,
+    setHostPaymentImage
 }) {
     const dispatch = useDispatch();
     const { user, loaded, authToken } = useSelector((state) => state.auth);
     const toast = useToast();
-    const showToast = configureShowToast(toast); 
+    const showToast = configureShowToast(toast);
     const [refresh, setRefresh] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
@@ -24,17 +26,21 @@ function HostPaymentQR({
             "image/png",
             "image/svg+xml",
             "image/heic"
-        ];        
+        ];
         if (file && allowedTypes.includes(file.type)) {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('hostID', hostID);
-            
+            setIsLoading(true);
             try {
                 // upload QR Code image
                 const response = await server.post('/orders/manageGuests/uploadPaymentQR', formData, { headers: { 'Content-Type': 'multipart/form-data' }, transformRequest: formData => formData });
                 dispatch(reloadAuthToken(authToken));
+                setIsLoading(false);
                 if (response.status === 200) {
+                    if (response.data && typeof response.data == "string") {
+                        setHostPaymentImage(response.data.substring("SUCCESS: Payment QR uploaded successfully. Image name: ".length));
+                    }
                     showToast('Image Uploaded', 'QR Code uploaded successfully', 3000, false, 'success');
                     setRefresh(!refresh);
                 } else {
@@ -43,6 +49,7 @@ function HostPaymentQR({
                 }
             } catch (error) {
                 dispatch(reloadAuthToken(authToken));
+                setIsLoading(false);
                 if (error.response && error.response.data) {
                     if (error.response.data.startsWith("UERROR")) {
                         showToast('Something went wrong', error.response.data.substring("UERROR: ".length), 3000, false, 'error');
@@ -58,7 +65,14 @@ function HostPaymentQR({
             }
         } else {
             showToast('Invalid file type', 'Please upload a valid image file', 3000, false, 'error');
+            setIsLoading(false);
             console.log('Invalid file type:', file.type);
+        }
+    };
+    
+    const handleUploadClick = () => {
+        if (!isLoading) {
+            document.getElementById('file-upload').click();
         }
     };
 
@@ -77,7 +91,7 @@ function HostPaymentQR({
                 justifyContent="center"
                 width="100%"
                 height="400px"
-                onClick={() => document.getElementById('file-upload').click()}
+                onClick={() => handleUploadClick()}
                 _hover={{
                     '& .qr-code-image': {
                         filter: "grayscale(100%)",
@@ -87,26 +101,32 @@ function HostPaymentQR({
                     },
                 }}
             >
-                <Image
-                    width="80%"
-                    height="400px"
-                    className="qr-code-image"
-                    src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getHostPaymentQR?token=${authToken}&something=${Date.now()}`}
-                    fallbackSrc={placeholderImage}
-                    transition="filter 0.3s ease"
-                    objectFit="contain"
-                />
-                <Box
-                    className="upload-icon"
-                    position="absolute"
-                    top="50%"
-                    left="50%"
-                    transform="translate(-50%, -50%)"
-                    opacity={0}
-                    transition="opacity 0.3s ease"
-                >
-                    <PiUploadSimpleBold size="60px" color="gray" />
-                </Box>
+                {isLoading ? (
+                    <Spinner size="xl" />
+                ) : (
+                    <>
+                        <Image
+                            width="80%"
+                            height="400px"
+                            className="qr-code-image"
+                            src={`${import.meta.env.VITE_BACKEND_URL}/cdn/getHostPaymentQR?token=${authToken}&something=${Date.now()}`}
+                            fallbackSrc={placeholderImage}
+                            transition="filter 0.3s ease"
+                            objectFit="contain"
+                        />
+                        <Box
+                            className="upload-icon"
+                            position="absolute"
+                            top="50%"
+                            left="50%"
+                            transform="translate(-50%, -50%)"
+                            opacity={0}
+                            transition="opacity 0.3s ease"
+                        >
+                            <PiUploadSimpleBold size="60px" color="gray" />
+                        </Box>
+                    </>
+                )}
             </Box>
             <Input
                 id="file-upload"

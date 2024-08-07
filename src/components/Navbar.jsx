@@ -4,11 +4,14 @@ import React from 'react'
 import Sidebar from './Sidebar'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux';
+import AdminSidebar from './AdminSideBar'
 
 function Navbar() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const navigate = useNavigate();
     const { user, authToken } = useSelector((state) => state.auth);
+
+    const isAdminAccount = user && user.userType == "Admin" ? true : false;
 
     const handleAvatarClick = () => {
         if (authToken) {
@@ -50,7 +53,11 @@ function Navbar() {
                     <Avatar size={"sm"} cursor={'pointer'} onClick={handleAvatarClick} />
                 )}
             </Flex>
-            <Sidebar isOpen={isOpen} onClose={onClose} />
+            {isAdminAccount ? (
+                <AdminSidebar isOpen={isOpen} onClose={onClose} />
+            ) : (
+                <Sidebar isOpen={isOpen} onClose={onClose} />
+            )}
         </>
     )
 }
