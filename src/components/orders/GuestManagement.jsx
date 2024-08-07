@@ -207,10 +207,11 @@ function GuestManagement({
                                         alignItems="center"
                                         justify={{ base: "flex-start", md: "space-between" }}
                                         width="100%"
-                                        gap={3}
+                                        gap={{ base: 0, md: 3 }}
                                     >
                                         <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total portion: {guest.Reservation.portions}</Text>
                                         <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total price: ${guest.Reservation.totalPrice}</Text>
+                                        <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Ref: {guest.Reservation.referenceNum}</Text>
                                     </Flex>
                                 </Box>
                             </Flex>
@@ -256,19 +257,6 @@ function GuestManagement({
                                         </Button>
                                     </Box>
                                 )}
-                                <Flex
-                                    mt={2}
-                                    direction={{ base: "column", md: "row" }}
-                                    alignItems="center"
-                                    justify={{ base: "flex-start", md: "space-between" }}
-                                    width="100%"
-                                    gap={{ base: 0, md: 3 }}
-                                >
-                                    <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total portion: {guest.Reservation.portions}</Text>
-                                    <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total price: ${guest.Reservation.totalPrice}</Text>
-                                    <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Ref: {guest.Reservation.referenceNum}</Text>
-                                </Flex>
-                            </Box>
                                 {!guest.Reservation.markedPaid && !guest.Reservation.chargeableCancelActive && (
                                     <IconButton
                                         background="red.500"
@@ -323,7 +311,6 @@ function GuestManagement({
                                 </Box>
                             </Box>
                         )}
-
                     </Flex>
                 ))
             ) : (
