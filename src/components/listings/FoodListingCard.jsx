@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { Card, CardBody, Image, Text, Box, SlideFade, Skeleton } from "@chakra-ui/react";
+import { Card, CardBody, Image, Text, Box, SlideFade, Skeleton, ScaleFade, Badge } from "@chakra-ui/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -17,6 +17,7 @@ const FoodListingCard = ({
     totalSlots,
     latitude,
     longitude,
+    flaggedForHygiene
 }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     return (
@@ -33,7 +34,7 @@ const FoodListingCard = ({
                     }
                 `}
             </style>
-            <Link to={"/targetListing"} state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude }}>
+            <Link to={"/targetListing"} state={{ listingID, hostID, images, title, shortDescription, approxAddress, portionPrice, totalSlots, latitude, longitude, flaggedForHygiene }}>
                 <Card maxW="sm" className="image-container" borderRadius={"2xl"}>
                     <CardBody padding={0}>
                         <Box>
@@ -59,7 +60,24 @@ const FoodListingCard = ({
                         </Box>
                         <Box mt={1}>
                             <Text fontSize={"20px"} textAlign={"left"} ml={4}>{title}</Text>
-                            <Text fontSize={"12px"} textAlign={"left"} ml={5}>By <i>{hostName}</i></Text>
+                            <Box display="flex">
+                                <Text fontSize={"12px"} textAlign={"left"} ml={5}>By <i>{hostName}</i></Text>
+                                {flaggedForHygiene && (
+                                    <ScaleFade in>
+                                        <Badge
+                                            colorScheme="red"
+                                            ml="10px"
+                                            mt={-2}
+                                            variant="solid"
+                                            px={2}
+                                            py={0.5}
+                                            fontSize="2xs"
+                                        >
+                                            Flagged
+                                        </Badge>
+                                    </ScaleFade>
+                                )}
+                            </Box>
                             <Box display="flex" justifyContent={"space-between"} mt={3} mb={1} ml={4} mr={4}>
                                 <Text color="blue.600" fontSize="18px">${portionPrice} / portion</Text>
                                 <Text>{hostFoodRating} ⭐️</Text>

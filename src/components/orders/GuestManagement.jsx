@@ -215,10 +215,11 @@ function GuestManagement({
                                         alignItems="center"
                                         justify={{ base: "flex-start", md: "space-between" }}
                                         width="100%"
-                                        gap={3}
+                                        gap={{ base: 0, md: 3 }}
                                     >
                                         <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total portion: {guest.Reservation.portions}</Text>
                                         <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Total price: ${guest.Reservation.totalPrice}</Text>
+                                        <Text color="grey" fontSize={{ base: "sm", md: "md" }}>Ref: {guest.Reservation.referenceNum}</Text>
                                     </Flex>
                                 </Box>
                             </Flex>
@@ -240,31 +241,33 @@ function GuestManagement({
                                     size={{ base: "sm", md: "lg" }}
                                     onClick={() => navigate(`/chat`)}
                                 />
-                                {guest.Reservation.paidAndPresent ? (
-                                    <Button
-                                        background="green.500"
-                                        color="white"
-                                        borderRadius="10px"
-                                        fontWeight="bold"
-                                        _hover={{ bg: "green.600" }}
-                                        size="sm"
-                                        isLoading={isLoading}
-                                        onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
-                                        rightIcon={<FaCheck />}
-                                    >
-                                        Paid & Present
-                                    </Button>
-                                ) : (
-                                    <Box>
-                                        <Button
-                                            variant="MMPrimary"
-                                            size="sm"
-                                            isLoading={isLoading}
-                                            onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
-                                        >
-                                            Paid & Present
-                                        </Button>
-                                    </Box>
+                                {!guest.Reservation.chargeableCancelActive && (
+                                    <>
+                                        {guest.Reservation.paidAndPresent ? (
+                                            <Button
+                                                background="green.500"
+                                                color="white"
+                                                borderRadius="10px"
+                                                fontWeight="bold"
+                                                _hover={{ bg: "green.600" }}
+                                                size="sm"
+                                                onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
+                                                rightIcon={<FaCheck />}
+                                            >
+                                                Paid & Present
+                                            </Button>
+                                        ) : (
+                                            <Box>
+                                                <Button
+                                                    variant="MMPrimary"
+                                                    size="sm"
+                                                    onClick={() => handlePaidAndPresent({ referenceNum: guest.Reservation.referenceNum, listingID, guestID: guest.Reservation.guestID })}
+                                                >
+                                                    Paid & Present
+                                                </Button>
+                                            </Box>
+                                        )}
+                                    </>
                                 )}
                                 {!guest.Reservation.markedPaid && !guest.Reservation.chargeableCancelActive && (
                                     <IconButton
@@ -322,7 +325,6 @@ function GuestManagement({
                                 </Box>
                             </Box>
                         )}
-
                     </Flex>
                 ))
             ) : (

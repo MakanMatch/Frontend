@@ -92,6 +92,7 @@ const FoodListingsPage = () => {
                 totalSlots: listing.totalSlots,
                 latitude: lat,
                 longitude: lng,
+                flaggedForHygiene: listing.Host.flaggedForHygiene
             },
         });
     };
@@ -155,7 +156,7 @@ const FoodListingsPage = () => {
                     >
                         <MarkeredGMaps
                             coordinatesList={listings.map((listing) => {
-                                const [lat, lng] = listing.coordinates.split(',').map(parseFloat);
+                                const [lat, lng] = listing.approxCoordinates.split(',').map(parseFloat);
                                 return { lat, lng };
                             })}
                             listings={listings}
@@ -223,6 +224,7 @@ const FoodListingsPage = () => {
                                                     totalSlots={listing.totalSlots}
                                                     latitude={parseFloat(listing.approxCoordinates.split(',')[0])}
                                                     longitude={parseFloat(listing.approxCoordinates.split(',')[1])}
+                                                    flaggedForHygiene={listing.Host.flaggedForHygiene}
                                                     sx={{ cursor: "pointer" }}
                                                 />
                                             </motion.div>

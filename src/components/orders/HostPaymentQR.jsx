@@ -7,8 +7,9 @@ import { reloadAuthToken } from '../../slices/AuthState';
 import configureShowToast from '../../components/showToast';
 import placeholderImage from '../../assets/placeholderImage.svg';
 
-function HostPaymentQR({
-    hostID
+function HostPaymentQR({ 
+    hostID,
+    setHostPaymentImage
 }) {
     const dispatch = useDispatch();
     const { user, loaded, authToken } = useSelector((state) => state.auth);
@@ -37,6 +38,9 @@ function HostPaymentQR({
                 dispatch(reloadAuthToken(authToken));
                 setIsLoading(false);
                 if (response.status === 200) {
+                    if (response.data && typeof response.data == "string") {
+                        setHostPaymentImage(response.data.substring("SUCCESS: Payment QR uploaded successfully. Image name: ".length));
+                    }
                     showToast('Image Uploaded', 'QR Code uploaded successfully', 3000, false, 'success');
                     setRefresh(!refresh);
                 } else {

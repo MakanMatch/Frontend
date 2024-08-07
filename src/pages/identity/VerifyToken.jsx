@@ -1,8 +1,11 @@
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import React, { useEffect, useState } from 'react';
 import { Box, Heading, Spinner, Text, useToast, VStack } from '@chakra-ui/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import server from '../../networking';
 import configureShowToast from '../../components/showToast';
+import { reloadAuthToken } from '../../slices/AuthState';
 
 function VerifyToken() {
     const navigate = useNavigate();
@@ -10,6 +13,8 @@ function VerifyToken() {
     const [message, setMessage] = useState('');
     const toast = useToast()
     const showToast = configureShowToast(toast);
+    const dispatch = useDispatch();
+    const authToken = useSelector((state) => state.auth.authToken);
 
     // Get token and userID from searchParams
     const token = searchParams.get('token');
