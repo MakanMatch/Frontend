@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Alert, AlertIcon, Box, Button, Spacer, useToast } from '@chakra-ui/react'
 import server from '../../networking'
 import configureShowToast from "../showToast";
+import { useDispatch } from "react-redux";
 
 function EmailVerificationAlert({ email, userType, emailVerificationTime }) {
     const [cooldown, setCooldown] = useState(0);
     const toast = useToast();
     const showToast = configureShowToast(toast);
-    console.log(emailVerificationTime);
+    const dispatch = useDispatch();
 
     const calculateVerificationTime = () => {
-        console.log(emailVerificationTime);
         const verificationTime = new Date(emailVerificationTime);
         const day = verificationTime.getDate()
         const month = verificationTime.getMonth() + 1
@@ -30,6 +30,7 @@ function EmailVerificationAlert({ email, userType, emailVerificationTime }) {
     const handleResendEmail = () => {
         server.post('/identity/emailVerification/send', { email })
             .then((res) => {
+                dispatch(reloadAuthToken(authToken))
                 if (res.data && res.data.startsWith("SUCCESS")) {
                     setCooldown(30);
                     showToast('Verification email sent.', 'Check your email for the verification link.', 3000, true, 'success')
@@ -38,6 +39,7 @@ function EmailVerificationAlert({ email, userType, emailVerificationTime }) {
                 }
             })
             .catch((err) => {
+                dispatch(reloadAuthToken(authToken))
                 console.log(err)
                 showToast('Error', err.response?.data || 'Failed to send verification email.', 3000, true, 'error')
             });
