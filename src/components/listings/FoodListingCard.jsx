@@ -59,7 +59,7 @@ const FoodListingCard = ({
                             </SlideFade>
                         </Box>
                         <Box mt={1}>
-                            <Text fontSize={"20px"} textAlign={"left"} ml={4}>{title}</Text>
+                            <Text fontSize={"20px"} textAlign={"left"} ml={4} white-space="nowrap" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" maxWidth="225px">{title}</Text>
                             <Box display="flex">
                                 <Text fontSize={"12px"} textAlign={"left"} ml={5}>By <i>{hostName}</i></Text>
                                 {flaggedForHygiene && (
