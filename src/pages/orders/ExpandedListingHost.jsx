@@ -369,8 +369,8 @@ function ExpandedListingHost() {
 
                                     <HStack spacing={"30px"} wrap={"wrap"}>
                                         <Statistic value={`${listingData.guests.length}/${listingData.totalSlots}`} description={"Reservations"} />
-                                        <Statistic value={listingData.impressions} description={"Impressions"} />
-                                        <Statistic value={listingData.ctr} description={"Click-Through Rate"} />
+                                        {listingData.impressions && <Statistic value={listingData.impressions || "Unavailable"} description={"Impressions"} />}
+                                        {listingData.ctr && <Statistic value={listingData.ctr || "Unavailable"} description={"Click-Through Rate"} />}
                                         <Statistic value={listingData.revenue} description={"Revenue"} />
                                     </HStack>
                                 </VStack>
