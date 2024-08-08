@@ -259,7 +259,6 @@ function ChatUi() {
             if (imagesToBeSubmitted) {
                 const formData = new FormData();
                 formData.append("image", image);
-                formData.append("senderID", user.userID);
                 formData.append("chatID", chatSelected);
                 formData.append("message", messageInput);
                 formData.append("datetime", new Date().toISOString());
