@@ -3,10 +3,21 @@ import { Alert, AlertIcon, Box, Button, Spacer, useToast } from '@chakra-ui/reac
 import server from '../../networking'
 import configureShowToast from "../showToast";
 
-function EmailVerificationAlert({ email, calculateAccountAge, userType }) {
+function EmailVerificationAlert({ email, userType, emailVerificationTime }) {
     const [cooldown, setCooldown] = useState(0);
     const toast = useToast();
     const showToast = configureShowToast(toast);
+    console.log(emailVerificationTime);
+
+    const calculateVerificationTime = () => {
+        console.log(emailVerificationTime);
+        const verificationTime = new Date(emailVerificationTime);
+        const day = verificationTime.getDate()
+        const month = verificationTime.getMonth() + 1
+        const year = verificationTime.getFullYear()
+        const lastDay = `${day}/${month}/${year}`
+        return lastDay
+    }
 
     useEffect(() => {
         let timer;
@@ -43,7 +54,7 @@ function EmailVerificationAlert({ email, calculateAccountAge, userType }) {
                     </>
                 ) : (
                     <>
-                        Your email has NOT been verified. Your account will be locked in {7 - calculateAccountAge()} days.
+                        You must verify your email by <strong>&nbsp;{calculateVerificationTime()}</strong>, otherwise your account will be locked.
                         <Spacer />
                     </>
                 )}

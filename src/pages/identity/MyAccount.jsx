@@ -495,7 +495,7 @@ const MyAccount = () => {
                 <PopoverForm />
 
                 {!accountInfo.emailVerified && (
-                    <EmailVerificationAlert email={accountInfo.email} calculateAccountAge={calculateAccountAge} userType={user.userType}/>
+                    <EmailVerificationAlert email={accountInfo.email} userType={user.userType} emailVerificationTime={accountInfo.emailVerificationTime}/>
                 )}
                 
                 <Stack direction={["column", "row"]} p={4} mt={4} justifyContent="space-between" width="100%" spacing={"20px"} height={"50vh"}>
