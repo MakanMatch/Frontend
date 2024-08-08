@@ -7,10 +7,10 @@ import { reloadAuthToken } from '../../slices/AuthState';
 import { useNavigate } from 'react-router-dom';
 import configureShowToast from '../showToast';
 
-function ReservationSettingsCard({ listingID, listingPublished, paymentImage, togglePublished, setEditListing, pricePerPortion, guestSlots, minGuests, handleSettingsChange }) {
+function ReservationSettingsCard({ listingID, listingPublished, paymentImage, togglePublished, setEditListing, pricePerPortion, guestSlots, minGuests, handleSettingsChange, listingCompleted }) {
     const formatAsCurrency = (val) => `$` + val
     const parseCurrencyValue = (val) => val.replace(/^\$/, '')
-    
+
     const { authToken } = useSelector((state) => state.auth);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const dispatch = useDispatch();
@@ -25,41 +25,41 @@ function ReservationSettingsCard({ listingID, listingPublished, paymentImage, to
         server.post("/deleteListing", {
             listingID
         })
-        .then(res => {
-            dispatch(reloadAuthToken(authToken))
-            setDeleting(false)
-            if (res.status == 200 && res.data && typeof res.data == "string") {
-                if (res.data.startsWith("SUCCESS")) {
-                    handleClose()
-                    navigate('/')
-                    setTimeout(() => {
-                        showToast("Listing Deleted", "Your listing has been successfully deleted. Looking forward to new ones in the future!", 4000, true, "success")
-                    }, 100)
-                    return
+            .then(res => {
+                dispatch(reloadAuthToken(authToken))
+                setDeleting(false)
+                if (res.status == 200 && res.data && typeof res.data == "string") {
+                    if (res.data.startsWith("SUCCESS")) {
+                        handleClose()
+                        navigate('/')
+                        setTimeout(() => {
+                            showToast("Listing Deleted", "Your listing has been successfully deleted. Looking forward to new ones in the future!", 4000, true, "success")
+                        }, 100)
+                        return
+                    } else {
+                        console.log("Unexpected response when deleting listing; response: ", res.data)
+                        showToast("Something went wrong", "Failed to delete your listing. Please try again!", 2000, true, "error")
+                    }
                 } else {
-                    console.log("Unexpected response when deleting listing; response: ", res.data)
+                    console.log("Failed to delete listing; response: ", res)
                     showToast("Something went wrong", "Failed to delete your listing. Please try again!", 2000, true, "error")
                 }
-            } else {
-                console.log("Failed to delete listing; response: ", res)
-                showToast("Something went wrong", "Failed to delete your listing. Please try again!", 2000, true, "error")
-            }
-        })
-        .catch(err => {
-            dispatch(reloadAuthToken(authToken))
-            setDeleting(false)
-            if (err.response && err.response.data && typeof err.response.data == "string") {
-                console.log("Failed to delete listing; error: ", err.response.data)
-                if (err.response.data.startsWith("UERROR")) {
-                    showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3000, true, "error")
+            })
+            .catch(err => {
+                dispatch(reloadAuthToken(authToken))
+                setDeleting(false)
+                if (err.response && err.response.data && typeof err.response.data == "string") {
+                    console.log("Failed to delete listing; error: ", err.response.data)
+                    if (err.response.data.startsWith("UERROR")) {
+                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3000, true, "error")
+                    } else {
+                        showToast("Something went wrong", "Failed to delete your listing. Please try again!", 2000, true, "error")
+                    }
                 } else {
+                    console.log("Failed to delete listing; error: ", err)
                     showToast("Something went wrong", "Failed to delete your listing. Please try again!", 2000, true, "error")
                 }
-            } else {
-                console.log("Failed to delete listing; error: ", err)
-                showToast("Something went wrong", "Failed to delete your listing. Please try again!", 2000, true, "error")
-            }
-        })
+            })
     }
 
     const handleClose = () => {
@@ -96,20 +96,25 @@ function ReservationSettingsCard({ listingID, listingPublished, paymentImage, to
                 </CardBody>
                 <CardFooter>
                     <VStack width={"100%"}>
-                        {!paymentImage ? (
+                        {listingCompleted ? (
                             <>
-                                <Text fontSize={"sm"} color={"red.500"}>Please upload your PayNow QR code to hide/show listing.</Text>
-                                <Button fontSize={"sm"} variant={"link"} color={"primaryColour"} onClick={() => setEditListing(false)}>See Manage Guests screen.</Button>
+                                {!paymentImage ? (
+                                    <>
+                                        <Text fontSize={"sm"} color={"red.500"}>Please upload your PayNow QR code to hide/show listing.</Text>
+                                        <Button fontSize={"sm"} variant={"link"} color={"primaryColour"} onClick={() => setEditListing(false)}>See Manage Guests screen.</Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        {listingPublished ?
+                                            <Button variant={"MMPrimary"} width={"100%"} leftIcon={<ViewOffIcon />} onClick={() => togglePublished(false)}>Hide Listing</Button> :
+                                            <Button variant={"MMPrimary"} width={"100%"} leftIcon={<ViewIcon />} onClick={() => togglePublished(true)}>Publish Listing</Button>
+                                        }
+                                    </>
+                                )}
                             </>
                         ) : (
-                            <>
-                                {listingPublished ?
-                                    <Button variant={"MMPrimary"} width={"100%"} leftIcon={<ViewOffIcon />} onClick={() => togglePublished(false)}>Hide Listing</Button> :
-                                    <Button variant={"MMPrimary"} width={"100%"} leftIcon={<ViewIcon />} onClick={() => togglePublished(true)}>Publish Listing</Button>
-                                }
-                            </>
+                            <Text color={"green"}>Hooray! Your listing is completed!</Text>
                         )}
-
                         <Button variant={'ghost'} colorScheme='red' fontWeight={"bold"} borderRadius={"10px"} width={"100%"} onClick={onOpen}>Delete Listing</Button>
                     </VStack>
                 </CardFooter>
