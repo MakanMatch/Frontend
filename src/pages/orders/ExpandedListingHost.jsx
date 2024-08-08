@@ -109,6 +109,13 @@ function ExpandedListingHost() {
         let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
         data.datetime = formattedString
 
+        const currentDate = new Date()
+        if (datetime.getDate() > currentDate.getDate() && datetime.getMonth() >= currentDate.getMonth() && datetime.getFullYear() >= currentDate.getFullYear()) {
+            data.complete = true
+        } else {
+            data.complete = false
+        }
+
         data.images = data.images.split("|")
 
         return data
@@ -324,9 +331,11 @@ function ExpandedListingHost() {
                                 <Button variant="MMPrimary" onClick={handleSaveChanges}>Save Changes</Button>
                             </SlideFade>
                         )}
-                        <Button variant="link" onClick={handleEditListing} color="blue" textDecoration="underline">
-                            {editListing ? "Manage Guests" : "Edit Listing"}
-                        </Button>
+                        {listingData.complete && (
+                            <Button variant="link" onClick={handleEditListing} color="blue" textDecoration="underline">
+                                {editListing ? "Manage Guests" : "Edit Listing"}
+                            </Button>
+                        )}
                     </VStack>
                 </GridItem>
                 {/*Edit Listing*/}
