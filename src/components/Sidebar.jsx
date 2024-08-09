@@ -73,7 +73,7 @@ function Sidebar({ isOpen, onClose }) {
                             <Text ml={2}>Home</Text>
                         </Button>
 
-                        {user && user.userType === "Guest" && (
+                        {(!user || user.userType !== "Host") && (
                             <Button color="#515F7C" mb={2} justifyContent={"left"} colorScheme='white' sx={DrawerHover} onClick={() => handleNavigationClick("/reservations/upcoming")}>
                                 <CalendarIcon ml={1}/>
                                 <Text ml={3}>Upcoming Reservations</Text>

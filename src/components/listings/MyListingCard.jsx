@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Card, CardBody, Image, Text, Box, SlideFade, Skeleton, ScaleFade, Badge } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const MyListingCard = ({
@@ -9,11 +9,12 @@ const MyListingCard = ({
     portionPrice,
     images,
     published,
-    archived,
+    listingDatetime,
     displayToast
 }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const navigate = useNavigate();
+    const [archived, setArchived] = useState(true);
 
     const handleClickMyListingCard = () => {
         if (archived === true) {
@@ -22,6 +23,16 @@ const MyListingCard = ({
             navigate(`/expandedListingHost`, { state: { listingID: listingID } });
         }
     };
+
+    useEffect(() => {
+        const currentDate = new Date()
+        const listingDate = new Date(listingDatetime)
+        if (listingDate.getDate() >= currentDate.getDate() && listingDate.getMonth() >= currentDate.getMonth() && listingDate.getFullYear() >= currentDate.getFullYear()) {
+            setArchived(false);
+        } else {
+            setArchived(true);
+        }
+    }, [])
 
     return (
         <>
@@ -73,10 +84,10 @@ const MyListingCard = ({
                     </Box>
                     <Box mt={1}>
                         <Box display="flex" alignItems="center" justifyContent="space-between">
-                            <Text 
-                                fontSize={"20px"} 
-                                textAlign={"left"} 
-                                ml={4} 
+                            <Text
+                                fontSize={"20px"}
+                                textAlign={"left"}
+                                ml={4}
                                 color={archived === true ? "grey" : "black"}
                                 className="truncate-text"
                                 overflow="hidden"

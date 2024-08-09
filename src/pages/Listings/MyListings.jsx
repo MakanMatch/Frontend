@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import MyListingCard from "../../components/listings/MyListingCard";
 import server from '../../networking';
+import { useNavigate } from "react-router-dom";
 
 function MyListings() {
     const [listings, setListings] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
     const toast = useToast();
+    const navigate = useNavigate();
 
     const { user, loaded } = useSelector((state) => state.auth);
 
@@ -40,7 +42,13 @@ function MyListings() {
     };
 
     useEffect(() => {
-        if (loaded) {
+        if (loaded == true) {
+            if (!user) {
+                navigate("/")
+                displayToast("Please sign in first", "Sign in to view your listings", "error", 2000, true);
+                return
+            }
+
             fetchHostListings();
         }
     }, [loaded, user]);
@@ -110,7 +118,7 @@ function MyListings() {
                                                     portionPrice={listing.portionPrice}
                                                     images={listing.images.split("|").map((imageName) => getImageLink(listing.listingID, imageName))}
                                                     published={listing.published}
-                                                    archived={listing.datetime < new Date().toISOString()}
+                                                    listingDatetime={listing.datetime}
                                                     displayToast={displayToast}
                                                 />
                                             </Box>
