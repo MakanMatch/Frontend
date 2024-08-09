@@ -110,7 +110,7 @@ function ExpandedListingHost() {
         data.datetime = formattedString
 
         const currentDate = new Date()
-        if (datetime.getDate() > currentDate.getDate() && datetime.getMonth() >= currentDate.getMonth() && datetime.getFullYear() >= currentDate.getFullYear()) {
+        if (datetime.getDate() >= currentDate.getDate() && datetime.getMonth() >= currentDate.getMonth() && datetime.getFullYear() >= currentDate.getFullYear()) {
             data.complete = true
         } else {
             data.complete = false

@@ -88,7 +88,7 @@ function ReservationSettingsCard({ listingID, listingPublished, paymentImage, to
                         <HStack width={"100%"}>
                             <Text>Price Per Portion</Text>
                             <Spacer />
-                            <NumberInput defaultValue={'$1.50'} onChange={(valueString) => handleSettingsChange(parseCurrencyValue(valueString), "pricePerPortion")} value={formatAsCurrency(pricePerPortion)}>
+                            <NumberInput max={10} min={1} defaultValue={'$1.50'} onChange={(valueString) => handleSettingsChange(parseCurrencyValue(valueString), "pricePerPortion")} value={formatAsCurrency(pricePerPortion)}>
                                 <NumberInputField />
                             </NumberInput>
                         </HStack>
