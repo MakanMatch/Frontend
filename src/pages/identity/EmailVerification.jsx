@@ -16,11 +16,11 @@ function EmailVerification() {
     const [isSmallerThan1040] = useMediaQuery('(max-width: 1040px)');
 
     const email = searchParams.get('email');
-    const resendOnLoad = searchParams.get('resendOnLoad');
+    const fromCreateAccount = searchParams.get('fromCreateAccount');
 
     useEffect(() => {
-        if (resendOnLoad === 'true') {
-            sendEmailVerification()
+        if (fromCreateAccount === 'true') {
+            setCooldown(30);
         }
     }, [])
     
@@ -44,7 +44,7 @@ function EmailVerification() {
             })
             .catch((err) => {
                 console.log(err)
-                showToast('Error', err.response?.data || 'Failed to send verification email.', 3000, true, 'error')
+                showToast('Error', err.response.data.substring("ERROR: ".length) || 'Failed to send verification email.', 3000, true, 'error')
             });
     };
 

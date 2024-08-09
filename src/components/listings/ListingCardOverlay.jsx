@@ -140,11 +140,12 @@ function ListingCardOverlay({ listingID, hostID, images, title, shortDescription
     }
 
     const proceedToExpandedListing = (id) => {
+        server.post("/listingAnalytics/updateClick", { listingID: id });
         navigate("/expandedListingGuest", {
             state: {
                 listingID: id
             }
-        })
+        });
     }
 
     const fetchRatingProgress = async () => {
