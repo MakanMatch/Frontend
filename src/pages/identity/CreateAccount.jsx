@@ -90,10 +90,8 @@ function CreateAccount() {
             .then((res) => {
                 if (res && res.data && res.data.startsWith("SUCCESS")) {
                     showToast('Account created', 'Please verify your email to continue', 3000, true, 'success');
-                    if (res.data.startsWith("SUCCESS RESENDVERIFICATION")) {
-                        navigate(`/auth/emailVerification?email=${submitValues.email}&resendOnLoad=true`);
-                    } else {
-                        navigate(`/auth/emailVerification?email=${submitValues.email}`);
+                    if (res.data.startsWith("SUCCESS")) {
+                        navigate(`/auth/emailVerification?email=${submitValues.email}&fromCreateAccount=true`);
                     }
                 } else {
                     showToast('Account creation failed', 'An error has occurred creating the account.', 3000, true, '');
@@ -106,7 +104,8 @@ function CreateAccount() {
                     actions.setFieldError('email', 'Email already exists.');
                 } else if (err.response.data === "UERROR: Contact number already exists.") {
                     actions.setFieldError('contactNum', 'Contact number already in use.');
-                } else if (err.response.data.startsWith("ERROR")) {
+                }
+                if (err.response.data.startsWith("ERROR")) {
                     showToast('Account creation failed', err.response.data.substring("ERROR: ".length), 3000, true, 'error');
                 }
                 showToast('Account creation failed.', err.response.data.substring("UERROR: ".length), 3000, true, 'error');
