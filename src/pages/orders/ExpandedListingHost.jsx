@@ -13,6 +13,7 @@ import HostPaymentQR from '../../components/orders/HostPaymentQR'
 import GuestManagement from '../../components/orders/GuestManagement'
 import configureShowToast from '../../components/showToast'
 import { reloadAuthToken } from '../../slices/AuthState'
+import Extensions from '../../extensions'
 
 function ExpandedListingHost() {
     // const Universal = useSelector(state => state.universal)
@@ -117,6 +118,9 @@ function ExpandedListingHost() {
         }
 
         data.images = data.images.split("|")
+
+        const revenue = data.guests.map(g => g.Reservation.portions * data.portionPrice).reduce((t, n) => t + n, 0)
+        data.revenue = Extensions.formatCurrency(revenue)
 
         return data
     }
@@ -373,10 +377,10 @@ function ExpandedListingHost() {
                                     <Heading size={"md"}>Listing Statistics</Heading>
 
                                     <HStack spacing={"30px"} wrap={"wrap"}>
-                                        <Statistic value={"2/5"} description={"Reservations"} />
-                                        <Statistic value={"1000"} description={"Impressions"} />
-                                        <Statistic value={"45%"} description={"Click-Through Rate"} />
-                                        <Statistic value={"$7.00"} description={"Revenue"} />
+                                        <Statistic value={`${listingData.guests.length}/${listingData.totalSlots}`} description={"Reservations"} />
+                                        {listingData.impressions && <Statistic value={listingData.impressions || "Unavailable"} description={"Impressions"} />}
+                                        {listingData.ctr && <Statistic value={listingData.ctr || "Unavailable"} description={"Click-Through Rate"} />}
+                                        <Statistic value={listingData.revenue} description={"Revenue"} />
                                     </HStack>
                                 </VStack>
                             </VStack>
