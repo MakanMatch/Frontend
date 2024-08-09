@@ -26,6 +26,10 @@ function ConfirmReservationLayout({
         }
     }
 
+    if (!loaded) {
+        return <Spinner />
+    }
+
     return (
         <Box p={"15px"}>
             <VStack alignItems={"flex-start"}>
@@ -112,14 +116,14 @@ function ConfirmReservationLayout({
                     </Box>
                 </Box>
 
-                {!isSmallerThan800 && user.userType == "Guest" && (
+                {!isSmallerThan800 && (!user || user.userType == "Guest") && (
                     <Box display={"flex"} justifyContent={"center"}>
                         <ConfirmReserveCard listingData={listingData} userData={userData} hostData={hostData} fetchListingDetails={fetchListingDetails} />
                     </Box>
                 )}
             </Box>
 
-            {isSmallerThan800 && user.userType == "Guest" && (
+            {isSmallerThan800 && (!user || user.userType == "Guest") && (
                 <Box display={"flex"} justifyContent={"center"} mt={"50px"}>
                     <ConfirmReserveCard listingData={listingData} userData={userData} hostData={hostData} fetchListingDetails={fetchListingDetails} />
                 </Box>

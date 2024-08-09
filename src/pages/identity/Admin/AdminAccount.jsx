@@ -7,14 +7,13 @@ import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormContro
     PopoverCloseButton, IconButton, Input, ButtonGroup, useMediaQuery
 } from "@chakra-ui/react";
 import { EditIcon } from "@chakra-ui/icons";
-import { FocusLock } from "@chakra-ui/react";
 import { logout } from "../../../slices/AuthState";
 import configureShowToast from '../../../components/showToast';
 import server from "../../../networking";
 import { reloadAuthToken } from "../../../slices/AuthState";
-import ChangeAddress from "../../../components/identity/ChangeAddress";
 import EditPicture from "../../../components/identity/EditPicture";
 import ChangePassword from "../../../components/identity/ChangePassword";
+import EmailVerificationAlert from "../../../components/identity/EmailVerificationAlert";
 
 function AdminAccount() {
     const navigate = useNavigate();
@@ -433,6 +432,14 @@ function AdminAccount() {
 
             <PopoverForm />
 
+            {!accountInfo.emailVerified && (
+                <Box justifyContent={'center'} display={'flex'}>
+                    <Box width={"62vw"} mb={4}>
+                        <EmailVerificationAlert email={accountInfo.email} userType={user.userType}/>
+                    </Box>
+                </Box>
+            )}
+
             {accountLoaded && accountInfo && (
                 <Box justifyContent={'center'} display={'flex'}>
                     <Stack direction={["column", "row"]} p={4} spacing={"12%"} width={"65vw"}>
@@ -442,10 +449,6 @@ function AdminAccount() {
                                 <Editable
                                     value={accountInfo.username}
                                     onChange={(value) => setAccountInfo({ ...accountInfo, username: value })}
-                                    // onChange={(value) => {           
-                                    //     const { username, ...rest } = accountInfo;
-                                    //     setAccountInfo({ ...rest, username: value });
-                                    // }}
                                     textAlign={"left"}
                                     borderColor={"black"}
                                     borderWidth={1}
@@ -461,10 +464,6 @@ function AdminAccount() {
                                 <Editable
                                     value={accountInfo.email}
                                     onChange={(value) => setAccountInfo({ ...accountInfo, email: value })}
-                                    // onChange={(value) => {
-                                    //     const { email, ...rest } = accountInfo;
-                                    //     setAccountInfo({ ...rest, email: value });
-                                    // }}
                                     textAlign={"left"}
                                     borderColor={"black"}
                                     borderWidth={1}
@@ -485,10 +484,6 @@ function AdminAccount() {
                                     value={accountInfo.contactNum || ''} 
                                     placeholder="Enter your contact number"
                                     onChange={(value) => setAccountInfo({ ...accountInfo, contactNum: value })}
-                                    // onChange={(value) => {
-                                    //     const { contactNum, ...rest } = accountInfo;
-                                    //     setAccountInfo({ ...rest, contactNum: value });
-                                    // }}
                                     textAlign={"left"}
                                     borderColor={"black"}
                                     borderWidth={1}

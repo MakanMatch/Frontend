@@ -31,10 +31,8 @@ const MarkeredGMaps = ({
             const skipRemount = localStorage.getItem("mapRemountDenyOnModalOpen") ? "mapRemountDenyOnModalOpen" : localStorage.getItem("mapRemountDenyOnModalClose") ? "mapRemountDenyOnModalClose" : null;
             if (skipRemount) {
                 localStorage.removeItem(skipRemount);
-                console.log("Skipped map remount");
                 return;
             }
-            console.log("Initialised map");
             const loader = new Loader({
                 apiKey: import.meta.env.VITE_GMAPS_API_KEY,
                 version: "weekly",
