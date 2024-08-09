@@ -18,10 +18,31 @@ const FoodListingsPage = () => {
     const [loading, setLoading] = useState(true); 
     const navigate = useNavigate();
 
+    const timeOfDay = () => {
+        const date = new Date();
+        const hours = date.getHours();
+        if (hours >= 5 && hours < 12) {
+            return "morning";
+        } else if (hours >= 12 && hours < 18) {
+            return "afternoon";
+        } else {
+            return "evening";
+        }
+    }
+
     const { user, authToken, loaded } = useSelector((state) => state.auth);
 
     const toast = useToast();
     const dispatch = useDispatch();
+
+    const salutations = [
+        "What's on your mind?",
+        "How about italian cuisine today?",
+        "Feeling hungry?",
+        "Let's find you something to eat!",
+        "Ready to dig in?",
+        "Wine and dine?"
+    ]
 
     function displayToast(title, description, status, duration, isClosable) {
         toast.closeAll();
@@ -138,13 +159,16 @@ const FoodListingsPage = () => {
     
     return (
         <>
+            <Text fontSize={"25px"} mb={4} ml={5} textAlign={"left"}>
+                {user ? `Good ${timeOfDay()} ${user.username}!` : "Welcome to MakanMatch!"}
+            </Text>
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                <Text fontSize={"30px"} mb={4}>
-                    {user ? `Welcome, ${user.username}` : "Welcome to MakanMatch!"}
+                <Text fontSize={"15px"} mb={4} textAlign={"left"} ml={5} color="grey">
+                    {salutations[Math.floor(Math.random() * salutations.length)]}
                 </Text>
             </motion.div>
             {isSmallerThan1095 && listings.length > 0 && (

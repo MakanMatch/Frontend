@@ -21,7 +21,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
     const [portionPrice, setPortionPrice] = useState(1);
     const [totalSlots, setTotalSlots] = useState(1);
     const [datetime, setDatetime] = useState(today.toISOString().slice(0, 16));
-    const [isChecked, setIsChecked] = useState(false);
     const [images, setImages] = useState([]);
     const authToken = useSelector((state) => state.auth.authToken);
 
@@ -63,7 +62,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
         setTotalSlots(1);
         setDatetime(today.toISOString().slice(0, 16));
         setImages([]);
-        setIsChecked(false);
     }
 
     function checkDate(date) {
@@ -91,7 +89,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
         formData.append("portionPrice", portionPrice);
         formData.append("totalSlots", totalSlots);
         formData.append("datetime", new Date(datetime).toISOString());
-        formData.append("publishInstantly", isChecked);
         images.forEach((image) => {
             formData.append("images", image);
         });
@@ -157,10 +154,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                 )
             }
         }
-    };
-
-    const handlePublishToggle = () => {
-        setIsChecked(!isChecked);
     };
 
     const handleKeyDown = (event) => {
@@ -456,12 +449,6 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                                     </>
                                 )}
                             </Box>
-                        </FormControl>
-                        <FormControl display='flex' alignItems='center'>
-                            <FormLabel mb='0'>
-                                Publish instantly?
-                            </FormLabel>
-                            <Switch isChecked={isChecked} onChange={handlePublishToggle} />
                         </FormControl>
                     </ModalBody>
 

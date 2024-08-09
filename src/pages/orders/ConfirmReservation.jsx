@@ -31,6 +31,7 @@ function ConfirmReservation() {
         data.fullDatetime = before;
 
         data.images = data.images.split("|")
+        data.approxCoordinates = data.approxCoordinates.split(",").map(coord => parseFloat(coord))
 
         var slotsTaken = 0;
         var includesUser = false;

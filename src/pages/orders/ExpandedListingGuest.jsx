@@ -181,6 +181,14 @@ function ExpandedListingGuest() {
             })
     }
 
+    const handleReviewsClick = () => {
+        navigate("/reviews", {
+            state: {
+                hostID: listingData.hostID
+            }
+        })
+    }
+
     if (loading) {
         return <Spinner />
     }
@@ -237,7 +245,7 @@ function ExpandedListingGuest() {
 
                     <Divider borderColor={'black'} orientation="vertical" />
 
-                    <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0} ml={"5%"}>
+                    <VStack textAlign={'left'} alignItems={'flex-start'} spacing={0} ml={"5%"} onClick={handleReviewsClick} cursor={"pointer"}>
                         <Text fontWeight={'bold'} fontSize={'1.5em'}>{hostData.reviewsCount}</Text>
                         <Text>Reviews</Text>
                     </VStack>
@@ -256,7 +264,7 @@ function ExpandedListingGuest() {
 
                     <Spacer />
 
-                    <Button variant="solid" colorScheme={getColorScheme(hostData.hygieneGrade)} size="md" borderRadius="10px" cursor="default" >
+                    <Button variant="solid" colorScheme={getColorScheme(hostData.hygieneGrade)} onClick={handleReviewsClick} size="md" borderRadius="10px" cursor="pointer">
                         {hostData.hygieneGrade}
                     </Button>
 
