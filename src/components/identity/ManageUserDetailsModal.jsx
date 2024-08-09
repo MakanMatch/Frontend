@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import {
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
-    Button, Input, useToast, FormControl, FormLabel
+    Button, Input, useToast, FormControl, FormLabel,
+    HStack
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { reloadAuthToken } from "../../slices/AuthState";
@@ -13,6 +14,7 @@ const ManageUserDetails = ({ isOpen, onClose, userID, userType, fname, lname, us
     const dispatch = useDispatch();
     const showToast = configureShowToast(toast);
     const [isUploading, setIsUploading] = useState(false);
+    const [resettingEmailVerification, setResettingEmailVerification] = useState(false);
     const [formData, setFormData] = useState({ userID, userType, fname, lname, username, email, contactNum });
 
     const authToken = useSelector((state) => state.auth.authToken);
@@ -67,8 +69,45 @@ const ManageUserDetails = ({ isOpen, onClose, userID, userType, fname, lname, us
         setIsUploading(false);
     };
 
+    const handleResetEmailVerification = async () => {
+        if (!email) { return; }
+        setResettingEmailVerification(true);
+        server.post("/admin/userManagement/resetEmailVerification", { userID })
+            .then(res => {
+                dispatch(reloadAuthToken(authToken));
+                setResettingEmailVerification(false);
+                if (res.status == 200) {
+                    if (res.data && typeof res.data == "string" && res.data.startsWith("SUCCESS")) {
+                        showToast("Success", "Email verification reset successfully.", 3000, true, "success");
+                    } else {
+                        console.log("Failed to reset email verification; response: " + res.data);
+                        showToast("Something went wrong", "Failed to reset email verification. Please try again.", 3500, true, "error");
+                    }
+                } else {
+                    console.log("Non-200 status code response received when attempting to reset email verification; response: ", res.data);
+                    showToast("Something went wrong", "Failed to reset email verification. Please try again.", 3500, true, "error");
+                }
+            })
+            .catch(err => {
+                dispatch(reloadAuthToken(authToken));
+                setResettingEmailVerification(false);
+                if (err.response && err.response.data && typeof err.response.data == "string") {
+                    if (err.response.data.startsWith("UERROR")) {
+                        console.log("User error in resetting email verification; error: ", err.response.data);
+                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3500, true, "error");
+                    } else {
+                        console.log("Unexpected error in resetting email verification; error: ", err.response.data);
+                        showToast("Something went wrong", "Failed to reset email verification. Please try again.", 3500, true, "error");
+                    }
+                } else {
+                    console.log("Unexpected error in resetting email verification; error: ", err);
+                    showToast("Something went wrong", "Failed to reset email verification. Please try again.", 3500, true, "error");
+                }
+            })
+    }
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Edit Account Details</ModalHeader>
@@ -121,18 +160,25 @@ const ManageUserDetails = ({ isOpen, onClose, userID, userType, fname, lname, us
                     </FormControl>
                 </ModalBody>
                 <ModalFooter>
-                    <Button
-                        variant="MMPrimary"
-                        isLoading={isUploading}
-                        loadingText="Uploading..."
-                        mr={3}
-                        onClick={handleSubmit}
-                    >
-                        Save Changes
-                    </Button>
-                    <Button onClick={onClose}>
-                        Cancel
-                    </Button>
+                    <HStack spacing={"10px"}>
+                        <Button onClick={onClose}>
+                            Cancel
+                        </Button>
+                        {email && email.length > 0 && (
+                            <Button variant={"MMPrimary"} isLoading={resettingEmailVerification} loadingText={"Resetting..."} onClick={handleResetEmailVerification}>
+                                Reset Email Verification
+                            </Button>
+                        )}
+                        <Button
+                            variant="MMPrimary"
+                            isLoading={isUploading}
+                            loadingText="Saving..."
+                            mr={3}
+                            onClick={handleSubmit}
+                        >
+                            Save Changes
+                        </Button>
+                    </HStack>
                 </ModalFooter>
             </ModalContent>
         </Modal>

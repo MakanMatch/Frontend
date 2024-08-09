@@ -1,13 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
-import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Box, useToast, Center, Fade, Spinner, useMediaQuery, Card, Image, Stack, CardBody, Heading, Text, CardFooter, Button } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
+import ExpandedGoogleMaps from "../../components/listings/ExpandedGoogleMaps";
+import ListingCardOverlay from "../../components/listings/ListingCardOverlay";
+import server from "../../networking";
 
 const GoogleMapsPage = () => {
     const navigate = useNavigate();
@@ -34,12 +35,17 @@ const GoogleMapsPage = () => {
     }
 
     useEffect(() => {
-        // if location.state doesnt have the required data, navigate back to homepage and show a toast
         if (!listingID || !hostID || !images || !title || !shortDescription || !approxAddress || !portionPrice || !totalSlots || !latitude || !longitude || typeof flaggedForHygiene !== "boolean") {
             navigate("/");
             setTimeout(() => {
                 displayToast("Invalid Listing", "Please select a valid listing", "error", 3000, true);
             }, 200);
+        } else {
+            const impressionCooldownDatetime = localStorage.getItem("impressionCooldownDatetime");
+            if (!impressionCooldownDatetime || (new Date().getTime() - new Date(impressionCooldownDatetime).getTime() > 120000)) {
+                server.post("/listingAnalytics/updateImpression", { listingID: listingID });
+                localStorage.setItem("impressionCooldownDatetime", new Date().toISOString());
+            }
         }
     }, [])
 
