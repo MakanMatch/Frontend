@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Alert, AlertIcon, Box, Button, Spacer, useToast } from '@chakra-ui/react'
 import server from '../../networking'
 import configureShowToast from "../showToast";
-import { useDispatch } from "react-redux";
+import { reloadAuthToken } from "../../slices/AuthState";
+import { useDispatch, useSelector } from "react-redux";
 
 function EmailVerificationAlert({ email, userType, emailVerificationTime }) {
     const [cooldown, setCooldown] = useState(0);
     const toast = useToast();
     const showToast = configureShowToast(toast);
     const dispatch = useDispatch();
+    const { authToken } = useSelector((state) => state.auth);
 
     const calculateVerificationTime = () => {
         const verificationTime = new Date(emailVerificationTime);
@@ -22,7 +24,7 @@ function EmailVerificationAlert({ email, userType, emailVerificationTime }) {
     useEffect(() => {
         let timer;
         if (cooldown > 0) {
-            timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+            timer = setTimeout(() => setCooldown(prev => prev - 1), 1000);
         }
         return () => clearTimeout(timer);
     }, [cooldown]);
@@ -31,17 +33,27 @@ function EmailVerificationAlert({ email, userType, emailVerificationTime }) {
         server.post('/identity/emailVerification/send', { email })
             .then((res) => {
                 dispatch(reloadAuthToken(authToken))
-                if (res.data && res.data.startsWith("SUCCESS")) {
+                if (res.data && typeof res.data == "string" && res.data.startsWith("SUCCESS")) {
                     setCooldown(30);
                     showToast('Verification email sent.', 'Check your email for the verification link.', 3000, true, 'success')
                 } else {
-                    showToast('Error.', res.data, 3000, true, 'error')
+                    showToast('Something went wrong', "Failed to resend email. Please try again.", 3000, true, 'error')
                 }
             })
             .catch((err) => {
                 dispatch(reloadAuthToken(authToken))
-                console.log(err)
-                showToast('Error', err.response?.data || 'Failed to send verification email.', 3000, true, 'error')
+                if (err.response && err.response.data && typeof err.response.data == "string") {
+                    if (err.response.data.startsWith("UERROR")) {
+                        console.log("User error occurred when resending email; response: " + err.response);
+                        showToast('Uh-oh!', err.response.data.substring("UERROR: ".length), 3500, true, 'error')
+                    } else {
+                        console.log("Failed to resend email; response: " + err.response);
+                        showToast('Something went wrong', 'Failed to resend email. Please try again.', 3500, true, 'error')
+                    }
+                } else {
+                    console.log("Unknown error occurred when resending email; error: " + err);
+                    showToast('Something went wrong', 'Failed to resend email. Please try again.', 3500, true, 'error')
+                }
             });
     }
 
@@ -61,7 +73,7 @@ function EmailVerificationAlert({ email, userType, emailVerificationTime }) {
                     </>
                 )}
                 <Spacer />
-                <Button size={"sm"} onClick={handleResendEmail} isDisabled={cooldown > 0}>
+                <Button colorScheme="yellow" variant={"outline"} size={"sm"} onClick={handleResendEmail} isDisabled={cooldown > 0}>
                     {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend verification email'}
                 </Button>
             </Alert>
