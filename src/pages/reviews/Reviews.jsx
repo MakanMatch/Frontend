@@ -146,17 +146,21 @@ function Reviews() {
                                 <VStack alignItems={{base: "center", md: "flex-start"}} spacing={0}>
                                     <Text fontSize={{ base: '2xl', md: '4xl' }}>{hostName}</Text>
                                     {flagged === true && (
-                                        <ScaleFade in>
-                                            <Badge
-                                                colorScheme="red"
-                                                variant="solid"
-                                                px={2}
-                                                py={0.5}
-                                                fontSize="xs"
-                                            >
-                                                Flagged
-                                            </Badge>
-                                        </ScaleFade>
+                                        <>
+                                            <Tooltip hasArrow label='Host has been flagged for poor hygiene.' bg='gray.100' color='black'>
+                                                <ScaleFade in>
+                                                    <Badge
+                                                        colorScheme="red"
+                                                        variant="solid"
+                                                        px={2}
+                                                        py={0.5}
+                                                        fontSize="xs"
+                                                    >
+                                                        Flagged
+                                                    </Badge>
+                                                </ScaleFade>
+                                            </Tooltip>
+                                        </>
                                     )}
                                 </VStack>
                             </Flex>

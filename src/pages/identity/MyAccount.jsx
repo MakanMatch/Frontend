@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, Heading, Text, Flex, Avatar, Button, Spinner, useToast, FormControl, FormLabel, Stack, 
     Editable, EditableInput, EditablePreview, AlertDialog, AlertDialogOverlay, AlertDialogHeader, AlertDialogBody,
     AlertDialogFooter, AlertDialogContent, useDisclosure, Popover, PopoverTrigger, PopoverContent, PopoverArrow, 
-    PopoverCloseButton, IconButton, Input, ButtonGroup, useMediaQuery
+    PopoverCloseButton, IconButton, Input, ButtonGroup, Alert, AlertIcon
 } from "@chakra-ui/react";
 import { EditIcon, } from "@chakra-ui/icons";
 import { logout } from "../../slices/AuthState";
@@ -15,6 +15,7 @@ import ChangePassword from "../../components/identity/ChangePassword";
 import EditPicture from "../../components/identity/EditPicture";
 import ChangeAddress from "../../components/identity/ChangeAddress";
 import { reloadAuthToken } from '../../slices/AuthState';
+import EmailVerificationAlert from "../../components/identity/EmailVerificationAlert";
 
 const MyAccount = () => {
     const navigate = useNavigate();
@@ -492,18 +493,18 @@ const MyAccount = () => {
                 </Box>
 
                 <PopoverForm />
+
+                {!accountInfo.emailVerified && (
+                    <EmailVerificationAlert email={accountInfo.email} userType={user.userType} emailVerificationTime={accountInfo.emailVerificationTime}/>
+                )}
                 
-                <Stack direction={["column", "row"]} p={4} mt={5} justifyContent="space-between" width="100%" spacing={"20px"}>
+                <Stack direction={["column", "row"]} p={4} mt={4} justifyContent="space-between" width="100%" spacing={"20px"} height={"50vh"}>
                     <Box p={2} width={"50%"}>
                         <FormControl mb={2}>
                             <FormLabel>Username</FormLabel>
                             <Editable
                                 value={accountInfo.username}
                                 onChange={(value) => setAccountInfo({ ...accountInfo, username: value })}
-                                // onChange={(value) => {           
-                                //     const { username, ...rest } = accountInfo;
-                                //     setAccountInfo({ ...rest, username: value });
-                                // }}
                                 textAlign={"left"}
                                 borderColor={"black"}
                                 borderWidth={1}
@@ -519,10 +520,6 @@ const MyAccount = () => {
                             <Editable
                                 value={accountInfo.email}
                                 onChange={(value) => setAccountInfo({ ...accountInfo, email: value })}
-                                // onChange={(value) => {
-                                //     const { email, ...rest } = accountInfo;
-                                //     setAccountInfo({ ...rest, email: value });
-                                // }}
                                 textAlign={"left"}
                                 borderColor={"black"}
                                 borderWidth={1}
@@ -542,10 +539,6 @@ const MyAccount = () => {
                                 value={accountInfo.contactNum || ''} 
                                 placeholder="Enter your contact number"
                                 onChange={(value) => setAccountInfo({ ...accountInfo, contactNum: value })}
-                                // onChange={(value) => {
-                                //     const { contactNum, ...rest } = accountInfo;
-                                //     setAccountInfo({ ...rest, contactNum: value });
-                                // }}
                                 textAlign={"left"}
                                 borderColor={"black"}
                                 borderWidth={1}
@@ -577,7 +570,7 @@ const MyAccount = () => {
                             </Flex>
                         </FormControl>
 
-                        <Button variant={"MMPrimary"} mb={4} onClick={(toggleChangePassword)} position="absolute" bottom={0} left={6}>
+                        <Button variant={"MMPrimary"} mt={5} onClick={(toggleChangePassword)} position="absolute" bottom={0} left={6}>
                             Change Password
                         </Button>
 
@@ -585,12 +578,6 @@ const MyAccount = () => {
                     </Box>
 
                     <Box p={2} width={"22%"}>
-                        <FormControl mb={2}>
-                            <FormLabel>Favorite Cuisine</FormLabel>
-                            <Text textAlign={"left"} pt={2} pb={2}>
-                                {accountInfo.favCuisine || "None"}
-                            </Text>
-                        </FormControl>
 
                         <FormControl mb={2}>
                             <FormLabel>Meals Matched</FormLabel>
@@ -621,7 +608,7 @@ const MyAccount = () => {
                                 </>
                             )}
 
-                            <Button colorScheme="red" onClick={handleDeleteAccount} borderRadius={10} position="absolute" bottom={0} mb={4}>
+                            <Button colorScheme="red" onClick={handleDeleteAccount} borderRadius={10} position="absolute" bottom={0}>
                                 Delete Account
                             </Button>
                         </Flex>

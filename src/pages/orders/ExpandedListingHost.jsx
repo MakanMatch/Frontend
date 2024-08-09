@@ -110,6 +110,13 @@ function ExpandedListingHost() {
         let formattedString = datetime.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', weekday: 'short' })
         data.datetime = formattedString
 
+        const currentDate = new Date()
+        if (datetime.getDate() >= currentDate.getDate() && datetime.getMonth() >= currentDate.getMonth() && datetime.getFullYear() >= currentDate.getFullYear()) {
+            data.complete = true
+        } else {
+            data.complete = false
+        }
+
         data.images = data.images.split("|")
 
         const revenue = data.guests.map(g => g.Reservation.portions * data.portionPrice).reduce((t, n) => t + n, 0)
@@ -328,9 +335,11 @@ function ExpandedListingHost() {
                                 <Button variant="MMPrimary" onClick={handleSaveChanges}>Save Changes</Button>
                             </SlideFade>
                         )}
-                        <Button variant="link" onClick={handleEditListing} color="blue" textDecoration="underline">
-                            {editListing ? "Manage Guests" : "Edit Listing"}
-                        </Button>
+                        {listingData.complete && (
+                            <Button variant="link" onClick={handleEditListing} color="blue" textDecoration="underline">
+                                {editListing ? "Manage Guests" : "Edit Listing"}
+                            </Button>
+                        )}
                     </VStack>
                 </GridItem>
                 {/*Edit Listing*/}
@@ -378,7 +387,7 @@ function ExpandedListingHost() {
                         </GridItem>
 
                         <GridItem colSpan={{ base: 3, md: 1 }} mt={3}>
-                            <ReservationSettingsCard listingID={listingID} listingPublished={listingPublished} paymentImage={hostPaymentImage} togglePublished={togglePublished} setEditListing={setEditListing} pricePerPortion={pricePerPortion} guestSlots={guestSlots} minGuests={listingData.guests.map(g => g.Reservation.portions).reduce((t, n) => t + n, 0)} handleSettingsChange={handleSettingsChange} />
+                            <ReservationSettingsCard listingID={listingID} listingPublished={listingPublished} paymentImage={hostPaymentImage} togglePublished={togglePublished} setEditListing={setEditListing} pricePerPortion={pricePerPortion} guestSlots={guestSlots} minGuests={listingData.guests.map(g => g.Reservation.portions).reduce((t, n) => t + n, 0)} handleSettingsChange={handleSettingsChange} listingCompleted={listingData.complete} />
                         </GridItem>
 
                         <UploadNewImageModal isOpen={isOpen} handleClose={handleClose} handleFileSubmission={handleFileSubmission} isUploading={isUploading} uploadImage={uploadImage} />
