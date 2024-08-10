@@ -26,6 +26,7 @@ function Reviews() {
     const [hostHygieneGrade, setHostHygieneGrade] = useState(0);
     const [flagged, setFlagged] = useState(false);
     const [stateRefresh, refreshState] = useState(false);
+    const [initialDataLoaded, setInitialDataLoaded] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const location = useLocation();
     const [searchParams] = useSearchParams();
@@ -67,6 +68,7 @@ function Reviews() {
                 setHostHygieneGrade(response.data.hygieneGrade);
                 setFlagged(response.data.flaggedForHygiene);
                 setHostReviewsCount(response.data.reviewsCount);
+                setInitialDataLoaded(true);
             }
         } catch (error) {
             dispatch(reloadAuthToken(authToken))
@@ -112,7 +114,7 @@ function Reviews() {
         }
     }, [hostID, stateRefresh]);
 
-    if (!loaded || !hostID) {
+    if (!loaded || !hostID || !initialDataLoaded) {
         return <Spinner />
     }
 

@@ -112,6 +112,9 @@ function ChatUi() {
                         dispatch(changeAuthToken(receivedMessage.token))
                         localStorage.setItem('jwt', receivedMessage.token);
                     }
+                } else if (receivedMessage.event == "connected") {
+                    console.log(receivedMessage.message || "No connected message received.")
+                    return;
                 }
             }
 
