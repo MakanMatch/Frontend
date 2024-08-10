@@ -182,7 +182,7 @@ function ChatUi() {
 
         ws.current.onerror = (error) => {
             showToast("Something went wrong", "Your connection was interrupted. Try refreshing.", 1500, true)
-            console.log("WebSocket error occurred: " + error)
+            console.log("WebSocket error occurred: ", error);
         };
 
         ws.current.onclose = () => {
