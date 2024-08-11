@@ -53,8 +53,8 @@ function ConfirmReservation() {
     }
 
     const processHostData = (data) => {
-        const { userID, username, foodRating, hygieneGrade } = data
-        return { userID, username, foodRating, hygieneGrade }
+        const { userID, fname, lname, username, foodRating, hygieneGrade } = data
+        return { userID, fname, lname, username, foodRating, hygieneGrade }
     }
 
     const fetchListingDetails = async (id) => {

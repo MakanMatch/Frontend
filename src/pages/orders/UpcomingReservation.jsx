@@ -174,7 +174,9 @@ function UpcomingReservation() {
                             <Text><strong>Guests</strong></Text>
                             <Text>{`${currentReservation.currentGuest.fname} ${currentReservation.currentGuest.lname} (You)`}</Text>
                             {currentReservation.listing.guests.map(guest => guest.userID != user.userID && (
-                                <Button key={guest.username} onClick={() => handleGuestClick(guest.userID)} variant={"link"} color={"primaryColour"}>{`${guest.fname} ${guest.lname}`}</Button>
+                                <>
+                                    <Button key={guest.username} onClick={() => handleGuestClick(guest.userID)} variant={"link"} color={"primaryColour"}>{`${guest.fname} ${guest.lname}`}</Button><br />
+                                </>
                             ))}
                         </Box>
                     </Box>

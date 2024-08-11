@@ -107,7 +107,7 @@ function ConfirmReserveCard({
 
                 <Text>Payment to be made 6 hours prior to meal.</Text>
                 <br />
-                <Text>You may contact <strong>Jamie</strong> any time via chat for questions upon reservation.</Text>
+                <Text>You may contact <strong>{hostData.fname}</strong> any time via chat for questions upon reservation.</Text>
                 <HStack mt={'15px'}>
                     <Text>Portion:</Text>
                     <Spacer />
