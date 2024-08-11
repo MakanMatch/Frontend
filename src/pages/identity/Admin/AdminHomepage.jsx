@@ -29,7 +29,7 @@ function AdminHomepage() {
                     newData.systemAnalytics.lastBoot
                 ).toLocaleString("en-US", {
                     dateStyle: "long",
-                    timeStyle: "short",
+                    timeStyle: "long",
                 });
             }
         }
@@ -40,55 +40,30 @@ function AdminHomepage() {
     const fetchMetrics = async () => {
         // This is a silent request. If it's successful, and only when it is, the system analytics dashboard section will be rendered. Other scenarios will only be logged to the console.
 
-        server
-            .get("/admin/getMetrics")
+        server.get("/admin/getMetrics")
             .then((res) => {
                 dispatch(reloadAuthToken(authToken));
                 if (res.status == 200) {
                     setSystemMetrics(processMetricsData(res.data));
                     setAnalyticsAvailable(true);
                 } else {
-                    console.log(
-                        "Non-200 status code response received in obtaining system metrics; response: ",
-                        res.data
-                    );
+                    console.log("Non-200 status code response received in obtaining system metrics; response: ", res.data);
                 }
             })
             .catch((err) => {
                 dispatch(reloadAuthToken(authToken));
                 setAnalyticsAvailable(false);
-                if (
-                    err.response &&
-                    err.response.data &&
-                    typeof err.response.data == "string"
-                ) {
-                    if (
-                        err.response.data ==
-                        "ERROR: Analytics are not available at this time."
-                    ) {
-                        console.log(
-                            "System analytics are not available currently."
-                        );
+                if (err.response && err.response.data && typeof err.response.data == "string") {
+                    if (err.response.data == "ERROR: Analytics are not available at this time.") {
+                        console.log("System analytics are not available currently.");
                     } else if (err.response.data.startsWith("UERROR")) {
-                        console.log(
-                            "User error occurred in retrieving system metrics; error: ",
-                            err.response.data
-                        );
-                        showToast(
-                            "Something went wrong",
-                            err.response.data.substring("UERROR: ".length)
-                        );
+                        console.log("User error occurred in retrieving system metrics; error: ", err.response.data);
+                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length));
                     } else {
-                        console.log(
-                            "Error occurred in retrieving system analytics; error: ",
-                            err.response.data
-                        );
+                        console.log("Error occurred in retrieving system analytics; error: ", err.response.data);
                     }
                 } else {
-                    console.log(
-                        "Error in retrieving system analytics; error: ",
-                        err
-                    );
+                    console.log("Error in retrieving system analytics; error: ", err);
                 }
             });
     };
@@ -209,8 +184,8 @@ function AdminHomepage() {
                 >
                     <Card p={5} mt={10}>
                         <VStack alignItems={"center"} mb={"30px"}>
-                            <Heading fontSize={"25px"} textAlign={"center"} mt={-5} p={3}>System Dashboard</Heading>
-                            <Button variant={"MMPrimary"} onClick={onOpen} maxW={"200px"}>View Requests</Button>
+                            <Heading fontSize={"25px"} textAlign={"center"} p={3}>System Dashboard</Heading>
+                            <Button variant={"link"} color={"primaryColour"} onClick={onOpen} maxW={"200px"}>View Requests</Button>
                         </VStack>
                         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }}>
                             <Box textAlign="center" mb={10}>
