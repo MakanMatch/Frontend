@@ -58,7 +58,7 @@ function AdminHomepage() {
                         console.log("System analytics are not available currently.");
                     } else if (err.response.data.startsWith("UERROR")) {
                         console.log("User error occurred in retrieving system metrics; error: ", err.response.data);
-                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length));
+                        showToast("Something went wrong", err.response.data.substring("UERROR: ".length), 3000, true, "error");
                     } else {
                         console.log("Error occurred in retrieving system analytics; error: ", err.response.data);
                     }
