@@ -120,6 +120,10 @@ function UpcomingReservation() {
         }
     }, [loaded, user])
 
+    const handleGuestClick = (guestID) => {
+        navigate(`/guestInfo?userID=${guestID}`);
+    }
+
     if (!dataLoaded) {
         return <Spinner />;
     }
@@ -170,7 +174,7 @@ function UpcomingReservation() {
                             <Text><strong>Guests</strong></Text>
                             <Text>{`${currentReservation.currentGuest.fname} ${currentReservation.currentGuest.lname} (You)`}</Text>
                             {currentReservation.listing.guests.map(guest => guest.userID != user.userID && (
-                                <Text key={guest.username}>{`${guest.fname} ${guest.lname}`}</Text>
+                                <Button key={guest.username} onClick={() => handleGuestClick(guest.userID)} variant={"link"} color={"primaryColour"}>{`${guest.fname} ${guest.lname}`}</Button>
                             ))}
                         </Box>
                     </Box>

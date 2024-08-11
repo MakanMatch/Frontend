@@ -9,9 +9,8 @@ import authReducer from './slices/AuthState.js'
 import MainTheme from './themes/MainTheme.js'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './Layout.jsx'
-import UserContext from './context/UserContext.js'
 import Version from './pages/Version.jsx'
-import Home from './pages/Home.jsx'
+import Health from './pages/Health.jsx'
 import ExpandedListingHost from './pages/orders/ExpandedListingHost.jsx'
 import FoodListingsPage from './pages/Listings/FoodListingsPage'
 import CreateAccount from './pages/identity/CreateAccount'
@@ -56,6 +55,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Routes>
                     <Route path='/' element={<Layout />}>
                         <Route index element={<FoodListingsPage />} />
+                        <Route path={'health'} element={<Health />} />
                         <Route path={'version'} element={<Version />} />
                         <Route path={"expandedListingHost"} element={<ExpandedListingHost />} />
                         <Route path={"expandedListingGuest"} element={<ExpandedListingGuest />} />
