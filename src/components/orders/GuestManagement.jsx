@@ -186,13 +186,16 @@ function GuestManagement({
                                         justifyContent={{ base: 'center', md: 'left' }}
                                     >
                                         <Box>
-                                            <Text
-                                                fontWeight="bold"
+                                            <Button
+                                                variant={'link'}
+                                                color={'black'}
+                                                fontWeight={'bold'}
                                                 fontSize={{ base: "md", md: "lg" }}
                                                 textAlign={textAlign}
+                                                onClick={() => navigate(`/guestInfo?userID=${guest.userID}`)}
                                             >
                                                 {guest.fname} {guest.lname}
-                                            </Text>
+                                            </Button>
                                         </Box>
                                         {guest.Reservation.markedPaid && !isBaseScreen && (
                                             <Box>
