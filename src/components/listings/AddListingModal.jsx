@@ -254,8 +254,8 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
     useEffect(() => {
         if (totalSlots > 10) {
             displayToast(
-                "Too many Slots!",
-                "You can prepare for a maximum of 10 slots",
+                "Too many portions!",
+                "You can prepare for a maximum of 10 portions",
                 "error",
                 2500,
                 true
@@ -366,7 +366,7 @@ const AddListingModal = ({ isOpen, onOpen, onClose, closeSidebar }) => {
                             </FormControl>
 
                             <FormControl flex="1" ml={2} isRequired>
-                                <FormLabel>No. of Slots (Max: 10)</FormLabel>
+                                <FormLabel>No. of Portions (Max: 10)</FormLabel>
                                     <NumberInput
                                         step={1}
                                         min={1}
