@@ -93,8 +93,11 @@ function AdminHomepage() {
             <Heading mt={10} mb={5}>
                 Hi, {user.username}!
             </Heading>
+            {user.role && (
+                <Text size={"md"} fontWeight={"bold"} mb={10}>{user.role}</Text>
+            )}
             <Text size={"md"} mb={5}>
-                Welcome Back to MakanMatch!
+                Welcome back to MakanMatch!
             </Text>
             <Box display="flex" justifyContent="space-between">
                 <Card width="32%">
