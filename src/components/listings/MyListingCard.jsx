@@ -27,8 +27,18 @@ const MyListingCard = ({
     useEffect(() => {
         const currentDate = new Date()
         const listingDate = new Date(listingDatetime)
-        if (listingDate.getDate() >= currentDate.getDate() && listingDate.getMonth() >= currentDate.getMonth() && listingDate.getFullYear() >= currentDate.getFullYear()) {
-            setArchived(false);
+        if (listingDate.getFullYear() >= currentDate.getFullYear()) {
+            if (listingDate.getMonth() > currentDate.getMonth()) {
+                setArchived(false);
+            } else if (listingDate.getMonth() == currentDate.getMonth()) {
+                if (listingDate.getDate() >= currentDate.getDate()) {
+                    setArchived(false);
+                } else {
+                    setArchived(true);
+                }
+            } else {
+                setArchived(true);
+            }
         } else {
             setArchived(true);
         }

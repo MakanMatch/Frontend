@@ -111,10 +111,20 @@ function ExpandedListingHost() {
         data.datetime = formattedString
 
         const currentDate = new Date()
-        if (datetime.getDate() >= currentDate.getDate() && datetime.getMonth() >= currentDate.getMonth() && datetime.getFullYear() >= currentDate.getFullYear()) {
-            data.complete = true
+        if (datetime.getFullYear() >= currentDate.getFullYear()) {
+            if (datetime.getMonth() > currentDate.getMonth()) {
+                data.complete = false;
+            } else if (datetime.getMonth() == currentDate.getMonth()) {
+                if (datetime.getDate() >= currentDate.getDate()) {
+                    data.complete = false;
+                } else {
+                    data.complete = true;
+                }
+            } else {
+                data.complete = true;
+            }
         } else {
-            data.complete = false
+            data.complete = true;
         }
 
         data.images = data.images.split("|")
@@ -335,7 +345,7 @@ function ExpandedListingHost() {
                                 <Button variant="MMPrimary" onClick={handleSaveChanges}>Save Changes</Button>
                             </SlideFade>
                         )}
-                        {listingData.complete && (
+                        {!listingData.complete && (
                             <Button variant="link" onClick={handleEditListing} color="blue" textDecoration="underline">
                                 {editListing ? "Manage Guests" : "Edit Listing"}
                             </Button>

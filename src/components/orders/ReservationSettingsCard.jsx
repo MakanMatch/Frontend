@@ -97,6 +97,8 @@ function ReservationSettingsCard({ listingID, listingPublished, paymentImage, to
                 <CardFooter>
                     <VStack width={"100%"}>
                         {listingCompleted ? (
+                            <Text color={"green"}>Hooray! Your listing is completed!</Text>
+                        ) : (
                             <>
                                 {!paymentImage ? (
                                     <>
@@ -112,8 +114,6 @@ function ReservationSettingsCard({ listingID, listingPublished, paymentImage, to
                                     </>
                                 )}
                             </>
-                        ) : (
-                            <Text color={"green"}>Hooray! Your listing is completed!</Text>
                         )}
                         <Button variant={'ghost'} colorScheme='red' fontWeight={"bold"} borderRadius={"10px"} width={"100%"} onClick={onOpen}>Delete Listing</Button>
                     </VStack>
