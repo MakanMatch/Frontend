@@ -117,7 +117,7 @@ The integrations come together across the system's backend and frontend to deliv
 
 MakanMatch's frontend uses an intelligent page-load and API communication workflow to enhance efficiency, user feedback and the instantaneousness of data flow.
 
-Page loads go through a custom design cycle:
+Page loads go through a custom-designed lifecycle:
 - Authentication state first initialises and tries to understand if there's any user logged in, and decrypts their information
 - A custom networking interface intercepts requests and responses sent by on-page functionality to ensure data consistency and state updates
 - View-is-a-function-of-state principle is followed consistently, resulting in a seamless, coherent and smooth user flow throughout all tasks
