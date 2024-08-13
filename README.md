@@ -13,7 +13,7 @@
 ![Google SMTP](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)
 ![OpenAI API](https://img.shields.io/badge/ChatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white)
 
-# MakanMatch Backend
+# MakanMatch Frontend
 
 ![Screenshot 2024-08-13 at 12 04 58 AM](https://github.com/user-attachments/assets/b0af8b22-8c62-4df2-80e6-3282552df823)
 
