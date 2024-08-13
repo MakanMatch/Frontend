@@ -43,7 +43,7 @@ Developed with ❤️ by the MakanMatch team, consisting of:
 - [MakanMatch in Images](#makanmatch-in-images)
 - [Integrations](#integrations)
 - [Frontend Technologies](#frontend-technologies)
-- [Backend Repository](https://github.com/MakanMatch/Frontend)
+- [Backend Repository](https://github.com/MakanMatch/Backend)
 
 # MakanMatch in Images
 
