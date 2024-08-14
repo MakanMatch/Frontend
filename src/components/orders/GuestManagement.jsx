@@ -307,7 +307,7 @@ function GuestManagement({
                                 >
                                     <Text fontWeight="bold" fontSize={{ base: "lg", md: "xl" }}>Cancelled within six hours</Text>
                                     <Text fontSize={{ base: "sm", md: "md" }}>
-                                        {guest.fname} {guest.lname} just cancelled their reservation. Check that they've paid the cancellation fee of <span style={{ color: "red", fontWeight: "bold" }}>{Extensions.formatCurrency(guest.Reservation.totalPrice * 2)}</span> and confirm cancellation.
+                                        {guest.fname} {guest.lname} just cancelled their reservation. Check that they've paid the cancellation fee of <span style={{ color: "red", fontWeight: "bold" }}>{Extensions.formatCurrency(import.meta.env.VITE_CANCELLATION_FEE_MODE === "five" ? 5: guest.Reservation.totalPrice * 2)}</span> and confirm cancellation.
                                     </Text>
 
                                 </Box>

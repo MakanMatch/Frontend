@@ -139,7 +139,7 @@ function ChargeableCancellation() {
 
                             <div>
                                 <Text fontWeight={"bold"}>Cancellations 6 hours prior to a reservation are chargeable.</Text>
-                                <Text>If you wish to cancel, you must pay a <span style={{ color: "red", fontWeight: "bold" }}>{Extensions.formatCurrency(currentReservation.totalPrice * 2)}</span> cancellation fee to the host.</Text>
+                                <Text>If you wish to cancel, you must pay a <span style={{ color: "red", fontWeight: "bold" }}>{Extensions.formatCurrency(import.meta.env.VITE_CANCELLATION_FEE_MODE === "five" ? 5: currentReservation.totalPrice * 2)}</span> cancellation fee to the host.</Text>
                             </div>
 
                             <div>

@@ -170,7 +170,7 @@ function ManageReservationSection({ currentReservation, setCurrentReservation, s
                             <Box display={"flex"} justifyContent={"center"} flexDir={"column"} mt={"20px"} alignItems={"center"}>
                                 <BsClockFill color={"#f2ed46"} size={'50px'} onClick={toggleMarkedPaid} />
                                 <Heading size={"lg"} mt={"20px"}>Pending Cancellation</Heading>
-                                <Text mt={"10px"}>You have paid the <strong>{Extensions.formatCurrency(currentReservation.totalPrice * 2)}</strong> cancellation fee to {currentReservation.listing.Host.fname}.</Text>
+                                <Text mt={"10px"}>You have paid the <strong>{Extensions.formatCurrency(import.meta.env.VITE_CANCELLATION_FEE_MODE === "five" ? 5: currentReservation.totalPrice * 2)}</strong> cancellation fee to {currentReservation.listing.Host.fname}.</Text>
                                 <Text mt={"10px"}>The host needs to check your fee payment and confirm the cancellation.</Text>
                                 <Button variant={'link'} color={'primaryColour'} fontSize={'small'} mt={"10px"} onClick={() => navigate("/chat")}>Inform them here.</Button>
                             </Box>
