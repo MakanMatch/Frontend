@@ -46,7 +46,7 @@ function ChargeableCancellation() {
                 setTimeout(() => {
                     setCancelling(false)
                     if (res.status == 200 && res.data && typeof res.data == "string" && res.data.startsWith("SUCCESS")) {
-                        showToast("Reservation cancelled successfully!", "You have successfully cancelled your reservation. We're sorry to see you go! 😢", 5000, true, "success")
+                        showToast("Reservation cancelled successfully!", "The host has been notified of your chargeable cancellation request. Inform them to speed up your cancellation.", 5000, true, "success")
                         navigate("/reservations/upcoming")
                         return;
                     } else {
