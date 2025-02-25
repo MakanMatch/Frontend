@@ -5,7 +5,7 @@ import configureShowToast from '../../components/showToast';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Extensions from '../../extensions';
-import placeholderImage from '../../assets/placeholderImage.svg';
+import placeholderImage from '../../../public/assets/placeholderImage.svg';
 import { reloadAuthToken } from '../../slices/AuthState';
 import server from '../../networking';
 

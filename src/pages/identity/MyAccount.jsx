@@ -79,12 +79,12 @@ const MyAccount = () => {
 
     const bannerStyles = {
         guest: {
-            backgroundImage: "url('/src/assets/GuestBanner.png')",
+            backgroundImage: "url('assets/GuestBanner.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
         },
         host: {
-            backgroundImage: "url('/src/assets/HostBanner.jpg')",
+            backgroundImage: "url('assets/HostBanner.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
         },

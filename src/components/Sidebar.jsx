@@ -4,7 +4,7 @@ import { CalendarIcon, ChatIcon } from '@chakra-ui/icons'
 import { BsQuestionCircle } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import Logo from '../assets/Logo.png'
+import Logo from '../../public/assets/Logo.png';
 import AddListingModal from './listings/AddListingModal';
 import configureShowToast from "../components/showToast"
 import { FaRegClipboard } from 'react-icons/fa';

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import server from '../../networking'
 import configureShowToast from '../../components/showToast'
-import placeholderImage from '../../assets/placeholderImage.svg'
+import placeholderImage from '../../../public/assets/placeholderImage.svg';
 import ReserveCard from '../../components/orders/ReserveCard'
 import { useDispatch, useSelector } from 'react-redux'
 import { reloadAuthToken } from '../../slices/AuthState'

@@ -74,7 +74,7 @@ function EmailVerification() {
                                 Verify your email
                             </Heading>
                             <Image
-                                src= '/src/assets/EmailVerificationImage.png'
+                                src= 'assets/EmailVerificationImage.png'
                                 alt="Email verification"
                                 objectFit="cover"
                                 mt={-10}

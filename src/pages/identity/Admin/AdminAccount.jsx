@@ -386,7 +386,7 @@ function AdminAccount() {
         <>
             <Box justifyContent={'center'} display={'flex'}>
                 <Box 
-                    backgroundImage={'/src/assets/AdminBanner.jpg'}
+                    backgroundImage={'assets/AdminBanner.jpg'}
                     width="65vw"
                     height="25vh"
                     position="relative"

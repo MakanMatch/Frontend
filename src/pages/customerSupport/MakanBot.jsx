@@ -1,5 +1,5 @@
 import { Box, Card, CardBody, Heading, Text, Image, CardFooter, FormControl, Input, useMediaQuery, useToast } from '@chakra-ui/react';
-import Logo from '../../assets/Logo.png';
+import Logo from '../../../public/assets/Logo.png';
 import { FaPaperPlane } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { reloadAuthToken } from '../../slices/AuthState';

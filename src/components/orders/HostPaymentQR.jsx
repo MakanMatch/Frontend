@@ -5,7 +5,7 @@ import server from '../../networking';
 import { useSelector, useDispatch } from 'react-redux';
 import { reloadAuthToken } from '../../slices/AuthState';
 import configureShowToast from '../../components/showToast';
-import placeholderImage from '../../assets/placeholderImage.svg';
+import placeholderImage from '../../../public/assets/placeholderImage.svg';
 
 function HostPaymentQR({ 
     hostID,

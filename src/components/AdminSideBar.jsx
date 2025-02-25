@@ -4,7 +4,7 @@ import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHea
 } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import Logo from '../assets/Logo.png'
+import Logo from '../../public/assets/Logo.png';
 import configureShowToast from "../components/showToast"
 import { BsPeople } from 'react-icons/bs';
 import { BiSolidReport } from 'react-icons/bi';

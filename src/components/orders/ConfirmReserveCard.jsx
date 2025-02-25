@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardFooter, CardHeader, Heading, HStack, Image,
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import placeholderImage from '../../assets/placeholderImage.svg'
+import placeholderImage from '../../../public/assets/placeholderImage.svg';
 import { StarIcon } from '@chakra-ui/icons';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { FaClock } from 'react-icons/fa';

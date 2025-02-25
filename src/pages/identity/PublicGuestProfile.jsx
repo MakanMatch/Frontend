@@ -86,7 +86,7 @@ function PublicGuestProfile() {
             </Button>
             <Box justifyContent={'center'} display={'flex'}>    
                 <Box 
-                    backgroundImage={'/src/assets/GuestBanner.png'}
+                    backgroundImage={'assets/GuestBanner.png'}
                     width="65vw"
                     height="25vh"
                     position="relative"

@@ -1,6 +1,6 @@
 import { Box, Image, Tooltip, CloseButton } from '@chakra-ui/react'
 import React from 'react'
-import placeholderImage from '../../assets/placeholderImage.svg'
+import placeholderImage from '../../../public/assets/placeholderImage.svg'
 
 function HostListingImage({ index, listingImages, imgURL, imgName, handleDeleteImage }) {
     const imageBox = (

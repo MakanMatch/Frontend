@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import configureShowToast from '../showToast';
 import { reloadAuthToken } from '../../slices/AuthState';
 import MealDetailsSection from './MealDetailsSection';
-import placeholderImage from '../../assets/placeholderImage.svg';
+import placeholderImage from '../../../public/assets/placeholderImage.svg';
 import { BsClockFill, BsFillCheckCircleFill } from 'react-icons/bs';
 
 function ManageReservationSection({ currentReservation, setCurrentReservation, setReservations, refreshReservations, inSixHourWindow, dataLoaded, mode = "full" }) {
